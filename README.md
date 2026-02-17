@@ -1,2 +1,2 @@
 # kanbear
-A companion for kanboard
+A little companion for kanboard
