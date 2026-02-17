@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu de Scripts</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+    }
+
+    #sidebar {
+      width: 200px;
+      background-color: #f0f0f0;
+      padding: 20px;
+      box-sizing: border-box;
+      border-right: 1px solid #ccc;
+      overflow-y: auto;
+    }
+
+    #content {
+      flex: 1;
+      padding: 20px;
+      overflow: auto;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: black;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    #script-container {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
+</head>
+<body>
+  <div id="sidebar">
+    <h2>Scripts</h2>
+    <button onclick="loadPage('report.html')">report</button>
+    <button onclick="loadPage('board.html')">Dummy futur use board</button>
+  </div>
+
+  <div id="content">
+    <div id="script-container"></div>
+  </div>
+
+  <script>
+    loadPage('report.html')
+    // Fonction pour charger un script dans la partie principale
+
+    function loadScript(scriptUrl) {
+      const container = document.getElementById('script-container');
+      container.innerHTML = `<h2>Chargement du script : ${scriptUrl}</h2>`;
+
+      // Créer un élément script et l'ajouter au DOM
+      const script = document.createElement('script');
+      script.src = scriptUrl;
+      script.onload = function() {
+        console.log(`Script ${scriptUrl} chargé avec succès.`);
+      };
+      script.onerror = function() {
+        container.innerHTML += `<p style="color: red;">Erreur de chargement du script : ${scriptUrl}</p>`;
+      };
+      container.appendChild(script);
+    }
+
+    // Fonction pour charger une page HTML dans un iframe
+    function loadPage(pageUrl) {
+      const container = document.getElementById('script-container');
+      container.innerHTML = `<iframe src="${pageUrl}"></iframe>`;
+    }
+  </script>
+</body>
+</html>

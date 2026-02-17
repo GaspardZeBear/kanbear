@@ -1,0 +1,33 @@
+{
+  "name": "kanbear",
+  "version": "1.0.0",
+  "description": "A little companion for kanboard",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GaspardZeBear/kanbear.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/GaspardZeBear/kanbear/issues"
+  },
+  "homepage": "https://github.com/GaspardZeBear/kanbear#readme",
+  "devDependencies": {
+    "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "axios": "^1.13.5",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "vite-plugin-static-copy": "^3.2.0"
+  }
+}
