@@ -7,6 +7,7 @@ export default defineConfig({
 
   //*-----------------------------
     plugins: [
+      /*
     viteStaticCopy({
       targets: [
         {
@@ -15,16 +16,12 @@ export default defineConfig({
         }
       ]
     })
+      */
   ],
   //----*/
 
   resolve: {
     alias: {
-      // Alias pour Three.js
-      'three': resolve('./node_modules/three'),
-      'three/*': resolve('./node_modules/three/src/*'),
-      'three/examples/jsm/controls/OrbitControls': resolve('./node_modules/three/examples/jsm/controls/OrbitControls.js'),
-      'three/examples/jsm/*': resolve('./node_modules/three/examples/jsm/*'),
       // Alias pour vos propres modules
       '@': resolve(__dirname, './src'),
       '@classes': resolve(__dirname, './src/classes'),
@@ -41,14 +38,13 @@ export default defineConfig({
       input: {
         // Points d'entrée : utilisez des chemins relatifs à la racine du projet
         main: resolve(__dirname, 'index.html'),
-        basic: resolve(__dirname, 'basic.html'),
-        snowball: resolve(__dirname, 'snowball.html'),
+        report: resolve(__dirname, 'report.html')
       },
       output: {
         entryFileNames: `assets/js/[name].js`,
         chunkFileNames: `assets/js/[name].js`,
         //assetFileNames: `assets/[ext]/[name].[ext]`,
-        //--------
+        /*
         assetFileNames: (assetInfo) => {
           if (assetInfo.name.endsWith('.jpg') || assetInfo.name.endsWith('.png')) {
             //return `assets/textures/[name][extname]`; // Place les images dans assets/textures/
@@ -56,7 +52,7 @@ export default defineConfig({
           }
           return `assets/[ext]/[name][extname]`; // Autres fichiers
         },
-        //*
+        */
       },
     },
   },
@@ -67,6 +63,5 @@ export default defineConfig({
   },
 
     optimizeDeps: {
-    include: ['three'],
   },
 });

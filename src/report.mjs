@@ -6,7 +6,7 @@ document.getElementById('loadReport').addEventListener('click', async () => {
   const swimlaneRegex = new RegExp(document.getElementById('swimlaneFilter').value);
   const taskRegex = new RegExp(document.getElementById('taskFilter').value);
   const columnRegex = new RegExp(document.getElementById('columnFilter').value);
- 
+
   //let kanboardReporter=new KanboardReporter(
   //    'http://A6.mshome.net:1961/kanboard-1.2.50/jsonrpc.php',
   //    'Basic YWRtaW46YWRtaW4='
