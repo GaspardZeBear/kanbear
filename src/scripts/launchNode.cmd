@@ -1,38 +1,30 @@
 @echo off
-title Node.js
+set SERVER=RPCGateway.mjs
+title %SERVER%
 
 set NODE_PATH="C:\Program Files\nodejs\node.exe"
 set NODE_SCRIPT_PATH="C:\Users\gzbze\kanbear\src\scripts"
 
 if not exist %NODE_PATH% (
-    echo Erreur : Node.js introuvable à %NODE_PATH%
+    echo Error Node not found %NODE_PATH%
     pause
     exit /b 1
 )
 
 if not exist %NODE_SCRIPT_PATH% (
-    echo Erreur : Script Node.js introuvable à %NODE_SCRIPT_PATH%
+    echo Error :  %NODE_SCRIPT_PATH% not found
     pause
     exit /b 1
 )
 
-echo Démarrage du serveur Node.js...
 cd %NODE_SCRIPT_PATH%
-set SERVER=RPCGateway.mjs
+
 set PORT=3001
-echo Démarrage du serveur Node.js... %SERVER%
-start "Node.js" /min %NODE_PATH% %SERVER% %PORT%
-
-echo Tous les serveurs sont démarrés.
-echo - Node.js : %NODE_SCRIPT_PATH% : 
-echo Appuyez sur une touche pour arrêter tous les serveurs...
-
+echo Node.js : %SERVER% /min %NODE_PATH% %SERVER% %PORT% 
+start %SERVER% /min %NODE_PATH% %SERVER% %PORT%
 pause
 
-:: Arrêter les serveurs
-echo Arrêt des serveurs en cours...
-
-taskkill /f /im node.exe >nul 2>&1
-
-echo Tous les serveurs sont arrêtés.
+echo %SERVER% shutting down
+taskkill /f /FI "WINDOWTITLE eq %SERVER%" /im node.exe >nul 2>&1
+echo %SERVER% stopped
 pause
