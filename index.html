@@ -1,113 +1,140 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kanbear</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      height: 100vh;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="module" src="src/index.mjs"></script>
+    <title>Kanbear</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
 
-    #sidebar {
-      width: 200px;
-      background-color: #f0f0f0;
-      padding: 20px;
-      box-sizing: border-box;
-      border-right: 1px solid #ccc;
-      overflow-y: auto;
-    }
+        .filters {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
 
-    #content {
-      flex: 1;
-      padding: 20px;
-      overflow: auto;
-    }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
 
-    button {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      background-color: black;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-    }
+        label {
+            font-weight: bold;
+        }
 
-    button:hover {
-      background-color: #45a049;
-    }
+        input[type="text"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 200px;
+            margin-right: 20px;
+        }
 
-    #script-container {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+        button {
+            padding: 10px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
 
+        button:hover {
+            background: #0056b3;
+        }
+
+        .content {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+        }
+
+        .results {
+            flex: 1;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #f2f2f2;
+        }
+    </style>
+    <script type="module" src="src/report.mjs"></script>
 </head>
+
 <body>
-  <div id="sidebar">
-    <h2>Scripts</h2>
-    <button onclick="loadPage('report.html')">report</button>
-    <button onclick="loadPage('board.html')">Dummy futur use board</button>
-  </div>
-  <!--
-  <div class="filters">
-    <label>Filtre Projet (Regex): <input type="text" id="projectFilter" placeholder=".*"></label>
-    <label>Filtre Swimlane (Regex): <input type="text" id="swimlaneFilter" placeholder=".*"></label>
-    <label>Filtre Tâche (Regex): <input type="text" id="taskFilter" placeholder=".*"></label>
-    <label>Filtre Colonne (Regex): <input type="text" id="columnFilter" placeholder=".*"></label>
-    <button id="loadReport">Charger le Rapport</button>
-  </div>
-  -->
-  <div id="content">
-    <div id="script-container"></div>
-  </div>
+    <h1>Outil de Filtrage JSON</h1>
 
-  <script>
-    loadPage('report.html')
-    // Fonction pour charger un script dans la partie principale
+    <!-- Filtres Regex -->
+    <div class="filters">
+        <div class="filter-group">
+            <label for="filterKey">Filtre Clé (Regex):</label>
+            <input type="text" id="filterKey" placeholder=".*">
+        </div>
+        <div class="filter-group">
+            <label for="filterValue">Filtre Valeur (Regex):</label>
+            <input type="text" id="filterValue" placeholder=".*">
+        </div>
+    </div>
 
-    function loadScript(scriptUrl) {
-      const container = document.getElementById('script-container');
-      container.innerHTML = `<h2>Chargement du script : ${scriptUrl}</h2>`;
+    
+        <!-- Affichage du JSON -->
+        <div class="message" id="message">
+            <p>Aucun fichier JSON chargé.</p>
+        </div>
+    <!-- Boutons d'Actions -->
+    <div class="content">
+        <div class="actions">
+            <button id="loadJson">Load report</button>
+            <button id="showDetails">Show details</button>
+            <button id="filterJson">Filtrer JSON</button>
+            <button id="countItems">Compter Éléments</button>
+            <button id="extractKeys">Extraire Clés</button>
+            <button id="clearData">Effacer Données</button>
+        </div>
 
-      // Créer un élément script et l'ajouter au DOM
-      const script = document.createElement('script');
-      script.src = scriptUrl;
-      script.onload = function() {
-        console.log(`Script ${scriptUrl} chargé avec succès.`);
-      };
-      script.onerror = function() {
-        container.innerHTML += `<p style="color: red;">Erreur de chargement du script : ${scriptUrl}</p>`;
-      };
-      container.appendChild(script);
-    }
 
-    // Fonction pour charger une page HTML dans un iframe
-    function XloadPage(pageUrl) {
-      const container = document.getElementById('script-container');
-      container.innerHTML = `<iframe src="${pageUrl}"></iframe>`;
-    }
+        <!-- Résultats -->
+        <div class="results" id="results">
+        </div>
+    </div>
 
-    // Fonction pour charger une page HTML dans un iframe
-    function loadPage(pageUrl) {
-      const container = document.getElementById('script-container');
-      container.innerHTML = `<iframe src="${pageUrl}"></iframe>`;
-    }
-  </script>
+    
 </body>
+
 </html>
