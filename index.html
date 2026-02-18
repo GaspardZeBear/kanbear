@@ -64,7 +64,15 @@
     <button onclick="loadPage('report.html')">report</button>
     <button onclick="loadPage('board.html')">Dummy futur use board</button>
   </div>
-
+  <!--
+  <div class="filters">
+    <label>Filtre Projet (Regex): <input type="text" id="projectFilter" placeholder=".*"></label>
+    <label>Filtre Swimlane (Regex): <input type="text" id="swimlaneFilter" placeholder=".*"></label>
+    <label>Filtre Tâche (Regex): <input type="text" id="taskFilter" placeholder=".*"></label>
+    <label>Filtre Colonne (Regex): <input type="text" id="columnFilter" placeholder=".*"></label>
+    <button id="loadReport">Charger le Rapport</button>
+  </div>
+  -->
   <div id="content">
     <div id="script-container"></div>
   </div>
@@ -87,6 +95,12 @@
         container.innerHTML += `<p style="color: red;">Erreur de chargement du script : ${scriptUrl}</p>`;
       };
       container.appendChild(script);
+    }
+
+    // Fonction pour charger une page HTML dans un iframe
+    function XloadPage(pageUrl) {
+      const container = document.getElementById('script-container');
+      container.innerHTML = `<iframe src="${pageUrl}"></iframe>`;
     }
 
     // Fonction pour charger une page HTML dans un iframe

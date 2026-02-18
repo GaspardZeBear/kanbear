@@ -7,6 +7,7 @@ document.getElementById('loadReport').addEventListener('click', async () => {
   const taskRegex = new RegExp(document.getElementById('taskFilter').value);
   const columnRegex = new RegExp(document.getElementById('columnFilter').value);
 
+  // to be tried when served from static : else CORS problem
   //let kanboardReporter=new KanboardReporter(
   //    'http://A6.mshome.net:1961/kanboard-1.2.50/jsonrpc.php',
   //    'Basic YWRtaW46YWRtaW4='
@@ -38,15 +39,27 @@ function renderTable(projects) {
 
   projects.forEach((project) => {
     console.log(project)
-
+    let jpd={}
+    try {
+      jpd=JSON.parse(project.description)
+      //console.log('parse OK')
+    } catch (e) {
+      console.log(e)
+      //jpd={}
+    }
+    //console.log('desc:',project.description,'jpd',jpd)
+    const projectDescription = ( jpd && jpd.style !== undefined) ? { style :jpd.style } : { style: "background-color:yellow" };
+    //let projectDescription = ( JSON.parse(project.description)?.color ) || { color: 'blue' }
+    console.log(jpd, projectDescription)
     Object.entries(project.swimlanes).forEach(([key, swimlane]) => {
       Object.entries(swimlane.tasks).forEach(([key, task]) => {
         const row = document.createElement('tr');
+
         row.innerHTML = `
-              <td>${project.name}</td>
+              <td style="${projectDescription.style}">${project.name}</td>
               <td>${swimlane.name}</td>
               <td>${task.title}</td>
-              <td>${project.columns[task.column_id].title}</td>
+              <td style="background-color:${task.color_id}">${project.columns[task.column_id].title}</td>
               <td>${new Date(1000 * task.date_moved).toUTCString()}</td>
             `;
         tbody.appendChild(row);

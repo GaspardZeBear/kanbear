@@ -1,5 +1,5 @@
 @echo off
-title Lancement des serveurs Nginx, PHP-CGI et Node.js
+title Node.js
 
 set NODE_PATH="C:\Program Files\nodejs\node.exe"
 set NODE_SCRIPT_PATH="C:\Users\gzbze\kanbear\src\scripts"
