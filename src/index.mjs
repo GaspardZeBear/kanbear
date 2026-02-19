@@ -1,5 +1,6 @@
 // Variable globale pour stocker le JSON
 import { renderTable } from './report.mjs'
+import { KanboardFilter } from './classes/KanboardFilter.mjs'
 let globalJsonData = null;
 
 // Charger un fichier JSON
@@ -8,7 +9,7 @@ document.getElementById('loadJson').addEventListener('click', async () => {
         const response = await fetch('http://localhost:3001/api/report');
         globalJsonData = await response.json();
 
-        document.getElementById('results').textContent = JSON.stringify(globalJsonData);
+        document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(globalJsonData, null, 2) + '</pre>';
         document.getElementById('message').innerHTML = '<p>Loaded</p>';
     } catch (error) {
         document.getElementById('message').innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
@@ -17,17 +18,19 @@ document.getElementById('loadJson').addEventListener('click', async () => {
 
 
 // Filtrer le JSON
+function getFiltersMap() {
+    const projectFilter = document.getElementById('projectFilter').value
+    const swimlaneFilter = document.getElementById('swimlaneFilter').value
+    const taskFilter = document.getElementById('taskFilter').value
+    const columnFilter = document.getElementById('columnFilter').value
+    return({projectFilter:projectFilter,swimlaneFilter,swimlaneFilter,taskFilter:taskFilter,columnFilter:columnFilter})
+}
 document.getElementById('filterJson').addEventListener('click', () => {
     if (!globalJsonData) {
         document.getElementById('message').innerHTML = '<p style="color: red;">Aucun JSON chargé.</p>';
         return;
     }
-
-    const keyRegex = new RegExp(document.getElementById('filterKey').value);
-    const valueRegex = new RegExp(document.getElementById('filterValue').value);
-
-    const filteredData = filterJson(globalJsonData, keyRegex, valueRegex);
-    displayResults(filteredData);
+    //document.getElementById('results').innerHTML = callFilter()
 });
 
 // Compter les éléments
@@ -41,16 +44,14 @@ document.getElementById('countItems').addEventListener('click', () => {
     document.getElementById('results').innerHTML = `<p>Nombre total d'éléments: ${count}</p>`;
 });
 
-// Compter les éléments
+//------------------- showDetails --------------------------------------
 document.getElementById('showDetails').addEventListener('click', () => {
     console.log(globalJsonData)
     if (!globalJsonData) {
         document.getElementById('message').innerHTML = '<p style="color: red;">No report loadec</p>';
         return;
     }
-
-    renderTable(globalJsonData, 'results');
-    //document.getElementById('results').innerHTML = `<p>Nombre total d'éléments: ${count}</p>`;
+    renderTable(globalJsonData, 'results',getFiltersMap());
 });
 
 // Extraire les clés
