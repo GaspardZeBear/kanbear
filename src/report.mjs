@@ -1,4 +1,5 @@
 import { KanboardFilter } from "./classes/KanboardFilter.mjs";
+import { formatDuration } from "./utils/formatDuration.mjs";
 
 
 function renderTable(projects, element, filtersMap) {
@@ -7,11 +8,12 @@ function renderTable(projects, element, filtersMap) {
   const thead = document.createElement('thead')
   const hrow = document.createElement('tr')
   hrow.innerHTML = `
-        <th>Projet</th>
+        <th>Project</th>
         <th>Swimlane</th>
-        <th>Tâche</th>
-        <th>Colonne</th>
-        <th>Depuis</th>
+        <th>Task</th>
+        <th>Column</th>
+        <th>Since</th>
+        <th>Duration</th>
       `
   thead.appendChild(hrow)
   table.appendChild(thead)
@@ -29,17 +31,18 @@ function renderTable(projects, element, filtersMap) {
       console.log(e)
     }
     const projectDescription = (jpd && jpd.style !== undefined) ? { style: jpd.style } : { style: "background-color:yellow" };
-      console.log(jpd, projectDescription)
     Object.entries(project.swimlanes).forEach(([key, swimlane]) => {
       Object.entries(swimlane.tasks).forEach(([key, task]) => {
         if (kanboardFilter.keep(project.name, swimlane.name, task.title, project.columns[task.column_id].title)) {
           const row = document.createElement('tr');
+          const duration=formatDuration( (Date.now()/1000-task.date_moved) )
           row.innerHTML = `
               <td style="${projectDescription.style}">${project.name}</td>
               <td>${swimlane.name}</td>
               <td>${task.title}</td>
               <td style="background-color:${task.color_id}">${project.columns[task.column_id].title}</td>
-              <td>${new Date(1000 * task.date_moved).toUTCString()}</td>
+              <td>${new Date(1000 * task.date_moved).toUTCString().slice(0,-4)}</td>
+              <td>${duration}</td>
             `;
           tbody.appendChild(row);
         }
