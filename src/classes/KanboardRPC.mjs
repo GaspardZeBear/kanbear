@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-axios.defaults.timeout = 3000; 
+axios.defaults.timeout = 3000;
 
 class KanboardRPC {
 
@@ -32,6 +32,18 @@ class KanboardRPC {
       console.error(`callKanboard() Error when calling  ${method}:`, error.response?.data || error.message);
       throw error;
     }
+  }
+  //-------------------------------------------------------------------------------
+  async getAllTags() {
+    return this.callKanboard('getAllTags', {
+    });
+  }
+
+  //-------------------------------------------------------------------------------
+  async getTags(projectId) {
+    return this.callKanboard('getTagsByProject', {
+      project_id: projectId,
+    });
   }
 
   //-------------------------------------------------------------------------------

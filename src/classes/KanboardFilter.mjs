@@ -8,8 +8,8 @@ class KanboardFilter {
   }
 
   keep(pName, sName, tTitle, cName) {
-    console.log('kanboardFilter.keep()',pName, sName, tTitle, cName)
-    console.log('kanboardFilter.keep() pName',this.pRx,this.pRx.test(pName))
+    //console.log('kanboardFilter.keep()',pName, sName, tTitle, cName)
+    //console.log('kanboardFilter.keep() pName',this.pRx,this.pRx.test(pName))
     return (
       (pName ? this.pRx.test(pName):true)
       && (sName ? this.sRx.test(sName):true)
