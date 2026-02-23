@@ -1,29 +1,58 @@
 import { KanboardFilter } from "./classes/KanboardFilter.mjs";
 import { formatDuration, dateToString, getDurationFromNow } from "./utils/formatDuration.mjs";
 
-function processTask(id) {
-  console.log(" task id ",id)
+//-----------------------------------------------------------------------------------------
+function dueShiftTask(projects, ref) {
+  console.log(ref)
+  let [projectId, swimlaneId, taskId] = ref.split(':')
+  let columnId = projects[projectId].swimlanes[swimlaneId].tasks[taskId].column_id
+  let task=projects[projectId].swimlanes[swimlaneId].tasks[taskId]
+  task.date_due += 10000
+  //console.log(projects[projectId].swimlanes)
+  //console.log(projects[projectId].swimlanes[swimlaneId].tasks)
+  //console.log(projects[projectId].swimlanes[swimlaneId].tasks[taskId])
+  console.log(" columnId ", columnId)
+  console.log(" columnId ", projects[projectId].columns[columnId])
+  console.log(" task id ", projects[projectId].columns[columnId].title)
 }
 
-function renderTable(projects, element, filtersMap) {
-  const result = document.getElementById(element);
-  //const button=document.createElement('button')
-  //  <button onclick="myFunction()">Click me</button> ')
+
+//-----------------------------------------------------------------------------------------
+function moveTask(projects, ref) {
+  console.log("move ",ref)
+  let [projectId, swimlaneId, taskId] = ref.split(':')
+}
+
+//-----------------------------------------------------------------------------------------
+function closeTask(projects, ref) {
+  console.log(" close ",ref)
+  let [projectId, swimlaneId, taskId] = ref.split(':')
+}
+
+//----------------------------------------------------------------
+function createDueShiftButton(projects,name,func) {
   const button = document.createElement('button')
-  // Set the button text to 'Can you click me?'
-  button.innerText = 'Shift'
-  button.id = 'mainButton'
-  // Attach the "click" event to your button
+  button.innerText = name
+  button.id = `${name}Button`
   button.addEventListener('click', () => {
-    // When there is a "click"
-    // it shows an alert in the browser
     const checkedBoxes = document.querySelectorAll('.taskCheckbox:checked');
     const checkedIds = Array.from(checkedBoxes).map(checkbox => checkbox.id);
-    alert(checkedIds.join(','))
-    checkedIds.forEach( (id) => processTask(id) )
+    //alert(checkedIds.join(','))
+    checkedIds.forEach((ref) => func(projects, ref))
   }
   )
-  document.body.appendChild(button)
+  return(button)
+}
+
+//-----------------------------------------------------------------
+function renderTable(projects, element, filtersMap) {
+  const result = document.getElementById(element);
+  const dueShiftButton = createDueShiftButton(projects,'dueShift',dueShiftTask)
+  const moveButton = createDueShiftButton(projects,'moveTask',moveTask)
+  const closeButton = createDueShiftButton(projects,'closeTask',closeTask)
+
+
+  document.body.appendChild(dueShiftButton)
   const table = document.createElement('table')
   const thead = document.createElement('thead')
   const hrow = document.createElement('tr')
@@ -44,8 +73,8 @@ function renderTable(projects, element, filtersMap) {
 
   const kanboardFilter = new KanboardFilter(filtersMap)
 
-  projects.forEach((project) => {
-    console.log(project)
+  projects.forEach((project, projectIndex) => {
+    //console.log(project)
     let jpd = {}
     try {
       jpd = JSON.parse(project.description)
@@ -60,7 +89,7 @@ function renderTable(projects, element, filtersMap) {
           const row = document.createElement('tr');
           const duration = formatDuration((Date.now() / 1000 - task.date_moved))
           row.innerHTML = `
-              <td><input type="checkbox" name="tasks" id="${task.id}" class="taskCheckbox"/></td>
+              <td><input type="checkbox" name="tasks" id="${projectIndex}:${swimlane.id}:${task.id}" class="taskCheckbox"/></td>
               <td style="${projectDescription.style}">${project.name}</td>
               <td>${swimlane.name}</td>
               <td>${task.title}</td>
@@ -76,7 +105,9 @@ function renderTable(projects, element, filtersMap) {
     });
     table.appendChild(tbody)
     //document.getElementById('results').replaceChildren(table)
-    result.replaceChildren(button)
+    result.replaceChildren(dueShiftButton)
+    result.appendChild(moveButton)
+    result.appendChild(closeButton)
     result.appendChild(table)
   });
 }
