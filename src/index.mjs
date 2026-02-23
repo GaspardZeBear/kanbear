@@ -1,6 +1,7 @@
 // Variable globale pour stocker le JSON
 import { renderTable } from './report.mjs'
 import { KanboardFilter } from './classes/KanboardFilter.mjs'
+import { KanboardListPanel } from './classes/KanboardListPanel.mjs';
 let globalJsonData = null;
 
 // Charger un fichier JSON
@@ -51,7 +52,8 @@ document.getElementById('showDetails').addEventListener('click', () => {
         document.getElementById('message').innerHTML = '<p style="color: red;">No report loadec</p>';
         return;
     }
-    renderTable(globalJsonData, 'results',getFiltersMap());
+    //renderTable(globalJsonData, 'results',getFiltersMap());
+    new KanboardListPanel(globalJsonData, 'results',getFiltersMap()).render()
 });
 
 // Extraire les clés
