@@ -8,13 +8,13 @@ class KanboardListPanel {
     this.kanboardFilter = new KanboardFilter(filtersMap)
     this.buttons = {}
     this.table = undefined
-    }
+  }
 
   //-----------------------------------------------------------------------------------------
   dueShiftTask(ref) {
     console.log(self)
     console.log(this.projects)
-    let [projectId, swimlaneId, taskId] = ref.split(':')
+    let [name, projectId, swimlaneId, taskId] = ref.split(':')
     let columnId = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId].column_id
     let task = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId]
     task.date_due += 10000
@@ -63,6 +63,7 @@ class KanboardListPanel {
     result.appendChild(this.buttons['move'])
     result.appendChild(this.buttons['close'])
     result.appendChild(this.table)
+    this.setPopup()
   }
 
   //-----------------------------------------------------------------
@@ -75,12 +76,12 @@ class KanboardListPanel {
 
   //-----------------------------------------------------------------
   createTable() {
-
     this.table = document.createElement('table')
     const thead = document.createElement('thead')
     const hrow = document.createElement('tr')
     hrow.innerHTML = `
-  <th>sel</th>
+        <th>Sel</th>
+        <th>Action</th>
         <th>Project</th>
         <th>Swimlane</th>
         <th>Task</th>
@@ -109,8 +110,10 @@ class KanboardListPanel {
           if (this.kanboardFilter.keep(project.name, swimlane.name, task.title, project.columns[task.column_id].title)) {
             const row = document.createElement('tr');
             const duration = formatDuration((Date.now() / 1000 - task.date_moved))
+            const ref = `${projectIndex}:${swimlane.id}:${task.id}`
             row.innerHTML = `
-              <td><input type="checkbox" name="tasks" id="${projectIndex}:${swimlane.id}:${task.id}" class="taskCheckbox"/></td>
+              <td><input type="checkbox" name="tasks" id="checkbox:${ref}" class="taskCheckbox"/></td>
+              <td><a href="#" class="taskCommentLink" id="commentLink:${ref}">c</a></td>
               <td style="${projectDescription.style}">${project.name}</td>
               <td>${swimlane.name}</td>
               <td>${task.title}</td>
@@ -128,6 +131,38 @@ class KanboardListPanel {
       //document.getElementById('results').replaceChildren(table)
 
     });
+  }
+
+  setPopup() {
+    let currentTaskId = null;
+    document.querySelectorAll('.taskCommentLink').forEach(link => {
+      console.log(link)
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        currentTaskId = this.getAttribute('id');
+        document.getElementById('popupTaskId').textContent = currentTaskId;
+        popup.style.display = 'flex';
+        // Charger les notes existantes si disponibles (exemple)
+        // taskNotes.value = getNotesForTask(currentTaskId);
+      });
+    });
+    document.querySelector('.close').addEventListener('click', function () {
+      popup.style.display = 'none';
+    });
+    const popup = document.getElementById('editPopup');
+    document.getElementById('editPopup').addEventListener('click', function (e) {
+      if (e.target === popup) {
+        popup.style.display = 'none';
+      }
+    });
+    document.getElementById('saveNotes').addEventListener('click', function () {
+      const notes = document.getElementById('taskNotes').value;
+      alert(`Comment registered  ${currentTaskId}: ${notes}`);
+      // Ici, vous pouvez envoyer les données au serveur via fetch()
+      // saveNotes(currentTaskId, notes);
+      popup.style.display = 'none';
+    });
+
   }
 
 
