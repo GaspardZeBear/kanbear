@@ -32,23 +32,26 @@
             <label for="columnFilter">Column</label>
             <input type="text" id="columnFilter" placeholder=".*">
         </div>
+        <div class="filter-group">
+            <label for="assigneeFilter">Assignee</label>
+            <input type="text" id="assigneeFilter" placeholder=".*">
+        </div>
 
     </div>
 
 
     <!-- Affichage du JSON -->
     <div class="message" id="message">
-        <p>Aucun fichier JSON chargé.</p>
+        <p>No projects loaded.</p>
     </div>
     <!-- Boutons d'Actions -->
     <div class="content">
         <div class="actions">
-            <button id="loadJson">Load report</button>
-            <button id="showDetails">Show details</button>
-            <button id="filterJson">Filtrer JSON</button>
-            <button id="countItems">Compter Éléments</button>
-            <button id="extractKeys">Extraire Clés</button>
-            <button id="clearData">Effacer Données</button>
+            <button id="loadJson">Load projects</button>
+            <button id="showDetails">List</button>
+            <button id="showBoard">Board</button>
+            <button id="showEvents">Events</button>
+            <button id="clearProjects">Clear projects</button>
         </div>
         <!-- Popup (masquée par défaut) -->
         <div id="editPopup" class="popup">

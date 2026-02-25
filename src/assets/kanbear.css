@@ -43,7 +43,7 @@ body {
 
         button {
             padding: 10px;
-            background: #007BFF;
+            background: grey;
             color: white;
             border: none;
             border-radius: 4px;
@@ -52,7 +52,7 @@ body {
         }
 
         button:hover {
-            background: #0056b3;
+            background: darkGrey;
         }
 
         .content {

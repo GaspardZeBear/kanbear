@@ -10,20 +10,29 @@ class KanboardListPanel {
     this.table = undefined
   }
 
-  //-----------------------------------------------------------------------------------------
-  dueShiftTask(ref) {
-    console.log(self)
-    console.log(this.projects)
+ //-----------------------------------------------------------------------------------------
+  getObjectsFromRef(ref) {
     let [name, projectId, swimlaneId, taskId] = ref.split(':')
     let columnId = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId].column_id
+    let project=this.projects[projectId]
     let task = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId]
+    let column = this.projects[projectId].columns[columnId]
+    return([name,project,column,task])
+  }
+
+  //-----------------------------------------------------------------------------------------
+  dueShiftTask(ref) {
+    //let [name, projectId, swimlaneId, taskId] = ref.split(':')
+    //let columnId = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId].column_id
+    //let task = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId]
+    const [name,project,column,task] = this.getObjectsFromRef(ref)
     task.date_due += 10000
     //console.log(projects[projectId].swimlanes)
     //console.log(projects[projectId].swimlanes[swimlaneId].tasks)
     //console.log(projects[projectId].swimlanes[swimlaneId].tasks[taskId])
-    console.log(" columnId ", columnId)
-    console.log(" columnId ", this.projects[projectId].columns[columnId])
-    console.log(" task id ", this.projects[projectId].columns[columnId].title)
+    //console.log(" columnId ", columnId)
+    //console.log(" columnId ", this.projects[projectId].columns[columnId])
+    //console.log(" task id ", this.projects[projectId].columns[columnId].title)
   }
 
   //-----------------------------------------------------------------------------------------
@@ -73,7 +82,6 @@ class KanboardListPanel {
     this.buttons['close'] = this.createButton('close', this.closeTask.bind(this))
   }
 
-
   //-----------------------------------------------------------------
   createTable() {
     this.table = document.createElement('table')
@@ -96,18 +104,19 @@ class KanboardListPanel {
     const tbody = document.createElement('tbody')
 
     this.projects.forEach((project, projectIndex) => {
-      //console.log(project)
       let jpd = {}
       try {
         jpd = JSON.parse(project.description)
-        //console.log('parse OK')
       } catch (e) {
         console.log(e)
       }
       const projectDescription = (jpd && jpd.style !== undefined) ? { style: jpd.style } : { style: "background-color:yellow" };
       Object.entries(project.swimlanes).forEach(([key, swimlane]) => {
         Object.entries(swimlane.tasks).forEach(([key, task]) => {
-          if (this.kanboardFilter.keep(project.name, swimlane.name, task.title, project.columns[task.column_id].title)) {
+          const keep=this.kanboardFilter.keep(project.name, swimlane.name, task.title, project.columns[task.column_id].title, project.users[task.owner_id].name)
+          console.log('keep =',keep)
+          if (keep) {
+            console.log('append to table')
             const row = document.createElement('tr');
             const duration = formatDuration((Date.now() / 1000 - task.date_moved))
             const ref = `${projectIndex}:${swimlane.id}:${task.id}`
@@ -128,19 +137,18 @@ class KanboardListPanel {
         })
       });
       this.table.appendChild(tbody)
-      //document.getElementById('results').replaceChildren(table)
-
     });
   }
 
+  //-----------------------------------------------------------------
   setPopup() {
-    let currentTaskId = null;
+    const self=this
     document.querySelectorAll('.taskCommentLink').forEach(link => {
-      console.log(link)
+      //console.log(link)
       link.addEventListener('click', function (e) {
         e.preventDefault();
-        currentTaskId = this.getAttribute('id');
-        document.getElementById('popupTaskId').textContent = currentTaskId;
+        const [name,project,column,task] = self.getObjectsFromRef(this.getAttribute('id'))
+        document.getElementById('popupTaskId').textContent = task.title;
         popup.style.display = 'flex';
         // Charger les notes existantes si disponibles (exemple)
         // taskNotes.value = getNotesForTask(currentTaskId);
@@ -157,7 +165,7 @@ class KanboardListPanel {
     });
     document.getElementById('saveNotes').addEventListener('click', function () {
       const notes = document.getElementById('taskNotes').value;
-      alert(`Comment registered  ${currentTaskId}: ${notes}`);
+      alert(`Comment registered : ${notes}`);
       // Ici, vous pouvez envoyer les données au serveur via fetch()
       // saveNotes(currentTaskId, notes);
       popup.style.display = 'none';

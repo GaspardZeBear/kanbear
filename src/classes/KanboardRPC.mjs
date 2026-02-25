@@ -53,6 +53,12 @@ class KanboardRPC {
   }
 
   //-------------------------------------------------------------------------------
+  async getAllUsers() {
+    return this.callKanboard('getAllUsers', {
+    });
+  }
+
+  //-------------------------------------------------------------------------------
   async getBoard(projectId) {
     let result = this.callKanboard('getBoard', { project_id: projectId });
     return (result)

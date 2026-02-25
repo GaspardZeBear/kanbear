@@ -20,6 +20,12 @@ class KanboardReporter {
     }
     //const tags = await this.kanboardRPC.getAllTags();
     //console.log(tags)
+    const users = await this.kanboardRPC.getAllUsers();
+    console.log(users)
+    let usersMap = {'0':'nobody'}
+    users.forEach((user) => {
+      usersMap[user.id] = { name: user.username }
+    })
     const tasksPromises = projects.map((project) => this.kanboardRPC.getTasks(project.id));
     const tasksResults = await Promise.all(tasksPromises);
     const columnsPromises = projects.map((project) => this.kanboardRPC.getColumns(project.id));
@@ -28,7 +34,7 @@ class KanboardReporter {
     const swimlanesResults = await Promise.all(swimlanesPromises);
     const tagsPromises = projects.map((project) => this.kanboardRPC.getTags(project.id));
     const tagsResults = await Promise.all(tagsPromises);
-    
+
     //-------------------------------------------------
     //Build a structure 
     // Projects []
@@ -39,11 +45,12 @@ class KanboardReporter {
     projects.forEach((project, index) => {
       project.swimlanes = {}
       project.columns = {}
-      project.tags=[]
+      project.tags = []
+      project.users = usersMap
 
       tagsResults[index].forEach((tag) => {
         console.log(tag)
-        project.tags.push(tag.name) 
+        project.tags.push(tag.name)
       })
       swimlanesResults[index].forEach((swimlane) => {
         project.swimlanes[swimlane.id] = swimlane
