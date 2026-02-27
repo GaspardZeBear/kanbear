@@ -1,0 +1,11 @@
+{
+    "gateway":"http://localhost:3001",
+    "dbpath":"../..",
+    "projects" : {
+        "Chambord2026Equipes" : {
+            "kind" : "resources",
+            "color" : "pink"
+        }
+
+    }
+}

@@ -4,10 +4,15 @@ import { KanboardFilter } from './classes/KanboardFilter.mjs'
 import { KanboardListPanel } from './classes/KanboardListPanel.mjs';
 let globalJsonData = null;
 
+const conf = await fetch('/kanbearConfig.json')
+console.log(conf)
+const kanboardConfig = await conf.json();
+console.log(kanboardConfig);
 // Charger un fichier JSON
 document.getElementById('loadJson').addEventListener('click', async () => {
     try {
-        const response = await fetch('http://localhost:3001/api/sql/report');
+        //const response = await fetch('http://localhost:3001/api/sql/report');
+        const response = await fetch(`${kanboardConfig.gateway}/api/sql/report`);
         globalJsonData = await response.json();
         document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(globalJsonData, null, 2) + '</pre>';
         document.getElementById('message').innerHTML = '<p>Loaded</p>';
@@ -24,11 +29,12 @@ function getFiltersMap() {
     const taskFilter = document.getElementById('taskFilter').value
     const columnFilter = document.getElementById('columnFilter').value
     const assigneeFilter = document.getElementById('assigneeFilter').value
-    return({projectFilter:projectFilter,
-        swimlaneFilter,swimlaneFilter,
-        taskFilter:taskFilter,
-        columnFilter:columnFilter,
-        assigneeFilter:assigneeFilter
+    return ({
+        projectFilter: projectFilter,
+        swimlaneFilter, swimlaneFilter,
+        taskFilter: taskFilter,
+        columnFilter: columnFilter,
+        assigneeFilter: assigneeFilter
     })
 }
 
@@ -40,7 +46,7 @@ document.getElementById('showDetails').addEventListener('click', () => {
         return;
     }
     //renderTable(globalJsonData, 'results',getFiltersMap());
-    new KanboardListPanel(globalJsonData, 'results',getFiltersMap()).render()
+    new KanboardListPanel(globalJsonData, 'results', getFiltersMap()).render()
 });
 
 
