@@ -13,7 +13,7 @@ document.getElementById('kanboard').href=`${kanboardConfig.kanboard.url}:${kanbo
 document.getElementById('loadJson').addEventListener('click', async () => {
     try {
         //const response = await fetch('http://localhost:3001/api/sql/report');
-        const response = await fetch(`${kanboardConfig.gateway}/api/sql/report`);
+        const response = await fetch(`${kanboardConfig.gateway.url}:${kanboardConfig.gateway.port}/api/sql/report`);
         globalJsonData = await response.json();
         document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(globalJsonData, null, 2) + '</pre>';
         document.getElementById('message').innerHTML = '<p>Loaded</p>';
