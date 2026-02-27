@@ -8,6 +8,7 @@ const conf = await fetch('/kanbearConfig.json')
 console.log(conf)
 const kanboardConfig = await conf.json();
 console.log(kanboardConfig);
+document.getElementById('kanboard').href=`${kanboardConfig.kanboard.url}:${kanboardConfig.kanboard.port}/${kanboardConfig.kanboard.uri}`
 // Charger un fichier JSON
 document.getElementById('loadJson').addEventListener('click', async () => {
     try {

@@ -5,6 +5,7 @@ import express from 'express'
 import { KanboardReporter } from '../classes/KanboardReporter.mjs';
 import { KanboardSqlReporter } from '../classes/KanboardSqlReporter.mjs';
 import cors from 'cors';
+import fs from 'fs'
 
 //const cors = require('cors');
 
@@ -23,12 +24,18 @@ app.use(express.static(path.join(__dirname, '')));
 app.use(cors());
 app.use(express.json());
 
+const configFile=process.argv[2]
+
+const config=JSON.parse(fs.readFileSync('../../kanbearConfig.json'))
+console.log(config)
+const port=config.gateway.port
+
 const reporter = new KanboardReporter(
       'http://A6.mshome.net:1961/kanboard-1.2.50/jsonrpc.php',
       'Basic YWRtaW46YWRtaW4='
 );
 const sqlReporter = new KanboardSqlReporter(
-      'dbfilename',false
+      config.sqliteFile,false
       );
 
 // Rediriger la racine vers index.html
@@ -60,7 +67,7 @@ app.get('/api/report', async (req, res) => {
   }
 });
 
-const port=process.argv[2]
+//const port=process.argv[2]
 app.listen(parseInt(port), () => {
   console.log('Serveur démarré sur http://localhost:',port);
 });

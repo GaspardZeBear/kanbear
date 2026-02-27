@@ -8,7 +8,8 @@ class KanboardSqlReporter {
   // PCST mean Projet, Swimlane, Column, Task !!!!!
   constructor(dbFile, runOnCreate) {
     console.log("KanboardSqlReporter.constructor() ", dbFile, "runOnCreate ", runOnCreate)
-    this.db = new DatabaseSync('db.sqlite', { readonly: true });
+    //this.db = new DatabaseSync('db.sqlite', { readonly: true });
+    this.db = new DatabaseSync(dbFile, { readonly: true });
     if (runOnCreate) {
       this.run()
     }
@@ -117,7 +118,7 @@ class KanboardSqlReporter {
 console.log(process.argv);
 if (process.argv[1].endsWith('KanboardSqlReporter.mjs')) {
   console.log("Mode 'main' : exécution directe");
-  new KanboardSqlReporter('xx', true)
+  new KanboardSqlReporter("C:\\nginx\\nginx-1.19.7\\html\\kanboard-1.2.50\\data\\db.sqlite", true)
 } else {
   console.log("Mode 'module' : importé depuis un autre fichier");
 }

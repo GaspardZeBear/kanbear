@@ -1,11 +1,24 @@
 {
-    "gateway":"http://localhost:3001",
-    "dbpath":"../..",
-    "projects" : {
-        "Chambord2026Equipes" : {
-            "kind" : "resources",
-            "color" : "pink"
+    "gateway": {
+        "url": "http://localhost",
+        "port": 3001
+    },
+    "kanboard": {
+        "url": "http://localhost",
+        "uri": "kanboard-1.2.50",
+        "rpc": "jsonrpc.php",
+        "port": 1961
+    },
+    "sqliteFile": "C:\\nginx\\nginx-1.19.7\\html\\kanboard-1.2.50\\data\\db.sqlite",
+    "projects": {
+        "Chambord2026Equipes": {
+            "kind": "resources",
+            "color": "pink",
+            "wording": {
+                "Swimlane" : "Poste",
+                "Task" : "Ressource",
+                "Column" : "Statut"
+            }
         }
-
     }
 }
