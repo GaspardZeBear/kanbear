@@ -56,8 +56,10 @@ class KanboardSqlReporter {
   async selectUsers() {
     console.log("KanboardSqlReporter.selectPCST()")
     let reqUsers = `select u.id uId,u.username uUsername, u.name uName from users as u`
-    let usersMap = { '0': 'nobody' }
+    //let usersMap = { '0': 'nobody' }
+    let usersMap={}
     const queryStmt = this.db.prepare(reqUsers);
+    
     for (let row of queryStmt.all()) {
       usersMap[row.uId] = { name: row.uName, username: row.uUsername }
     }
