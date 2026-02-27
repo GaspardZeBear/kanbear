@@ -98,6 +98,7 @@ class KanboardListPanel {
         <th>Duration</th>
         <th>Due</th>
         <th>Duration</th>
+        <th>Assignee</th>
       `
     thead.appendChild(hrow)
     this.table.appendChild(thead)
@@ -113,8 +114,12 @@ class KanboardListPanel {
       const projectDescription = (jpd && jpd.style !== undefined) ? { style: jpd.style } : { style: "background-color:yellow" };
       Object.entries(project.swimlanes).forEach(([key, swimlane]) => {
         Object.entries(swimlane.tasks).forEach(([key, task]) => {
-          const keep=this.kanboardFilter.keep(project.name, swimlane.name, task.title, project.columns[task.column_id].title, project.users[task.owner_id].name)
-          console.log('keep =',keep)
+          let userName=""
+          if ( project.users[task.owner_id] && project.users[task.owner_id].name ) {
+            userName=project.users[task.owner_id].name
+          }
+          const keep=this.kanboardFilter.keep(project.name, swimlane.name, task.title, project.columns[task.column_id].title, userName)
+          console.log("Owner ",project.users[task.owner_id]," ",userName)
           if (keep) {
             console.log('append to table')
             const row = document.createElement('tr');
@@ -131,6 +136,7 @@ class KanboardListPanel {
               <td>${getDurationFromNow(task.date_moved, true)}</td>
               <td>${dateToString(task.date_due)}</td>
               <td>${getDurationFromNow(task.date_due, true) ?? ''}</td>
+              <td>${userName}</td>
             `;
             tbody.appendChild(row);
           }

@@ -3,6 +3,7 @@
 //const KanboardReporter = require('./kanboardReporter');
 import express from 'express'
 import { KanboardReporter } from '../classes/KanboardReporter.mjs';
+import { KanboardSqlReporter } from '../classes/KanboardSqlReporter.mjs';
 import cors from 'cors';
 
 //const cors = require('cors');
@@ -26,11 +27,29 @@ const reporter = new KanboardReporter(
       'http://A6.mshome.net:1961/kanboard-1.2.50/jsonrpc.php',
       'Basic YWRtaW46YWRtaW4='
 );
+const sqlReporter = new KanboardSqlReporter(
+      'dbfilename',false
+      );
 
 // Rediriger la racine vers index.html
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '', 'index.html'));
 });
+
+app.get('/api/sql/report', async (req, res) => {
+   console.log("/api/sql/report invokated")
+  try {
+   
+    const report = await sqlReporter.getJsonReport();
+    console.log("api.get() ", report)
+    res.json(report);
+  } catch (error) {
+     console.log("/api/sql/report error ",error.message )
+    res.status(500).json({ error: error.message });
+  }
+   console.log("/api/sql/report done")
+});
+
 
 app.get('/api/report', async (req, res) => {
   try {
