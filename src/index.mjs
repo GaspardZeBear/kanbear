@@ -2,20 +2,15 @@
 import { renderTable } from './report.mjs'
 import { KanboardFilter } from './classes/KanboardFilter.mjs'
 import { KanboardListPanel } from './classes/KanboardListPanel.mjs';
-let globalJsonData = null;
+import { Kontext } from './classes/Kontext.mjs';
 
-const conf = await fetch('/kanbearConfig.json')
-console.log(conf)
-const kanboardConfig = await conf.json();
-console.log(kanboardConfig);
-document.getElementById('kanboard').href=`${kanboardConfig.kanboard.url}:${kanboardConfig.kanboard.port}/${kanboardConfig.kanboard.uri}`
-// Charger un fichier JSON
+await Kontext.loadConfig()
+document.getElementById('kanboard').href=Kontext.getKanboardUrl()
+
 document.getElementById('loadJson').addEventListener('click', async () => {
     try {
-        //const response = await fetch('http://localhost:3001/api/sql/report');
-        const response = await fetch(`${kanboardConfig.gateway.url}:${kanboardConfig.gateway.port}/api/sql/report`);
-        globalJsonData = await response.json();
-        document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(globalJsonData, null, 2) + '</pre>';
+        const response = await Kontext.loadJsonBulkData()
+        document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(Kontext.getJsonBulkData(), null, 2) + '</pre>';
         document.getElementById('message').innerHTML = '<p>Loaded</p>';
     } catch (error) {
         document.getElementById('message').innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
@@ -41,13 +36,13 @@ function getFiltersMap() {
 
 //------------------- showDetails --------------------------------------
 document.getElementById('showDetails').addEventListener('click', () => {
-    console.log(globalJsonData)
-    if (!globalJsonData) {
+    //console.log(Kontext.getJsonBulkData())
+    if (!Kontext.getJsonBulkData()) {
         document.getElementById('message').innerHTML = '<p style="color: red;">No report loadec</p>';
         return;
     }
     //renderTable(globalJsonData, 'results',getFiltersMap());
-    new KanboardListPanel(globalJsonData, 'results', getFiltersMap()).render()
+    new KanboardListPanel('results', getFiltersMap()).render()
 });
 
 

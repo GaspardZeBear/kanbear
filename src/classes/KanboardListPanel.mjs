@@ -1,9 +1,10 @@
 import { KanboardFilter } from "./KanboardFilter.mjs"
 import { formatDuration, dateToString, getDurationFromNow } from "../utils/formatDuration.mjs";
+import { Kontext } from "./Kontext.mjs";
 
 class KanboardListPanel {
-  constructor(projects, element, filtersMap) {
-    this.projects = projects
+  constructor(element, filtersMap) {
+    this.projects = Kontext.getJsonBulkData()
     this.htmlElement = element
     this.kanboardFilter = new KanboardFilter(filtersMap)
     this.buttons = {}
@@ -13,6 +14,8 @@ class KanboardListPanel {
  //-----------------------------------------------------------------------------------------
   getObjectsFromRef(ref) {
     let [name, projectId, swimlaneId, taskId] = ref.split(':')
+    console.log(ref)
+    console.log(this.projects[projectId].swimlanes[swimlaneId].tasks," --- ",taskId)
     let columnId = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId].column_id
     let project=this.projects[projectId]
     let task = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId]
