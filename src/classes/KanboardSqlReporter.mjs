@@ -94,6 +94,7 @@ class KanboardSqlReporter {
         projectsMap[row.pId].swimlanes[row.sId] = { id: row.sId, name: row.sName, tasks: {} }
       }
       projectsMap[row.pId].swimlanes[row.sId].tasks[row.tId] = {
+        id:row.tId,
         title: row.tTitle,
         column_id: row.cId,
         date_moved: row.tMoved,
