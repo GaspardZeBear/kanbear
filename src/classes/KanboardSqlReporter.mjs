@@ -28,12 +28,16 @@ class KanboardSqlReporter {
         p.id pId,
 	      p.name pName,
         p.description pDescription,
-	      s.id sId,
+        s.id sId,
 	      s.name sName,
+        s.description sDescription,
  	      c.id cId,
 	      c.title cTitle,
+        c.position cPosition,
+        c.description cDescription,
         t.id tId,
 	      t.title tTitle,
+        t.description tDescription,
         t.owner_id tOwnerId,
         t.color_id tColor,
 	      t.date_moved tMoved,
@@ -81,6 +85,7 @@ class KanboardSqlReporter {
       if (!projectsMap[row.pId]) {
         projectsMap[row.pId] = {}
         projectsMap[row.pId].name = row.pName
+        projectsMap[row.pId].id = row.pId
         projectsMap[row.pId].description = row.pDescription
         projectsMap[row.pId].swimlanes = {}
         projectsMap[row.pId].columns = {}
@@ -88,13 +93,14 @@ class KanboardSqlReporter {
         projectsMap[row.pId].users = usersMap
       }
       if (!projectsMap[row.pId].columns[row.cId]) {
-        projectsMap[row.pId].columns[row.cId] = { id: row.cId, title: row.cTitle }
+        projectsMap[row.pId].columns[row.cId] = { id: row.cId, title: row.cTitle ,description: row.cDescription, position: row.cPosition}
       }
       if (!projectsMap[row.pId].swimlanes[row.sId]) {
-        projectsMap[row.pId].swimlanes[row.sId] = { id: row.sId, name: row.sName, tasks: {} }
+        projectsMap[row.pId].swimlanes[row.sId] = { id: row.sId, name: row.sName, description: row.sDescription, tasks: {} }
       }
       projectsMap[row.pId].swimlanes[row.sId].tasks[row.tId] = {
         id:row.tId,
+        description: row.tDescription,
         title: row.tTitle,
         column_id: row.cId,
         date_moved: row.tMoved,

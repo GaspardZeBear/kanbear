@@ -1,6 +1,7 @@
 // Variable globale pour stocker le JSON
-import { renderTable } from './report.mjs'
-import { KanboardFilter } from './classes/KanboardFilter.mjs'
+//import { renderTable } from './report.mjs'
+//import { KanboardFilter } from './classes/KanboardFilter.mjs'
+import { KanbanPanel } from './classes/KanbanPanel.mjs';
 import { KanboardListPanel } from './classes/KanboardListPanel.mjs';
 import { Kontext } from './classes/Kontext.mjs';
 
@@ -37,12 +38,23 @@ function getFiltersMap() {
 //------------------- showDetails --------------------------------------
 document.getElementById('showDetails').addEventListener('click', () => {
     //console.log(Kontext.getJsonBulkData())
-    if (!Kontext.getJsonBulkData()) {
-        document.getElementById('message').innerHTML = '<p style="color: red;">No report loadec</p>';
-        return;
-    }
-    //renderTable(globalJsonData, 'results',getFiltersMap());
+    //if (!Kontext.getJsonBulkData()) {
+    //    document.getElementById('message').innerHTML = '<p style="color: red;">No report loadec</p>';
+    //    return;
+    //}
+    ////renderTable(globalJsonData, 'results',getFiltersMap());
     new KanboardListPanel('results', getFiltersMap()).render()
+});
+
+//------------------- showDetails --------------------------------------
+document.getElementById('kanban').addEventListener('click', () => {
+    //console.log(Kontext.getJsonBulkData())
+    //if (!Kontext.getJsonBulkData()) {
+    //    document.getElementById('message').innerHTML = '<p style="color: red;">No report loadec</p>';
+    //    return;
+    //}
+    ////renderTable(globalJsonData, 'results',getFiltersMap());
+    new KanbanPanel('results', getFiltersMap()).render()
 });
 
 
