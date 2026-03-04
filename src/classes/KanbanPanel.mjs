@@ -17,7 +17,8 @@ class KanbanPanel {
   render() {
     document.getElementById(this.htmlElement).innerHTML = "Kanban to come"
     this.buildKanbanDivsForProject(this.projects[0])
-    this.buildkColumnsQuerySelectors(this.projects[0])
+    //this.buildkColumnsQuerySelectors(this.projects[0])
+    this.setDropZones(this.projects[0])
     this.loadTasksForProject(this.projects[0])
   }
 
@@ -59,7 +60,7 @@ class KanbanPanel {
     kanbanDiv.setAttribute("id", project.id)
     kanbanDiv.setAttribute("data-projectid", project.id)
     Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
-      
+
       // create kanban-swimlane
       const kSwimlaneDiv = document.createElement('div')
       kSwimlaneDiv.classList.add("kanban-swimlane")
@@ -99,13 +100,15 @@ class KanbanPanel {
         kCounterDiv.classList.add("kanban-count")
         kCounterDiv.innerHTML = 0
 
-      // create kanban-items
+        // create kanban-items
         const kColumnItemsDiv = document.createElement('div')
         kColumnItemsDiv.classList.add("kanban-items")
         //kColumnItemsDiv.setAttribute("id", `${col.title}-items`)
         // col.id or col.title ????
         kColumnItemsDiv.setAttribute("data-status", col.id)
         kColumnItemsDiv.setAttribute("data-swimlane-id", swimlane.id)
+        //kColumnItemsDiv.setAttribute("ondragover", "handleDragover(event)")
+        //kColumnItemsDiv.setAttribute("ondrop", "handleDrop(event)")
 
         const addButtonDiv = document.createElement('button')
         addButtonDiv.classList.add("add-item-btn")
@@ -131,7 +134,25 @@ class KanbanPanel {
   };
 
   //----------------------------------------------------------------------------------------
-  buildkColumnsQuerySelectors(project) {
+  setDropZones(project) {
+    console.log("setDropZones")
+    this.kColumns[project.id] = {}
+    const qs = `.kanban-items`
+    console.log("qs", qs)
+    const zones = document.querySelectorAll(qs)
+    console.log(zones)
+    zones.forEach((zone) => {
+      zone.addEventListener('dragover', (ev) => {
+        handleDragover(ev)
+      })
+      zone.addEventListener('drop', (ev) => {
+        handleDrop(ev)
+      })
+
+    })
+  };
+  //----------------------------------------------------------------------------------------
+  xbuildkColumnsQuerySelectors(project) {
     console.log("buildkColumnsQuerySelectors(project)", project)
     this.kColumns[project.id] = {}
     Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
@@ -148,22 +169,6 @@ class KanbanPanel {
     console.log(this.kColumns)
   };
 
-
-  //----------------------------------------------------------------------------------------------
-  xloadTasksForProject(project) {
-    Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
-      Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
-        //console.log(project)
-        //console.log(task)
-        const column = project.columns[task.column_id].title
-        const container = this.kColumns[project.id][column]
-        container.innerHTML = '';
-        this.createTaskElement(task, column, container);
-        //this.updateCounter(column);
-      })
-    })
-  }
-
   //------------------------------------------------------------------------
   loadTasksForProject(project) {
     const kSwimlanes = document.querySelectorAll('.kanban-swimlane');
@@ -175,7 +180,7 @@ class KanbanPanel {
       const kColumns = kSwimlane.querySelectorAll('.kanban-column');
 
       kColumns.forEach(kColumn => {
-        console.log("load() kColumn ", kColumn)
+        //console.log("load() kColumn ", kColumn)
         const status = kColumn.dataset.status;
         console.log("load() status ", status)
         const container = kColumn.querySelector('.kanban-items');
@@ -183,7 +188,7 @@ class KanbanPanel {
 
         if (project.swimlanes[kSwimlaneId]) {
           Object.entries(project.swimlanes[kSwimlaneId].tasks).forEach(([tKey, task]) => {
-            console.log("task ", task, "status", status)
+            //console.log("task ", task, "status", status)
             if (task.column_id == status) {
               this.createTaskElement(task, status, kSwimlaneId, container);
             }
@@ -194,14 +199,6 @@ class KanbanPanel {
       })
 
     });
-  }
-
-  //---------------------------------------------------------------------------------------
-  XupdateCounter(status) {
-    const column = document.querySelector(`.kanban-column[data-status="${status}"]`);
-    const countElement = column.querySelector('.kanban-count');
-    const count = column.querySelectorAll('.kanban-item').length;
-    countElement.textContent = count;
   }
 
   // Mettre à jour le compteur de tâches
@@ -223,18 +220,29 @@ class KanbanPanel {
 
     taskElement.innerHTML = `
             <div class="kanban-item-header">
+                <div class="kanban-item-title">#${task.id}</div>
                 <div class="kanban-item-title">${task.title}</div>
                 <button class="edit-task-btn" data-task-id="${task.id}">Edit</button>
             </div>
             <div class="kanban-item-description">${task.description}</div>
-            <div class="kanban-item-swimlane">Swimlane ${swimlaneId}</div>
-        `;
+          `;
 
     container.appendChild(taskElement);
 
     // Ajouter les événements de drag and drop
-    taskElement.addEventListener('dragstart', handleDragStart);
-    taskElement.addEventListener('dragend', handleDragEnd);
+    //taskElement.addEventListener('dragstart', handleDragStart);
+
+    taskElement.addEventListener('dragstart', (ev) => {
+      console.log("dragstart")
+      //taskElement.classList.add('dragging');
+      ev.dataTransfer.setData('text/taskId', task.id);
+      ev.dataTransfer.setData('text/status', status);
+      ev.dataTransfer.setData('text/swimlaneId', swimlaneId);
+      console.log(ev.dataTransfer)
+      ev.dataTransfer.effectAllowed = 'move';
+    })
+    //taskElement.addEventListener('dragover', handleDragOver);
+    //taskElement.addEventListener('dragend', handleDragEnd);
 
     // Ajouter l'événement pour éditer la tâche
     const editBtn = taskElement.querySelector('.edit-task-btn');
@@ -244,9 +252,6 @@ class KanbanPanel {
     });
   }
 
-
-
-
   // Mettre à jour le compteur de tâches
   updateCounter(status) {
     const column = document.querySelector(`.kanban-column[data-status="${status}"]`);
@@ -254,9 +259,6 @@ class KanbanPanel {
     const count = column.querySelectorAll('.kanban-item').length;
     countElement.textContent = count;
   }
-
-
-
 }
 
 //----- function out of object cause this is ambiguous 
@@ -265,18 +267,32 @@ let draggedItem = null;
 let currentTaskId = null;
 
 // Gestion du drag and drop
-function handleDragStart(e) {
-  console.log("dragging")
+function handleDragStart(ev) {
+  console.log("dragstart")
   draggedItem = this;
-  this.classList.add('dragging');
-  e.dataTransfer.setData('text/plain', this.dataset.taskId);
-  e.dataTransfer.setData('text/status', this.dataset.status);
-  e.dataTransfer.setData('text/swimlaneId', this.dataset.swimlaneId);
-  e.dataTransfer.effectAllowed = 'move';
+  //this.classList.add('dragging');
+  ev.dataTransfer.setData('text/taskId', this.dataset.taskId);
+  ev.dataTransfer.setData('text/status', this.dataset.status);
+  ev.dataTransfer.setData('text/swimlaneId', this.dataset.swimlaneId);
+  console.log(ev.dataTransfer.getData("text"))
+  ev.dataTransfer.effectAllowed = 'move';
 }
 
-function handleDragEnd() {
-  this.classList.remove('dragging');
+
+function handleDragover(ev) {
+  console.log("dragover")
+  ev.preventDefault()
+}
+
+
+function handleDrop(ev) {
+  console.log("drop")
+  console.log(ev)
+  ev.preventDefault()
+  const data = ev.dataTransfer.getData("text/taskId");
+  console.log(ev.dataTransfer)
+  ev.target.appendChild(document.getElementById(data))
+  //this.classList.remove('dragging');
 }
 
 export { KanbanPanel }

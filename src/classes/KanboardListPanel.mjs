@@ -115,8 +115,8 @@ class KanboardListPanel {
         console.log(e)
       }
       const projectDescription = (jpd && jpd.style !== undefined) ? { style: jpd.style } : { style: "background-color:yellow" };
-      Object.entries(project.swimlanes).forEach(([key, swimlane]) => {
-        Object.entries(swimlane.tasks).forEach(([key, task]) => {
+      Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
+        Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
           let userName=""
           if ( project.users[task.owner_id] && project.users[task.owner_id].name ) {
             userName=project.users[task.owner_id].name
