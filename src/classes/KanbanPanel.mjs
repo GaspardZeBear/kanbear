@@ -10,6 +10,7 @@ class KanbanPanel {
     this.buttons = {}
     this.table = undefined
     this.kColumns = {}
+
   }
 
   //------------------------------------------------------------------------
@@ -54,16 +55,31 @@ class KanbanPanel {
   buildKanbanDivsForProject(project) {
     console.log("buildkColumnsForProject(project)", project)
     const kanbanDiv = document.createElement('div')
+    kanbanDiv.classList.add("kanban-board")
     kanbanDiv.setAttribute("id", project.id)
+    kanbanDiv.setAttribute("data-projectid", project.id)
     Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
+      
+      // create kanban-swimlane
       const kSwimlaneDiv = document.createElement('div')
       kSwimlaneDiv.classList.add("kanban-swimlane")
       kSwimlaneDiv.setAttribute("data-swimlane-id", swimlane.id)
+      // create swimlane-header
+      const kSwimlaneHeaderDiv = document.createElement('div')
+      kSwimlaneHeaderDiv.classList.add("swimlane-header")
+      // create fill-in header
       const kSwimlaneDivH2 = document.createElement('h2')
       kSwimlaneDivH2.innerHTML = swimlane.name
-      kSwimlaneDiv.appendChild(kSwimlaneDivH2)
+
+      kSwimlaneHeaderDiv.appendChild(kSwimlaneDivH2)
+      kSwimlaneDiv.appendChild(kSwimlaneHeaderDiv)
+
+      // create columns for this swimlane
+      const kSwimlaneColumnsDiv = document.createElement('div')
+      kSwimlaneColumnsDiv.classList.add("swimlane-columns")
 
       Object.entries(project.columns).forEach(([tKey, col]) => {
+        // create a kanban-column
         console.log("buildkColumnsDivsForProject(project) col=", col)
         const kColumnDiv = document.createElement('div')
         kColumnDiv.classList.add("kanban-column")
@@ -71,34 +87,44 @@ class KanbanPanel {
         kColumnDiv.setAttribute("data-status", col.id)
         kColumnDiv.setAttribute("data-swimlane-id", swimlane.id)
 
+        // create kanban-column-header
         const kColumnHeaderDiv = document.createElement('div')
         kColumnHeaderDiv.setAttribute("data-swimlane-id", swimlane.id)
         kColumnHeaderDiv.classList.add("kanban-column-header")
 
+        // fillin column header
         const kColumnHeaderDivH3 = document.createElement('h3')
         kColumnHeaderDivH3.innerHTML = col.title
+        const kCounterDiv = document.createElement('span')
+        kCounterDiv.classList.add("kanban-count")
+        kCounterDiv.innerHTML = 0
 
+      // create kanban-items
         const kColumnItemsDiv = document.createElement('div')
         kColumnItemsDiv.classList.add("kanban-items")
-        kColumnItemsDiv.setAttribute("id", `${col.title}-items`)
+        //kColumnItemsDiv.setAttribute("id", `${col.title}-items`)
+        // col.id or col.title ????
+        kColumnItemsDiv.setAttribute("data-status", col.id)
         kColumnItemsDiv.setAttribute("data-swimlane-id", swimlane.id)
 
         const addButtonDiv = document.createElement('button')
         addButtonDiv.classList.add("add-item-btn")
         addButtonDiv.setAttribute("data-swimlane-id", swimlane.id)
-        addButtonDiv.setAttribute("data-status", col.title)
+        //addButtonDiv.setAttribute("data-status", col.title)
+        addButtonDiv.setAttribute("data-status", col.id)
         addButtonDiv.innerHTML = "Add"
 
+        // link all
         kColumnHeaderDiv.appendChild(kColumnHeaderDivH3)
         kColumnDiv.appendChild(kColumnHeaderDiv)
         kColumnDiv.appendChild(kColumnItemsDiv)
         kColumnDiv.appendChild(addButtonDiv)
 
-        kSwimlaneDiv.appendChild(kColumnDiv)
+        kSwimlaneColumnsDiv.appendChild(kColumnDiv)
+        kSwimlaneDiv.appendChild(kSwimlaneColumnsDiv)
 
       })
       kanbanDiv.appendChild(kSwimlaneDiv)
-
       console.log(this.kColumns)
     })
     document.getElementById(this.htmlElement).appendChild(kanbanDiv)
@@ -155,18 +181,18 @@ class KanbanPanel {
         const container = kColumn.querySelector('.kanban-items');
         container.innerHTML = '';
 
-        Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
-          Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
-            console.log("task ", task)
-            if (task.column_id === status ) {
-              createTaskElement(task, status, kSwimlaneId, container);
+        if (project.swimlanes[kSwimlaneId]) {
+          Object.entries(project.swimlanes[kSwimlaneId].tasks).forEach(([tKey, task]) => {
+            console.log("task ", task, "status", status)
+            if (task.column_id == status) {
+              this.createTaskElement(task, status, kSwimlaneId, container);
             }
-            // Mettre à jour le compteur
+            //Mettre à jour le compteur
             //this.updateCounter(status, kSwimlaneId);
-          });
-
-        })
+          })
+        }
       })
+
     });
   }
 
@@ -186,7 +212,7 @@ class KanbanPanel {
     countElement.textContent = count;
   }
 
-  // Créer un élément de tâche
+  //-----------------------------------------------------------------------------------------------------
   createTaskElement(task, status, swimlaneId, container) {
     const taskElement = document.createElement('div');
     taskElement.className = 'kanban-item';
@@ -219,17 +245,7 @@ class KanbanPanel {
   }
 
 
-  // Gestion du drag and drop
-  handleDragStart(e) {
-    draggedItem = this;
-    this.classList.add('dragging');
-    e.dataTransfer.setData('text/plain', this.dataset.taskId);
-    e.dataTransfer.effectAllowed = 'move';
-  }
 
-  handleDragEnd() {
-    this.classList.remove('dragging');
-  }
 
   // Mettre à jour le compteur de tâches
   updateCounter(status) {
@@ -239,8 +255,28 @@ class KanbanPanel {
     countElement.textContent = count;
   }
 
+
+
 }
 
+//----- function out of object cause this is ambiguous 
 
+let draggedItem = null;
+let currentTaskId = null;
+
+// Gestion du drag and drop
+function handleDragStart(e) {
+  console.log("dragging")
+  draggedItem = this;
+  this.classList.add('dragging');
+  e.dataTransfer.setData('text/plain', this.dataset.taskId);
+  e.dataTransfer.setData('text/status', this.dataset.status);
+  e.dataTransfer.setData('text/swimlaneId', this.dataset.swimlaneId);
+  e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDragEnd() {
+  this.classList.remove('dragging');
+}
 
 export { KanbanPanel }
