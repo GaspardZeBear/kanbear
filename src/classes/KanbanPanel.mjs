@@ -143,10 +143,20 @@ class KanbanPanel {
     console.log(zones)
     zones.forEach((zone) => {
       zone.addEventListener('dragover', (ev) => {
-        handleDragover(ev)
+        console.log("dragover")
+        ev.preventDefault()
       })
       zone.addEventListener('drop', (ev) => {
-        handleDrop(ev)
+        console.log("drop-inner")
+        console.log(ev)
+        ev.preventDefault()
+        const data = ev.dataTransfer.getData("dragId");
+        console.log(data)
+        //const x=document.createElement('div')
+        //x.innerHTML=data
+        
+        console.log(ev.target)
+        ev.target.appendChild(document.getElementById(data))
       })
 
     })
@@ -211,13 +221,16 @@ class KanbanPanel {
 
   //-----------------------------------------------------------------------------------------------------
   createTaskElement(task, status, swimlaneId, container) {
+    const dragId=`drag-${task.id}`
     const taskElement = document.createElement('div');
-    taskElement.className = 'kanban-item';
-    taskElement.draggable = true;
-    taskElement.dataset.taskId = task.id;
-    taskElement.dataset.status = status;
-    taskElement.dataset.swimlaneId = swimlaneId;
-
+    taskElement.setAttribute("id",dragId)
+    taskElement.classList.add('kanban-item');
+    //taskElement.draggable = true;
+    taskElement.setAttribute("draggable",true)
+    //taskElement.dataset.taskId = task.id;
+    //taskElement.dataset.status = status;
+    //taskElement.dataset.swimlaneId = swimlaneId;
+    
     taskElement.innerHTML = `
             <div class="kanban-item-header">
                 <div class="kanban-item-title">#${task.id}</div>
@@ -235,9 +248,10 @@ class KanbanPanel {
     taskElement.addEventListener('dragstart', (ev) => {
       console.log("dragstart")
       //taskElement.classList.add('dragging');
-      ev.dataTransfer.setData('text/taskId', task.id);
-      ev.dataTransfer.setData('text/status', status);
-      ev.dataTransfer.setData('text/swimlaneId', swimlaneId);
+      //ev.dataTransfer.setData('text/taskId', task.id);
+      //ev.dataTransfer.setData('text/status', status);
+      //ev.dataTransfer.setData('text/swimlaneId', swimlaneId);
+      ev.dataTransfer.setData('dragId', dragId);
       console.log(ev.dataTransfer)
       ev.dataTransfer.effectAllowed = 'move';
     })
@@ -267,7 +281,7 @@ let draggedItem = null;
 let currentTaskId = null;
 
 // Gestion du drag and drop
-function handleDragStart(ev) {
+function XhandleDragStart(ev) {
   console.log("dragstart")
   draggedItem = this;
   //this.classList.add('dragging');
@@ -279,20 +293,22 @@ function handleDragStart(ev) {
 }
 
 
-function handleDragover(ev) {
+function xhandleDragover(ev) {
   console.log("dragover")
   ev.preventDefault()
 }
 
 
-function handleDrop(ev) {
+function XhandleDrop(ev) {
   console.log("drop")
   console.log(ev)
   ev.preventDefault()
-  const data = ev.dataTransfer.getData("text/taskId");
-  console.log(ev.dataTransfer)
-  ev.target.appendChild(document.getElementById(data))
-  //this.classList.remove('dragging');
+  const data = ev.dataTransfer.getData("text/html");
+  console.log(data)
+  //const x=document.createElement('div')
+  //x.innerHTML=data
+  //document.getElementById(data))
+  ev.target.appendChild(data)
 }
 
 export { KanbanPanel }
