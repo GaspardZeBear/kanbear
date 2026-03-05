@@ -11,16 +11,16 @@ class KanboardListPanel {
     this.table = undefined
   }
 
- //-----------------------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------------------
   getObjectsFromRef(ref) {
     let [name, projectId, swimlaneId, taskId] = ref.split(':')
     console.log(ref)
-    console.log(this.projects[projectId].swimlanes[swimlaneId].tasks," --- ",taskId)
+    console.log(this.projects[projectId].swimlanes[swimlaneId].tasks, " --- ", taskId)
     let columnId = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId].column_id
-    let project=this.projects[projectId]
+    let project = this.projects[projectId]
     let task = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId]
     let column = this.projects[projectId].columns[columnId]
-    return([name,project,column,task])
+    return ([name, project, column, task])
   }
 
   //-----------------------------------------------------------------------------------------
@@ -28,7 +28,7 @@ class KanboardListPanel {
     //let [name, projectId, swimlaneId, taskId] = ref.split(':')
     //let columnId = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId].column_id
     //let task = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId]
-    const [name,project,column,task] = this.getObjectsFromRef(ref)
+    const [name, project, column, task] = this.getObjectsFromRef(ref)
     task.date_due += 10000
     //console.log(projects[projectId].swimlanes)
     //console.log(projects[projectId].swimlanes[swimlaneId].tasks)
@@ -108,41 +108,34 @@ class KanboardListPanel {
     const tbody = document.createElement('tbody')
 
     this.projects.forEach((project, projectIndex) => {
-      let jpd = {}
-      try {
-        jpd = JSON.parse(project.description)
-      } catch (e) {
-        console.log(e)
-      }
-      const projectDescription = (jpd && jpd.style !== undefined) ? { style: jpd.style } : { style: "background-color:yellow" };
+      if (!this.kanboardFilter.keepProject(project.name)) { return }
+      const projectStyle = Kontext.getProjectStyle(project.name)
       Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
+        if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
         Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
-          let userName=""
-          if ( project.users[task.owner_id] && project.users[task.owner_id].name ) {
-            userName=project.users[task.owner_id].name
+          if (!this.kanboardFilter.keepTask(task.title)) { return }
+          if (!this.kanboardFilter.keepColumn(project.columns[task.column_id].title)) { return }
+          let userName = ""
+          if (project.users[task.owner_id] && project.users[task.owner_id].name) {
+            userName = project.users[task.owner_id].name
           }
-          const keep=this.kanboardFilter.keep(project.name, swimlane.name, task.title, project.columns[task.column_id].title, userName)
-          console.log("Owner ",project.users[task.owner_id]," ",userName)
-          if (keep) {
-            console.log('append to table')
-            const row = document.createElement('tr');
-            const duration = formatDuration((Date.now() / 1000 - task.date_moved))
-            const ref = `${projectIndex}:${swimlane.id}:${task.id}`
-            row.innerHTML = `
+          const row = document.createElement('tr');
+          const duration = formatDuration((Date.now() / 1000 - task.date_moved))
+          const ref = `${projectIndex}:${swimlane.id}:${task.id}`
+          row.innerHTML = `
               <td><input type="checkbox" name="tasks" id="checkbox:${ref}" class="taskCheckbox"/></td>
               <td><a href="#" class="taskCommentLink" id="commentLink:${ref}">c</a></td>
-              <td style="${projectDescription.style}">${project.name}</td>
+              <td style="${projectStyle}">${project.name}</td>
               <td>${swimlane.name}</td>
               <td>${task.title}</td>
-              <td style="background-color:${task.color_id}">${project.columns[task.column_id].title}</td>
+              <td style="background-color:${task.color}">${project.columns[task.column_id].title}</td>
               <td>${dateToString(task.date_moved)}</td>
               <td>${getDurationFromNow(task.date_moved, true)}</td>
               <td>${dateToString(task.date_due)}</td>
               <td>${getDurationFromNow(task.date_due, true) ?? ''}</td>
               <td>${userName}</td>
             `;
-            tbody.appendChild(row);
-          }
+          tbody.appendChild(row);
         })
       });
       this.table.appendChild(tbody)
@@ -151,12 +144,12 @@ class KanboardListPanel {
 
   //-----------------------------------------------------------------
   setPopup() {
-    const self=this
+    const self = this
     document.querySelectorAll('.taskCommentLink').forEach(link => {
       //console.log(link)
       link.addEventListener('click', function (e) {
         e.preventDefault();
-        const [name,project,column,task] = self.getObjectsFromRef(this.getAttribute('id'))
+        const [name, project, column, task] = self.getObjectsFromRef(this.getAttribute('id'))
         document.getElementById('popupTaskId').textContent = task.title;
         popup.style.display = 'flex';
         // Charger les notes existantes si disponibles (exemple)

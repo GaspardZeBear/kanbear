@@ -1,4 +1,4 @@
-class KanboardFilter { 
+class KanboardFilter {
   constructor(filtersMap) {
     console.log("kanboardFilter() ", filtersMap)
     this.pRx = new RegExp(filtersMap.projectFilter)
@@ -10,18 +10,44 @@ class KanboardFilter {
     this.aRx = new RegExp('.*')
   }
 
+  //-------------------------------------------------------------------
+  keepProject(pName) {
+    return ((pName ? this.pRx.test(pName) : true) )
+  }
+
+  //-------------------------------------------------------------------
+  keepSwimlane(sName) {
+    return ((sName ? this.sRx.test(sName) : true))
+  }
+
+  //-------------------------------------------------------------------
+  keepTask(tTitle) {
+    return ((tTitle ? this.tRx.test(tTitle) : true))
+  }
+
+  //-------------------------------------------------------------------
+  keepColumn(cName) {
+    return ((cName ? this.cRx.test(cName) : true))
+  }
+
+  //-------------------------------------------------------------------
+  keepAssignee(aName) {
+    return ((aName ? this.aRx.test('') : true))
+  }
+
+  //-------------------------------------------------------------------
   keep(pName, sName, tTitle, cName, aName) {
     //console.log('kanboardFilter.keep()',pName, sName, tTitle, cName)
-    console.log('kanboardFilter.keep() aName',aName,' arx  ', this.aRx, ' test ', this.aRx.test(aName))
-    let aNameTest=(aName ? this.aRx.test(aName):true)
-    if ( !aName ) {
-      aNameTest=(aName ? this.aRx.test(''):true)
+    console.log('kanboardFilter.keep() aName', aName, ' arx  ', this.aRx, ' test ', this.aRx.test(aName))
+    let aNameTest = (aName ? this.aRx.test(aName) : true)
+    if (!aName) {
+      aNameTest = (aName ? this.aRx.test('') : true)
     }
     return (
-      (pName ? this.pRx.test(pName):true)
-      && (sName ? this.sRx.test(sName):true)
-      && (tTitle ?this.tRx.test(tTitle):true)
-      && (cName ? this.cRx.test(cName):true)
+      (pName ? this.pRx.test(pName) : true)
+      && (sName ? this.sRx.test(sName) : true)
+      && (tTitle ? this.tRx.test(tTitle) : true)
+      && (cName ? this.cRx.test(cName) : true)
       && aNameTest
     )
   }

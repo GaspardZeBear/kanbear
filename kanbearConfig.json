@@ -13,11 +13,20 @@
     "projects": {
         "Chambord2026Equipes": {
             "kind": "resources",
-            "color": "pink",
+            "style": "background-color:pink",
             "wording": {
-                "Swimlane" : "Poste",
-                "Task" : "Ressource",
-                "Column" : "Statut"
+                "Swimlane": "Poste",
+                "Task": "Ressource",
+                "Column": "Statut"
+            }
+        },
+        "Chambord2026Vehicles": {
+            "kind": "resources",
+            "style": "background-color:green",
+            "wording": {
+                "Swimlane": "Poste",
+                "Task": "Ressource",
+                "Column": "Statut"
             }
         }
     }

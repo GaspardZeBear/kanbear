@@ -22,7 +22,17 @@ class KanbanPanel {
     this.loadTasksForProject(this.projects[0])
   }
 
-  
+  //------------------------------------------------------------------------
+  Nrender() {
+    document.getElementById(this.htmlElement).innerHTML = "Kanban to come"
+    this.projects.forEach((project) => {
+      this.buildKanbanDivsForProject(project)
+      //this.buildkColumnsQuerySelectors(this.projects[0])
+      this.setDropZones(project)
+      this.loadTasksForProject(project)
+    })
+  }
+
   //----------------------------------------------------------------------------------------
   buildKanbanDivsForProject(project) {
     console.log("buildkColumnsForProject(project)", project)
@@ -31,7 +41,7 @@ class KanbanPanel {
     kanbanDiv.setAttribute("id", project.id)
     kanbanDiv.setAttribute("data-projectid", project.id)
     Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
-
+      if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
       // create kanban-swimlane
       const kSwimlaneDiv = document.createElement('div')
       kSwimlaneDiv.classList.add("kanban-swimlane")
@@ -41,7 +51,7 @@ class KanbanPanel {
       kSwimlaneHeaderDiv.classList.add("swimlane-header")
       // create fill-in header
       const kSwimlaneDivH2 = document.createElement('h2')
-      kSwimlaneDivH2.innerHTML = swimlane.name
+      kSwimlaneDivH2.innerHTML = `${project.name}>${swimlane.name}`
 
       kSwimlaneHeaderDiv.appendChild(kSwimlaneDivH2)
       kSwimlaneDiv.appendChild(kSwimlaneHeaderDiv)
@@ -69,6 +79,7 @@ class KanbanPanel {
         kColumnHeaderDivH3.innerHTML = col.title
         const kCounterDiv = document.createElement('span')
         kCounterDiv.classList.add("kanban-count")
+        kCounterDiv.setAttribute("id", `counter:${project.id}:${swimlane.id}:${col.id}`)
         kCounterDiv.innerHTML = 0
 
         // create kanban-items
@@ -76,7 +87,7 @@ class KanbanPanel {
         kColumnItemsDiv.classList.add("kanban-items")
         kColumnItemsDiv.setAttribute("data-status", col.id)
         kColumnItemsDiv.setAttribute("data-swimlane-id", swimlane.id)
-        
+
         const addButtonDiv = document.createElement('button')
         addButtonDiv.classList.add("add-item-btn")
         addButtonDiv.setAttribute("data-swimlane-id", swimlane.id)
@@ -102,34 +113,28 @@ class KanbanPanel {
 
   //----------------------------------------------------------------------------------------
   setDropZones(project) {
-    console.log("setDropZones")
+    //console.log("setDropZones")
     this.kColumns[project.id] = {}
     const qs = `.kanban-items`
-    console.log("qs", qs)
+    //console.log("qs", qs)
     const zones = document.querySelectorAll(qs)
-    console.log(zones)
+    //console.log(zones)
     zones.forEach((zone) => {
       zone.addEventListener('dragover', (ev) => {
-        console.log("dragover")
         ev.preventDefault()
       })
       zone.addEventListener('drop', (ev) => {
-        console.log("drop-inner")
-        console.log(ev)
         ev.preventDefault()
         const data = ev.dataTransfer.getData("dragId");
-        console.log(data)
-        console.log(ev.target)
         ev.target.appendChild(document.getElementById(data))
       })
 
     })
   };
-  
 
   //------------------------------------------------------------------------
   // Searh if task in swimlane/column
-
+  // status is column !
   //------------------------------------------------------------------------
   loadTasksForProject(project) {
     const kSwimlanes = document.querySelectorAll('.kanban-swimlane');
@@ -166,11 +171,11 @@ class KanbanPanel {
 
   //-----------------------------------------------------------------------------------------------------
   createTaskElement(task, status, swimlaneId, container) {
-    const dragId=`drag-${task.id}`
+    const dragId = `drag-${task.id}`
     const taskElement = document.createElement('div');
-    taskElement.setAttribute("id",dragId)
+    taskElement.setAttribute("id", dragId)
     taskElement.classList.add('kanban-item');
-    taskElement.setAttribute("draggable",true)
+    taskElement.setAttribute("draggable", true)
     taskElement.innerHTML = `
             <div class="kanban-item-header">
                 <div class="kanban-item-title">#${task.id}</div>
@@ -196,13 +201,6 @@ class KanbanPanel {
     });
   }
 
-  // Mettre à jour le compteur de tâches
-  XupdateCounter(status) {
-    const column = document.querySelector(`.kanban-column[data-status="${status}"]`);
-    const countElement = column.querySelector('.kanban-count');
-    const count = column.querySelectorAll('.kanban-item').length;
-    countElement.textContent = count;
-  }
 }
 
 export { KanbanPanel }

@@ -27,6 +27,19 @@ class Kontext {
     }
 
     //--------------------------------------------------------------
+    static getProject(pName) {
+        return (Kontext.kanboardConfig.projects[pName])
+    }
+
+    //--------------------------------------------------------------
+    static getProjectStyle(pName) {
+        console.log("pName",pName)
+        let style="background-color:yellow"
+        return ( Kontext.kanboardConfig.projects[pName] ?.style ?? style)
+    }
+
+
+    //--------------------------------------------------------------
     static async loadJsonBulkData() {
         try {
             const url=`${Kontext.getGatewayUrl()}/api/sql/report`
