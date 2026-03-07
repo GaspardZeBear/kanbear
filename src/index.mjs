@@ -6,7 +6,15 @@ import { KanboardListPanel } from './classes/KanboardListPanel.mjs';
 import { Kontext } from './classes/Kontext.mjs';
 
 await Kontext.loadConfig()
-document.getElementById('kanboard').href=Kontext.getKanboardUrl()
+buildProjectsSelectBox()
+
+document.getElementById('kanboard').href = Kontext.getKanboardUrl()
+
+document.getElementById('projectsSelectBox').addEventListener('change', (e) => {
+    const selectedProject = e.target.value;
+    console.log("projectSelectBox",e.target.value)
+    Kontext.setProject(selectedProject,"xxxx")
+});
 
 document.getElementById('loadJson').addEventListener('click', async () => {
     try {
@@ -18,6 +26,17 @@ document.getElementById('loadJson').addEventListener('click', async () => {
     }
 })
 
+//---------------------------------------------------------------------------------
+async function buildProjectsSelectBox() {
+    await Kontext.loadProjects()
+    Object.entries(Kontext.getProjects()).forEach(([pId, pName]) => {
+        console.log(pId, pName)
+        const option = document.createElement('option')
+        option.setAttribute("value", pId)
+        option.innerHTML = pName
+        document.getElementById('projectsSelectBox').appendChild(option)
+    })
+}
 
 //---------------------------------------------------------------------------------
 function getFiltersMap() {

@@ -43,10 +43,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '', 'index.html'));
 });
 
+//------------------------------------------------------------------------------
 app.get('/api/sql/report', async (req, res) => {
    console.log("/api/sql/report invokated")
   try {
-   
     const report = await sqlReporter.getJsonReport();
     console.log("api.get() ", report)
     res.json(report);
@@ -57,7 +57,21 @@ app.get('/api/sql/report', async (req, res) => {
    console.log("/api/sql/report done")
 });
 
+//------------------------------------------------------------------------------
+app.get('/api/sql/loadProjects', async (req, res) => {
+   console.log("/api/sql/loadProjects invokated")
+  try {
+    const report = await sqlReporter.loadProjects();
+    console.log("api.get() ", report)
+    res.json(report);
+  } catch (error) {
+     console.log("/api/sql/loadProjects error ",error.message )
+    res.status(500).json({ error: error.message });
+  }
+   console.log("/api/sql/loadProjects done")
+});
 
+//------------------------------------------------------------------------------
 app.get('/api/report', async (req, res) => {
   try {
     const report = await reporter.getJsonReport();

@@ -107,7 +107,8 @@ class KanboardListPanel {
     this.table.appendChild(thead)
     const tbody = document.createElement('tbody')
 
-    this.projects.forEach((project, projectIndex) => {
+    //this.projects.forEach((project, projectIndex) => {
+    Object.entries(this.projects).forEach(([projectIndex, project]) => {
       if (!this.kanboardFilter.keepProject(project.name)) { return }
       const projectStyle = Kontext.getProjectStyle(project.name)
       Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {

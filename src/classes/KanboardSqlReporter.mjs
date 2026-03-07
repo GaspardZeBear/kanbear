@@ -53,7 +53,7 @@ class KanboardSqlReporter {
       order by p.name,s.name,t.title
       `
     const queryStmt = this.db.prepare(reqPCST);
-    return(queryStmt.all())
+    return (queryStmt.all())
     //console.log(queryStmt.all())
   }
 
@@ -62,13 +62,13 @@ class KanboardSqlReporter {
     console.log("KanboardSqlReporter.selectPCST()")
     let reqUsers = `select u.id uId,u.username uUsername, u.name uName from users as u`
     //let usersMap = { '0': 'nobody' }
-    let usersMap={}
+    let usersMap = {}
     const queryStmt = this.db.prepare(reqUsers);
-    
+
     for (let row of queryStmt.all()) {
       usersMap[row.uId] = { name: row.uName, username: row.uUsername }
     }
-    return(usersMap)
+    return (usersMap)
   }
 
   //-----------------------------------------------------
@@ -77,7 +77,7 @@ class KanboardSqlReporter {
     let projectsMap = {}
     const pcstPromises = this.selectPCST()
     const usersPromise = this.selectUsers()
-    let [pcst,usersMap]=await Promise.all([pcstPromises,usersPromise])
+    let [pcst, usersMap] = await Promise.all([pcstPromises, usersPromise])
 
     //-- turn into table
     for (let row of pcst) {
@@ -93,13 +93,13 @@ class KanboardSqlReporter {
         projectsMap[row.pId].users = usersMap
       }
       if (!projectsMap[row.pId].columns[row.cId]) {
-        projectsMap[row.pId].columns[row.cId] = { id: row.cId, title: row.cTitle ,description: row.cDescription, position: row.cPosition}
+        projectsMap[row.pId].columns[row.cId] = { id: row.cId, title: row.cTitle, description: row.cDescription, position: row.cPosition }
       }
       if (!projectsMap[row.pId].swimlanes[row.sId]) {
         projectsMap[row.pId].swimlanes[row.sId] = { id: row.sId, name: row.sName, description: row.sDescription, tasks: {} }
       }
       projectsMap[row.pId].swimlanes[row.sId].tasks[row.tId] = {
-        id:row.tId,
+        id: row.tId,
         description: row.tDescription,
         title: row.tTitle,
         column_id: row.cId,
@@ -114,14 +114,42 @@ class KanboardSqlReporter {
     }
     console.log(report)
     console.log(usersMap)
-    return (report)
-    //const columns = queryStmt.columns();
-    //for (let column of columns) {
-    //console.log(column)
-    //}
+    //return (report)
+    return(projectsMap)
+  }
+
+//-----------------------------------------------------
+  async selectP () {
+    console.log("KanboardSqlReporter.selectP()")
+    let reqPCST = `
+      select 
+        p.id pId,
+	      p.name pName
+      from projects as p
+      order by p.name
+      `
+    const queryStmt = this.db.prepare(reqPCST);
+    return (queryStmt.all())
+    //console.log(queryStmt.all())
+  }
+
+//-----------------------------------------------------
+  async loadProjects() {
+    let report = []
+    let projectsMap = {}
+    const pPromises = this.selectP()
+    const usersPromise = this.selectUsers()
+    let [p] = await Promise.all([pPromises])
+    //-- turn into table
+    for (let row of p) {
+      console.log(row)
+      projectsMap[row.pId]=row.pName
+    }
+    return(projectsMap)
   }
 
 }
+//------------------------------------------------------------------------------------------------------------
 console.log(process.argv);
 if (process.argv[1].endsWith('KanboardSqlReporter.mjs')) {
   console.log("Mode 'main' : exécution directe");

@@ -1,10 +1,14 @@
 import { KanboardFilter } from "./KanboardFilter.mjs"
 import { Kontext } from "./Kontext.mjs"
+import { TaskManager } from "./TaskManager.mjs"
 
 class KanbanPanel {
   //------------------------------------------------------------------------
   constructor(element, filtersMap) {
     this.projects = Kontext.getJsonBulkData()
+    // beware probably a bug as BulkDat is an array !!!
+    console.log("KanbanPanel constructor pid",Kontext.getCurrentProjectId())
+    this.project= Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()]
     this.htmlElement = element
     this.kanboardFilter = new KanboardFilter(filtersMap)
     this.buttons = {}
@@ -16,10 +20,11 @@ class KanbanPanel {
   //------------------------------------------------------------------------
   render() {
     document.getElementById(this.htmlElement).innerHTML = "Kanban to come"
-    this.buildKanbanDivsForProject(this.projects[0])
+    console.log("render pid ",this.project)
+    this.buildKanbanDivsForProject(this.project)
     //this.buildkColumnsQuerySelectors(this.projects[0])
-    this.setDropZones(this.projects[0])
-    this.loadTasksForProject(this.projects[0])
+    this.setDropZones(this.project)
+    this.loadTasksForProject(this.project)
   }
 
   //------------------------------------------------------------------------
@@ -35,7 +40,7 @@ class KanbanPanel {
 
   //----------------------------------------------------------------------------------------
   buildKanbanDivsForProject(project) {
-    console.log("buildkColumnsForProject(project)", project)
+    console.log("buildKanbanDivsForProject", project)
     const kanbanDiv = document.createElement('div')
     kanbanDiv.classList.add("kanban-board")
     kanbanDiv.setAttribute("id", project.id)
@@ -92,14 +97,16 @@ class KanbanPanel {
         addButtonDiv.classList.add("add-item-btn")
         addButtonDiv.setAttribute("data-swimlane-id", swimlane.id)
         addButtonDiv.setAttribute("data-status", col.id)
-        addButtonDiv.innerHTML = "Add"
+        addButtonDiv.innerHTML = "+"
 
         // link all
         kColumnHeaderDiv.appendChild(kColumnHeaderDivH3)
         kColumnHeaderDiv.appendChild(kCounterDiv)
         kColumnDiv.appendChild(kColumnHeaderDiv)
         kColumnDiv.appendChild(kColumnItemsDiv)
-        kColumnDiv.appendChild(addButtonDiv)
+        kColumnHeaderDiv.appendChild(addButtonDiv)
+        // kColumnDiv.appendChild(addButtonDiv)
+
 
         kSwimlaneColumnsDiv.appendChild(kColumnDiv)
         kSwimlaneDiv.appendChild(kSwimlaneColumnsDiv)
@@ -197,9 +204,10 @@ class KanbanPanel {
     const editBtn = taskElement.querySelector('.edit-task-btn');
     editBtn.addEventListener('click', function (e) {
       e.stopPropagation();
-      openEditPopup(task.id, task.title, task.description, status, swimlaneId);
+      new TaskManager(task).openEditPopup();
     });
   }
+
 
 }
 
