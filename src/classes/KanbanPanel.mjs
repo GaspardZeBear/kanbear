@@ -1,14 +1,14 @@
 import { KanboardFilter } from "./KanboardFilter.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { TaskManager } from "./TaskManager.mjs"
+import { ProjectManager} from "./ProjectManager.mjs"
 
 class KanbanPanel {
   //------------------------------------------------------------------------
   constructor(element, filtersMap) {
     this.projects = Kontext.getJsonBulkData()
-    // beware probably a bug as BulkDat is an array !!!
     console.log("KanbanPanel constructor pid",Kontext.getCurrentProjectId())
-    this.project= Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()]
+    this.project= Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()] || undefined
     this.htmlElement = element
     this.kanboardFilter = new KanboardFilter(filtersMap)
     this.buttons = {}
@@ -19,23 +19,17 @@ class KanbanPanel {
 
   //------------------------------------------------------------------------
   render() {
-    document.getElementById(this.htmlElement).innerHTML = "Kanban to come"
     console.log("render pid ",this.project)
+    let [displayable, cause] = new ProjectManager(this.project).isDisplayable() 
+    if ( !displayable) {
+      document.getElementById(this.htmlElement).innerHTML = `Project not displayable ${cause}`
+      return
+    }
+    document.getElementById(this.htmlElement).innerHTML = this.project.name
     this.buildKanbanDivsForProject(this.project)
     //this.buildkColumnsQuerySelectors(this.projects[0])
     this.setDropZones(this.project)
     this.loadTasksForProject(this.project)
-  }
-
-  //------------------------------------------------------------------------
-  Nrender() {
-    document.getElementById(this.htmlElement).innerHTML = "Kanban to come"
-    this.projects.forEach((project) => {
-      this.buildKanbanDivsForProject(project)
-      //this.buildkColumnsQuerySelectors(this.projects[0])
-      this.setDropZones(project)
-      this.loadTasksForProject(project)
-    })
   }
 
   //----------------------------------------------------------------------------------------

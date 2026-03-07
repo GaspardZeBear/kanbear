@@ -56,23 +56,11 @@ function getFiltersMap() {
 
 //------------------- showDetails --------------------------------------
 document.getElementById('showDetails').addEventListener('click', () => {
-    //console.log(Kontext.getJsonBulkData())
-    //if (!Kontext.getJsonBulkData()) {
-    //    document.getElementById('message').innerHTML = '<p style="color: red;">No report loadec</p>';
-    //    return;
-    //}
-    ////renderTable(globalJsonData, 'results',getFiltersMap());
     new KanboardListPanel('results', getFiltersMap()).render()
 });
 
 //------------------- showDetails --------------------------------------
 document.getElementById('kanban').addEventListener('click', () => {
-    //console.log(Kontext.getJsonBulkData())
-    //if (!Kontext.getJsonBulkData()) {
-    //    document.getElementById('message').innerHTML = '<p style="color: red;">No report loadec</p>';
-    //    return;
-    //}
-    ////renderTable(globalJsonData, 'results',getFiltersMap());
     new KanbanPanel('results', getFiltersMap()).render()
 });
 
