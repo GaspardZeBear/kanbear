@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="src/assets/modal.css">
+</head>
+
+<body>
+
+    <h2>Modal Example</h2>
+
+    <!-- Trigger/Open The Modal -->
+    <button id="projectModalButton" class="myButton" modal="projectModal">Project</button>
+    <button id="swimlaneModalButton" class="myButton" modal="swimlaneModal">Swimlane</button>
+    <button id="taskModalButton" class="myButton" modal="taskModal">Task</button>
+
+
+    <!-- The Modals -->
+    <div id="projectModalDiv" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <label for="pName">Project Name</label>
+            <input type="text" id="pName" name="pName"><br><br>
+            <label for="pDescription">Description</label>
+            <input type="text" id="pDescription" name="pDescription"><br><br>
+            <button class="save" id="saveProject">Save</button>
+            <button class="rename" id="renameProject">Rename</button>
+            <button class="addSwimlane" id="addSwimlaneToProject">AddSwimlane</button>
+
+        </div>
+    </div>
+    <div id="swimlaneModalDiv" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <label for="sName">Swimlane Name</label>
+            <input type="text" id="pName" name="pName"><br><br>
+            <button class="save" id="saveSwimlane">Save</button>
+        </div>
+    </div>
+    <div id="taskModalDiv" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <label for="tTitle">Title</label>
+            <input type="text" id="tTitle" name="tTitle"><br><br>
+            <label for="sName">Swimlane</label>
+            <input type="text" id="sName" name="sName"><br><br>
+            <button class="save" id="saveTask">Save</button>
+        </div>
+    </div>
+
+    <script>
+
+        //let buttons = document.querySelectorAll(".myButton")
+        //buttons.forEach((button, index) => {
+
+        function projectModal(context) {
+            console.log(context)
+            let pName = document.getElementById("pName")
+            //console.log(pName)
+
+            alert(pName.value)
+        }
+
+        function swimlaneModal(context) {
+            console.log(context)
+            let sName = document.getElementById("sName")
+            //console.log(pName)
+            alert(sName.value)
+        }
+
+        function taskModal(context) {
+            console.log(context)
+            let tTitle = document.getElementById("tTitle")
+            //console.log(pName)
+            alert(tTitle.value)
+        }
+
+
+        function modalManage(onClickFunction, modalDivId, context = {}) {
+            //let modalId = document.getElementById(button)
+            let modal = document.getElementById(modalDivId)
+            console.log(" Modal ", modal)
+            let saveBtn = modal.querySelector(".save")
+            console.log(saveBtn)
+            saveBtn.addEventListener('click', (ev) => {
+                onClickFunction(context)
+                modal.style.display = "none";
+            })
+            // Get the <span> element that closes the modal
+            let span = document.getElementsByClassName("close")[0];
+            // When the user clicks the button, open the modal 
+            //button.onclick = function () {
+            modal.style.display = "block";
+            //}
+            // When the user clicks on <span> (x), close the modal
+            span.onclick = function () {
+                modal.style.display = "none";
+            }
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function (event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+
+        }
+
+        console.log("setting event listeners")
+        //document.getElementById("projectModal").querySelector(".save").addEventListener('click', (ev) => {
+        document.getElementById("projectModalButton").addEventListener('click', (ev) => {
+            console.log("projectModal eventListener")
+            modalManage(projectModal, "projectModalDiv", { project: "project1", bogus: "bogus" })
+        })
+        //document.getElementById("swimlaneModalButton").addEventListener('click', (ev) => {
+        //    console.log("swimlaneModal eventListener")
+        //    modalManage(swimlaneModal, "swimlaneModalDiv",{projectId:"1"})
+        //})
+        document.getElementById("addSwimlaneToProject").addEventListener('click', (ev) => {
+            console.log("swimlaneModal eventListener")
+            modalManage(swimlaneModal, "swimlaneModalDiv", { projectId: "1" })
+        })
+
+        //document.getElementById("taskModal").querySelector(".save").addEventListener('click', (ev) => {
+        document.getElementById("taskModalButton").addEventListener('click', (ev) => {
+            console.log("taskModal eventListener")
+            modalManage(taskModal, "taskModalDiv")
+        })
+
+    </script>
+
+</body>
+
+</html>
