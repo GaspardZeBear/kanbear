@@ -12,8 +12,8 @@ document.getElementById('kanboard').href = Kontext.getKanboardUrl()
 
 document.getElementById('projectsSelectBox').addEventListener('change', (e) => {
     const selectedProject = e.target.value;
-    console.log("projectSelectBox",e.target.value)
-    Kontext.setProject(selectedProject,"xxxx")
+    console.log("projectSelectBox", e.target.value)
+    Kontext.setProject(selectedProject, "xxxx")
 });
 
 document.getElementById('loadJson').addEventListener('click', async () => {
@@ -29,9 +29,18 @@ document.getElementById('loadJson').addEventListener('click', async () => {
 //---------------------------------------------------------------------------------
 async function buildProjectsSelectBox() {
     await Kontext.loadProjects()
-    Object.entries(Kontext.getProjects()).forEach(([pId, pName]) => {
-        console.log(pId, pName)
+    //const option = document.createElement('option')
+    //option.setAttribute("value", 0)
+    //option.innerHTML = '-------'
+    //document.getElementById('projectsSelectBox').appendChild(option)
+    Object.entries(Kontext.getProjects()).forEach(([pId, pName],idx) => {
+        console.log(idx,pId, pName)
+        
         const option = document.createElement('option')
+        if ( idx == 0) {
+            Kontext.setProject(pId,pName)
+            option.setAttribute("selected","selected")
+        }
         option.setAttribute("value", pId)
         option.innerHTML = pName
         document.getElementById('projectsSelectBox').appendChild(option)

@@ -21,7 +21,7 @@ class KanboardSqlReporter {
   }
 
   //-----------------------------------------------------
-  async selectPCST() {
+  async selectPCST(projectId) {
     console.log("KanboardSqlReporter.selectPCST()")
     let reqPCST = `
       select 
@@ -50,6 +50,7 @@ class KanboardSqlReporter {
         on p.id=t.project_id
       join columns as c
         on c.id=t.column_id
+        where p.id=${projectId}
       order by p.name,s.name,t.title
       `
     const queryStmt = this.db.prepare(reqPCST);
@@ -72,10 +73,10 @@ class KanboardSqlReporter {
   }
 
   //-----------------------------------------------------
-  async getJsonReport() {
+  async getJsonReport(projectId) {
     let report = []
     let projectsMap = {}
-    const pcstPromises = this.selectPCST()
+    const pcstPromises = this.selectPCST(projectId)
     const usersPromise = this.selectUsers()
     let [pcst, usersMap] = await Promise.all([pcstPromises, usersPromise])
 

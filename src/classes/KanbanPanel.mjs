@@ -127,6 +127,8 @@ class KanbanPanel {
       zone.addEventListener('drop', (ev) => {
         ev.preventDefault()
         const data = ev.dataTransfer.getData("dragId");
+        console.log("setDropZone() drop ev",ev)
+        console.log("setDropZone() drop target",ev.target)
         ev.target.appendChild(document.getElementById(data))
       })
 

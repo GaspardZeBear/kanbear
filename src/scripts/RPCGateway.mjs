@@ -44,10 +44,11 @@ app.get('/', (req, res) => {
 });
 
 //------------------------------------------------------------------------------
-app.get('/api/sql/report', async (req, res) => {
-   console.log("/api/sql/report invokated")
+app.get('/api/sql/report/:projectId', async (req, res) => {
+  const projectId=parseInt(req.params.projectId)
+   console.log("/api/sql/report invokated pId",projectId)
   try {
-    const report = await sqlReporter.getJsonReport();
+    const report = await sqlReporter.getJsonReport(projectId);
     console.log("api.get() ", report)
     res.json(report);
   } catch (error) {
