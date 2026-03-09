@@ -97,12 +97,14 @@ class KanboardSqlReporter {
         projectsMap[row.pId].columns[row.cId] = { id: row.cId, title: row.cTitle, description: row.cDescription, position: row.cPosition }
       }
       if (!projectsMap[row.pId].swimlanes[row.sId]) {
-        projectsMap[row.pId].swimlanes[row.sId] = { id: row.sId, name: row.sName, description: row.sDescription, tasks: {} }
+        projectsMap[row.pId].swimlanes[row.sId] = { id: row.sId, project_id: row.pId, name: row.sName, description: row.sDescription, tasks: {} }
       }
       projectsMap[row.pId].swimlanes[row.sId].tasks[row.tId] = {
         id: row.tId,
         description: row.tDescription,
         title: row.tTitle,
+        project_id : row.pId,
+        swimlane_id : row.sId,
         column_id: row.cId,
         date_moved: row.tMoved,
         date_due: row.tDue,

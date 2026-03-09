@@ -16,6 +16,13 @@ class Ref {
     static getRef(name, projectId, swimlaneId, taskId) {
         return(`${name}:${projectId}:${swimlaneId}:${taskId}`)
     }
+    
+    //-----------------------------------------------------------------------------------------
+    static getRefFromTaskId(name, taskId) {
+        let swimlaneId=task.swimlane_id
+        let projectId=task.project_id
+        return(Ref.getRef(name,projectId,swimlaneId,taskId))
+    }
 
     //-----------------------------------------------------------------------------------------
     static getObjectsFromRef(ref) {

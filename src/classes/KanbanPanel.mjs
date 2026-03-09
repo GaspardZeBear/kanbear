@@ -2,6 +2,7 @@ import { KanboardFilter } from "./KanboardFilter.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { TaskManager } from "./TaskManager.mjs"
 import { ProjectManager } from "./ProjectManager.mjs"
+import { Ref } from "./Ref.mjs"
 
 class KanbanPanel {
   //------------------------------------------------------------------------
@@ -28,7 +29,7 @@ class KanbanPanel {
     //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
     let resultTitle = document.createElement('h2')
     resultTitle.innerHTML = `${this.project.name} filtered by ...`
-    document.getElementById(this.htmlElement).append(resultTitle)
+    document.getElementById(this.htmlElement).replaceChildren(resultTitle)
 
     this.buildKanbanDivsForProject(this.project)
     //this.buildkColumnsQuerySelectors(this.projects[0])
@@ -149,6 +150,8 @@ class KanbanPanel {
         } else {
           itemsDiv.insertBefore(document.getElementById(data), ev.target)
         }
+        // save task to database
+        // Beware : swimlane may change, updte id too in db and in task div Id !!!!!!!!!!!!!!!
       })
 
     })
@@ -200,7 +203,8 @@ class KanbanPanel {
 
   //-----------------------------------------------------------------------------------------------------
   createTaskElement(task, status, swimlaneId, container) {
-    const dragId = `drag-${task.id}`
+    //const dragId = `drag-${task.id}`
+    const dragId=Ref.getRefFromTaskid('drag',task.id)
     const taskElement = document.createElement('div');
     taskElement.setAttribute("id", dragId)
     taskElement.classList.add('kanban-item');
