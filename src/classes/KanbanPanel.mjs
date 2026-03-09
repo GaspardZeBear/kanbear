@@ -1,14 +1,14 @@
 import { KanboardFilter } from "./KanboardFilter.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { TaskManager } from "./TaskManager.mjs"
-import { ProjectManager} from "./ProjectManager.mjs"
+import { ProjectManager } from "./ProjectManager.mjs"
 
 class KanbanPanel {
   //------------------------------------------------------------------------
   constructor(element, filtersMap) {
     this.projects = Kontext.getJsonBulkData()
-    console.log("KanbanPanel constructor pid",Kontext.getCurrentProjectId())
-    this.project= Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()] || undefined
+    console.log("KanbanPanel constructor pid", Kontext.getCurrentProjectId())
+    this.project = Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()] || undefined
     this.htmlElement = element
     this.kanboardFilter = new KanboardFilter(filtersMap)
     this.buttons = {}
@@ -19,9 +19,9 @@ class KanbanPanel {
 
   //------------------------------------------------------------------------
   render() {
-    console.log("render pid ",this.project)
-    let [displayable, cause] = new ProjectManager(this.project).isDisplayable() 
-    if ( !displayable) {
+    console.log("render pid ", this.project)
+    let [displayable, cause] = new ProjectManager(this.project).isDisplayable()
+    if (!displayable) {
       document.getElementById(this.htmlElement).innerHTML = `Project not displayable ${cause}`
       return
     }
@@ -119,20 +119,38 @@ class KanbanPanel {
     const qs = `.kanban-items`
     //console.log("qs", qs)
     const zones = document.querySelectorAll(qs)
-    //console.log(zones)
+    console.log(zones)
     zones.forEach((zone) => {
+       console.log("listener",zone)
       zone.addEventListener('dragover', (ev) => {
+        console.log("dargover",zone)
         ev.preventDefault()
+        zone.classList.add("drag-over")
+      })
+      zone.addEventListener('dragleave', (ev) => {
+        zone.classList.remove("drag-over")
       })
       zone.addEventListener('drop', (ev) => {
+        console.log(zone)
         ev.preventDefault()
+        zone.classList.remove("drag-over")
         const data = ev.dataTransfer.getData("dragId");
-        console.log("setDropZone() drop ev",ev)
-        console.log("setDropZone() drop target",ev.target)
-        ev.target.appendChild(document.getElementById(data))
+        console.log("setDropZone() drop ev", ev)
+        console.log("setDropZone() drop target", ev.target)
+        console.log("parent",ev.target.closest(".kanban-items"))
+        let itemsDiv=ev.target.closest(".kanban-items")
+        //
+        itemsDiv.appendChild(document.getElementById(data))
       })
 
     })
+    document.querySelectorAll('.kanban-item-header button, .kanban-item-title, .kanban-item-description').forEach(el => {
+      el.addEventListener('dragstart', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      });
+    });
   };
 
   //------------------------------------------------------------------------
@@ -185,8 +203,8 @@ class KanbanPanel {
                 <div class="kanban-item-title">${task.title}</div>
                 <button class="edit-task-btn" data-task-id="${task.id}">Edit</button>
             </div>
-            <div class="kanban-item-description">${task.description}</div>
-          `;
+           `;
+    //       <div class="kanban-item-description">${task.description}</div>
 
     container.appendChild(taskElement);
 
@@ -194,7 +212,16 @@ class KanbanPanel {
       console.log("dragstart")
       ev.dataTransfer.setData('dragId', dragId);
       console.log(ev.dataTransfer)
+      ev.target.classList.add("dragging")
+      //ev.stopPropagation()
       ev.dataTransfer.effectAllowed = 'move';
+    })
+
+    taskElement.addEventListener('dragend', (ev) => {
+      console.log("dragend")
+      //ev.dataTransfer.setData('dragId', dragId);
+      //console.log(ev.dataTransfer)
+      ev.target.classList.remove("dragging")
     })
 
     const editBtn = taskElement.querySelector('.edit-task-btn');
