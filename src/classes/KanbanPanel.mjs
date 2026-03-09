@@ -140,7 +140,11 @@ class KanbanPanel {
         console.log("parent",ev.target.closest(".kanban-items"))
         let itemsDiv=ev.target.closest(".kanban-items")
         //
+        if ( ev.target === itemsDiv ) {
         itemsDiv.appendChild(document.getElementById(data))
+        } else {
+        itemsDiv.insertBefore(document.getElementById(data),ev.target)
+        }
       })
 
     })
