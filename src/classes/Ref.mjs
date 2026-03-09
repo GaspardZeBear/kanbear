@@ -18,10 +18,10 @@ class Ref {
     }
     
     //-----------------------------------------------------------------------------------------
-    static getRefFromTaskId(name, taskId) {
+    static getRefFromTask(name, task) {
         let swimlaneId=task.swimlane_id
         let projectId=task.project_id
-        return(Ref.getRef(name,projectId,swimlaneId,taskId))
+        return(Ref.getRef(name,projectId,swimlaneId,task.id))
     }
 
     //-----------------------------------------------------------------------------------------

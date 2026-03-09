@@ -142,7 +142,7 @@ class KanbanPanel {
         const data = ev.dataTransfer.getData("dragId");
         console.log("setDropZone() drop ev", ev)
         console.log("setDropZone() drop target", ev.target)
-        console.log("parent", ev.target.closest(".kanban-items"))
+        //npm startconsole.log("parent", ev.target.closest(".kanban-items"))
         let itemsDiv = ev.target.closest(".kanban-items")
         //
         if (ev.target === itemsDiv) {
@@ -152,6 +152,7 @@ class KanbanPanel {
         }
         // save task to database
         // Beware : swimlane may change, updte id too in db and in task div Id !!!!!!!!!!!!!!!
+        console.log("dragId",data)
       })
 
     })
@@ -204,7 +205,7 @@ class KanbanPanel {
   //-----------------------------------------------------------------------------------------------------
   createTaskElement(task, status, swimlaneId, container) {
     //const dragId = `drag-${task.id}`
-    const dragId=Ref.getRefFromTaskid('drag',task.id)
+    const dragId=Ref.getRefFromTask('drag',task)
     const taskElement = document.createElement('div');
     taskElement.setAttribute("id", dragId)
     taskElement.classList.add('kanban-item');
