@@ -1,6 +1,7 @@
 import { KanboardFilter } from "./KanboardFilter.mjs"
 import { formatDuration, dateToString, getDurationFromNow } from "../utils/formatDuration.mjs";
 import { Kontext } from "./Kontext.mjs";
+import { Ref} from "./Ref.mjs"
 
 class KanboardListPanel {
   constructor(element, filtersMap) {
@@ -108,7 +109,7 @@ class KanboardListPanel {
     const tbody = document.createElement('tbody')
 
     //this.projects.forEach((project, projectIndex) => {
-    Object.entries(this.projects).forEach(([projectIndex, project]) => {
+    Object.entries(this.projects).forEach(([projectId, project]) => {
       if (!this.kanboardFilter.keepProject(project.name)) { return }
       const projectStyle = Kontext.getProjectStyle(project.name)
       Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
@@ -122,10 +123,11 @@ class KanboardListPanel {
           }
           const row = document.createElement('tr');
           const duration = formatDuration((Date.now() / 1000 - task.date_moved))
-          const ref = `${projectIndex}:${swimlane.id}:${task.id}`
+          const checkBoxId = Ref.getRef('checkbox',projectId,swimlane.id,task.id)
+          const commentLinkId = Ref.getRef('commentLink',projectId,swimlane.id,task.id)
           row.innerHTML = `
-              <td><input type="checkbox" name="tasks" id="checkbox:${ref}" class="taskCheckbox"/></td>
-              <td><a href="#" class="taskCommentLink" id="commentLink:${ref}">c</a></td>
+              <td><input type="checkbox" name="tasks" id="${checkBoxId}" class="taskCheckbox"/></td>
+              <td><a href="#" class="taskCommentLink" id="${commentLinkId}">c</a></td>
               <td style="${projectStyle}">${project.name}</td>
               <td>${swimlane.name}</td>
               <td>${task.title}</td>
@@ -150,7 +152,7 @@ class KanboardListPanel {
       //console.log(link)
       link.addEventListener('click', function (e) {
         e.preventDefault();
-        const [name, project, column, task] = self.getObjectsFromRef(this.getAttribute('id'))
+        const [name, project, swimlane, task, column] = self.getObjectsFromRef(this.getAttribute('id'))
         document.getElementById('popupTaskId').textContent = task.title;
         popup.style.display = 'flex';
         // Charger les notes existantes si disponibles (exemple)

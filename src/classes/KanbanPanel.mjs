@@ -25,7 +25,11 @@ class KanbanPanel {
       document.getElementById(this.htmlElement).innerHTML = `Project not displayable ${cause}`
       return
     }
-    document.getElementById(this.htmlElement).innerHTML = this.project.name
+    //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
+    let resultTitle = document.createElement('h2')
+    resultTitle.innerHTML = `${this.project.name} filtered by ...`
+    document.getElementById(this.htmlElement).append(resultTitle)
+
     this.buildKanbanDivsForProject(this.project)
     //this.buildkColumnsQuerySelectors(this.projects[0])
     this.setDropZones(this.project)
@@ -121,9 +125,9 @@ class KanbanPanel {
     const zones = document.querySelectorAll(qs)
     console.log(zones)
     zones.forEach((zone) => {
-       console.log("listener",zone)
+      console.log("listener", zone)
       zone.addEventListener('dragover', (ev) => {
-        console.log("dargover",zone)
+        console.log("dragover", zone)
         ev.preventDefault()
         zone.classList.add("drag-over")
       })
@@ -137,13 +141,13 @@ class KanbanPanel {
         const data = ev.dataTransfer.getData("dragId");
         console.log("setDropZone() drop ev", ev)
         console.log("setDropZone() drop target", ev.target)
-        console.log("parent",ev.target.closest(".kanban-items"))
-        let itemsDiv=ev.target.closest(".kanban-items")
+        console.log("parent", ev.target.closest(".kanban-items"))
+        let itemsDiv = ev.target.closest(".kanban-items")
         //
-        if ( ev.target === itemsDiv ) {
-        itemsDiv.appendChild(document.getElementById(data))
+        if (ev.target === itemsDiv) {
+          itemsDiv.appendChild(document.getElementById(data))
         } else {
-        itemsDiv.insertBefore(document.getElementById(data),ev.target)
+          itemsDiv.insertBefore(document.getElementById(data), ev.target)
         }
       })
 
@@ -205,6 +209,7 @@ class KanbanPanel {
             <div class="kanban-item-header">
                 <div class="kanban-item-title">#${task.id}</div>
                 <div class="kanban-item-title">${task.title}</div>
+                <div class="kanban-item-description">blabla description${task.description}</div>
                 <button class="edit-task-btn" data-task-id="${task.id}">Edit</button>
             </div>
            `;
