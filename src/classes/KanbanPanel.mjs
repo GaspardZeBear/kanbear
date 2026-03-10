@@ -83,7 +83,7 @@ class KanbanPanel {
         kColumnHeaderDivH3.innerHTML = col.title
         const kCounterDiv = document.createElement('span')
         kCounterDiv.classList.add("kanban-count")
-        kCounterDiv.setAttribute("id", `counter:${project.id}:${swimlane.id}:${col.id}`)
+        kCounterDiv.setAttribute("id", `counter:${project.id}:${swimlane.id}:_:${col.id}`)
         kCounterDiv.innerHTML = 0
 
         // create kanban-items
@@ -127,8 +127,9 @@ class KanbanPanel {
     console.log(zones)
     zones.forEach((zone) => {
       console.log("listener", zone)
+      project = this.project
       zone.addEventListener('dragover', (ev) => {
-        console.log("dragover", zone)
+        //console.log("dragover", zone)
         ev.preventDefault()
         zone.classList.add("drag-over")
       })
@@ -136,23 +137,67 @@ class KanbanPanel {
         zone.classList.remove("drag-over")
       })
       zone.addEventListener('drop', (ev) => {
-        console.log(zone)
+        console.log("Drop starting for zone ", zone)
         ev.preventDefault()
         zone.classList.remove("drag-over")
         const data = ev.dataTransfer.getData("dragId");
-        console.log("setDropZone() drop ev", ev)
-        console.log("setDropZone() drop target", ev.target)
-        //npm startconsole.log("parent", ev.target.closest(".kanban-items"))
+        let taskElement = document.getElementById(data)
+        
+        console.log("drop() data", data)
+        console.log("drop() taskElement", taskElement)
+        console.log("drop() target", ev.target)
+
+        //---------------------------------------------------------------------------
+        // Todo 
+        // - save task to database
+        // - update task in Kontext  
+        // Beware : swimlane may change, update id too in db and in task div Id !!!!!!!!!!!!!!!
+        // - update taskElement dragId :  update dragstart eventListener (remove/add) 
+        // - update the DOM
+        //------------------------------------------------------------------------------------
+
+        let ref = taskElement.getAttribute("id")
+        let [name, pId, sId, tId, cId] = Ref.getIdsFromRef(ref)
+
+        let kanbanColumn = ev.target.closest(".kanban-column")
+        let targetSwimlaneId = kanbanColumn.getAttribute("data-swimlane-id")
+        let targetColumnId = kanbanColumn.getAttribute("data-status")
+
+        console.log("drop() targetSwimlaneId", targetSwimlaneId, targetColumnId)
+        //this.updateCounters()
+
+        // get a new ref with new swimlaneId and new columnId
+        let newRef = Ref.getRef(name, pId, targetSwimlaneId, tId, targetColumnId)
+        console.log("drop() data", data, document.getElementById(data))
+        taskElement.setAttribute("id", newRef)
+        console.log("drop() newRef", newRef, document.getElementById(newRef))
+
+        // update task in context
+        Kontext.getJsonBulkData()[pId].swimlanes[sId].tasks[tId].column_id = targetColumnId
+
+        // replace event listener dragId
+        removeEventListener('dragstart', taskElement)
+        taskElement.addEventListener('dragstart', (ev) => {
+          console.log("drop() dragstart")
+          ev.dataTransfer.setData('dragId', newRef);
+          console.log(ev.dataTransfer)
+          ev.target.classList.add("dragging")
+          //ev.stopPropagation()
+          ev.dataTransfer.effectAllowed = 'move';
+        })
+
+        // update the DOM
+        //console.log("srcRef", Ref.getIdsFromRef(ref), "targetId", document.getElementById(newRef).getAttribute("id"))
+        // If drop over column (ex :empty column, appendChild)
+        // Drop over another taskElement : must insert before it (choice, seems most convenient)
         let itemsDiv = ev.target.closest(".kanban-items")
-        //
         if (ev.target === itemsDiv) {
-          itemsDiv.appendChild(document.getElementById(data))
+          itemsDiv.appendChild(document.getElementById(newRef))
         } else {
-          itemsDiv.insertBefore(document.getElementById(data), ev.target)
+          itemsDiv.insertBefore(document.getElementById(newRef), ev.target)
         }
-        // save task to database
-        // Beware : swimlane may change, updte id too in db and in task div Id !!!!!!!!!!!!!!!
-        console.log("dragId",data)
+        //
+
       })
 
     })
@@ -202,10 +247,23 @@ class KanbanPanel {
     countElement.textContent = count;
   }
 
+  //---------------------------------------------------------------------------------------
+  updateCounters() {
+    //const column = document.querySelector(`.kanban-column[data-status="${status}"][data-swimlane-id="${swimlaneId}"]`);
+    const counters = document.querySelectorAll('.kanban-count');
+    //console.log(counters)
+    counters.forEach((counter) => {
+      //console.log(counter)
+
+    })
+    //const count = column.querySelectorAll('.kanban-item').length;
+    //countElement.textContent = count;
+  }
+
   //-----------------------------------------------------------------------------------------------------
   createTaskElement(task, status, swimlaneId, container) {
     //const dragId = `drag-${task.id}`
-    const dragId=Ref.getRefFromTask('drag',task)
+    const dragId = Ref.getRefFromTask('drag', task)
     const taskElement = document.createElement('div');
     taskElement.setAttribute("id", dragId)
     taskElement.classList.add('kanban-item');

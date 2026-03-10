@@ -1,3 +1,5 @@
+import { Kontext } from "./Kontext.mjs"
+
 class Ref {
 
     constructor() {
@@ -13,40 +15,43 @@ class Ref {
     }
 
     //-----------------------------------------------------------------------------------------
-    static getRef(name, projectId, swimlaneId, taskId) {
-        return(`${name}:${projectId}:${swimlaneId}:${taskId}`)
+    static getRef(name, projectId, swimlaneId, taskId,columId="_") {
+        return(`${name}:${projectId}:${swimlaneId}:${taskId}:${columId}`)
     }
     
     //-----------------------------------------------------------------------------------------
     static getRefFromTask(name, task) {
         let swimlaneId=task.swimlane_id
         let projectId=task.project_id
-        return(Ref.getRef(name,projectId,swimlaneId,task.id))
+        let columnId=task.column_id
+        return(Ref.getRef(name,projectId,swimlaneId,task.id,columnId))
     }
 
     //-----------------------------------------------------------------------------------------
     static getObjectsFromRef(ref) {
-        let [name, projectId, swimlaneId, taskId] = ref.split(':')
+        let [name, projectId, swimlaneId, taskId, columnId] = ref.split(':')
         console.log(ref)
-        console.log(this.projects[projectId].swimlanes[swimlaneId].tasks, " --- ", taskId)
-        let columnId = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId].column_id
-        let swimlane=this.projects[projectId].swimlanes[swimlaneId]
-        let project = this.projects[projectId]
-        let task = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId]
-        let column = this.projects[projectId].columns[columnId]
+        let project=Kontext.getJsonBulkData()[projectId]
+        console.log(project.swimlanes[swimlaneId].tasks, " --- ", taskId)
+        let columnId1 = project.swimlanes[swimlaneId].tasks[taskId].column_id
+        let swimlane=project.swimlanes[swimlaneId]
+        //let project = this.projects[projectId]
+        let task = project.swimlanes[swimlaneId].tasks[taskId]
+        let column = project.columns[columnId1]
         return ([name, project, swimlane, task, column])
     }
 
     //-----------------------------------------------------------------------------------------
     static getIdsFromRef(ref) {
-        let [name, projectId, swimlaneId, taskId] = ref.split(':')
+        let [name, projectId, swimlaneId, taskId, columnId] = ref.split(':')
         console.log(ref)
-        console.log(this.projects[projectId].swimlanes[swimlaneId].tasks, " --- ", taskId)
-        let columnId = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId].column_id
+        let project=Kontext.getJsonBulkData()[projectId]
+        console.log(project.swimlanes[swimlaneId].tasks, " --- ", taskId)
+        let columnId1 = project.swimlanes[swimlaneId].tasks[taskId].column_id
         //let project = this.projects[projectId]
         //let task = this.projects[projectId].swimlanes[swimlaneId].tasks[taskId]
         //let column = this.projects[projectId].columns[columnId]
-        return ([name, projectId, swimlaneId, taskId, columnId])
+        return ([name, projectId, swimlaneId, taskId, columnId1])
     }
 
 }
