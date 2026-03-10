@@ -126,7 +126,7 @@ class KanbanPanel {
     const zones = document.querySelectorAll(qs)
     console.log(zones)
     zones.forEach((zone) => {
-      console.log("listener", zone)
+      //console.log("listener", zone)
       project = this.project
       zone.addEventListener('dragover', (ev) => {
         //console.log("dragover", zone)
@@ -174,6 +174,24 @@ class KanbanPanel {
 
         // update task in context
         Kontext.getJsonBulkData()[pId].swimlanes[sId].tasks[tId].column_id = targetColumnId
+        Kontext.getJsonBulkData()[pId].swimlanes[sId].tasks[tId].swimlane_id = targetSwimlaneId
+         // attach the task in swimlane
+        let project=Kontext.getJsonBulkData()[pId]
+        console.log("drop() project",project)
+        if ( sId != targetSwimlaneId) {
+          //console.log("drop() swimlanes target,src",targetSwimlaneId,sId)
+          //console.log("drop() swimlanes target,raw target",project.swimlanes[targetSwimlaneId].tasks[tId])
+          //console.log("drop() swimlanes target,raw src",project.swimlanes[sId].tasks[tId])
+          project.swimlanes[targetSwimlaneId].tasks[tId]={}
+          //console.log("drop() swimlanes",targetSwimlaneId,sId)
+            Object.assign(
+              project.swimlanes[targetSwimlaneId].tasks[tId],
+              project.swimlanes[sId].tasks[tId]
+            )
+            delete(project.swimlanes[sId].tasks[tId])
+
+        }
+       
 
         // replace event listener dragId
         removeEventListener('dragstart', taskElement)
