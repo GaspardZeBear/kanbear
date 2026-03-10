@@ -214,6 +214,8 @@ class KanbanPanel {
         } else {
           itemsDiv.insertBefore(document.getElementById(newRef), ev.target)
         }
+        this.updateCounter(cId,sId)
+        this.updateCounter(targetColumnId,targetSwimlaneId)
         //
 
       })
@@ -265,20 +267,7 @@ class KanbanPanel {
     countElement.textContent = count;
   }
 
-  //---------------------------------------------------------------------------------------
-  updateCounters() {
-    //const column = document.querySelector(`.kanban-column[data-status="${status}"][data-swimlane-id="${swimlaneId}"]`);
-    const counters = document.querySelectorAll('.kanban-count');
-    //console.log(counters)
-    counters.forEach((counter) => {
-      //console.log(counter)
-
-    })
-    //const count = column.querySelectorAll('.kanban-item').length;
-    //countElement.textContent = count;
-  }
-
-  //-----------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------
   createTaskElement(task, status, swimlaneId, container) {
     //const dragId = `drag-${task.id}`
     const dragId = Ref.getRefFromTask('drag', task)
