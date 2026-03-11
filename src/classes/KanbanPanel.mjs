@@ -1,6 +1,6 @@
 import { KanboardFilter } from "./KanboardFilter.mjs"
 import { Kontext } from "./Kontext.mjs"
-import { TaskManager } from "./TaskManager.mjs"
+import { Task } from "./Task.mjs"
 import { ProjectManager } from "./ProjectManager.mjs"
 import { Ref } from "./Ref.mjs"
 
@@ -142,6 +142,9 @@ class KanbanPanel {
         zone.classList.remove("drag-over")
         const data = ev.dataTransfer.getData("dragId");
         let taskElement = document.getElementById(data)
+
+        //remove old taskElment
+        taskElement.parentElement.removeChild(taskElement)
         
         console.log("drop() data", data)
         console.log("drop() taskElement", taskElement)
@@ -158,6 +161,11 @@ class KanbanPanel {
 
         let ref = taskElement.getAttribute("id")
         let [name, pId, sId, tId, cId] = Ref.getIdsFromRef(ref)
+        let [name1, project, swimlane, taskO, column] = Ref.getObjectsFromRef(ref)
+        
+        const task=new Task(taskO)
+        task.setRef(ref)
+        
 
         let kanbanColumn = ev.target.closest(".kanban-column")
         let targetSwimlaneId = kanbanColumn.getAttribute("data-swimlane-id")
@@ -168,15 +176,20 @@ class KanbanPanel {
 
         // get a new ref with new swimlaneId and new columnId
         let newRef = Ref.getRef(name, pId, targetSwimlaneId, tId, targetColumnId)
+        task.setRef(newRef)
         console.log("drop() data", data, document.getElementById(data))
-        taskElement.setAttribute("id", newRef)
+        //taskElement.setAttribute("id", newRef)
         console.log("drop() newRef", newRef, document.getElementById(newRef))
 
         // update task in context
-        Kontext.getJsonBulkData()[pId].swimlanes[sId].tasks[tId].column_id = targetColumnId
-        Kontext.getJsonBulkData()[pId].swimlanes[sId].tasks[tId].swimlane_id = targetSwimlaneId
+        //Kontext.getJsonBulkData()[pId].swimlanes[sId].tasks[tId].column_id = targetColumnId
+        //Kontext.getJsonBulkData()[pId].swimlanes[sId].tasks[tId].swimlane_id = targetSwimlaneId
+        task.setColumn(targetColumnId)
+         task.setSwimlane(targetSwimlaneId)
          // attach the task in swimlane
-        let project=Kontext.getJsonBulkData()[pId]
+        //let project=Kontext.getJsonBulkData()[pId]
+
+        /*
         console.log("drop() project",project)
         if ( sId != targetSwimlaneId) {
           //console.log("drop() swimlanes target,src",targetSwimlaneId,sId)
@@ -191,9 +204,11 @@ class KanbanPanel {
             delete(project.swimlanes[sId].tasks[tId])
 
         }
+            */
        
 
         // replace event listener dragId
+        /*
         removeEventListener('dragstart', taskElement)
         taskElement.addEventListener('dragstart', (ev) => {
           console.log("drop() dragstart")
@@ -203,16 +218,23 @@ class KanbanPanel {
           //ev.stopPropagation()
           ev.dataTransfer.effectAllowed = 'move';
         })
+          */
+        
+        //let [name1, project, swimlane, task, column] = Ref.getObjectsFromRef(ref)
+        const taskElementNew=task.createKanbanTaskElement()
 
         // update the DOM
         //console.log("srcRef", Ref.getIdsFromRef(ref), "targetId", document.getElementById(newRef).getAttribute("id"))
         // If drop over column (ex :empty column, appendChild)
         // Drop over another taskElement : must insert before it (choice, seems most convenient)
         let itemsDiv = ev.target.closest(".kanban-items")
+      
         if (ev.target === itemsDiv) {
-          itemsDiv.appendChild(document.getElementById(newRef))
+          //itemsDiv.appendChild(document.getElementById(newRef))
+          itemsDiv.appendChild(taskElementNew)
         } else {
-          itemsDiv.insertBefore(document.getElementById(newRef), ev.target)
+          //itemsDiv.insertBefore(document.getElementById(newRef), ev.target)
+          itemsDiv.insertBefore(taskElementNew, ev.target)
         }
         this.updateCounter(cId,sId)
         this.updateCounter(targetColumnId,targetSwimlaneId)
@@ -248,7 +270,9 @@ class KanbanPanel {
         if (project.swimlanes[kSwimlaneId]) {
           Object.entries(project.swimlanes[kSwimlaneId].tasks).forEach(([tKey, task]) => {
             if (task.column_id == status) {
-              this.createTaskElement(task, status, kSwimlaneId, container);
+              //const taskO=new Task(task)
+              //this.createTaskElement(task, status, kSwimlaneId, container);
+              container.appendChild(new Task(task).createKanbanTaskElement());
             }
             //Mettre à jour le compteur
             this.updateCounter(status, kSwimlaneId);
@@ -268,7 +292,7 @@ class KanbanPanel {
   }
 
     //-----------------------------------------------------------------------------------------------------
-  createTaskElement(task, status, swimlaneId, container) {
+  XcreateTaskElement(task, status, swimlaneId, container) {
     //const dragId = `drag-${task.id}`
     const dragId = Ref.getRefFromTask('drag', task)
     const taskElement = document.createElement('div');
