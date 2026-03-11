@@ -69,8 +69,7 @@ class KanbanPanel {
         console.log("buildkColumnsDivsForProject(project) col=", col)
         const kColumnDiv = document.createElement('div')
         kColumnDiv.classList.add("kanban-column")
-        //kColumnDiv.setAttribute("data-status", col.title)
-        kColumnDiv.setAttribute("data-status", col.id)
+        kColumnDiv.setAttribute("data-column-id", col.id)
         kColumnDiv.setAttribute("data-swimlane-id", swimlane.id)
 
         // create kanban-column-header
@@ -89,13 +88,13 @@ class KanbanPanel {
         // create kanban-items
         const kColumnItemsDiv = document.createElement('div')
         kColumnItemsDiv.classList.add("kanban-items")
-        kColumnItemsDiv.setAttribute("data-status", col.id)
+        kColumnItemsDiv.setAttribute("data-column-id", col.id)
         kColumnItemsDiv.setAttribute("data-swimlane-id", swimlane.id)
 
         const addButtonDiv = document.createElement('button')
         addButtonDiv.classList.add("add-item-btn")
         addButtonDiv.setAttribute("data-swimlane-id", swimlane.id)
-        addButtonDiv.setAttribute("data-status", col.id)
+        addButtonDiv.setAttribute("data-column-id", col.id)
         addButtonDiv.innerHTML = "+"
 
         // link all
@@ -164,7 +163,7 @@ class KanbanPanel {
 
         let kanbanColumn = ev.target.closest(".kanban-column")
         let targetSwimlaneId = kanbanColumn.getAttribute("data-swimlane-id")
-        let targetColumnId = kanbanColumn.getAttribute("data-status")
+        let targetColumnId = kanbanColumn.getAttribute("data-column-id")
         // get a new ref with new swimlaneId and new columnId
         let newRef = Ref.getRef(name, pId, targetSwimlaneId, tId, targetColumnId)
 
@@ -208,17 +207,18 @@ class KanbanPanel {
       const kColumns = kSwimlane.querySelectorAll('.kanban-column');
 
       kColumns.forEach(kColumn => {
-        const status = kColumn.dataset.status;
+        console.log("dataset", kColumn.dataset)
+        const columnId = kColumn.dataset.columnId;
         const container = kColumn.querySelector('.kanban-items');
         container.innerHTML = '';
 
         if (project.swimlanes[kSwimlaneId]) {
           Object.entries(project.swimlanes[kSwimlaneId].tasks).forEach(([tKey, task]) => {
-            if (task.column_id == status) {
+            if (task.column_id == columnId) {
               container.appendChild(new Task(task).createKanbanTaskElement());
             }
             //Mettre à jour le compteur
-            this.updateCounter(status, kSwimlaneId);
+            this.updateCounter(columnId, kSwimlaneId);
           })
         }
       })
@@ -227,8 +227,8 @@ class KanbanPanel {
   }
 
   //---------------------------------------------------------------------------------------
-  updateCounter(status, swimlaneId) {
-    const column = document.querySelector(`.kanban-column[data-status="${status}"][data-swimlane-id="${swimlaneId}"]`);
+  updateCounter(columnId, swimlaneId) {
+    const column = document.querySelector(`.kanban-column[data-column-id="${columnId}"][data-swimlane-id="${swimlaneId}"]`);
     const countElement = column.querySelector('.kanban-count');
     const count = column.querySelectorAll('.kanban-item').length;
     countElement.textContent = count;
