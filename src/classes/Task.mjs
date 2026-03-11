@@ -1,3 +1,4 @@
+import { Kontext } from "./Kontext.mjs"
 import { Ref } from "./Ref.mjs"
 
 class Task {
@@ -28,17 +29,18 @@ class Task {
     // Move swimlane_id in task and 
     // - add task to new swimlane
     // - remove it from old swimlane
-    setSwimlane(swimlaneId) {
-        let [name, project, swimlane, task, column] = Ref.getObjectsFromRef(this.ref)
-        if (swimlane.id != swimlaneId) {
-            this.task.swimlane_id = swimlaneId
+    // Beware : remove works by ref, so duplicate
+    setSwimlane(oldSwimlaneId,newSwimlaneId) {
+        let project=Kontext.getCurrentProject()
+        if (oldSwimlaneId != newSwimlaneId) {
+            this.task.swimlane_id = newSwimlaneId
 
-            project.swimlanes[targetSwimlaneId].tasks[this.task.id] = {}
+            project.swimlanes[newSwimlaneId].tasks[this.task.id] = {}
             Object.assign(
-                project.swimlanes[targetSwimlaneId].tasks[this.task.id],
-                swimlane.tasks[this.task.id]
+                project.swimlanes[newSwimlaneId].tasks[this.task.id],
+                project.swimlanes[oldSwimlaneId].tasks[this.task.id]
             )
-            delete (swimlane.tasks[this.task.id])
+            delete (project.swimlanes[oldSwimlaneId].tasks[this.task.id])
         }
     }
 

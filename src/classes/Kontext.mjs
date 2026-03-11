@@ -25,6 +25,12 @@ class Kontext {
         return(Kontext.projects)
     }
 
+//--------------------------------------------------------------
+    static getCurrentProject() {
+        console.log("Kontext getCurrentProject() ",Kontext.currentProjectId)
+        return(Kontext.jsonBulkData[Kontext.currentProjectId])
+    }
+
     //--------------------------------------------------------------
     static getCurrentProjectId() {
         console.log("Kontext getCurrentProjectId() ",Kontext.currentProjectId)

@@ -145,10 +145,6 @@ class KanbanPanel {
 
         //remove old taskElment
         taskElement.parentElement.removeChild(taskElement)
-        
-        console.log("drop() data", data)
-        console.log("drop() taskElement", taskElement)
-        console.log("drop() target", ev.target)
 
         //---------------------------------------------------------------------------
         // Todo 
@@ -162,84 +158,33 @@ class KanbanPanel {
         let ref = taskElement.getAttribute("id")
         let [name, pId, sId, tId, cId] = Ref.getIdsFromRef(ref)
         let [name1, project, swimlane, taskO, column] = Ref.getObjectsFromRef(ref)
-        
-        const task=new Task(taskO)
+
+        const task = new Task(taskO)
         task.setRef(ref)
-        
 
         let kanbanColumn = ev.target.closest(".kanban-column")
         let targetSwimlaneId = kanbanColumn.getAttribute("data-swimlane-id")
         let targetColumnId = kanbanColumn.getAttribute("data-status")
-
-        console.log("drop() targetSwimlaneId", targetSwimlaneId, targetColumnId)
-        //this.updateCounters()
-
         // get a new ref with new swimlaneId and new columnId
         let newRef = Ref.getRef(name, pId, targetSwimlaneId, tId, targetColumnId)
-        task.setRef(newRef)
-        console.log("drop() data", data, document.getElementById(data))
-        //taskElement.setAttribute("id", newRef)
-        console.log("drop() newRef", newRef, document.getElementById(newRef))
 
         // update task in context
-        //Kontext.getJsonBulkData()[pId].swimlanes[sId].tasks[tId].column_id = targetColumnId
-        //Kontext.getJsonBulkData()[pId].swimlanes[sId].tasks[tId].swimlane_id = targetSwimlaneId
         task.setColumn(targetColumnId)
-         task.setSwimlane(targetSwimlaneId)
-         // attach the task in swimlane
-        //let project=Kontext.getJsonBulkData()[pId]
-
-        /*
-        console.log("drop() project",project)
-        if ( sId != targetSwimlaneId) {
-          //console.log("drop() swimlanes target,src",targetSwimlaneId,sId)
-          //console.log("drop() swimlanes target,raw target",project.swimlanes[targetSwimlaneId].tasks[tId])
-          //console.log("drop() swimlanes target,raw src",project.swimlanes[sId].tasks[tId])
-          project.swimlanes[targetSwimlaneId].tasks[tId]={}
-          //console.log("drop() swimlanes",targetSwimlaneId,sId)
-            Object.assign(
-              project.swimlanes[targetSwimlaneId].tasks[tId],
-              project.swimlanes[sId].tasks[tId]
-            )
-            delete(project.swimlanes[sId].tasks[tId])
-
-        }
-            */
-       
-
-        // replace event listener dragId
-        /*
-        removeEventListener('dragstart', taskElement)
-        taskElement.addEventListener('dragstart', (ev) => {
-          console.log("drop() dragstart")
-          ev.dataTransfer.setData('dragId', newRef);
-          console.log(ev.dataTransfer)
-          ev.target.classList.add("dragging")
-          //ev.stopPropagation()
-          ev.dataTransfer.effectAllowed = 'move';
-        })
-          */
-        
-        //let [name1, project, swimlane, task, column] = Ref.getObjectsFromRef(ref)
-        const taskElementNew=task.createKanbanTaskElement()
+        task.setSwimlane(swimlane.id, targetSwimlaneId)
+        task.setRef(newRef)
+        const taskElementNew = task.createKanbanTaskElement()
 
         // update the DOM
-        //console.log("srcRef", Ref.getIdsFromRef(ref), "targetId", document.getElementById(newRef).getAttribute("id"))
         // If drop over column (ex :empty column, appendChild)
         // Drop over another taskElement : must insert before it (choice, seems most convenient)
         let itemsDiv = ev.target.closest(".kanban-items")
-      
         if (ev.target === itemsDiv) {
-          //itemsDiv.appendChild(document.getElementById(newRef))
           itemsDiv.appendChild(taskElementNew)
         } else {
-          //itemsDiv.insertBefore(document.getElementById(newRef), ev.target)
           itemsDiv.insertBefore(taskElementNew, ev.target)
         }
-        this.updateCounter(cId,sId)
-        this.updateCounter(targetColumnId,targetSwimlaneId)
-        //
-
+        this.updateCounter(cId, sId)
+        this.updateCounter(targetColumnId, targetSwimlaneId)
       })
 
     })
@@ -270,8 +215,6 @@ class KanbanPanel {
         if (project.swimlanes[kSwimlaneId]) {
           Object.entries(project.swimlanes[kSwimlaneId].tasks).forEach(([tKey, task]) => {
             if (task.column_id == status) {
-              //const taskO=new Task(task)
-              //this.createTaskElement(task, status, kSwimlaneId, container);
               container.appendChild(new Task(task).createKanbanTaskElement());
             }
             //Mettre à jour le compteur
@@ -290,50 +233,6 @@ class KanbanPanel {
     const count = column.querySelectorAll('.kanban-item').length;
     countElement.textContent = count;
   }
-
-    //-----------------------------------------------------------------------------------------------------
-  XcreateTaskElement(task, status, swimlaneId, container) {
-    //const dragId = `drag-${task.id}`
-    const dragId = Ref.getRefFromTask('drag', task)
-    const taskElement = document.createElement('div');
-    taskElement.setAttribute("id", dragId)
-    taskElement.classList.add('kanban-item');
-    taskElement.setAttribute("draggable", true)
-    taskElement.innerHTML = `
-            <div class="kanban-item-header">
-                <div class="kanban-item-title">#${task.id}</div>
-                <div class="kanban-item-title">${task.title}</div>
-                <div class="kanban-item-description">blabla description${task.description}</div>
-                <button class="edit-task-btn" data-task-id="${task.id}">Edit</button>
-            </div>
-           `;
-    //       <div class="kanban-item-description">${task.description}</div>
-
-    container.appendChild(taskElement);
-
-    taskElement.addEventListener('dragstart', (ev) => {
-      console.log("dragstart")
-      ev.dataTransfer.setData('dragId', dragId);
-      console.log(ev.dataTransfer)
-      ev.target.classList.add("dragging")
-      //ev.stopPropagation()
-      ev.dataTransfer.effectAllowed = 'move';
-    })
-
-    taskElement.addEventListener('dragend', (ev) => {
-      console.log("dragend")
-      //ev.dataTransfer.setData('dragId', dragId);
-      //console.log(ev.dataTransfer)
-      ev.target.classList.remove("dragging")
-    })
-
-    const editBtn = taskElement.querySelector('.edit-task-btn');
-    editBtn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      new TaskManager(task).openEditPopup();
-    });
-  }
-
 
 }
 
