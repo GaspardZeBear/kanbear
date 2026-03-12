@@ -4,15 +4,26 @@ class Workspace {
   static create(workspace, callback) {
     const { name, is_open } = workspace;
     const sql = 'INSERT INTO workspaces (name, is_open) VALUES (?, ?)';
-    db.run(sql, [name, is_open], function(err) {
-      callback(err, this.lastID);
-    });
+    //db.run(sql, [name, is_open], function(err) {
+    //  callback(err, this.lastID);
+    //});
+    const exec=db.prepare(sql, [name, is_open]).exec()
+    console.log(exec)
   }
 
-  static getAll(callback) {
+  static NgetAll(callback) {
+    const sql = 'SELECT * FROM workspaces';
+    //db.all(sql, [], callback);
+    const exec = db.prepare(sql,[]).all()
+    console.log("models/Workspace.getAll()",sql, exec,callback)
+    callback(exec)
+    
+  }
+   static getAll(callback) {
     const sql = 'SELECT * FROM workspaces';
     db.all(sql, [], callback);
   }
+
 
   static getById(id, callback) {
     const sql = 'SELECT * FROM workspaces WHERE id = ?';

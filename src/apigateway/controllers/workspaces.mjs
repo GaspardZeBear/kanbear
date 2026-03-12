@@ -8,8 +8,12 @@ export const   createWorkspace = (req, res) => {
 };
 
 export const   getAllWorkspaces = (req, res) => {
+  console.log("workspaces callback function ")
   Workspace.getAll((err, workspaces) => {
+    console.log("workspaces getAll() ")
+    console.log("workspaces getAll() err ",err)
     if (err) return res.status(500).json({ error: err.message });
+    console.log("workspaces resp ")
     res.json(workspaces);
   });
 };
