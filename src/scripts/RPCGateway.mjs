@@ -84,5 +84,5 @@ app.get('/api/report', async (req, res) => {
 
 //const port=process.argv[2]
 app.listen(parseInt(port), () => {
-  console.log('Serveur démarré sur http://localhost:',port);
+  console.log('RPCGateway  http://localhost:',port);
 });
