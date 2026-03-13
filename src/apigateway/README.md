@@ -8,3 +8,9 @@ sed -i.bak "s@const db = require('../config/database');@import { db } from '../c
 
 sed -i.bak2 -E 's/module\.exports =(.*);/export { \1 } /g' column.mjs
 
+
+curl http://A6.mshome.net:3002/api/workspaces
+curl http://A6.mshome.net:3002/api/workspaces/1
+curl -X POST -H  "Content-Type: application/json" -d '{"name":"ws2"}' http://A6.mshome.net:3002/api/workspaces/
+curl  -X PUT -H  "Content-Type: application/json" -d '{"name":"ws","is_open":1}' http://A6.mshome.net:3002/api/workspaces/37
+

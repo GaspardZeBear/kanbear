@@ -1,5 +1,5 @@
 import express from 'express'
-//import { bodyParser } from 'body-parser';
+import bodyParser from 'body-parser';
 import cors from 'cors';
 //import { morgan } from 'morgan';
 import { db } from './config/database.mjs';
@@ -9,7 +9,7 @@ const app = express();
 
 // Middlewares
 app.use(cors());
-//app.use(bodyParser.json());
+app.use(bodyParser.json());
 //app.use(morgan('dev'));
 
 // Ajoutez ces lignes après les autres routes

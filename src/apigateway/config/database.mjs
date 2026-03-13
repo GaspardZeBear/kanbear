@@ -22,13 +22,43 @@ class Db {
 
     //------------------------------------------------------------------------------
     // wraps native db.all() sqlite3 methods
-    all(sql,parms,callback) {
-        console.log("Db.all()",sql, parms,callback)
+    all(sql,parms,callAfterAll) {
+        console.log("Db.all()",sql, parms,callAfterAll)
         const stmt = this.db.prepare(sql,[])
         const res=stmt.all()
         console.log("Db.all() res",res)
-        callback(null,res)
+        callAfterAll(null,res)
     }
+
+    //------------------------------------------------------------------------------
+    // wraps native db.all() sqlite3 methods
+    get(sql,id,callAfterGet) {
+        console.log("Db.get()",id,callAfterGet)
+        const stmt = this.db.prepare(sql)
+        const res=stmt.get(id[0])
+        console.log("Db.get() res",res)
+        callAfterGet(null,res)
+    }
+    //------------------------------------------------------------------------------
+    // wraps native run() sqlite3 methods
+    run(sql,parms,callAfterRun) {
+        console.log("Db.run() <sql>",sql, "<params>",parms,"<callback function>",callAfterRun)
+        const stmt = this.db.prepare(sql,[])
+        //const res=stmt.run(parms[0],parms[1])
+        try {
+          const res=stmt.run(...parms)
+          console.log("Db.run() res",res)
+        //res.lastID=res.lastInsertRowid
+          console.log("Db.run() calling callback")
+          callAfterRun(res, res.lastInsertRowid)
+        } catch (error) {
+          console.log("Db.run() exception ",error)
+          callAfterRun({message: "Error see log"})
+        }
+        //return(res)
+    }
+
+
 }
 //------------------------------------------------------------------------------------------
 const db=new Db(dbFile)
