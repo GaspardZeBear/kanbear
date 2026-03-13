@@ -42,7 +42,7 @@ class Db {
     //------------------------------------------------------------------------------
     // wraps native run() sqlite3 methods
     run(sql,parms,callAfterRun) {
-        console.log("Db.run() <sql>",sql, "<params>",parms,"<callback function>",callAfterRun)
+        console.log("Db.run() <sql>",sql, "<parms>",parms,"<callback function>",callAfterRun)
         const stmt = this.db.prepare(sql,[])
         //const res=stmt.run(parms[0],parms[1])
         try {

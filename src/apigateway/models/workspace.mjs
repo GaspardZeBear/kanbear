@@ -1,4 +1,6 @@
 import { db } from '../config/database.mjs'
+import { SqlBuilder } from './SqlBuilder.mjs'
+
 
 class Workspace {
 
@@ -25,6 +27,16 @@ class Workspace {
     const { name, is_open } = workspace;
     console.log("update",workspace)
     const sql = 'UPDATE workspaces SET name = ?, is_open = ? WHERE id = ?';
+    db.run(sql, [name, is_open, id], (res) => {
+      console.log("model function update onRes fired, will call callback res=", res)
+      res.lastInsertRowid != null ? callback(null, res.lastInsertRowid) : callback(res, null)
+    });
+  }
+
+  static patch(id, workspace, callback) {
+    const { name, is_open } = workspace;
+    console.log("patch",workspace)
+    const { sql, params } = new SqlBuilder().generatePatchStatement('workspaces',id,workspace)
     db.run(sql, [name, is_open, id], (res) => {
       console.log("model function update onRes fired, will call callback res=", res)
       res.lastInsertRowid != null ? callback(null, res.lastInsertRowid) : callback(res, null)

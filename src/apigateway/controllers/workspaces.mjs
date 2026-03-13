@@ -33,6 +33,14 @@ export const updateWorkspace = (req, res) => {
   });
 };
 
+export const patchWorkspace = (req, res) => {
+  Workspace.patch(req.params.id, req.body, (err) => {
+    console.log("controller patch callback")
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: 'Workspace patched successfully' });
+  });
+};
+
 export const deleteWorkspace = (req, res) => {
   Workspace.delete(req.params.id, (err) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -45,6 +53,7 @@ export const workspaceController = {
   getAllWorkspaces,
   getWorkspaceById,
   updateWorkspace,
+  patchWorkspace,
   deleteWorkspace,
 
 
