@@ -2,8 +2,8 @@ import { UnifiedModel } from '../models/UnifiedModel.mjs'
 
 class UnifiedController {
 
-    static getFunction(table, op, suffix) {
-        console.log("UnifiedController.getFunction called", table, op, suffix)
+    static getFunction(table, op) {
+        console.log("UnifiedController.getFunction called", table, op)
         //UnifiedModel[op](table, op, () => {} )
         return (
             (req, res) => {
@@ -12,7 +12,7 @@ class UnifiedController {
                 UnifiedModel[op](table, req.params, req.body, (err, params) => {
                     console.log(`UnifiedModel workspaces.${op}_${table}() callback function err`, err, 'params (result)','params')
                     if (err) return res.status(500).json({ error: err.message });
-                    res.status(201).json({ xd: params });
+                    res.status(201).json({ id: params });
                 }
 
                 )

@@ -1,4 +1,5 @@
 import { db } from '../config/database.mjs'
+import { SqlBuilder } from './SqlBuilder.mjs'
 
 class UnifiedModel {
 
@@ -13,9 +14,8 @@ class UnifiedModel {
     }
 
     static create(table, params, body, callback) {
-        const { name, is_open } = body;
-        const sql = `INSERT INTO ${table} (name, is_open) VALUES (?, ?)`;
-        db.run(sql, [name, is_open], (res) => {
+        const { sql, bindVariables } = new SqlBuilder().generateCreateStatement(table, body)
+        db.run(sql, bindVariables, (res) => {
             console.log("UnifiedModel.create(), will call callback <res>", res)
             res.lastInsertRowid ? callback(null, res.lastInsertRowid) : callback(res, null)
         });
@@ -36,8 +36,6 @@ class UnifiedModel {
 
     static update(table, params, body, callback) {
         console.log("UnifiedModel.update(), <params>", params, "<body>", body)
-        const { name, is_open } = body;
-        console.log("update", workspace)
         //const sql = `UPDATE ${table} SET name = ?, is_open = ? WHERE id = ?`;
         const { sql, bindVariables } = new SqlBuilder().generatePatchStatement(table, params["id"], body)
         db.run(sql, bindVariables, (res) => {
