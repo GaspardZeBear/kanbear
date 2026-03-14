@@ -23,10 +23,10 @@ class Db {
     //------------------------------------------------------------------------------
     // wraps native db.all() sqlite3 methods
     all(sql,parms,callAfterAll) {
-        console.log("Db.all()",sql, parms,callAfterAll)
+        console.log("Db.all()",sql, parms,"<callAfterAll>",callAfterAll)
         const stmt = this.db.prepare(sql,[])
         const res=stmt.all()
-        console.log("Db.all() res",res)
+        console.log("Db.all() over <res>",'res')
         callAfterAll(null,res)
     }
 
@@ -36,7 +36,7 @@ class Db {
         console.log("Db.get()",id,callAfterGet)
         const stmt = this.db.prepare(sql)
         const res=stmt.get(id[0])
-        console.log("Db.get() res",res)
+        console.log("Db.get() <res>",res)
         callAfterGet(null,res)
     }
     //------------------------------------------------------------------------------

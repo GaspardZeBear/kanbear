@@ -14,11 +14,11 @@ class SqlBuilder {
         // Filtrer les champs vides ou non définis
         //console.log(updates)
         const setClauses = []
-        const params = []
+        const bindVariables = []
         const fields = Object.keys(updates).filter(key => updates[key] !== undefined);
         Object.entries(updates).forEach(([key, val]) => {
             setClauses.push(`${key}=?`)
-            params.push(val)
+            bindVariables.push(val)
         })
 
         // Construire la partie SET de la requête (ex: "name = ?, description = ?")
@@ -27,7 +27,7 @@ class SqlBuilder {
         //console.log(sql)
         // Construire le tableau des paramètres (valeurs + ID)
         //console.log(params)
-        return { sql, params };
+        return { sql, bindVariables };
     }
 }
 
