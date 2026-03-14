@@ -12,7 +12,7 @@ class UnifiedController {
                 UnifiedModel[op](table, req.params, req.body, (err, params) => {
                     console.log(`UnifiedModel workspaces.${op}_${table}() callback function err`, err, 'params (result)','params')
                     if (err) return res.status(500).json({ error: err.message });
-                    res.status(201).json({ id: params });
+                    res.status(201).json(params);
                 }
 
                 )
