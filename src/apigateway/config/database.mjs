@@ -23,7 +23,7 @@ class Db {
     //------------------------------------------------------------------------------
     // wraps native db.all() sqlite3 methods
     all(sql,parms,callAfterAll) {
-        console.log("Db.all()",sql, parms,"<callAfterAll>",callAfterAll)
+        console.log("Db.all() <sql>",sql, "<parms>",parms,"<callAfterAll>",callAfterAll)
         const stmt = this.db.prepare(sql,[])
         const res=stmt.all()
         console.log("Db.all() over <res>",'res')
@@ -33,16 +33,16 @@ class Db {
     //------------------------------------------------------------------------------
     // wraps native db.all() sqlite3 methods
     get(sql,id,callAfterGet) {
-        console.log("Db.get()",id,callAfterGet)
+        console.log("Db.get() <sql>",sql,"<id>",id,"<callAfterGet>",callAfterGet)
         const stmt = this.db.prepare(sql)
-        const res=stmt.get(id[0])
+        const res=stmt.get(id)
         console.log("Db.get() <res>",res)
         callAfterGet(null,res)
     }
     //------------------------------------------------------------------------------
     // wraps native run() sqlite3 methods
     run(sql,parms,callAfterRun) {
-        console.log("Db.run() <sql>",sql, "<parms>",parms,"<callback function>",callAfterRun)
+        console.log("Db.run() <sql>",sql, "<parms>",parms,"<callAfterRun>",callAfterRun)
         const stmt = this.db.prepare(sql,[])
         //const res=stmt.run(parms[0],parms[1])
         try {
