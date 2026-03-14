@@ -12,21 +12,21 @@ class SqlBuilder {
     //generatePatchStatement(tableName, updates, idColumn, idValue) {
     generatePatchStatement(tableName, id, updates) {
         // Filtrer les champs vides ou non définis
-        console.log(updates)
+        //console.log(updates)
+        const setClauses = []
+        const params = []
         const fields = Object.keys(updates).filter(key => updates[key] !== undefined);
-
-        if (fields.length === 0) {
-            throw new Error('Aucun champ à mettre à jour');
-        }
+        Object.entries(updates).forEach(([key, val]) => {
+            setClauses.push(`${key}=?`)
+            params.push(val)
+        })
 
         // Construire la partie SET de la requête (ex: "name = ?, description = ?")
-        const setClauses = fields.map(field => `${field} = ?`).join(', ');
-        const sql = `UPDATE ${tableName} SET ${setClauses} WHERE id=${id}`;
-console.log(sql)
+        const setClausesStr = setClauses.join(', ');
+        const sql = `UPDATE ${tableName} SET ${setClausesStr} WHERE id=${id}`;
+        //console.log(sql)
         // Construire le tableau des paramètres (valeurs + ID)
-        const params = fields.map(field => updates[field]);
-        params.push(params);
-console.log(params)
+        //console.log(params)
         return { sql, params };
     }
 }
