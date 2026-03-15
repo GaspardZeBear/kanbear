@@ -26,7 +26,7 @@ class Db {
         console.log("Db.all() <sql>", sql, "<parms>", parms, "<callAfterAll>", callAfterAll)
         const stmt = this.db.prepare(sql, [])
         console.log("Db.run() <expandeSql>", stmt.expandedSQL)
-        const res = stmt.all()
+        const res = stmt.all(parms)
         console.log("Db.all() over <res>", 'res')
         callAfterAll(null, 200, res)
     }

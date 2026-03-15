@@ -12,7 +12,8 @@ router.get('/', UnifiedController.getFunction('swimlanes','getById'))
 
 
 // To be seen !!!!!!!!!!!!!!!!!!!!!
-router.get('/project/:projectId', swimlaneController.getSwimlanesByProjectId);
+//router.get('/project/:projectId', swimlaneController.getSwimlanesByProjectId);
+router.get('/project/:projectId', UnifiedController.getFunction('swimlanes','getByForeignKey',{foreignKey:'project_id',sortColumn:'position'}))
 
 //router.put('/:id', swimlaneController.updateSwimlane);
 router.put('/:id', UnifiedController.getFunction('swimlanes','update'));

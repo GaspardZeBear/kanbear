@@ -61,7 +61,7 @@ import {db } from './config/database.mjs'
       id INTEGER PRIMARY KEY,
       name TEXT NOT NULL,
       project_id INTEGER NOT NULL,
-      color_id TEXT DEFAULT NULL,
+      color TEXT DEFAULT 'yellow',
       UNIQUE(project_id, name)
     )
   `);
