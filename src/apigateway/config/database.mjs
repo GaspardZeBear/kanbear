@@ -17,54 +17,64 @@ const dbFile = path.join(__dirname, '../kanban.db');
 class Db {
 
     constructor(dbFile) {
-        this.db=new DatabaseSync(dbFile);
+        this.db = new DatabaseSync(dbFile);
     }
 
     //------------------------------------------------------------------------------
     // wraps native db.all() sqlite3 methods
-    all(sql,parms,callAfterAll) {
-        console.log("Db.all() <sql>",sql, "<parms>",parms,"<callAfterAll>",callAfterAll)
-        const stmt = this.db.prepare(sql,[])
-        console.log("Db.run() <expandeSql>",stmt.expandedSQL)
-        const res=stmt.all()
-        console.log("Db.all() over <res>",'res')
-        callAfterAll(null,200,res)
+    all(sql, parms, callAfterAll) {
+        console.log("Db.all() <sql>", sql, "<parms>", parms, "<callAfterAll>", callAfterAll)
+        const stmt = this.db.prepare(sql, [])
+        console.log("Db.run() <expandeSql>", stmt.expandedSQL)
+        const res = stmt.all()
+        console.log("Db.all() over <res>", 'res')
+        callAfterAll(null, 200, res)
     }
 
     //------------------------------------------------------------------------------
     // wraps native db.get() sqlite3 methods
-    get(sql,id,callAfterGet) {
-        console.log("Db.get() <sql>",sql,"<id>",id,"<callAfterGet>",callAfterGet)
+    get(sql, id, callAfterGet) {
+        console.log("Db.get() <sql>", sql, "<id>", id, "<callAfterGet>", callAfterGet)
         const stmt = this.db.prepare(sql)
-        console.log("Db.run() <expandeSql>",stmt.expandedSQL)
-        const res=stmt.get(id)
-        console.log("Db.get() <res>",res)
-        callAfterGet(null,200,res)
+        console.log("Db.run() <expandeSql>", stmt.expandedSQL)
+        const res = stmt.get(id)
+        console.log("Db.get() <res>", res)
+        callAfterGet(null, 200, res)
     }
     //------------------------------------------------------------------------------
     // wraps native run() sqlite3 methods
-    run(sql,parms,callAfterRun) {
-        console.log("Db.run() <sql>",sql, "<parms>",parms,"<callAfterRun>",callAfterRun)
-        const stmt = this.db.prepare(sql,[])
-        console.log("Db.run() <expandeSql>",stmt.expandedSQL)
+    run(sql, parms, callAfterRun) {
+        console.log("Db.run() <sql>", sql, "<parms>", parms, "<callAfterRun>", callAfterRun)
+        const stmt = this.db.prepare(sql, [])
+        console.log("Db.run() <expandeSql>", stmt.expandedSQL)
         try {
-          const res=stmt.run(...parms)
-          console.log("Db.run() res",res)
-        //res.lastID=res.lastInsertRowid
-          console.log("Db.run() calling callback")
-          callAfterRun(res, res.lastInsertRowid)
+            const res = stmt.run(...parms)
+            console.log("Db.run() res", res)
+            //res.lastID=res.lastInsertRowid
+            console.log("Db.run() calling callback")
+            callAfterRun(res, res.lastInsertRowid)
         } catch (error) {
-          console.log("Db.run() exception ",error)
-          callAfterRun({message: "Error see log"})
+            console.log("Db.run() exception ", error)
+            callAfterRun({ message: "Error see log" })
         }
         //return(res)
+    }
+
+    //------------------------------------------------------------------------------
+    // wraps native run() sqlite3 methods
+    exec(sql) {
+        console.log("Db.exec() <sql>", sql)
+        const stmt = this.db.prepare(sql, [])
+        const res = stmt.run()
+        console.log("Db.exec() res", res)
+
     }
 
 
 }
 //------------------------------------------------------------------------------------------
-const db=new Db(dbFile)
-export {db } 
+const db = new Db(dbFile)
+export { db }
 //export const db = new DatabaseSync(dbFile, { readonly: true });
 
 
