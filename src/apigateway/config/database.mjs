@@ -28,7 +28,7 @@ class Db {
         console.log("Db.run() <expandeSql>",stmt.expandedSQL)
         const res=stmt.all()
         console.log("Db.all() over <res>",'res')
-        callAfterAll(null,res)
+        callAfterAll(null,200,res)
     }
 
     //------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ class Db {
         console.log("Db.run() <expandeSql>",stmt.expandedSQL)
         const res=stmt.get(id)
         console.log("Db.get() <res>",res)
-        callAfterGet(null,res)
+        callAfterGet(null,200,res)
     }
     //------------------------------------------------------------------------------
     // wraps native run() sqlite3 methods
