@@ -1,4 +1,5 @@
-import { DatabaseSync } from 'node:sqlite';
+//import { DatabaseSync } from 'node:sqlite';
+import Database from 'better-sqlite3';
 import path from 'path'
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -17,7 +18,8 @@ const dbFile = path.join(__dirname, '../kanban.db');
 class Db {
 
     constructor(dbFile) {
-        this.db = new DatabaseSync(dbFile);
+        //this.db = new DatabaseSync(dbFile);
+        this.db = new Database(dbFile, { verbose: console.log });
     }
 
     //------------------------------------------------------------------------------
@@ -45,14 +47,27 @@ class Db {
     // wraps native run() sqlite3 methods
     run(sql, parms, callAfterRun) {
         console.log("Db.run() <sql>", sql, "<parms>", parms, "<callAfterRun>", callAfterRun)
-        const stmt = this.db.prepare(sql, [])
-        console.log("Db.run() <expandeSql>", stmt.expandedSQL)
         try {
+            //const res = stmt.run(...parms)
+            //console.log("<...parms>",...parms)
+            /*
+                        const trans = this.db.transaction((parms) => {
+                            const stmt = this.db.prepare(sql, [])
+                            //console.log("Db.run() <expandeSql>", stmt.expandedSQL)
+                            const res = stmt.run(...parms)
+                            console.log("Db.run() res", res)
+                            //res.lastID=res.lastInsertRowid
+                            console.log("Db.run() calling callback")
+                            callAfterRun(res, res.lastInsertRowid)
+                        })
+                        trans(parms)
+                        */
+            const stmt = this.db.prepare(sql, [])
             const res = stmt.run(...parms)
             console.log("Db.run() res", res)
-            //res.lastID=res.lastInsertRowid
             console.log("Db.run() calling callback")
             callAfterRun(res, res.lastInsertRowid)
+
         } catch (error) {
             console.log("Db.run() exception ", error)
             callAfterRun({ message: "Error see log" })
