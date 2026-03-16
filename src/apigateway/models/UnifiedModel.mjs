@@ -46,8 +46,8 @@ class UnifiedModel {
     //------------------------------------------------------------------
     static getById(table, params, body, opParms, callback) {
         console.log("UnifiedModel.getById(), <params>", params, "<body>", body)
-        const sql = `SELECT * FROM ${table} WHERE id = ?`;
-        db.get(sql, params["id"], callback);
+        const sql = `SELECT * FROM ${table} WHERE id = ${params["id"]}`;
+        db.get(sql, [], callback);
     }
 
         //------------------------------------------------------------------
@@ -90,8 +90,8 @@ class UnifiedModel {
     //------------------------------------------------------------------
     static delete(table, params, body, opParms, callback) {
         console.log("UnifiedModel.delete(), <params>",params,"<body>",body)
-        const sql = `DELETE FROM ${table} WHERE id = ?`;
-        db.run(sql, [params["id"]], (res) => {
+        const sql = `DELETE FROM ${table} WHERE id = ${params["id"]}`;
+        db.run(sql, [], (res) => {
             console.log("UnifiedModel.delete()  fired, will call callback res=", res)
             //res.lastInsertRowid != null ? callback(null, res.lastInsertRowid) : callback(res, null)
             res.lastInsertRowid != null ? callback(null, 204, res) : callback(res, 500, null)

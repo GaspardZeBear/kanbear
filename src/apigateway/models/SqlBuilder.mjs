@@ -13,6 +13,19 @@ class SqlBuilder {
         return { sql, bindVariables };
     }
 
+        //----------------------------------------------------------------------------------
+    generateDeleteStatement(tableName, id) {
+        const setClauses = []
+        const bindVariables = []
+        Object.entries(updates).forEach(([key, val]) => {
+            setClauses.push(`${key}=?`)
+            bindVariables.push(val)
+        })
+        const setClausesStr = setClauses.join(', ');
+        const sql = `DELETE FROM ${tableName} WHERE id=${id}`;
+        return { sql, bindVariables };
+    }
+
     //----------------------------------------------------------------------------------
     generateCreateStatement(tableName, inserts) {
         const setClauses = []
