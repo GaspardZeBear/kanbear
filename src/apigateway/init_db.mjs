@@ -66,6 +66,8 @@ import {db } from './config/database.mjs'
     )
   `);
 
+
+  //project_id INTEGER REFERENCES projects(id) ON DELETE  SET NULL,
   db.exec(`
     CREATE TABLE IF NOT EXISTS tasks (
       id INTEGER PRIMARY KEY,
@@ -73,14 +75,13 @@ import {db } from './config/database.mjs'
       description TEXT,
       note TEXT,
       color TEXT,
-      project_id INTEGER REFERENCES projects(id) ON DELETE  SET NULL,
-      column_id INTEGER REFERENCES columns(id) ON DELETE  SET NULL,
+      column_id INTEGER NOT NULL REFERENCES columns(id) ON DELETE  SET NULL,
       creator_id INTEGER REFERENCES users(id) ON DELETE  SET NULL,
       assignee_id INTEGER REFERENCES assignees(id) ON DELETE  SET NULL,
       position INTEGER,
       is_open INTEGER DEFAULT 1,
       priority INTEGER DEFAULT 0,
-      swimlane_id INTEGER REFERENCES swimlanes(id) ON DELETE  SET NULL,
+      swimlane_id INTEGER NOT NULL REFERENCES swimlanes(id) ON DELETE  SET NULL,
       date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
       date_started INTEGER DEFAULT 0,
       date_moved INTEGER DEFAULT 0,
@@ -91,7 +92,7 @@ import {db } from './config/database.mjs'
       moved_warning TEXT,
       due_warning TEXT,
       checked_warning TEXT,
-      UNIQUE(project_id, name)
+      UNIQUE(name)
     )
   `);
 
@@ -120,7 +121,7 @@ import {db } from './config/database.mjs'
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY,
-      username TEXT NOT NULL,
+      name TEXT NOT NULL,
       password TEXT,
       is_admin INTEGER DEFAULT 0
     )

@@ -14,6 +14,7 @@ class Entity {
     async list() {
         let counter
         let res = await new ApiCaller().get(this.api)
+        console.log(this.table,res.data)
     }
 
     //-----------------------------------------------------

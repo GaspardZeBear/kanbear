@@ -19,6 +19,7 @@ import swimlaneRoutes  from './routes/swimlanes.mjs'
 import tagRoutes  from './routes/tags.mjs'
 import projectRoutes  from './routes/projects.mjs'
 import userRoutes  from './routes/users.mjs'
+import taskRoutes  from './routes/tasks.mjs'
 import workspaceRoutes  from './routes/workspaces.mjs'
 import projectUserRoutes  from './routes/projectUsers.mjs'
 import taskHasTagRoutes  from './routes/taskHasTags.mjs'
@@ -28,6 +29,7 @@ app.use('/api/assignees', assigneeRoutes);
 app.use('/api/columns', columnRoutes);
 app.use('/api/swimlanes', swimlaneRoutes);
 app.use('/api/tags', tagRoutes);
+app.use('/api/tasks', taskRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/workspaces', workspaceRoutes);
