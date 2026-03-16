@@ -12,13 +12,13 @@ import {db } from './config/database.mjs'
   db.exec(`
     CREATE TABLE IF NOT EXISTS columns (
       id INTEGER PRIMARY KEY,
-      title TEXT NOT NULL,
+      name TEXT NOT NULL,
       position INTEGER,
       project_id INTEGER NOT NULL,
       color TEXT DEFAULT 'white',
       description TEXT,
       FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE SET NULL,
-      UNIQUE (title, project_id)
+      UNIQUE (name, project_id)
     )
   `);
 
@@ -69,7 +69,7 @@ import {db } from './config/database.mjs'
   db.exec(`
     CREATE TABLE IF NOT EXISTS tasks (
       id INTEGER PRIMARY KEY,
-      title TEXT NOCASE NOT NULL,
+      name TEXT NOCASE NOT NULL,
       description TEXT,
       note TEXT,
       color TEXT,
@@ -90,7 +90,8 @@ import {db } from './config/database.mjs'
       date_modified INTEGER DEFAULT '0',
       moved_warning TEXT,
       due_warning TEXT,
-      checked_warning TEXT
+      checked_warning TEXT,
+      UNIQUE(project_id, name)
     )
   `);
 
