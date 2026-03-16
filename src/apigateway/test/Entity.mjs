@@ -22,12 +22,14 @@ class Entity {
     }
 
     //-----------------------------------------------------
-    async create() {
+    async create(data={}) {
         let counter
         let res = await new ApiCaller().get(this.api)
         counter = res.data.length
         this.name = this.table + "#" + counter
-        res = await new ApiCaller().post(this.api, { name: this.name })
+        data.name=this.name
+        console.log("Entity.create() data",data) 
+        res = await new ApiCaller().post(this.api, data)
         //console.log(res.data)
         this.id = res.data["lastInsertRowid"]
     }
