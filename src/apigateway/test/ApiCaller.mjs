@@ -6,21 +6,29 @@ const apiUrl = 'http://A6.mshome.net:3002'
 //-------------------------------------------------------------------------------------
 class ApiCaller {
 
-    //-----------------------------------------------------------------
-    async url(path) {
-        return (`${apiUrl}${path}`)
+    constructor() {
+
     }
 
     //-----------------------------------------------------------------
-    async header(parms) {
-        console.log("---", ...parms)
+    async url(path) {
+        let url=`${apiUrl}${path}`
+        console.log("ApiCaller() url",url)
+        return(url)
+    }
+
+    //-----------------------------------------------------------------
+    header(parms) {
+        console.log("->", ...parms)
     }
 
     //-----------------------------------------------------------------
     async get(uri) {
-        header(["GET", uri])
+        this.header(["GET", uri])
+        console.log("url ", await this.url(uri))
         try {
-            const res = await axios.get(this.url(uri));
+            
+            const res = await axios.get(await this.url(uri));
             console.log(res.status); // Status Code
             console.log(res.data); // Response Data
             return (res)
@@ -32,9 +40,9 @@ class ApiCaller {
 
     //------------------------------------------------------------------------------------
     async post(uri, body = {}) {
-        header(["POST", uri, body])
+        this.header(["POST", uri, body])
         try {
-            const res = await axios.post(this.url(uri), body);
+            const res = await axios.post(await this.url(uri), body);
             console.log(res.status); // Status Code
             console.log(res.data); // Response Data
             return (res)
@@ -47,9 +55,9 @@ class ApiCaller {
 
     //------------------------------------------------------------------------------------
     async put(uri, body = {}) {
-        header(["PUT", uri, body])
+        this.header(["PUT", uri, body])
         try {
-            const res = await axios.put(url(this.uri), body);
+            const res = await axios.put(await url(this.uri), body);
             console.log(res.status); // Status Code
             console.log(res.data); // Response Data
             return (res)
@@ -61,9 +69,9 @@ class ApiCaller {
 
     //------------------------------------------------------------------------------------
     async patch(uri, body = {}) {
-        header(["PATCH", uri, body])
+        this.header(["PATCH", uri, body])
         try {
-            const res = await axios.patch(this.url(uri), body);
+            const res = await axios.patch(await this.url(uri), body);
             console.log(res.status); // Status Code
             console.log(res.data); // Response Data
             return (res)
@@ -75,9 +83,9 @@ class ApiCaller {
 
     //------------------------------------------------------------------------------------
     async erase(uri) {
-        header(["DELETE", uri])
+        this.header(["DELETE", uri])
         try {
-            const res = await axios.delete(this.url(uri));
+            const res = await axios.delete(await this.url(uri));
             console.log(res.status); // Status Code
             console.log(res.data); // Response Data
             return (res)

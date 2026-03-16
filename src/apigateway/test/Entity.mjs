@@ -24,7 +24,7 @@ class Entity {
     //-----------------------------------------------------
     async create() {
         let counter
-        let res = await get(this.api)
+        let res = await new ApiCaller().get(this.api)
         counter = res.data.length
         this.name = this.table + "#" + counter
         res = await new ApiCaller().post(this.api, { name: this.name })
@@ -36,8 +36,7 @@ class Entity {
     async alter() {
         let newName = this.name + '++'
         let res = await new ApiCaller().patch(`${this.api}/${this.id}`, { "name": newName })
-        await get(`${this.api}/${this.id}`)
-
+        await new ApiCaller().get(`${this.api}/${this.id}`)
     }
 
     //---------------------------------------------------------
