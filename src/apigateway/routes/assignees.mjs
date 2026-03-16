@@ -9,11 +9,11 @@ router.post('/', UnifiedController.getFunction('assignees','create'))
 //router.get('/', assigneeController.getAllAssignees);
 router.get('/', UnifiedController.getFunction('assignees','getAll'))
 //router.get('/:id', assigneeController.getAssigneeById);
-router.get('/', UnifiedController.getFunction('assignees','getById'))
+router.get('/:id', UnifiedController.getFunction('assignees','getById'))
 //router.put('/:id', assigneeController.updateAssignee);
-router.put('/', UnifiedController.getFunction('assignees','update'))
+router.put('/:id', UnifiedController.getFunction('assignees','update'))
 //router.patch('/:id', assigneeController.updateAssignee);
-router.patch('/', UnifiedController.getFunction('assignees','patch'))
+router.patch('/:id', UnifiedController.getFunction('assignees','patch'))
 //router.delete('/:id', assigneeController.deleteAssignee);
 router.delete('/:id', UnifiedController.getFunction('assignees','delete'))
 export default router

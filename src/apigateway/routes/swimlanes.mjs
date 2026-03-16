@@ -8,7 +8,7 @@ router.post('/', UnifiedController.getFunction('swimlanes','create'))
 //router.get('/', swimlaneController.getAllSwimlanes);
 router.get('/', UnifiedController.getFunction('swimlanes','getAll'))
 //router.get('/:id', swimlaneController.getSwimlaneById);
-router.get('/', UnifiedController.getFunction('swimlanes','getById'))
+router.get('/:id', UnifiedController.getFunction('swimlanes','getById'))
 
 
 // To be seen !!!!!!!!!!!!!!!!!!!!!
