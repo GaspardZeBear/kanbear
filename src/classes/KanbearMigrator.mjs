@@ -1,0 +1,35 @@
+import { KanboardFilter } from "./KanboardFilter.mjs"
+import { formatDuration, dateToString, getDurationFromNow } from "../utils/formatDuration.mjs";
+import { Kontext } from "./Kontext.mjs";
+import { Ref } from "./Ref.mjs"
+
+class KanbearMigrator {
+  constructor(element, filtersMap) {
+    this.project = Kontext.getCurrentProject()
+    this.htmlElement = element
+    this.kanboardFilter = new KanboardFilter(filtersMap)
+    this.buttons = {}
+    this.table = undefined
+  }
+
+  //-----------------------------------------------------------------
+  migrate() {
+    //this.projects.forEach((project, projectIndex) => {
+
+
+    console.log(this.project.name)
+    Object.entries(this.project.columns).forEach(([cKey, column]) => {
+      console.log("columns", column.name)
+    })
+
+    Object.entries(this.project.swimlanes).forEach(([sKey, swimlane]) => {
+      console.log("swimlanes", swimlane.name)
+      Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
+        console.log("tasks", task.name)
+      })
+    });
+
+  }
+
+}
+export { KanbearMigrator }
