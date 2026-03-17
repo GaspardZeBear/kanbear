@@ -3,6 +3,7 @@
 //import { KanboardFilter } from './classes/KanboardFilter.mjs'
 import { KanbanPanel } from './classes/KanbanPanel.mjs';
 import { KanboardListPanel } from './classes/KanboardListPanel.mjs';
+import { KanbearMigrator } from './classes/KanbearMigrator.mjs';
 import { Kontext } from './classes/Kontext.mjs';
 
 await Kontext.loadConfig()
@@ -63,12 +64,19 @@ function getFiltersMap() {
     })
 }
 
+
+//------------------- migrate from kanboard to kanbear --------------------------------------
+document.getElementById('migrate').addEventListener('click', () => {
+    new KanbearMigrator('results', getFiltersMap()).migrate()
+});
+
+
 //------------------- showDetails --------------------------------------
 document.getElementById('showDetails').addEventListener('click', () => {
     new KanboardListPanel('results', getFiltersMap()).render()
 });
 
-//------------------- showDetails --------------------------------------
+//------------------- kanban --------------------------------------
 document.getElementById('kanban').addEventListener('click', () => {
     new KanbanPanel('results', getFiltersMap()).render()
 });
