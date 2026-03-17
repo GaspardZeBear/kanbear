@@ -112,7 +112,7 @@ h1 {
     pointer-events: none;
 }
 
-.kanban-item-title {
+.kanban-item-name {
     font-weight: 500;
     color: violet;
     pointer-events: none;

@@ -36,7 +36,7 @@ class KanboardListPanel {
     //console.log(projects[projectId].swimlanes[swimlaneId].tasks[taskId])
     //console.log(" columnId ", columnId)
     //console.log(" columnId ", this.projects[projectId].columns[columnId])
-    //console.log(" task id ", this.projects[projectId].columns[columnId].title)
+    //console.log(" task id ", this.projects[projectId].columns[columnId].name)
   }
 
   //-----------------------------------------------------------------------------------------
@@ -120,8 +120,8 @@ class KanboardListPanel {
       Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
         if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
         Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
-          if (!this.kanboardFilter.keepTask(task.title)) { return }
-          if (!this.kanboardFilter.keepColumn(project.columns[task.column_id].title)) { return }
+          if (!this.kanboardFilter.keepTask(task.name)) { return }
+          if (!this.kanboardFilter.keepColumn(project.columns[task.column_id].name)) { return }
           let userName = ""
           if (project.users[task.owner_id] && project.users[task.owner_id].name) {
             userName = project.users[task.owner_id].name
@@ -135,8 +135,8 @@ class KanboardListPanel {
               <td><a href="#" class="taskCommentLink" id="${commentLinkId}">c</a></td>
               <td style="${projectStyle}">${project.name}</td>
               <td>${swimlane.name}</td>
-              <td>${task.title}</td>
-              <td style="background-color:${task.color}">${project.columns[task.column_id].title}</td>
+              <td>${task.name}</td>
+              <td style="background-color:${task.color}">${project.columns[task.column_id].name}</td>
               <td>${dateToString(task.date_moved)}</td>
               <td>${getDurationFromNow(task.date_moved, true)}</td>
               <td>${dateToString(task.date_due)}</td>
@@ -158,7 +158,7 @@ class KanboardListPanel {
       link.addEventListener('click', function (e) {
         e.preventDefault();
         const [name, project, swimlane, task, column] = self.getObjectsFromRef(this.getAttribute('id'))
-        document.getElementById('popupTaskId').textContent = task.title;
+        document.getElementById('popupTaskId').textContent = task.name;
         popup.style.display = 'flex';
         // Charger les notes existantes si disponibles (exemple)
         // taskNotes.value = getNotesForTask(currentTaskId);

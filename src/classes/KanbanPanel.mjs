@@ -79,7 +79,7 @@ class KanbanPanel {
 
         // fillin column header
         const kColumnHeaderDivH3 = document.createElement('h3')
-        kColumnHeaderDivH3.innerHTML = col.title
+        kColumnHeaderDivH3.innerHTML = col.name
         const kCounterDiv = document.createElement('span')
         kCounterDiv.classList.add("kanban-count")
         kCounterDiv.setAttribute("id", `counter:${project.id}:${swimlane.id}:_:${col.id}`)
@@ -187,7 +187,7 @@ class KanbanPanel {
       })
 
     })
-    document.querySelectorAll('.kanban-item-header button, .kanban-item-title, .kanban-item-description').forEach(el => {
+    document.querySelectorAll('.kanban-item-header button, .kanban-item-name, .kanban-item-description').forEach(el => {
       el.addEventListener('dragstart', function (e) {
         e.preventDefault();
         e.stopPropagation();

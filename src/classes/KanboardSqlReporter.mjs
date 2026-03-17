@@ -94,7 +94,7 @@ class KanboardSqlReporter {
         projectsMap[row.pId].users = usersMap
       }
       if (!projectsMap[row.pId].columns[row.cId]) {
-        projectsMap[row.pId].columns[row.cId] = { id: row.cId, title: row.cTitle, description: row.cDescription, position: row.cPosition }
+        projectsMap[row.pId].columns[row.cId] = { id: row.cId, name: row.cTitle, description: row.cDescription, position: row.cPosition }
       }
       if (!projectsMap[row.pId].swimlanes[row.sId]) {
         projectsMap[row.pId].swimlanes[row.sId] = { id: row.sId, project_id: row.pId, name: row.sName, description: row.sDescription, tasks: {} }
@@ -102,7 +102,7 @@ class KanboardSqlReporter {
       projectsMap[row.pId].swimlanes[row.sId].tasks[row.tId] = {
         id: row.tId,
         description: row.tDescription,
-        title: row.tTitle,
+        name: row.tTitle,
         project_id : row.pId,
         swimlane_id : row.sId,
         column_id: row.cId,

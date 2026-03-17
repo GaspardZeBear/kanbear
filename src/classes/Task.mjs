@@ -55,8 +55,8 @@ class Task {
         taskElement.setAttribute("draggable", true)
         taskElement.innerHTML = `
             <div class="kanban-item-header">
-                <div class="kanban-item-title">#${this.task.id}</div>
-                <div class="kanban-item-title">${this.task.title}</div>
+                <div class="kanban-item-name">#${this.task.id}</div>
+                <div class="kanban-item-name">${this.task.name}</div>
                 <div class="kanban-item-description">blabla description${this.task.description}</div>
                 <button class="edit-task-btn" data-task-id="${this.task.id}">Edit</button>
             </div>
