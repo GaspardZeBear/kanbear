@@ -50,7 +50,7 @@ class ApiCaller {
             return (res)
         } catch (error) {
             console.error(`post() Error when calling  `, error.res?.data || error.message);
-            //throw error;
+            throw error;
         }
     }
 

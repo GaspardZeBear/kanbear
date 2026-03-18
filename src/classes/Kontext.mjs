@@ -1,7 +1,7 @@
 class Kontext {
 
     static jsonBulkData
-    static kanboardConfig
+    static kanbearConfig
     static projects
     static currentProjectId
     static currentProjectName
@@ -9,8 +9,8 @@ class Kontext {
     //--------------------------------------------------------------
     static async loadConfig() {
         const config = await fetch('/kanbearConfig.json')
-        Kontext.kanboardConfig = await config.json();
-        console.log(Kontext.kanboardConfig)
+        Kontext.kanbearConfig = await config.json();
+        console.log(Kontext.kanbearConfig)
     }
 //--------------------------------------------------------------
     static async setProject(projectId,projectName) {
@@ -39,12 +39,17 @@ class Kontext {
 
     //--------------------------------------------------------------
     static getKanboardUrl() {
-        return(`${Kontext.kanboardConfig.kanboard.url}:${Kontext.kanboardConfig.kanboard.port}/${Kontext.kanboardConfig.kanboard.uri}`)
+        return(`${Kontext.kanbearConfig.kanboard.url}:${Kontext.kanbearConfig.kanboard.port}/${Kontext.kanbearConfig.kanboard.uri}`)
+    }
+
+    //--------------------------------------------------------------
+    static getKanbearUrl() {
+        return(`${Kontext.kanbearConfig.kanbear.url}:${Kontext.kanbearConfig.kanbear.port}`)
     }
 
         //--------------------------------------------------------------
     static getGatewayUrl() {
-        return(`${Kontext.kanboardConfig.gateway.url}:${Kontext.kanboardConfig.gateway.port}`)
+        return(`${Kontext.kanbearConfig.gateway.url}:${Kontext.kanbearConfig.gateway.port}`)
     }
 
     //--------------------------------------------------------------
@@ -54,14 +59,14 @@ class Kontext {
 
     //--------------------------------------------------------------
     static getProjectConfig(pName) {
-        return (Kontext.kanboardConfig.projects[pName])
+        return (Kontext.kanbearConfig.projects[pName])
     }
 
     //--------------------------------------------------------------
     static getProjectStyle(pName) {
         console.log("pName",pName)
         let style="background-color:yellow"
-        return ( Kontext.kanboardConfig.projects[pName] ?.style ?? style)
+        return ( Kontext.kanbearConfig.projects[pName] ?.style ?? style)
     }
 
     //--------------------------------------------------------------
