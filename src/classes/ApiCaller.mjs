@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { Kontext } from './Kontext.mjs';
 
 axios.defaults.timeout = 3000;
 const apiUrl = 'http://A6.mshome.net:3002'
@@ -6,15 +7,17 @@ const apiUrl = 'http://A6.mshome.net:3002'
 //-------------------------------------------------------------------------------------
 class ApiCaller {
 
-    constructor() {
-
+    constructor(apiToken="dummyToken") {
+        this.kanbearUrl = Kontext.getKanbearUrl()
+        this.apiToken = apiToken;
+        axios.defaults.headers.post['Authorization'] = apiToken;
     }
 
     //-----------------------------------------------------------------
     async url(path) {
-        let url=`${apiUrl}${path}`
-        console.log("ApiCaller() url",url)
-        return(url)
+        let url = `${this.kanbearUrl}${path}`
+        console.log("ApiCaller() url", url)
+        return (url)
     }
 
     //-----------------------------------------------------------------

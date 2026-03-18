@@ -3,12 +3,12 @@ import { Ref } from "./Ref.mjs"
 
 class Task {
 
+    //------------------------------------------------------------------------
     constructor(task) {
         this.task = task
         this.ref = null
         //this.openPopup()
     }
-
 
     //-------------------------------------------------------------------------
     setRef(ref) {
