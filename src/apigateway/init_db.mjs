@@ -26,9 +26,11 @@ import {db } from './config/database.mjs'
     CREATE TABLE IF NOT EXISTS projects (
       id INTEGER PRIMARY KEY,
       name TEXT NOCASE NOT NULL,
+      description TEXT,
       workspace_id INTEGER NOT NULL,
       is_open INTEGER DEFAULT 1,
-      FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE SET  NULL
+      FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE SET  NULL,
+      UNIQUE (name, id)
     )
   `);
 
@@ -60,6 +62,7 @@ import {db } from './config/database.mjs'
     CREATE TABLE IF NOT EXISTS tags (
       id INTEGER PRIMARY KEY,
       name TEXT NOT NULL,
+      description TEXT,
       project_id INTEGER NOT NULL,
       color TEXT DEFAULT 'yellow',
       UNIQUE(project_id, name)
@@ -121,6 +124,7 @@ import {db } from './config/database.mjs'
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY,
+      description TEXT,
       name TEXT NOT NULL,
       password TEXT,
       is_admin INTEGER DEFAULT 0
@@ -131,7 +135,9 @@ import {db } from './config/database.mjs'
     CREATE TABLE IF NOT EXISTS workspaces (
       id INTEGER PRIMARY KEY,
       name TEXT NOCASE NOT NULL,
-      is_open INTEGER DEFAULT 1
+      description TEXT,
+      is_open INTEGER DEFAULT 1,
+      UNIQUE(name)
     )
   `);
 
