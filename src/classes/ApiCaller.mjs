@@ -7,8 +7,13 @@ const apiUrl = 'http://A6.mshome.net:3002'
 //-------------------------------------------------------------------------------------
 class ApiCaller {
 
-    constructor(apiToken="dummyToken") {
-        this.kanbearUrl = Kontext.getKanbearUrl()
+    constructor(url, apiToken = "dummyToken") {
+        
+        if (url === undefined) {
+            this.kanbearUrl = Kontext.getKanbearUrl()
+        } else {
+            this.kanbearUrl = url
+        }
         this.apiToken = apiToken;
         axios.defaults.headers.post['Authorization'] = apiToken;
     }
@@ -35,7 +40,7 @@ class ApiCaller {
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
-            console.error(`post() Error when calling  `, error.res?.data || error.message);
+            console.error(`get() Error when calling  `, error.res?.data || error.message);
             //throw error;
         }
     }
@@ -64,7 +69,7 @@ class ApiCaller {
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
-            console.error(`post() Error when calling  `, error.res?.data || error.message);
+            console.error(`put() Error when calling  `, error.res?.data || error.message);
             //throw error;
         }
     }
@@ -78,7 +83,7 @@ class ApiCaller {
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
-            console.error(`post() Error when calling  `, error.res?.data || error.message);
+            console.error(`patch() Error when calling  `, error.res?.data || error.message);
             //throw error;
         }
     }
@@ -92,7 +97,7 @@ class ApiCaller {
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
-            console.error(`post() Error when calling  `, error.res?.data || error.message);
+            console.error(`erase() Error when calling  `, error.res?.data || error.message);
             //throw error;
         }
     }

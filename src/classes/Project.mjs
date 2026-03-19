@@ -1,7 +1,7 @@
 import { ApiCaller } from "./ApiCaller.mjs"
-import { KanbearObject } from "./KanbearObject.mjs"
+import { KanbearEntity } from "./KanbearEntity.mjs"
 
-class Project extends KanbearObject {
+class Project extends KanbearEntity {
 
     //------------------------------------------------------------------------
     constructor(project) {
@@ -9,12 +9,6 @@ class Project extends KanbearObject {
         this.project = project
     }
 
-    //----------------------------------------------------------------------------
-    static generate() {
-        return new Project({})
-    }
-
-    
 }
 
 export { Project }

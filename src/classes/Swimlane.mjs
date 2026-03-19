@@ -1,17 +1,12 @@
 import { ApiCaller } from "./ApiCaller.mjs"
-import { KanbearObject } from "./KanbearObject.mjs"
+import { KanbearEntity } from "./KanbearEntity.mjs"
 
-class Swimlane extends KanbearObject {
+class Swimlane extends KanbearEntity {
 
     //------------------------------------------------------------------------
     constructor(swimlane) {
         super('swimlane')
         this.swimlane = swimlane
-    }
-
-    //----------------------------------------------------------------------------
-    static generate() {
-        return new Swimlane({})
     }
 
 }

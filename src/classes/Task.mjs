@@ -1,8 +1,8 @@
-import { KanbearObject } from "./KanbearObject.mjs"
+import { KanbearEntity } from "./KanbearEntity.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { Ref } from "./Ref.mjs"
 
-class Task extends KanbearObject{
+class Task extends KanbearEntity{
 
     //------------------------------------------------------------------------
     constructor(task) {
@@ -11,12 +11,6 @@ class Task extends KanbearObject{
         this.ref = null
         //this.openPopup()
     }
-
-    //----------------------------------------------------------------------------
-    static generate() {
-        return new Workspace({})
-    }
-
 
     //-------------------------------------------------------------------------
     setRef(ref) {
