@@ -31,7 +31,7 @@ class KanbearMigrator {
     wsDiv.classList.add("filter-group")
     const label = document.createElement("label")
     label.setAttribute("for", "workspace")
-    label.innerHTML=labelText
+    label.innerHTML = labelText
     const select = document.createElement("select")
     select.setAttribute("name", "workspace")
     select.setAttribute("id", id)
@@ -49,14 +49,14 @@ class KanbearMigrator {
     })
     wsDiv.appendChild(label)
     wsDiv.appendChild(select)
-    return(wsDiv)
+    return (wsDiv)
   }
 
   //-----------------------------------------------------------------
   async migrate() {
     let wss = await Workspace.getAll('workspaces')
     console.log("KanbearMigrator.migrate", wss)
-    let wsDiv = await this.buildTargetWorkspaceSelectBox("targetWorspaceSelectBox",wss, "target workspace")
+    let wsDiv = await this.buildTargetWorkspaceSelectBox("targetWorspaceSelectBox", wss, "target workspace")
     document.getElementById(this.htmlElement).appendChild(wsDiv)
     document.getElementById("targetWorspaceSelectBox").addEventListener('change', (e) => {
       const targetWorkspaceId = e.target.value;
@@ -79,23 +79,42 @@ class KanbearMigrator {
     pr.setDescription(this.project.description)
     pr.setOpen(this.project.is_open)
     await pr.create()
-    Object.entries(this.project.columns).forEach( async ([cKey, column]) => {
+    console.log("Project envelop created (empty)")
+    Object.entries(this.project.columns).forEach(async ([cKey, column]) => {
       console.log("columns", column.name)
       const co = await KanbearEntityFactory.generate('column')
-       co.setName(column.name)
+      co.setName(column.name)
       co.setDescription(column.description)
-      co.setData("position",column.position)
-      co.setData("project_id",this.project.id)
+      co.setData("position", column.position)
+      co.setData("project_id", this.project.id)
+      await co.create()
     })
-
-    Object.entries(this.project.swimlanes).forEach(([sKey, swimlane]) => {
-
+console.log("Project columns created ")
+    Object.entries(this.project.swimlanes).forEach(async ([sKey, swimlane]) => {
+      console.log("swimlanes", swimlane.name)
+      const sw = await KanbearEntityFactory.generate('swimlane')
+      sw.setName(swimlane.name)
+      sw.setDescription(swimlane.description)
+      sw.setData("position", swimlane.position)
+      sw.setData("project_id", this.project.id)
       //console.log("swimlanes", swimlane.name)
-      Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
+      await sw.create()
+      console.log("Project swimlane created", swimlane.name )
+      Object.entries(swimlane.tasks).forEach( async ([tKey, task]) => {
+        console.log("tasks", task.name)
+        const ta = await KanbearEntityFactory.generate('task')
+        ta.setName(task.name)
+        ta.setDescription(task.description)
+        ta.setData("position", task.position)
+        ta.setData("project_id", this.project.id)
+        ta.setData("project_id", sw.getId())
+        //console.log("swimlanes", swimlane.name)
+        await ta.create()
         //console.log("tasks", task.name)
       })
+      console.log("Project tasks created")
     });
-
+    alert("Projet migrated")
   }
 
 }

@@ -14,31 +14,34 @@ class KanbearEntity {
     }
 
     //----------------------------------------------------------------------------
-    async setName(name) {
+    setName(name) {
         this.data.name = name
     }
 
     //----------------------------------------------------------------------------
-    async setOpen(open) {
+    setOpen(open) {
         this.data.is_open = open
     }
 
     //----------------------------------------------------------------------------
-    async setDescription(description) {
+    setDescription(description) {
         this.data.description = description
     }
 
-    async setData(dataKey, dataval) {
+    setData(dataKey, dataval) {
         this.data[dataKey] = dataval
-        console.log("setData", this.data)
+        console.log(`${this.kind} setData() ${dataKey}`, this.data)
     }
 
     //----------------------------------------------------------------------------
     async create() {
-        //const open=this.is_open?this.is_open:1
-        //const data={name:this.name,is_open:open}
-        console.log("----------- create() this.data ", this.data)
-        const resp = await new ApiCaller().post(`/api/${this.kind}s`, this.data)
+        // Remove undefined data
+        const data = {}
+        Object.entries(this.data).forEach( ([key,val]) => {
+            val ? data[key]=val:1
+        })
+        console.log(data)
+        const resp = await new ApiCaller().post(`/api/${this.kind}s`, data)
         console.log("resp ", resp.data)
         this.id = resp.data.lastInsertRowid
     }
