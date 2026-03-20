@@ -78,6 +78,7 @@ import {db } from './config/database.mjs'
       description TEXT,
       note TEXT,
       color TEXT,
+      color_rules TEXT,
       column_id INTEGER NOT NULL REFERENCES columns(id) ON DELETE  SET NULL,
       creator_id INTEGER REFERENCES users(id) ON DELETE  SET NULL,
       assignee_id INTEGER REFERENCES assignees(id) ON DELETE  SET NULL,
@@ -95,7 +96,7 @@ import {db } from './config/database.mjs'
       moved_warning TEXT,
       due_warning TEXT,
       checked_warning TEXT,
-      UNIQUE(name)
+      UNIQUE(name,swimlane_id,column_id)
     )
   `);
 
