@@ -1,27 +1,29 @@
   //---------------------------------------------------------------------------------
-  async function selectBoxBuilder(id, blabel, wss, labelText, klass="filter-group") {
+  async function selectBoxBuilder(params) {
+    
+    console.log(params)
+    let domId=params.domId
+    let boxLabel=params.boxLabel
+    let wss=params.items
+    let labelText=params.labelText
+    let klass=params.klass
+    ////"filter-group") {
 
     console.log("selectBoxBuilder", wss)
     const wsDiv = document.createElement("div")
     wsDiv.classList.add(klass)
-    const label = document.createElement(blabel)
-    label.setAttribute("for", "workspace")
+    const label = document.createElement(boxLabel)
+    label.setAttribute("for", boxLabel)
     label.innerHTML = labelText
     const select = document.createElement("select")
     select.setAttribute("name", label)
-    select.setAttribute("id", id)
+    select.setAttribute("id", domId)
     
     const fakeOption = document.createElement('option')
-    fakeOption.setAttribute("value", -2)
+    fakeOption.setAttribute("value", -wss.length)
     //fakeOption.setAttribute("selected", "selected")
     fakeOption.innerHTML = '- No selection  -'
     select.appendChild(fakeOption)
-
-    const newOption = document.createElement('option')
-    newOption.setAttribute("value", -1)
-    //fakeOption.setAttribute("selected", "selected")
-    newOption.innerHTML = '- Create new workspace -'
-    select.appendChild(newOption)
 
     wss.forEach((ws, idx) => {
       console.log(ws)
