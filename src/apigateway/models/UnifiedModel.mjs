@@ -38,9 +38,10 @@ class UnifiedModel {
 
     //------------------------------------------------------------------
     static getAll(table, req, opParms, callback) {
-        console.log("UnifiedModel.getAll(), will call callback res=")
+        
         const { sql, bindVariables } = new SqlBuilder().generateGetStatement(table, req)
         //const sql = `SELECT * FROM ${table}`;
+        console.log("UnifiedModel.getAll(), <table>",table,"<req.query>", req.query,"<sql>",sql)
         db.all(sql, bindVariables, callback);
     }
 

@@ -27,7 +27,7 @@ class Db {
     all(sql, parms, callAfterAll) {
         console.log("Db.all() <sql>", sql, "<parms>", parms, "<callAfterAll>", callAfterAll)
         const stmt = this.db.prepare(sql, [])
-        console.log("Db.run() <expandeSql>", stmt.expandedSQL)
+        //console.log("Db.run() <expandeSql>", stmt.expandedSQL)
         const res = stmt.all(parms)
         console.log("Db.all() over <res>", 'res')
         callAfterAll(null, 200, res)
@@ -38,7 +38,7 @@ class Db {
     get(sql, id, callAfterGet) {
         console.log("Db.get() <sql>", sql, "<id>", id, "<callAfterGet>", callAfterGet)
         const stmt = this.db.prepare(sql)
-        console.log("Db.run() <expandeSql>", stmt.expandedSQL)
+        //console.log("Db.run() <expandeSql>", stmt.expandedSQL)
         const res = stmt.get(id)
         console.log("Db.get() <res>", res)
         callAfterGet(null, 200, res)

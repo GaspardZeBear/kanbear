@@ -47,8 +47,8 @@ class KanbearEntity {
     }
 
     //-------------------------------------------------------------------------------
-    static async getAll(kind) {
-        const resp = await new ApiCaller().get(`/api/${kind}`)
+    static async getAll(kind,params) {
+        const resp = await new ApiCaller().get(`/api/${kind}`,params)
         console.log("KanbearObject.getAll()", resp.data)
         return (resp.data)
     }

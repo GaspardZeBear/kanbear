@@ -27,15 +27,15 @@ class ApiCaller {
 
     //-----------------------------------------------------------------
     header(parms) {
-        console.log("ApiCaller ", ...parms)
+        console.log("----> ApiCaller ", ...parms)
     }
 
     //-----------------------------------------------------------------
-    async get(uri) {
-        this.header(["GET", uri])
-        console.log("url ", await this.url(uri))
+    async get(uri,params={}) {
+        this.header(["GET", uri, {params}])
+        console.log("url ", await this.url(uri), {params : params})
         try {
-            const res = await axios.get(await this.url(uri));
+            const res = await axios.get(await this.url(uri),{ params: params});
             console.log(res.status); // Status Code
             //console.log(res.data); // Response Data
             return (res)

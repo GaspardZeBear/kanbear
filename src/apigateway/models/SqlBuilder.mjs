@@ -50,19 +50,28 @@ class SqlBuilder {
         const bindVariables = []
         const qmarks = []
         const filter = req.query ?? {}
-        console.log("req.query", req.query)
+        console.log("SqlBuilder.generateGetStatement() <req.query>", req.query, "<filter>", filter)
         // quick and darty, does not work for strings !
+        let filters = []
+        Object.entries(filter).forEach(([key, val]) => {
+            filters.push(`${key}=${val}`)
+        })
+        /*
         let whereStr = ''
-        if (req.query && req.query.filter) {
-            if (Array.isArray(req.query.filter)) {
-                whereStr = req.query.filter.join(' AND ')
+        if (req.query && filter) {
+            if (Array.isArray(filter)) {
+                whereStr = filter.join(' AND ')
             } else {
-                whereStr = req.query.filter
+                whereStr = filter
             }
         }
-        const qmarksStr = qmarks.join(', ');
-        console.log(whereStr)
+        */
+        let whereStr = filters.join(' AND ')
         whereStr ? whereStr = 'WHERE ' + whereStr : ''
+
+        const qmarksStr = qmarks.join(', ');
+        console.log("SqlBuilder.generateGetStatement() <whereStr>", whereStr)
+
         const sql = `SELECT * FROM ${tableName} ${whereStr}`;
         //const sql = `INSERT INTO  ${tableName} (${setClausesStr}) VALUES (${qmarksStr})`;
         return { sql, bindVariables };
