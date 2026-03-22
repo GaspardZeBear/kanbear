@@ -5,6 +5,8 @@ class Kontext {
     static projects
     static currentProjectId
     static currentProjectName
+    static workspaceId
+
 
     //--------------------------------------------------------------
     static async loadConfig() {
@@ -55,6 +57,16 @@ class Kontext {
     //--------------------------------------------------------------
     static getJsonBulkData() {
         return (Kontext.jsonBulkData)
+    }
+
+    //--------------------------------------------------------------
+    static setWorkspaceId(id) {
+        Kontext.workspaceId=id
+    }
+
+    //--------------------------------------------------------------
+    static getWorkspaceId(id) {
+        return (Kontext.workspaceId)
     }
 
     //--------------------------------------------------------------

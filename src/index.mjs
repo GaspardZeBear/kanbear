@@ -11,8 +11,9 @@ import { selectBoxBuilder} from './utils/selectBoxBuilder.mjs'
 
 await Kontext.loadConfig()
 buildWorkspacesSelectBox()
-buildProjectsSelectBox()
 buildKanbearProjectsSelectBox()
+buildProjectsSelectBox()
+
 
 document.getElementById('kanboard').href = Kontext.getKanboardUrl()
 
@@ -55,18 +56,23 @@ async function buildProjectsSelectBox() {
 
 //---------------------------------------------------------------------------------
 async function buildKanbearProjectsSelectBox() {
-    let wss = await Project.getAll('projects')
+    let workspaceId=Kontext.getWorkspaceId()
+    let projects=[]
+    console.log("buildKanbearProjectsSelectBox() <workspaceId>", workspaceId)
+    if ( workspaceId ) {
+        projects=await Project.getAll('projects',{workspace_id:workspaceId})
+    }
     let boxName="kanbearProjectSelectBox"
     let boxParams= {
       domId: boxName,
       boxLabel : "project",
-      items : wss,
+      items : projects,
       labelText:"kanbear project",
       klass:"filter-group",
       //headItems:[['* Create new workspace',-1]]
     }
     let wsDiv = await selectBoxBuilder(boxParams)
-    document.getElementById("kanbearProjectsDiv").appendChild(wsDiv)
+    document.getElementById("kanbearProjectsDiv").replaceChildren(wsDiv)
     document.getElementById(boxName).addEventListener('change', async (e) => {
       let targetWorkspaceId = e.target.value;
       console.log({boxName}, e.target.value)
@@ -77,7 +83,7 @@ async function buildKanbearProjectsSelectBox() {
 async function buildWorkspacesSelectBox() {
     let wss = await Workspace.getAll('workspaces')
     // let wsDiv = await this.buildTargetWorkspaceSelectBox("targetWorspaceSelectBox", wss, "target workspace")
-    let boxName="workspaceSelectBox"
+    let boxName="kanbearWorkspaceSelectBox"
     let boxParams= {
       domId: boxName,
       boxLabel : "workspace",
@@ -87,9 +93,10 @@ async function buildWorkspacesSelectBox() {
       //headItems:[['* Create new workspace',-1]]
     }
     let wsDiv = await selectBoxBuilder(boxParams)
-    document.getElementById("workspacesDiv").replaceChildren(wsDiv)
+    document.getElementById("kanbearWorkspacesDiv").replaceChildren(wsDiv)
     document.getElementById(boxName).addEventListener('change', async (e) => {
-      let targetWorkspaceId = e.target.value;
+      Kontext.setWorkspaceId(e.target.value);
+      buildKanbearProjectsSelectBox()
       console.log({boxName}, e.target.value)
     });
 }
