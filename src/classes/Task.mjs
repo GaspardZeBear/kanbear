@@ -55,11 +55,12 @@ class Task extends KanbearEntity{
         taskElement.setAttribute("id", dragId)
         taskElement.classList.add('kanban-item');
         taskElement.setAttribute("draggable", true)
+        let description=this.task.description ?? "noDesc"
         taskElement.innerHTML = `
             <div class="kanban-item-header">
                 <div class="kanban-item-name">#${this.task.id}</div>
                 <div class="kanban-item-name">${this.task.name}</div>
-                <div class="kanban-item-description">blabla description${this.task.description}</div>
+                <div class="kanban-item-description">${description}</div>
                 <button class="edit-task-btn" data-task-id="${this.task.id}">Edit</button>
             </div>
            `;

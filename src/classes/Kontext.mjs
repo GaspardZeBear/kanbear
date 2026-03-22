@@ -19,10 +19,10 @@ class Kontext {
         console.log(Kontext.kanbearConfig)
     }
 //--------------------------------------------------------------
-    static async setProject(projectId,projectName) {
+    static async setProject(projectId) {
         Kontext.currentProjectId=projectId
-        Kontext.currentProjectName=projectName
-        console.log("Kontext setProject() bulk ",Kontext.currentProjectId," ",Kontext.currentProjectName)
+        //Kontext.currentProjectName=projectName
+        console.log("Kontext setProject() bulk ",Kontext.currentProjectId)
         await Kontext.loadKanbearJsonBulkData()
         //await Kontext.loadKanboardJsonBulkData()
     }

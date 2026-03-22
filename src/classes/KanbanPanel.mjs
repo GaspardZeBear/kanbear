@@ -66,7 +66,7 @@ class KanbanPanel {
 
       Object.entries(project.columns).forEach(([tKey, col]) => {
         // create a kanban-column
-        console.log("buildkColumnsDivsForProject(project) col=", col)
+        //console.log("buildkColumnsDivsForProject(project) col=", col)
         const kColumnDiv = document.createElement('div')
         kColumnDiv.classList.add("kanban-column")
         kColumnDiv.setAttribute("data-column-id", col.id)
