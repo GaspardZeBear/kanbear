@@ -25,7 +25,7 @@ document.getElementById('projectsSelectBox').addEventListener('change', (e) => {
 
 document.getElementById('loadJson').addEventListener('click', async () => {
     try {
-        const response = await Kontext.loadKanboardJsonBulkData()
+        const response = await Kontext.loadKanbearJsonBulkData()
         document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(Kontext.getJsonBulkData(), null, 2) + '</pre>';
         document.getElementById('message').innerHTML = '<p>Loaded</p>';
     } catch (error) {
@@ -74,8 +74,9 @@ async function buildKanbearProjectsSelectBox() {
     let wsDiv = await selectBoxBuilder(boxParams)
     document.getElementById("kanbearProjectsDiv").replaceChildren(wsDiv)
     document.getElementById(boxName).addEventListener('change', async (e) => {
-      let targetWorkspaceId = e.target.value;
-      console.log({boxName}, e.target.value)
+        console.log({boxName}, e.target)
+      Kontext.setProject(e.target.value,"xxx");
+      
     });
 }
 
