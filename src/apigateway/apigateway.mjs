@@ -24,7 +24,10 @@ import workspaceRoutes  from './routes/workspaces.mjs'
 import projectUserRoutes  from './routes/projectUsers.mjs'
 import taskHasTagRoutes  from './routes/taskHasTags.mjs'
 import taskCommentRoutes  from './routes/taskComments.mjs'
+import { KanbearSqlReporter } from './classes/KanbearSqlReporter.mjs';
 
+
+// Crud api
 app.use('/api/assignees', assigneeRoutes);
 app.use('/api/columns', columnRoutes);
 app.use('/api/swimlanes', swimlaneRoutes);
@@ -36,6 +39,22 @@ app.use('/api/workspaces', workspaceRoutes);
 app.use('/api/projects_users', projectUserRoutes);
 app.use('/api/task_has_tags', taskHasTagRoutes);
 app.use('/api/tasks_comments', taskCommentRoutes);
+
+//------------------------------------------------------------------------------
+app.get('/api/sql/report/:projectId', async (req, res) => {
+  const projectId=parseInt(req.params.projectId)
+   console.log("/api/sql/report invokated pId",projectId)
+  try {
+    const sqlReporter=new KanbearSqlReporter(false)
+    const report = await sqlReporter.getJsonReport(projectId);
+    console.log("api.get() ", report)
+    res.json(report);
+  } catch (error) {
+     console.log("/api/sql/report error ",error.message )
+    res.status(500).json({ error: error.message });
+  }
+   console.log("/api/sql/report done")
+});
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 3002;

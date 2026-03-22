@@ -71,7 +71,7 @@ class KanbearMigrator {
     console.log("ws id ", wsId)
     const pr = await KanbearEntityFactory.generate('project')
     pr.setData("workspace_id", wsId)
-    pr.setName(this.project.name)
+    pr.setName(`${this.project.name}-${new Date().toJSON()}`)
     pr.setDescription(this.project.description)
     pr.setOpen(this.project.is_open)
     await pr.create()
