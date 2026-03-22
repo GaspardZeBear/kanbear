@@ -207,7 +207,7 @@ class KanbanPanel {
       const kColumns = kSwimlane.querySelectorAll('.kanban-column');
 
       kColumns.forEach(kColumn => {
-        console.log("dataset", kColumn.dataset)
+        //console.log("dataset", kColumn.dataset)
         const columnId = kColumn.dataset.columnId;
         const container = kColumn.querySelector('.kanban-items');
         container.innerHTML = '';

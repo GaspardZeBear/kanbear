@@ -12,20 +12,20 @@ import { selectBoxBuilder} from './utils/selectBoxBuilder.mjs'
 await Kontext.loadConfig()
 buildWorkspacesSelectBox()
 buildKanbearProjectsSelectBox()
-buildProjectsSelectBox()
-
 
 document.getElementById('kanboard').href = Kontext.getKanboardUrl()
 
+/*
 document.getElementById('projectsSelectBox').addEventListener('change', (e) => {
     const selectedProject = e.target.value;
     console.log("projectSelectBox", e.target.value)
     Kontext.setProject(selectedProject, "xxxx")
 });
+*/
 
 document.getElementById('loadJson').addEventListener('click', async () => {
     try {
-        const response = await Kontext.loadJsonBulkData()
+        const response = await Kontext.loadKanboardJsonBulkData()
         document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(Kontext.getJsonBulkData(), null, 2) + '</pre>';
         document.getElementById('message').innerHTML = '<p>Loaded</p>';
     } catch (error) {
@@ -34,22 +34,22 @@ document.getElementById('loadJson').addEventListener('click', async () => {
 })
 
 //---------------------------------------------------------------------------------
-async function buildProjectsSelectBox() {
-    await Kontext.loadProjects()
+async function XbuildKanbearProjectsSelectBox() {
+    await Kontext.loadKanbearProjects()
     //const option = document.createElement('option')
     //option.setAttribute("value", 0)
     //option.innerHTML = '-------'
     //document.getElementById('projectsSelectBox').appendChild(option)
-    Object.entries(Kontext.getProjects()).forEach(([pId, pName],idx) => {
-        console.log(idx,pId, pName)
+    Object.entries(Kontext.getProjects()).forEach(([pId, project],idx) => {
+        console.log(idx,pId, project.name)
         
         const option = document.createElement('option')
         if ( idx == 0) {
-            Kontext.setProject(pId,pName)
+            Kontext.setProject(pId,project.name)
             option.setAttribute("selected","selected")
         }
         option.setAttribute("value", pId)
-        option.innerHTML = pName
+        option.innerHTML = project.name
         document.getElementById('projectsSelectBox').appendChild(option)
     })
 }

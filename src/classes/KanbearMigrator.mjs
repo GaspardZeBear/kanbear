@@ -12,13 +12,13 @@ import { selectBoxBuilder } from "../utils/selectBoxBuilder.mjs";
 
 class KanbearMigrator {
   constructor(element, filtersMap) {
-    this.project = Kontext.getCurrentProject()
+    //this.project = Kontext.getCurrentProject()
     this.htmlElement = element
     this.kanboardFilter = new KanboardFilter(filtersMap)
     this.buttons = {}
     this.table = undefined
     let resultTitle = document.createElement('h2')
-    resultTitle.innerHTML = `Migrating ${this.project.name} from kanboard`
+    resultTitle.innerHTML = `Migrating from kanboard`
     document.getElementById(this.htmlElement).replaceChildren(resultTitle)
   }
 
@@ -31,8 +31,38 @@ class KanbearMigrator {
     return (ws.getId())
   }
 
-  //-----------------------------------------------------------------
-  async migrate() {
+  //---------------------------------------------------------------------------------
+  // Kanboard load !!!
+  async buildKanboardProjectsSelectBox() {
+    await Kontext.loadKanboardProjects()
+    let projectsMap = Kontext.kanboardProjects
+    let projects = []
+    // convert to array from old kanboard loading
+    Object.entries(projectsMap).forEach(([id, project]) => {
+      console.log(project)
+      projects.push({id:id,name:project})
+    })
+    console.log("buildKanboardProjectsSelectBox() : kanboard projects", projects)
+    let boxName = "kanboardProjectsSelectBox"
+    let boxParams = {
+      domId: boxName,
+      boxLabel: "project",
+      items: projects,
+      labelText: "kanboard Project",
+      klass: "filter-group",
+      //headItems:[['* Create new workspace',-1]]
+    }
+    //let wsDiv = await selectBoxBuilder(boxName, "workspace", wss, "target workspace")
+    let wsDiv = await selectBoxBuilder(boxParams)
+    document.getElementById(this.htmlElement).appendChild(wsDiv)
+    document.getElementById(boxName).addEventListener('change', async (e) => {
+      let kanboardProjectId = e.target.value;
+      this.project=await Kontext.getKanboardProjectById(kanboardProjectId )
+    });
+  }
+
+  //---------------------------------------------------------------------------------
+  async buildWorkspacesSelectBox() {
     let wss = await Workspace.getAll('workspaces')
     if (wss.length == 0) {
       const ws = await KanbearEntityFactory.generate('workspace')
@@ -40,16 +70,16 @@ class KanbearMigrator {
       await ws.create()
       wss = await Workspace.getAll('workspaces')
     }
-    wss.unshift({id:-1,name:'* Create new workspace'})
+    wss.unshift({ id: -1, name: '* Create new workspace' })
     console.log("KanbearMigrator.migrate", wss)
     // let wsDiv = await this.buildTargetWorkspaceSelectBox("targetWorspaceSelectBox", wss, "target workspace")
-    let boxName="targetWorkspaceSelectBox"
-    let boxParams= {
+    let boxName = "targetWorkspaceSelectBox"
+    let boxParams = {
       domId: boxName,
-      boxLabel : "workspace",
-      items : wss,
-      labelText:"target workspace",
-      klass:"filter-group",
+      boxLabel: "workspace",
+      items: wss,
+      labelText: "target workspace",
+      klass: "filter-group",
       //headItems:[['* Create new workspace',-1]]
     }
     //let wsDiv = await selectBoxBuilder(boxName, "workspace", wss, "target workspace")
@@ -66,8 +96,16 @@ class KanbearMigrator {
     });
   }
 
+  //-----------------------------------------------------------------------------------------
+   async migrate() {
+    await Kontext.loadKanboardJsonBulkData()
+    await this.buildKanboardProjectsSelectBox()
+    await this.buildWorkspacesSelectBox()
+   }
+
   //-----------------------------------------------------------------
   async migrateProjectToWorkspace(wsId) {
+    console.log("migrateProjectToWorkspace() <project>", this.project)
     console.log("ws id ", wsId)
     const pr = await KanbearEntityFactory.generate('project')
     pr.setData("workspace_id", wsId)
