@@ -111,7 +111,7 @@ class KanbanPanel {
 
       })
       kanbanDiv.appendChild(kSwimlaneDiv)
-      console.log(this.kColumns)
+      //console.log(this.kColumns)
     })
     document.getElementById(this.htmlElement).appendChild(kanbanDiv)
   };
@@ -123,7 +123,7 @@ class KanbanPanel {
     const qs = `.kanban-items`
     //console.log("qs", qs)
     const zones = document.querySelectorAll(qs)
-    console.log(zones)
+    //console.log(zones)
     zones.forEach((zone) => {
       //console.log("listener", zone)
       project = this.project

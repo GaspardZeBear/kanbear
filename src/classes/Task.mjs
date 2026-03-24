@@ -2,7 +2,7 @@ import { KanbearEntity } from "./KanbearEntity.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { Ref } from "./Ref.mjs"
 
-class Task extends KanbearEntity{
+class Task extends KanbearEntity {
 
     //------------------------------------------------------------------------
     constructor(task) {
@@ -32,8 +32,8 @@ class Task extends KanbearEntity{
     // - add task to new swimlane
     // - remove it from old swimlane
     // Beware : remove works by ref, so duplicate
-    setSwimlane(oldSwimlaneId,newSwimlaneId) {
-        let project=Kontext.getCurrentProject()
+    setSwimlane(oldSwimlaneId, newSwimlaneId) {
+        let project = Kontext.getCurrentProject()
         if (oldSwimlaneId != newSwimlaneId) {
             this.task.swimlane_id = newSwimlaneId
 
@@ -55,7 +55,46 @@ class Task extends KanbearEntity{
         taskElement.setAttribute("id", dragId)
         taskElement.classList.add('kanban-item');
         taskElement.setAttribute("draggable", true)
-        let description=this.task.description ?? "noDesc"
+
+        //const dummyDiv = document.createElement("div")
+        const headerDiv = document.createElement("div")
+        headerDiv.classList.add("kanban-item-header")
+
+        const top = document.createElement("div")
+        top.classList.add("kanban-item-name")
+        top.innerHTML = `#${this.task.id} ${this.task.name}`
+
+        const description = this.task.description ?? "noDesc"
+        const tDesc = document.createElement("div")
+        tDesc.classList.add("kanban-item-name")
+        tDesc.innerHTML = description
+
+        //let editBtnDiv=document.createElement("div")
+        let editBtn = document.createElement("button")
+        editBtn.classList.add("edit-task-btn")
+        editBtn.setAttribute("id", `taskEditButton-${this.task.id}`)
+        editBtn.setAttribute("data-task-id", `${this.task.id}`)
+        editBtn.innerHTML = "Edit"
+
+
+        //editBtnDiv.appendChild(editBtn)
+        //top.appendChild(editBtn)
+        //dummyDiv.appendChild(tId)
+        //dummyDiv.appendChild(editBtnDiv)
+
+        //taskElement.appendChild(dummyDiv)
+        headerDiv.appendChild(top)
+        headerDiv.appendChild(tDesc)
+
+
+        // Strange behaviour : edit button clickable or not  !!!!!!!!!!!!!!!!!!!!!!!!!
+        // append editBtn to headerDiv Does not work : click listener not activatide 
+        //headerDiv.append(editBtn)
+        taskElement.appendChild(headerDiv)
+        // append editBtn append to taskElement works
+        taskElement.appendChild(editBtn)
+
+        /*
         taskElement.innerHTML = `
             <div class="kanban-item-header">
                 <div class="kanban-item-name">#${this.task.id}</div>
@@ -67,6 +106,7 @@ class Task extends KanbearEntity{
         //       <div class="kanban-item-description">${task.description}</div>
 
         //container.appendChild(taskElement);
+        */
 
         taskElement.addEventListener('dragstart', (ev) => {
             console.log("dragstart")
@@ -84,11 +124,18 @@ class Task extends KanbearEntity{
             ev.target.classList.remove("dragging")
         })
 
-        const editBtn = taskElement.querySelector('.edit-task-btn');
-        editBtn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            thsi.task.openEditPopup();
+
+
+        editBtn = taskElement.querySelector('.edit-task-btn');
+        //console.log(editBtn)
+        let task=this
+        editBtn.addEventListener('click', function (ev) {
+            console.log("Edit task")
+            ev.stopPropagation();
+            task.openEditPopup();
         });
+        console.log(editBtn)
+
         return (taskElement)
     }
 

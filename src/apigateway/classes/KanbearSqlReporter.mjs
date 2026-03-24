@@ -50,7 +50,7 @@ class KanbearSqlReporter {
         on s.id=t.swimlane_id
       join columns as c
         on c.id=t.column_id
-        where p.id=${projectId}
+      where p.id=${projectId} and c.project_id=${projectId}
       order by p.name,s.name,t.name
       `
     db.all(reqPCST, [], this.callAfterPCST.bind(this));
@@ -111,7 +111,7 @@ class KanbearSqlReporter {
         projectsMap[row.pId].users = this.usersMap
       }
       if (!projectsMap[row.pId].columns[row.cId]) {
-        projectsMap[row.pId].columns[row.cId] = { id: row.cId, name: row.cTitle, description: row.cDescription, position: row.cPosition }
+        projectsMap[row.pId].columns[row.cId] = { id: row.cId, name: row.cName, description: row.cDescription, position: row.cPosition }
       }
       if (!projectsMap[row.pId].swimlanes[row.sId]) {
         projectsMap[row.pId].swimlanes[row.sId] = { id: row.sId, project_id: row.pId, name: row.sName, description: row.sDescription, tasks: {} }
@@ -119,7 +119,7 @@ class KanbearSqlReporter {
       projectsMap[row.pId].swimlanes[row.sId].tasks[row.tId] = {
         id: row.tId,
         description: row.tDescription,
-        name: row.tTitle,
+        name: row.tName,
         project_id: row.pId,
         swimlane_id: row.sId,
         column_id: row.cId,
