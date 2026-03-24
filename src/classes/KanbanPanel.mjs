@@ -198,7 +198,7 @@ class KanbanPanel {
 
   //------------------------------------------------------------------------
   // Searh if task in swimlane/column
-  // status is column !
+  // status is column 
   //------------------------------------------------------------------------
   loadTasksForProject(project) {
     const kSwimlanes = document.querySelectorAll('.kanban-swimlane');
@@ -215,15 +215,23 @@ class KanbanPanel {
         if (project.swimlanes[kSwimlaneId]) {
           Object.entries(project.swimlanes[kSwimlaneId].tasks).forEach(([tKey, task]) => {
             if (task.column_id == columnId) {
-              container.appendChild(new Task(task).createKanbanTaskElement());
+              const newTask=new Task(task)
+              container.appendChild(newTask.createKanbanTaskElement());
+              
+              
+              //document.getElementById(project.id).addEventListener("taskModified", (ev) => {
+              document.addEventListener("taskModified", (ev) => {
+                console.log("taskModified listener <ev>",ev)
+              })
+              
+              //Mettre à jour le compteur
+              this.updateCounter(columnId, kSwimlaneId);
             }
-            //Mettre à jour le compteur
-            this.updateCounter(columnId, kSwimlaneId);
           })
         }
       })
-
-    });
+    }
+  );
   }
 
   //---------------------------------------------------------------------------------------

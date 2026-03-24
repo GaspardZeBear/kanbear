@@ -113,7 +113,7 @@ class Task extends KanbearEntity {
             ev.stopPropagation();
             task.openEditPopup();
         });
-        console.log(editBtn)
+        //console.log(editBtn)
         return (taskElement)
     }
 
@@ -125,6 +125,13 @@ class Task extends KanbearEntity {
         this.task.description=description
         await this.patch()
         document.getElementById(this.elementId).replaceWith(this.createKanbanTaskElement())
+        const taskModifiedEvent = new CustomEvent("taskModified", {
+                detail: {taskId:this.task.id},
+                bubbles: true,
+                cancelable: true,
+                composed: true
+              })
+        document.dispatchEvent(taskModifiedEvent)
     }
 
     //---------------------------------------------------------------------------------------------

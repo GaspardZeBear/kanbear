@@ -28,6 +28,13 @@ class KanbearMigrator {
     const ws = await KanbearEntityFactory.generate('workspace')
     ws.setName(targetNewWorkspaceName)
     await ws.create()
+        const workspaceAddedEvent = new CustomEvent("workspaceAdded", {
+      detail: { projectId: ws.getId() },
+      bubbles: true,
+      cancelable: true,
+      composed: true
+    })
+    document.dispatchEvent(workspaceAddedEvent)
     return (ws.getId())
   }
 
@@ -40,7 +47,7 @@ class KanbearMigrator {
     // convert to array from old kanboard loading
     Object.entries(projectsMap).forEach(([id, project]) => {
       console.log(project)
-      projects.push({id:id,name:project})
+      projects.push({ id: id, name: project })
     })
     console.log("buildKanboardProjectsSelectBox() : kanboard projects", projects)
     let boxName = "kanboardProjectsSelectBox"
@@ -57,7 +64,7 @@ class KanbearMigrator {
     document.getElementById(this.htmlElement).appendChild(wsDiv)
     document.getElementById(boxName).addEventListener('change', async (e) => {
       let kanboardProjectId = e.target.value;
-      this.project=await Kontext.getKanboardProjectById(kanboardProjectId )
+      this.project = await Kontext.getKanboardProjectById(kanboardProjectId)
     });
   }
 
@@ -97,11 +104,11 @@ class KanbearMigrator {
   }
 
   //-----------------------------------------------------------------------------------------
-   async migrate() {
+  async migrate() {
     await Kontext.loadKanboardJsonBulkData()
     await this.buildKanboardProjectsSelectBox()
     await this.buildWorkspacesSelectBox()
-   }
+  }
 
   //-----------------------------------------------------------------
   async migrateProjectToWorkspace(wsId) {
@@ -157,7 +164,17 @@ class KanbearMigrator {
       })
       console.log("Project tasks created")
     });
-    //alert("Projet migrated")
+
+
+
+    alert("Projet migrated")
+    const projectAddedEvent = new CustomEvent("projectAdded", {
+      detail: { projectId: pr.getId() },
+      bubbles: true,
+      cancelable: true,
+      composed: true
+    })
+    document.dispatchEvent(projectAddedEvent)
   }
 
 }
