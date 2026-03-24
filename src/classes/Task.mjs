@@ -6,8 +6,9 @@ class Task extends KanbearEntity {
 
     //------------------------------------------------------------------------
     constructor(task) {
-        super('task')
+        super('task',task)
         this.task = task
+        //this.id=task.id
         this.ref = null
         //this.openPopup()
     }
@@ -52,6 +53,7 @@ class Task extends KanbearEntity {
         //const dragId = `drag-${task.id}`
         const dragId = Ref.getRefFromTask('drag', this.task)
         const taskElement = document.createElement('div');
+        this.elementId=dragId
         taskElement.setAttribute("id", dragId)
         taskElement.classList.add('kanban-item');
         taskElement.setAttribute("draggable", true)
@@ -76,13 +78,6 @@ class Task extends KanbearEntity {
         editBtn.setAttribute("data-task-id", `${this.task.id}`)
         editBtn.innerHTML = "Edit"
 
-
-        //editBtnDiv.appendChild(editBtn)
-        //top.appendChild(editBtn)
-        //dummyDiv.appendChild(tId)
-        //dummyDiv.appendChild(editBtnDiv)
-
-        //taskElement.appendChild(dummyDiv)
         headerDiv.appendChild(top)
         headerDiv.appendChild(tDesc)
 
@@ -93,20 +88,6 @@ class Task extends KanbearEntity {
         taskElement.appendChild(headerDiv)
         // append editBtn append to taskElement works
         taskElement.appendChild(editBtn)
-
-        /*
-        taskElement.innerHTML = `
-            <div class="kanban-item-header">
-                <div class="kanban-item-name">#${this.task.id}</div>
-                <div class="kanban-item-name">${this.task.name}</div>
-                <div class="kanban-item-description">${description}</div>
-                <button class="edit-task-btn" data-task-id="${this.task.id}">Edit</button>
-            </div>
-           `;
-        //       <div class="kanban-item-description">${task.description}</div>
-
-        //container.appendChild(taskElement);
-        */
 
         taskElement.addEventListener('dragstart', (ev) => {
             console.log("dragstart")
@@ -124,8 +105,6 @@ class Task extends KanbearEntity {
             ev.target.classList.remove("dragging")
         })
 
-
-
         editBtn = taskElement.querySelector('.edit-task-btn');
         //console.log(editBtn)
         let task=this
@@ -135,16 +114,22 @@ class Task extends KanbearEntity {
             task.openEditPopup();
         });
         console.log(editBtn)
-
         return (taskElement)
     }
 
     //---------------------------------------------------------------------------------
-    openEditPopup() {
-        //alert(this.task.id);
+    async openEditPopupAsync() {
         let popup = document.getElementById('taskPopup')
-        console.log(popup)
-        //popup.style.display('flex')
+        let description=prompt("description : ")
+        this.setDescription(description)
+        this.task.description=description
+        await this.patch()
+        document.getElementById(this.elementId).replaceWith(this.createKanbanTaskElement())
+    }
+
+    //---------------------------------------------------------------------------------------------
+    openEditPopup() {
+        this.openEditPopupAsync()
     }
 
     // Fermer la popup
