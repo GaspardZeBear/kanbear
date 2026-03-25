@@ -11,16 +11,18 @@ import { selectBoxBuilder } from './utils/selectBoxBuilder.mjs'
 
 await Kontext.loadConfig()
 buildWorkspacesSelectBox()
-document.addEventListener("workspaceAdded", (ev) => {
-    console.log("workspaceAdded listener fired <ev>", ev)
+document.addEventListener("workspaceCreated", (ev) => {
+    console.log("workspaceCreated listener fired <ev>", ev)
     buildWorkspacesSelectBox()
 })
 buildKanbearProjectsSelectBox()
-//document.getElementById(project.id).addEventListener("taskModified", (ev) => {
-document.addEventListener("projectAdded", (ev) => {
-    console.log("projectAdded listener fired <ev>", ev)
+//document.querySelectorAll("projectCreated").addEventListener("projectCreated", (ev) => {
+document.addEventListener("projectCreated", (ev) => {
+    console.log("projectCreated listener fired <ev>", ev)
     buildKanbearProjectsSelectBox()
 })
+//document.getElementById(project.id).addEventListener("taskModified", (ev) => {
+
 
 document.getElementById('kanboard').href = Kontext.getKanboardUrl()
 
@@ -33,27 +35,6 @@ document.getElementById('loadJson').addEventListener('click', async () => {
         document.getElementById('message').innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
     }
 })
-
-//---------------------------------------------------------------------------------
-async function XbuildKanbearProjectsSelectBox() {
-    await Kontext.loadKanbearProjects()
-    //const option = document.createElement('option')
-    //option.setAttribute("value", 0)
-    //option.innerHTML = '-------'
-    //document.getElementById('projectsSelectBox').appendChild(option)
-    Object.entries(Kontext.getProjects()).forEach(([pId, project], idx) => {
-        console.log(idx, pId, project.name)
-
-        const option = document.createElement('option')
-        if (idx == 0) {
-            Kontext.setProject(pId, project.name)
-            option.setAttribute("selected", "selected")
-        }
-        option.setAttribute("value", pId)
-        option.innerHTML = project.name
-        document.getElementById('projectsSelectBox').appendChild(option)
-    })
-}
 
 //---------------------------------------------------------------------------------
 async function buildKanbearProjectsSelectBox() {
@@ -73,12 +54,14 @@ async function buildKanbearProjectsSelectBox() {
         //headItems:[['* Create new workspace',-1]]
     }
     let wsDiv = await selectBoxBuilder(boxParams)
+    wsDiv.classList.add("projectCreated")
     document.getElementById("kanbearProjectsDiv").replaceChildren(wsDiv)
     document.getElementById(boxName).addEventListener('change', async (e) => {
         console.log({ boxName }, e.target)
         Kontext.setProject(e.target.value, "xxx");
 
     });
+
 }
 
 //---------------------------------------------------------------------------------
