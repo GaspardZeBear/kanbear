@@ -82,10 +82,18 @@ class KanbearProjectCleanor {
 
         log(logDiv, "delete project <id>", project.id, "<name> ", project.name)
         const pr = new Project(project)
-        pr.delete()
+        await pr.delete()
 
 
         document.getElementById(this.htmlElement).appendChild(logDiv)
+        const projectDeletedEvent = new CustomEvent("projectDeleted", {
+            detail: { projectId: pr.getId() },
+            bubbles: true,
+            cancelable: true,
+            composed: true
+        })
+        //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
+        document.dispatchEvent(projectDeletedEvent)
     }
 
 }
