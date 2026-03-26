@@ -9,6 +9,7 @@ import { KanbearEntityFactory } from "./KanbearEntityFactory.mjs";
 import { Task } from "./Task.mjs";
 import { Ref } from "./Ref.mjs"
 import { selectBoxBuilder } from "../utils/selectBoxBuilder.mjs";
+import { log } from '../utils/logListBuilder.mjs'
 
 class KanbearMigrator {
   constructor(element, filtersMap) {
@@ -28,8 +29,8 @@ class KanbearMigrator {
     const ws = await KanbearEntityFactory.generate('workspace')
     ws.setName(targetNewWorkspaceName)
     await ws.create()
-        const workspaceCreatedEvent = new CustomEvent("workspaceCreated", {
-      detail: { projectId: ws.getId() },
+    const workspaceCreatedEvent = new CustomEvent("workspaceCreated", {
+      detail: { workspaceId: ws.getId() },
       bubbles: true,
       cancelable: true,
       composed: true
@@ -110,22 +111,12 @@ class KanbearMigrator {
     await this.buildWorkspacesSelectBox()
   }
 
-  //----------------------------------------------------------------
-  log(...items) {
-    let liDiv=document.createElement("li")
-    let msg=new Date().toJSON()
-    items.forEach( (m) => {
-      msg += ` ${m}`
-    })
-    liDiv.innerHTML=msg
-    this.logDiv.appendChild(liDiv)
-  }
 
   //-----------------------------------------------------------------
   async migrateProjectToWorkspace(wsId) {
-    this.logDiv=document.createElement("ul")
-    this.log("migrateProjectToWorkspace() <project>",this.project)
-    this.log(`ws id ${wsId} `)
+    let logDiv = document.createElement("ul")
+    log(logDiv, "migrateProjectToWorkspace() <project>", this.project)
+    log(logDiv, `ws id ${wsId} `)
     const pr = await KanbearEntityFactory.generate('project')
     pr.setData("workspace_id", wsId)
     pr.setName(`${this.project.name}-${new Date().toJSON()}`)
@@ -133,11 +124,17 @@ class KanbearMigrator {
     pr.setOpen(this.project.is_open)
     await pr.create()
 
-    this.log(`Project envelop created (empty)`)
-    const newColumnsId = {}
+    log(logDiv, `Project envelop created (empty)`)
+
+
+    // tricky play with promises : f... async/awit !!!!!!!
+    let columnEntityPromises = []
+    /*
     Object.entries(this.project.columns).forEach(async ([cKey, column]) => {
       //console.log("columns", column.name)
+
       const co = await KanbearEntityFactory.generate('column')
+      
       co.setName(column.name)
       co.setDescription(column.description)
       co.setData("position", column.position)
@@ -145,7 +142,41 @@ class KanbearMigrator {
       await co.create()
       newColumnsId[column.name] = co.getId()
     })
-    this.log(`Project columns created ${newColumnsId}`)
+    
+    let cols=await Promise.all(columnEntityPromises)
+    
+    console.log(cols)
+*/
+
+    // Lt's create all columns before creating other element
+    const newColumnsId = {}
+    const persistedColumnPromises = []
+    Object.entries(this.project.columns).forEach(async ([cKey, column]) => {
+      const createColsStuff = new Promise(async (resolve, reject) => {
+        let co = await KanbearEntityFactory.generate('column')
+        console.log("col = ", co)
+        co.setName(column.name)
+        co.setDescription(column.description)
+        co.setData("position", column.position)
+        co.setData("project_id", pr.getId())
+        await co.create()
+        newColumnsId[column.name] = co.getId()
+        resolve("ok")
+      })
+      persistedColumnPromises.push(createColsStuff)
+    })
+    console.log("Waiting for columns")
+    let persistedColumns = await Promise.all(persistedColumnPromises)
+
+    //cols.forEach((co) => {
+    //  console.log(`co : `, co)
+    //  newColumnsId[co.name] = co.getId()
+    //})
+
+    console.log(`Project columns created`, newColumnsId)
+    log(logDiv, `Project columns created ${newColumnsId}`)
+
+    const persistedTaskPromises = []
     Object.entries(this.project.swimlanes).forEach(async ([sKey, swimlane]) => {
       //console.log("swimlanes", swimlane.name)
       const sw = await KanbearEntityFactory.generate('swimlane')
@@ -157,28 +188,33 @@ class KanbearMigrator {
       //console.log("swimlanes", swimlane.name)
       await sw.create()
       const swId = sw.getId()
-      this.log(`Project swimlane created ${swimlane.name}`)
-      Object.entries(swimlane.tasks).forEach(async ([tKey, task]) => {
-        //console.log("migrating task", task)
-        const ta = await KanbearEntityFactory.generate('task')
-        ta.setName(task.name)
-        ta.setDescription(task.description)
-        ta.setData("position", task.position)
-        ta.setData("swimlane_id", swId)
-        console.log(tKey, "source project cols", this.project.columns)
-        console.log(tKey, "source task.column_id=", task.column_id)
-        let colName = this.project.columns[task.column_id].name
-        console.log(tKey, "colName", colName)
-        ta.setData("column_id", newColumnsId[colName])
-        console.log(tKey, "target task", ta)
-        await ta.create()
-        this.log("Tasks", task.name, "created in swimlane ",swimlane.name)
-      })
+      log(logDiv, `Project swimlane created ${swimlane.name}`)
       
-    });
+      Object.entries(swimlane.tasks).forEach(async ([tKey, task]) => {
+        const createTaskStuff = new Promise(async (resolve, reject) => {
+          const ta = await KanbearEntityFactory.generate('task')
+          ta.setName(task.name)
+          ta.setDescription(task.description)
+          ta.setData("position", task.position)
+          ta.setData("swimlane_id", swId)
+          console.log(tKey, "source project cols", this.project.columns)
+          console.log(tKey, "source task.column_id=", task.column_id)
+          let colName = this.project.columns[task.column_id].name
+          console.log(tKey, "colName", colName)
+          ta.setData("column_id", newColumnsId[colName])
+          console.log(tKey, "target task", ta)
+          await ta.create()
+          log(logDiv, "Tasks", task.name, "created in swimlane ", swimlane.name)
+          resolve("ok")
+        })
+        persistedTaskPromises.push(createTaskStuff)
+      })
 
-    this.log("Project migrated")
-    document.getElementById(this.htmlElement).appendChild(this.logDiv)
+    });
+    console.log("persistedTaskPromises",persistedTaskPromises)
+    let persistedTasks = await Promise.all(persistedTaskPromises)
+    log(logDiv, "Project migrated")
+    document.getElementById(this.htmlElement).appendChild(logDiv)
     const projectCreatedEvent = new CustomEvent("projectCreated", {
       detail: { projectId: pr.getId() },
       bubbles: true,

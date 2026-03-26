@@ -5,7 +5,7 @@ class Column extends KanbearEntity {
 
     //------------------------------------------------------------------------
     constructor(column) {
-        super('column')
+        super('column',column)
         this.column = column
     }
 

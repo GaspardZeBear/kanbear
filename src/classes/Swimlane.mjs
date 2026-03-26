@@ -5,7 +5,7 @@ class Swimlane extends KanbearEntity {
 
     //------------------------------------------------------------------------
     constructor(swimlane) {
-        super('swimlane')
+        super('swimlane',swimlane)
         this.swimlane = swimlane
     }
 

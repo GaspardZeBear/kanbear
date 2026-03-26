@@ -7,7 +7,8 @@ class KanbearEntity {
         this.kind = kind
         this.data = {}
         from.id ? this.id=from.id : undefined
-        console.log(this)
+        console.log("KanbearEntity.constructor() <from>",from)
+        console.log("KanbearEntity.constructor() <this>",this)
     }
 
     //----------------------------------------------------------------------------
@@ -71,6 +72,18 @@ class KanbearEntity {
         console.log(data)
         const resp = await new ApiCaller().patch(`/api/${this.kind}s/${this.id}`, data)
         console.log("KanbearObject.patch()", resp.data)
+        return (resp.data)
+    }
+
+    //-------------------------------------------------------------------------------
+    async delete(kind, params) {
+        const data = {}
+        Object.entries(this.data).forEach(([key, val]) => {
+            val ? data[key] = val : 1
+        })
+        console.log("KanbearEntity.delete() <kind>",this.kind,"<id>",this.id, "<data>",data)
+        const resp = await new ApiCaller().erase(`/api/${this.kind}s/${this.id}`, data)
+        console.log("KanbearObject.delete()", resp.data)
         return (resp.data)
     }
 

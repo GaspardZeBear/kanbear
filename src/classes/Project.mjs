@@ -5,7 +5,7 @@ class Project extends KanbearEntity {
 
     //------------------------------------------------------------------------
     constructor(project) {
-        super('project')
+        super('project',project)
         this.project = project
     }
 

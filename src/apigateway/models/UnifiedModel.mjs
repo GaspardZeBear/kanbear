@@ -92,7 +92,8 @@ class UnifiedModel {
     //------------------------------------------------------------------
     static delete(table, req, opParms, callback) {
         console.log("UnifiedModel.delete(), <params>",req.params,"<body>",req.body)
-        const sql = `DELETE FROM ${table} WHERE id = ${req.params["id"]}`;
+        //const sql = `DELETE FROM ${table} WHERE id = ${req.params["id"]}`;
+        const { sql, bindVariables } = new SqlBuilder().generateDeleteStatement(table, req)
         db.run(sql, [], (res) => {
             console.log("UnifiedModel.delete()  fired, will call callback res=", res)
             //res.lastInsertRowid != null ? callback(null, res.lastInsertRowid) : callback(res, null)

@@ -4,6 +4,7 @@
 import { KanbanPanel } from './classes/KanbanPanel.mjs';
 import { KanboardListPanel } from './classes/KanboardListPanel.mjs';
 import { KanbearMigrator } from './classes/KanbearMigrator.mjs';
+import { KanbearProjectCleanor } from './classes/KanbearProjectCleanor.mjs';
 import { Kontext } from './classes/Kontext.mjs';
 import { Workspace } from './classes/Workspace.mjs';
 import { Project } from './classes/Project.mjs';
@@ -122,9 +123,7 @@ document.getElementById('kanban').addEventListener('click', () => {
 
 // Effacer les données
 document.getElementById('clearProjects').addEventListener('click', () => {
-    globalJsonData = null;
-    document.getElementById('message').textContent = 'No projects loaded';
-    document.getElementById('results').innerHTML = '<p></p>';
+    new KanbearProjectCleanor('results', getFiltersMap()).cleanup()
 });
 
 
