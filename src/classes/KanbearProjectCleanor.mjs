@@ -26,36 +26,62 @@ class KanbearProjectCleanor {
 
     //-----------------------------------------------------------------------------------
     cleanup() {
+        console.log(Kontext.getCurrentProject())
         this.doCleanup(Kontext.getCurrentProject())
     }
     //-----------------------------------------------------------------------------------
     // Cleanup all the tasks in swimlanes
     // then remove columns and swimlanes
     // then remove project
+    // Beware : asynchronous !!!!! Force rendez-vous
     async doCleanup(project) {
         let logDiv = document.createElement("ul")
 
+        const taskDeletePromises = []
         Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
             log(logDiv, "tasks in  swimlane ", swimlane.name)
-            Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
-                log(logDiv, "delete task <id>", task.id, "<name>", task.name)
-                const ta=new Task(task)
-                ta.delete()
+            Object.entries(swimlane.tasks).forEach(async ([tKey, task]) => {
+                const taskDelete = new Promise(async (resolve, reject) => {
+                    log(logDiv, "delete task <id>", task.id, "<name>", task.name)
+                    const ta = new Task(task)
+                    await ta.delete()
+                    resolve(["OK", task.name, task.id])
+                })
+                taskDeletePromises.push(taskDelete)
             })
         })
+        let taskPromises = await Promise.all(taskDeletePromises)
+        console.log("doCleanup() <taskPromises>", taskPromises)
 
+        const swimlaneDeletePromises = []
         Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
-            log(logDiv, "delete swimlane <id>", swimlane.id , "<name> " ,swimlane.name)
+            log(logDiv, "delete swimlane <id>", swimlane.id, "<name> ", swimlane.name)
+            const swDelete = new Promise(async (resolve, reject) => {
+                const sw = new Swimlane(swimlane)
+                await sw.delete()
+                resolve(["OK", swimlane.name, sw.id])
+            })
+            swimlaneDeletePromises.push(swDelete)
+        })
+        let swimlanePromises = await Promise.all(swimlaneDeletePromises)
+        console.log("doCleanup() <swimlanePromises>", swimlanePromises)
+
+        const columnDeletePromises = []
+        Object.entries(project.columns).forEach(([sKey, column]) => {
+            log(logDiv, "delete column <id>", column.id, "<name> ", column.name)
+            const coDelete = new Promise(async (resolve, reject) => {
+                const co = new Column(column)
+                await co.delete()
+                resolve(["OK", column.name, co.id])
+            })
+            columnDeletePromises.push(coDelete)
         })
 
-        Object.entries(project.columns).forEach(async ([sKey, column]) => {
-            log(logDiv, "delete column <id>", column.id , "<name> ", column.name)
-            const co = new Column(column)
-            co.delete()
-        })
+        let columnPromises = await Promise.all(columnDeletePromises)
+        console.log("doCleanup() <columnPromises>", columnPromises)
 
-         log(logDiv, "delete project <id>", project.id , "<name> ", project.name)
-        const pr=new Project(project)
+        log(logDiv, "delete project <id>", project.id, "<name> ", project.name)
+        const pr = new Project(project)
         pr.delete()
 
 

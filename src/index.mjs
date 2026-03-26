@@ -22,6 +22,10 @@ document.addEventListener("projectCreated", (ev) => {
     console.log("projectCreated listener fired <ev>", ev)
     buildKanbearProjectsSelectBox()
 })
+document.addEventListener("projectDeleted", (ev) => {
+    console.log("projectDeleted listener fired <ev>", ev)
+    buildKanbearProjectsSelectBox()
+})
 //document.getElementById(project.id).addEventListener("taskModified", (ev) => {
 
 

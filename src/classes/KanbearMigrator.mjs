@@ -215,13 +215,14 @@ class KanbearMigrator {
     let persistedTasks = await Promise.all(persistedTaskPromises)
     log(logDiv, "Project migrated")
     document.getElementById(this.htmlElement).appendChild(logDiv)
-    const projectCreatedEvent = new CustomEvent("projectCreated", {
+    const projectDeletedEvent = new CustomEvent("projectDeleted", {
       detail: { projectId: pr.getId() },
       bubbles: true,
       cancelable: true,
       composed: true
     })
-    document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
+    //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
+    document.dispatchEvent(projectDeletedEvent)
   }
 
 }
