@@ -22,7 +22,13 @@ document.addEventListener("projectCreated", async (ev) => {
     console.log("projectCreated listener fired <ev>", ev)
     buildKanbearProjectsSelectBox()
     await Kontext.setProject(ev.detail.projectId);
-    new KanbanPanel('results', getFiltersMap()).render() 
+    new KanbanPanel('results', getFiltersMap()).render()
+})
+document.addEventListener("projectSelected", async (ev) => {
+    console.log("projectSelected listener fired <ev>", ev)
+    buildKanbearProjectsSelectBox()
+    await Kontext.setProject(ev.detail.projectId);
+    new KanbanPanel('results', getFiltersMap()).render()
 })
 document.addEventListener("projectDeleted", (ev) => {
     console.log("projectDeleted listener fired <ev>", ev)
@@ -65,7 +71,15 @@ async function buildKanbearProjectsSelectBox() {
     document.getElementById("kanbearProjectsDiv").replaceChildren(wsDiv)
     document.getElementById(boxName).addEventListener('change', async (e) => {
         console.log({ boxName }, e.target)
-        Kontext.setProject(e.target.value);
+        //Kontext.setProject(e.target.value);
+        const projectSelectedEvent = new CustomEvent("projectSelected", {
+            detail: { projectId: e.target.value },
+            bubbles: true,
+            cancelable: true,
+            composed: true
+        })
+        //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
+        document.dispatchEvent(projectSelectedEvent)
     });
 }
 
