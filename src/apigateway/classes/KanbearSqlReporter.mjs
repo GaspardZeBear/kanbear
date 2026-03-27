@@ -43,7 +43,7 @@ class KanbearSqlReporter {
 	      t.date_due tDue,
 	      datetime(t.date_moved,'unixepoch') tMovedDatetime
       from projects as p
-      right join swimlanes as s
+      left join swimlanes as s
         on p.id=s.project_id
       left join tasks as t
         on s.id = t.swimlane_id
@@ -55,34 +55,7 @@ class KanbearSqlReporter {
     //console.log(queryStmt.all())
   }
 
-  //-----------------------------------------------------
-  async XselectC(projectId) {
-    console.log("KanboardSqlReporter.selectC()")
-    let reqC = `
-      select 
-        p.id pId,
-	      p.name pName,
-        p.description pDescription,
- 	      c.id cId,
-	      c.name cName,
-        c.position cPosition,
-        c.description cDescription,
-        t.id tId,
-        t.name tName
-      from projects as p
-      right join columns as c
-        on p.id=c.project_id
-      left join tasks as t
-        on c.id = t.column_id
-      where p.id=${projectId}
-      order by p.name,c.name
-      `
-    db.all(reqC, [], this.callAfterC.bind(this));
-    //return (queryStmt.all())
-    //console.log(queryStmt.all())
-  }
-
-  //-----------------------------------------------------
+   //-----------------------------------------------------
   async selectC(projectId) {
     console.log("KanboardSqlReporter.selectC()")
     let reqC = `
@@ -170,15 +143,17 @@ class KanbearSqlReporter {
         projectsMap[row.pId].tags = {}
         projectsMap[row.pId].users = this.usersMap
       }
-      //if (!projectsMap[row.pId].columns[row.cId]) {
-      //  projectsMap[row.pId].columns[row.cId] = { id: row.cId, name: row.cName, description: row.cDescription, position: row.cPosition }
-      //}
+
+      if (row.sId == null) {
+        console.log("row.sId skip ")
+        continue
+      }
       if (!projectsMap[row.pId].swimlanes[row.sId]) {
         projectsMap[row.pId].swimlanes[row.sId] = { id: row.sId, project_id: row.pId, name: row.sName, description: row.sDescription, tasks: {} }
       }
       // Beware of left/righ join, task may be null 
-      console.log("row.tId",row.tId)
-      if ( row.tId == null ) {
+      //console.log("row.tId",row.tId)
+      if (row.tId == null) {
         console.log("row.tId skip ")
         continue
       }
@@ -199,10 +174,10 @@ class KanbearSqlReporter {
     //console.log("this.CResp", this.CResp)
     for (let c of this.CResp) {
       projectsMap[projectId].columns[c.cId] = {
-        name : c.cName,
-        id : c.cId,
-        position : c.cPosition,
-        description : c.cDescription
+        name: c.cName,
+        id: c.cId,
+        position: c.cPosition,
+        description: c.cDescription
       }
     }
     for (let p in projectsMap) {

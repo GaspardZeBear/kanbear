@@ -111,14 +111,14 @@ class Task extends KanbearEntity {
         editBtn.addEventListener('click', function (ev) {
             console.log("Edit task")
             ev.stopPropagation();
-            task.openEditPopup();
+            task.openEditModal();
         });
         //console.log(editBtn)
         return (taskElement)
     }
 
     //---------------------------------------------------------------------------------
-    async openEditPopupAsync() {
+    async openEditModalAsync() {
         let popup = document.getElementById('taskPopup')
         let description=prompt("description : ")
         this.setDescription(description)
@@ -135,8 +135,8 @@ class Task extends KanbearEntity {
     }
 
     //---------------------------------------------------------------------------------------------
-    openEditPopup() {
-        this.openEditPopupAsync()
+    openEditModal() {
+        this.openEditModalAsync()
     }
 
     // Fermer la popup

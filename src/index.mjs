@@ -18,9 +18,11 @@ document.addEventListener("workspaceCreated", (ev) => {
 })
 buildKanbearProjectsSelectBox()
 //document.querySelectorAll("projectCreated").addEventListener("projectCreated", (ev) => {
-document.addEventListener("projectCreated", (ev) => {
+document.addEventListener("projectCreated", async (ev) => {
     console.log("projectCreated listener fired <ev>", ev)
     buildKanbearProjectsSelectBox()
+    await Kontext.setProject(ev.detail.projectId);
+    new KanbanPanel('results', getFiltersMap()).render() 
 })
 document.addEventListener("projectDeleted", (ev) => {
     console.log("projectDeleted listener fired <ev>", ev)
@@ -63,10 +65,8 @@ async function buildKanbearProjectsSelectBox() {
     document.getElementById("kanbearProjectsDiv").replaceChildren(wsDiv)
     document.getElementById(boxName).addEventListener('change', async (e) => {
         console.log({ boxName }, e.target)
-        Kontext.setProject(e.target.value, "xxx");
-
+        Kontext.setProject(e.target.value);
     });
-
 }
 
 //---------------------------------------------------------------------------------
