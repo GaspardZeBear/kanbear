@@ -147,8 +147,8 @@ class KanbanPanel {
 
         //---------------------------------------------------------------------------
         // Todo 
-        // - save task to database
         // - update task in Kontext  
+        // - save task to database
         // Beware : swimlane may change, update id too in db and in task div Id !!!!!!!!!!!!!!!
         // - update taskElement dragId :  update dragstart eventListener (remove/add) 
         // - update the DOM
@@ -171,6 +171,9 @@ class KanbanPanel {
         task.setColumn(targetColumnId)
         task.setSwimlane(swimlane.id, targetSwimlaneId)
         task.setRef(newRef)
+        task.setData("column_id", targetColumnId)
+        task.setData("swimlane_id", targetSwimlaneId)
+        task.patch()
         const taskElementNew = task.createKanbanTaskElement()
 
         // update the DOM
@@ -215,15 +218,15 @@ class KanbanPanel {
         if (project.swimlanes[kSwimlaneId]) {
           Object.entries(project.swimlanes[kSwimlaneId].tasks).forEach(([tKey, task]) => {
             if (task.column_id == columnId) {
-              const newTask=new Task(task)
+              const newTask = new Task(task)
               container.appendChild(newTask.createKanbanTaskElement());
-              
-              
+
+
               //document.getElementById(project.id).addEventListener("taskModified", (ev) => {
               document.addEventListener("taskModified", (ev) => {
-                console.log("taskModified listener <ev>",ev)
+                console.log("taskModified listener <ev>", ev)
               })
-              
+
               //Mettre à jour le compteur
               this.updateCounter(columnId, kSwimlaneId);
             }
@@ -231,7 +234,7 @@ class KanbanPanel {
         }
       })
     }
-  );
+    );
   }
 
   //---------------------------------------------------------------------------------------

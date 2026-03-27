@@ -19,7 +19,7 @@ class KanbearProjectCleanor {
         this.buttons = {}
         this.table = undefined
         let resultTitle = document.createElement('h2')
-        resultTitle.innerHTML = `Cleaning project `
+        resultTitle.innerHTML = `Delete project  ${Kontext.getCurrentProject().name}`
         document.getElementById(this.htmlElement).replaceChildren(resultTitle)
         //cleanup(Kontext.getCurrentProject())
     }
@@ -27,7 +27,13 @@ class KanbearProjectCleanor {
     //-----------------------------------------------------------------------------------
     cleanup() {
         console.log(Kontext.getCurrentProject())
-        this.doCleanup(Kontext.getCurrentProject())
+        if (confirm(`Delete project  ${Kontext.getCurrentProject().name} ?`)) {
+            this.doCleanup(Kontext.getCurrentProject())
+        } else {
+            let cancelTitle = document.createElement('h2')
+            cancelTitle.innerHTML = `Delete cancelled`
+            document.getElementById(this.htmlElement).appendChild(cancelTitle)
+        }
     }
     //-----------------------------------------------------------------------------------
     // Cleanup all the tasks in swimlanes
