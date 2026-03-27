@@ -150,6 +150,7 @@ import {db } from './config/database.mjs'
   db.exec('CREATE INDEX IF NOT EXISTS columns_project_idx ON columns(project_id)');
   db.exec('CREATE INDEX IF NOT EXISTS swimlanes_project_idx ON swimlanes(project_id)');
 
+  db.exec("INSERT INTO workspaces (name,is_open) VALUES('default_workspace',1)")
   console.log('Base de données initialisée avec succès.');
 
 

@@ -151,7 +151,7 @@ class KanbearMigrator {
     // Lt's create all columns before creating other element
     const newColumnsId = {}
     const persistedColumnPromises = []
-    Object.entries(this.project.columns).forEach(async ([cKey, column]) => {
+    Object.entries(this.project.columns).forEach(([cKey, column]) => {
       const createColsStuff = new Promise(async (resolve, reject) => {
         let co = await KanbearEntityFactory.generate('column')
         console.log("col = ", co)
@@ -163,6 +163,7 @@ class KanbearMigrator {
         newColumnsId[column.name] = co.getId()
         resolve("ok")
       })
+
       persistedColumnPromises.push(createColsStuff)
     })
     console.log("Waiting for columns")
@@ -190,7 +191,7 @@ class KanbearMigrator {
       const swId = sw.getId()
       log(logDiv, `Project swimlane created ${swimlane.name}`)
       
-      Object.entries(swimlane.tasks).forEach(async ([tKey, task]) => {
+      Object.entries(swimlane.tasks).forEach( ([tKey, task]) => {
         const createTaskStuff = new Promise(async (resolve, reject) => {
           const ta = await KanbearEntityFactory.generate('task')
           ta.setName(task.name)
