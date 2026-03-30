@@ -35,6 +35,11 @@ document.addEventListener("projectDeleted", (ev) => {
     console.log("projectDeleted listener fired <ev>", ev)
     buildKanbearProjectsSelectBox()
 })
+
+document.addEventListener("swimlaneCreated", async (ev) => {
+    console.log("swimlane listener fired <ev>", ev)
+    new KanbanPanel('results', getFiltersMap()).render()
+})
 //document.getElementById(project.id).addEventListener("taskModified", (ev) => {
 
 
@@ -76,11 +81,13 @@ async function buildKanbearProjectsSelectBox() {
         console.log({ boxName }, e.target)
         let projectId = e.target.value;
         if (projectId == -1) {
-            let newProjectId =new ProjectDialog("create",workspaceId)
+            let newProject =new ProjectDialog("create",workspaceId)
+            projectId=newProject.getProject().getId()
         }
         //Kontext.setProject(e.target.value);
         const projectSelectedEvent = new CustomEvent("projectSelected", {
-            detail: { projectId: e.target.value },
+            //detail: { projectId: e.target.value },
+            detail: { projectId: projectId },
             bubbles: true,
             cancelable: true,
             composed: true

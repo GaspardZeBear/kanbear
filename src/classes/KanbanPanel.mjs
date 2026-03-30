@@ -2,6 +2,8 @@ import { KanboardFilter } from "./KanboardFilter.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { Task } from "./Task.mjs"
 import { ProjectManager } from "./ProjectManager.mjs"
+import { SwimlaneDialog } from "./SwimlaneDialog.mjs"
+import { ColumnDialog } from "./ColumnDialog.mjs"
 import { Ref } from "./Ref.mjs"
 
 class KanbanPanel {
@@ -15,7 +17,6 @@ class KanbanPanel {
     this.buttons = {}
     this.table = undefined
     this.kColumns = {}
-
   }
 
   //------------------------------------------------------------------------
@@ -26,9 +27,36 @@ class KanbanPanel {
       document.getElementById(this.htmlElement).innerHTML = `Project not displayable ${cause}`
       return
     }
-    //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
+     
+    let projectId=this.project.id
+
+    const addSwimlaneButton = document.createElement('button')
+    addSwimlaneButton.classList.add("add-item-btn")
+    addSwimlaneButton.setAttribute("data-project-id", this.project.id)
+    addSwimlaneButton.innerHTML = "+S"
+    
+    addSwimlaneButton.addEventListener('click', function (ev) {
+            console.log("Edit task")
+            ev.stopPropagation();
+            const swimlane=new SwimlaneDialog('create',projectId);
+        });
+
+    const addColumnButton = document.createElement('button')
+    addColumnButton.classList.add("add-item-btn")
+    addColumnButton.setAttribute("data-project-id", this.project.id)
+    addColumnButton.innerHTML = "+C"
+    addColumnButton.addEventListener('click', function (ev) {
+            console.log("Edit task")
+            ev.stopPropagation();
+            const column=new ColumnDialog('create',projectId);
+        });
+
     let resultTitle = document.createElement('h2')
-    resultTitle.innerHTML = `${this.project.name} filtered by ...`
+    resultTitle.appendChild(addSwimlaneButton)
+    resultTitle.appendChild(addColumnButton)
+    let title=document.createElement("span")
+    title.innerHTML = `${this.project.name} filtered by ...`
+    resultTitle.appendChild(title)
     document.getElementById(this.htmlElement).replaceChildren(resultTitle)
 
     this.buildKanbanDivsForProject(this.project)
@@ -95,7 +123,7 @@ class KanbanPanel {
         addButtonDiv.classList.add("add-item-btn")
         addButtonDiv.setAttribute("data-swimlane-id", swimlane.id)
         addButtonDiv.setAttribute("data-column-id", col.id)
-        addButtonDiv.innerHTML = "+"
+        addButtonDiv.innerHTML = "+T"
 
         // link all
         kColumnHeaderDiv.appendChild(kColumnHeaderDivH3)

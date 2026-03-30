@@ -1,15 +1,15 @@
 import { Dialog } from './Dialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 
-class ProjectDialog extends Dialog {
+class ColumnDialog extends Dialog {
 
-    constructor(dialogName, workspaceId) {
+    constructor(dialogName, projectId) {
         super()
         this.dialogName = dialogName
-        this.workspaceId = workspaceId
+        this.projectId = projectId
         this.buildHtmlDialog()
         this.showDialog()
-        this.project=null
+        this.column=null
     }
 
     //------------------------------------------------------------------------------------------
@@ -19,22 +19,22 @@ class ProjectDialog extends Dialog {
                 this.createDialog()
                 break
             default:
-                console.log("ProjectDialog.buildHtmlDialog() unknown dialogName ", this.dialogName)
+                console.log("ColumnDialog.buildHtmlDialog() unknown dialogName ", this.dialogName)
         }
     }
 
     //-------------------------------------------------------------------------------------
     createDialog() {
-        this.dialog = document.getElementById("projectDialog")
+        this.dialog = document.getElementById("columnDialog")
         let dialog = this.dialog
         let close = this.closeDialog.bind(this)
         let save = this.save.bind(this)
         //document.getElementById("projectNameDiv").setAttribute("hidden","")
-        document.getElementById("saveProjectBtn").addEventListener("click", function (event) {
-            console.log("eventListener saveProjectBtn dialog")
+        document.getElementById("saveColumnBtn").addEventListener("click", function (event) {
+            console.log("eventListener saveSwimlaneBtn dialog")
             save()
         });
-        document.getElementById("cancelProjectBtn").addEventListener("click", function (event) {
+        document.getElementById("cancelColumnBtn").addEventListener("click", function (event) {
             console.log("eventListener cancelBtn dialog")
             close();
         });
@@ -42,25 +42,24 @@ class ProjectDialog extends Dialog {
 
     //-------------------------------------------------------------------------------------
     async save() {
-        console.log("processSave() dialog, field name", projectForm.projectName.value)
-        const pr = await KanbearEntityFactory.generate('project')
-        pr.setData("workspace_id", this.workspaceId)
-        pr.setName(projectForm.projectName.value)
-        pr.setDescription(projectForm.projectDescription.value)
-        pr.setOpen(projectForm.projectIs_open.value)
-        await pr.create()
+        console.log("save() dialog, field name", columnForm.columnName.value)
+        const co = await KanbearEntityFactory.generate('column')
+        co.setData("project_id", this.projectId)
+        co.setName(columnForm.columnName.value)
+        co.setDescription(columnForm.columnDescription.value)
+        await co.create()
         this.closeDialog()
-        const projectCreatedEvent = new CustomEvent("projectCreated", {
-            detail: { projectId: pr.getId() },
+        const columnCreatedEvent = new CustomEvent("columnCreated", {
+            detail: { columnId: co.getId() },
             bubbles: true,
             cancelable: true,
             composed: true
         })
         //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
-        document.dispatchEvent(projectCreatedEvent)
-        this.project=pr
+        document.dispatchEvent(columnCreatedEvent)
+        this.column=co
     }
 
 }
 
-export { ProjectDialog }
+export { ColumnDialog }

@@ -17,14 +17,14 @@
     <!-- Filtres Regex -->
     <div class="filters">
         <!-- Filtres Regex -->
-        
+
 
         <div id="kanbearWorkspacesDiv" class="filter-group">
         </div>
 
-       <div id="kanbearProjectsDiv" class="filter-group">
+        <div id="kanbearProjectsDiv" class="filter-group">
         </div>
-        
+
         <!--
         <div id="projectsDiv" class="filter-group">
             <label for="projects">kanboard project</label>
@@ -74,9 +74,9 @@
             <button id="clearProjects">Clear project</button>
         </div>
 
-        
+
         <!-- Résultats -->
-                <!-- Résultats -->
+        <!-- Résultats -->
         <div class="results scroller" id="results">
         </div>
 
@@ -124,10 +124,50 @@
                 <label for="is_open">Open </label>
                 <input type="checkbox" id="projectIs_open" checked />
             </div>
-                <button type="button" value="save" name="saveProjectBtn" id="saveProjectBtn">Save</button>
-                <button type="button" value="cancel" name="cancelProjectBtn" id="cancelProjectBtn">Cancel</button>
-           </form>
+            <button type="button" value="save" name="saveProjectBtn" id="saveProjectBtn">Save</button>
+            <button type="button" value="cancel" name="cancelProjectBtn" id="cancelProjectBtn">Cancel</button>
+        </form>
     </dialog>
+
+    <dialog id="swimlaneDialog" closedby="any">
+        <form id="swimlaneForm" method="dialog">
+            <h2>Create new swimlane</h2>
+            <div id="swimlaneNameDiv">
+                <label for="name">Swimlane Name: </label>
+                <input type="text" id="swimlaneName" name="name" />
+            </div>
+            <div id="swimlaneDescriptionDiv">
+                <label for="description">Description: </label>
+                <input type="text" id="swimlaneDescription" name="swimlane" />
+            </div>
+            <div id="swimlaneIs_openDiv">
+                <label for="is_open">Open </label>
+                <input type="checkbox" id="swimlaneIs_open" checked />
+            </div>
+            <button type="button" value="save" name="saveSwimlaneBtn" id="saveSwimlaneBtn">Save</button>
+            <button type="button" value="cancel" name="cancelSwimlaneBtn" id="cancelSwimlaneBtn">Cancel</button>
+        </form>
+    </dialog>
+
+    <dialog id="columnDialog" closedby="any">
+        <form id="columnForm" method="dialog">
+            <h2>Create new column</h2>
+            <div id="columnNameDiv">
+                <label for="name">Column Name: </label>
+                <input type="text" id="columnName" name="name" />
+            </div>
+            <div id="columnDescriptionDiv">
+                <label for="description">Description: </label>
+                <input type="text" id="columnDescription" name="swimlane" />
+            </div>
+            <button type="button" value="save" name="saveColumnBtn" id="saveColumnBtn">Save</button>
+            <button type="button" value="cancel" name="cancelColumnBtn" id="cancelColumnBtn">Cancel</button>
+        </form>
+    </dialog>
+
+
+
+
 
 
 

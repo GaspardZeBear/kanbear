@@ -1,15 +1,15 @@
 import { Dialog } from './Dialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 
-class ProjectDialog extends Dialog {
+class SwimlaneDialog extends Dialog {
 
-    constructor(dialogName, workspaceId) {
+    constructor(dialogName, projectId) {
         super()
         this.dialogName = dialogName
-        this.workspaceId = workspaceId
+        this.projectId = projectId
         this.buildHtmlDialog()
         this.showDialog()
-        this.project=null
+        this.swimlane=null
     }
 
     //------------------------------------------------------------------------------------------
@@ -25,16 +25,16 @@ class ProjectDialog extends Dialog {
 
     //-------------------------------------------------------------------------------------
     createDialog() {
-        this.dialog = document.getElementById("projectDialog")
+        this.dialog = document.getElementById("swimlaneDialog")
         let dialog = this.dialog
         let close = this.closeDialog.bind(this)
         let save = this.save.bind(this)
         //document.getElementById("projectNameDiv").setAttribute("hidden","")
-        document.getElementById("saveProjectBtn").addEventListener("click", function (event) {
-            console.log("eventListener saveProjectBtn dialog")
+        document.getElementById("saveSwimlaneBtn").addEventListener("click", function (event) {
+            console.log("eventListener saveSwimlaneBtn dialog")
             save()
         });
-        document.getElementById("cancelProjectBtn").addEventListener("click", function (event) {
+        document.getElementById("cancelSwimlaneBtn").addEventListener("click", function (event) {
             console.log("eventListener cancelBtn dialog")
             close();
         });
@@ -42,25 +42,25 @@ class ProjectDialog extends Dialog {
 
     //-------------------------------------------------------------------------------------
     async save() {
-        console.log("processSave() dialog, field name", projectForm.projectName.value)
-        const pr = await KanbearEntityFactory.generate('project')
-        pr.setData("workspace_id", this.workspaceId)
-        pr.setName(projectForm.projectName.value)
-        pr.setDescription(projectForm.projectDescription.value)
-        pr.setOpen(projectForm.projectIs_open.value)
-        await pr.create()
+        console.log("save() dialog, field name", swimlaneForm.swimlaneName.value)
+        const sw = await KanbearEntityFactory.generate('swimlane')
+        sw.setData("project_id", this.projectId)
+        sw.setName(swimlaneForm.swimlaneName.value)
+        sw.setDescription(swimlaneForm.swimlaneDescription.value)
+        sw.setOpen(swimlaneForm.swimlaneIs_open.value)
+        await sw.create()
         this.closeDialog()
-        const projectCreatedEvent = new CustomEvent("projectCreated", {
-            detail: { projectId: pr.getId() },
+        const swimlaneCreatedEvent = new CustomEvent("swimlaneCreated", {
+            detail: { swimlaneId: sw.getId() },
             bubbles: true,
             cancelable: true,
             composed: true
         })
         //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
-        document.dispatchEvent(projectCreatedEvent)
-        this.project=pr
+        document.dispatchEvent(swimlaneCreatedEvent)
+        this.swimlane=sw
     }
 
 }
 
-export { ProjectDialog }
+export { SwimlaneDialog }
