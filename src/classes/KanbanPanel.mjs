@@ -27,34 +27,39 @@ class KanbanPanel {
       document.getElementById(this.htmlElement).innerHTML = `Project not displayable ${cause}`
       return
     }
-     
-    let projectId=this.project.id
+
+    let projectId = this.project.id
 
     const addSwimlaneButton = document.createElement('button')
     addSwimlaneButton.classList.add("add-item-btn")
+    addSwimlaneButton.setAttribute("id", "addSwimlaneButton")
     addSwimlaneButton.setAttribute("data-project-id", this.project.id)
     addSwimlaneButton.innerHTML = "+S"
-    
-    addSwimlaneButton.addEventListener('click', function (ev) {
-            console.log("Edit task")
-            ev.stopPropagation();
-            const swimlane=new SwimlaneDialog('create',projectId);
-        });
+    let addSwimlaneFn = function (ev) {
+      console.log("addSwimlaneButton event Listener fired")
+      ev.stopPropagation();
+      const swimlane = new SwimlaneDialog('create', projectId);
+    }
+    removeEventListener("click", addSwimlaneFn)
+    addSwimlaneButton.addEventListener('click', addSwimlaneFn);
+
 
     const addColumnButton = document.createElement('button')
     addColumnButton.classList.add("add-item-btn")
     addColumnButton.setAttribute("data-project-id", this.project.id)
     addColumnButton.innerHTML = "+C"
-    addColumnButton.addEventListener('click', function (ev) {
-            console.log("Edit task")
-            ev.stopPropagation();
-            const column=new ColumnDialog('create',projectId);
-        });
+    let addColumnFn = function (ev) {
+      console.log("addColumnButton event Listener fired")
+      ev.stopPropagation();
+      const column = new ColumnDialog('create', projectId);
+    }
+    removeEventListener("click", addColumnFn)
+    addColumnButton.addEventListener('click', addColumnFn);
 
     let resultTitle = document.createElement('h2')
     resultTitle.appendChild(addSwimlaneButton)
     resultTitle.appendChild(addColumnButton)
-    let title=document.createElement("span")
+    let title = document.createElement("span")
     title.innerHTML = `${this.project.name} filtered by ...`
     resultTitle.appendChild(title)
     document.getElementById(this.htmlElement).replaceChildren(resultTitle)

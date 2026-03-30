@@ -4,7 +4,7 @@ import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 class ProjectDialog extends Dialog {
 
     constructor(dialogName, workspaceId) {
-        super()
+        super('project')
         this.dialogName = dialogName
         this.workspaceId = workspaceId
         this.buildHtmlDialog()
@@ -24,7 +24,7 @@ class ProjectDialog extends Dialog {
     }
 
     //-------------------------------------------------------------------------------------
-    createDialog() {
+    XcreateDialog() {
         this.dialog = document.getElementById("projectDialog")
         let dialog = this.dialog
         let close = this.closeDialog.bind(this)

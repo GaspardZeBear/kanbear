@@ -4,7 +4,7 @@ import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 class SwimlaneDialog extends Dialog {
 
     constructor(dialogName, projectId) {
-        super()
+        super('swimlane')
         this.dialogName = dialogName
         this.projectId = projectId
         this.buildHtmlDialog()
@@ -24,20 +24,25 @@ class SwimlaneDialog extends Dialog {
     }
 
     //-------------------------------------------------------------------------------------
-    createDialog() {
+    XcreateDialog() {
         this.dialog = document.getElementById("swimlaneDialog")
         let dialog = this.dialog
         let close = this.closeDialog.bind(this)
         let save = this.save.bind(this)
         //document.getElementById("projectNameDiv").setAttribute("hidden","")
-        document.getElementById("saveSwimlaneBtn").addEventListener("click", function (event) {
+        let saveFn=function (event) {
             console.log("eventListener saveSwimlaneBtn dialog")
             save()
-        });
-        document.getElementById("cancelSwimlaneBtn").addEventListener("click", function (event) {
+        }
+        removeEventListener("click",saveFn)
+        document.getElementById("saveSwimlaneBtn").addEventListener("click", saveFn);
+
+        let cancelFn=function (event) {
             console.log("eventListener cancelBtn dialog")
             close();
-        });
+        }
+        removeEventListener("click",cancelFn)
+        document.getElementById("cancelSwimlaneBtn").addEventListener("click", cancelFn );
     }
 
     //-------------------------------------------------------------------------------------
