@@ -29,7 +29,9 @@ document.addEventListener("projectSelected", async (ev) => {
     console.log("projectSelected listener fired <ev>", ev)
     buildKanbearProjectsSelectBox()
     await Kontext.setProject(ev.detail.projectId);
-    new KanbanPanel('results', getFiltersMap()).render()
+    const kb=await KanbanPanel.builder('results', getFiltersMap())
+    kb.render()
+    //new KanbanPanel('results', getFiltersMap()).render()
 })
 document.addEventListener("projectDeleted", (ev) => {
     console.log("projectDeleted listener fired <ev>", ev)
@@ -37,8 +39,15 @@ document.addEventListener("projectDeleted", (ev) => {
 })
 
 document.addEventListener("swimlaneCreated", async (ev) => {
-    console.log("swimlane listener fired <ev>", ev)
-    new KanbanPanel('results', getFiltersMap()).render()
+    console.log("index.mjs() swimlane listener fired <ev>", ev)
+    const kb=await KanbanPanel.builder('results', getFiltersMap())
+    kb.render()
+})
+
+document.addEventListener("columnCreated", async (ev) => {
+    console.log("index.mjs() column listener fired <ev>", ev)
+    const kb=await KanbanPanel.builder('results', getFiltersMap())
+    kb.render()
 })
 //document.getElementById(project.id).addEventListener("taskModified", (ev) => {
 

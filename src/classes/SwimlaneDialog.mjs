@@ -9,7 +9,7 @@ class SwimlaneDialog extends Dialog {
         this.projectId = projectId
         this.buildHtmlDialog()
         this.showDialog()
-        this.swimlane=null
+        this.swimlane = null
     }
 
     //------------------------------------------------------------------------------------------
@@ -30,31 +30,32 @@ class SwimlaneDialog extends Dialog {
         let close = this.closeDialog.bind(this)
         let save = this.save.bind(this)
         //document.getElementById("projectNameDiv").setAttribute("hidden","")
-        let saveFn=function (event) {
+        let saveFn = function (event) {
             console.log("eventListener saveSwimlaneBtn dialog")
             save()
         }
-        removeEventListener("click",saveFn)
+        removeEventListener("click", saveFn)
         document.getElementById("saveSwimlaneBtn").addEventListener("click", saveFn);
 
-        let cancelFn=function (event) {
+        let cancelFn = function (event) {
             console.log("eventListener cancelBtn dialog")
             close();
         }
-        removeEventListener("click",cancelFn)
-        document.getElementById("cancelSwimlaneBtn").addEventListener("click", cancelFn );
+        removeEventListener("click", cancelFn)
+        document.getElementById("cancelSwimlaneBtn").addEventListener("click", cancelFn);
     }
 
     //-------------------------------------------------------------------------------------
     async save() {
-        console.log("save() dialog, field name", swimlaneForm.swimlaneName.value)
+        console.log("Swimlane.save() dialog, field name", swimlaneForm.swimlaneName.value)
         const sw = await KanbearEntityFactory.generate('swimlane')
         sw.setData("project_id", this.projectId)
         sw.setName(swimlaneForm.swimlaneName.value)
         sw.setDescription(swimlaneForm.swimlaneDescription.value)
         sw.setOpen(swimlaneForm.swimlaneIs_open.value)
         await sw.create()
-        this.closeDialog()
+        console.log("Swimlane.save() dialog, created, <name>",sw.name,"<swimlaneId>=", sw.getId())
+        //alert("Created")
         const swimlaneCreatedEvent = new CustomEvent("swimlaneCreated", {
             detail: { swimlaneId: sw.getId() },
             bubbles: true,
@@ -63,7 +64,8 @@ class SwimlaneDialog extends Dialog {
         })
         //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
         document.dispatchEvent(swimlaneCreatedEvent)
-        this.swimlane=sw
+        this.closeDialog()
+        this.swimlane = sw
     }
 
 }

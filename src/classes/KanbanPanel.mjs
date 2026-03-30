@@ -10,7 +10,7 @@ class KanbanPanel {
   //------------------------------------------------------------------------
   constructor(element, filtersMap) {
     this.projects = Kontext.getJsonBulkData()
-    console.log("KanbanPanel constructor pid", Kontext.getCurrentProjectId())
+    console.log("KanbanPanel.constructor() projectId", Kontext.getCurrentProjectId())
     this.project = Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()] || undefined
     this.htmlElement = element
     this.kanboardFilter = new KanboardFilter(filtersMap)
@@ -18,10 +18,19 @@ class KanbanPanel {
     this.table = undefined
     this.kColumns = {}
   }
-
   //------------------------------------------------------------------------
-  render() {
-    console.log("render pid ", this.project)
+  // hint to have a kind of async construtor
+  //----------------------------------------------------------
+  static async builder(element,filterMap) {
+    console.log("KanbanPanel.reload()")
+    await Kontext.loadKanbearJsonBulkData()
+    console.log("KanbanPanel.reload() done")
+    return new KanbanPanel(element,filterMap)
+  }
+  
+  //------------------------------------------------------------------------
+  async render() {
+    console.log("KanbanPanel.render() <project>", this.project)
     let [displayable, cause] = new ProjectManager(this.project).isDisplayable()
     if (!displayable) {
       document.getElementById(this.htmlElement).innerHTML = `Project not displayable ${cause}`
@@ -40,8 +49,8 @@ class KanbanPanel {
       ev.stopPropagation();
       const swimlane = new SwimlaneDialog('create', projectId);
     }
-    removeEventListener("click", addSwimlaneFn)
-    addSwimlaneButton.addEventListener('click', addSwimlaneFn);
+    //removeEventListener("click", addSwimlaneFn)
+    addSwimlaneButton.addEventListener('click', addSwimlaneFn, {once:true});
 
 
     const addColumnButton = document.createElement('button')
@@ -53,14 +62,14 @@ class KanbanPanel {
       ev.stopPropagation();
       const column = new ColumnDialog('create', projectId);
     }
-    removeEventListener("click", addColumnFn)
-    addColumnButton.addEventListener('click', addColumnFn);
+    //removeEventListener("click", addColumnFn)
+    addColumnButton.addEventListener('click', addColumnFn, {once:true});
 
     let resultTitle = document.createElement('h2')
     resultTitle.appendChild(addSwimlaneButton)
     resultTitle.appendChild(addColumnButton)
     let title = document.createElement("span")
-    title.innerHTML = `${this.project.name} filtered by ...`
+    title.innerHTML = `Project <${this.project.name}> filtered by ...`
     resultTitle.appendChild(title)
     document.getElementById(this.htmlElement).replaceChildren(resultTitle)
 

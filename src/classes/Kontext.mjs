@@ -93,6 +93,7 @@ class Kontext {
             console.log("Kontext.loadKanbearJsonBulkData() from kanbear",url)
             const response = await fetch(url);
             Kontext.jsonBulkData = await response.json();
+            console.log("Kontext.loadKanbearJsonBulkData() from updated loaded",Kontext.jsonBulkData)
         } catch (error) {
             throw new Error(`Kontext.loadKanbearJsonBulkData() error ${error.message}`)
         }

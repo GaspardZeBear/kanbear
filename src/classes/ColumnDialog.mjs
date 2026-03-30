@@ -2,6 +2,8 @@ import { Dialog } from './Dialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 
 class ColumnDialog extends Dialog {
+    
+  
 
     constructor(dialogName, projectId) {
         super('column')

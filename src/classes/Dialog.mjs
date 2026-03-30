@@ -2,20 +2,20 @@ import { KanbearEntity } from "./KanbearEntity.mjs"
 
 class Dialog {
 
-    static clickListeners=[]
+    //static clickListeners=[]
 
     //------------------------------------------------------------------------
     constructor(kind) {
         this.kind=kind
         this.upperFirstKind=this.kind.charAt(0).toUpperCase() + this.kind.slice(1)
         this.dialog = null
-        console.log("Dialog clickListeners before",Dialog.clickListeners)
-        Dialog.clickListeners.forEach( ( listenerFunction) => {
-            console.log("Dialog clickListeners remove ",listenerFunction)
-            removeEventListener("click",listenerFunction)
-        })
-        Dialog.clickListeners=[]
-        console.log("Dialog clickListeners after",Dialog.clickListeners)
+        //console.log("Dialog clickListeners before",Dialog.clickListeners)
+       // for ( let listenerFunction of Dialog.clickListeners) {
+        //    console.log("Dialog clickListeners remove ",listenerFunction)
+        //    removeEventListener("click",listenerFunction)
+        //}
+        //Dialog.clickListeners=[]
+        //console.log("Dialog clickListeners after",Dialog.clickListeners)
     }
 
     showDialog() {
@@ -25,6 +25,7 @@ class Dialog {
 
     closeDialog() {
         console.log("closeDialog()", this.dialog)
+        console.log("close clickListeners",Dialog.clickListeners)
         this.dialog.close();
     }
 
@@ -37,24 +38,24 @@ class Dialog {
         //document.getElementById("projectNameDiv").setAttribute("hidden","")
         let saveBtnId="save"+this.upperFirstKind+"Btn"
         console.log("create savefn")
-        let saveFn=function (event) {
+        let saveFn=async function (event) {
             console.log("eventListener ",saveBtnId," dialog")
             console.log("eventListener ",save)
-            save()
+            await save()
         }
-        Dialog.clickListeners.push(saveFn)
-        console.log("saveListeners",Dialog.saveListeners)
+        //Dialog.clickListeners.push(saveFn)
+        //console.log("createDialog() saveListeners after push",Dialog.clickListeners)
         //removeEventListener("click",saveFn)
-        document.getElementById(saveBtnId).addEventListener("click", saveFn);
+        document.getElementById(saveBtnId).addEventListener("click", saveFn, {once: true});
 
         let cancelBtnId="cancel"+this.upperFirstKind+"Btn"
         let cancelFn=function (event) {
             console.log("eventListener",cancelBtnId,"dialog")
             close();
         }
-        Dialog.clickListeners.push(cancelFn)
+        //Dialog.clickListeners.push(cancelFn)
         //removeEventListener("click",cancelFn)
-        document.getElementById(cancelBtnId).addEventListener("click", cancelFn );
+        document.getElementById(cancelBtnId).addEventListener("click", cancelFn, { once:true} );
     }
 
 
