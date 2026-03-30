@@ -4,14 +4,14 @@
     console.log(params)
     let domId=params.domId
     let boxLabel=params.boxLabel
-    let wss=params.items
+    let items=params.items
     let labelText=params.labelText
     let klass=params.klass
     ////"filter-group") {
 
-    console.log("selectBoxBuilder", wss)
-    const wsDiv = document.createElement("div")
-    wsDiv.classList.add(klass)
+    console.log("selectBoxBuilder", items)
+    const itemDiv = document.createElement("div")
+    itemDiv.classList.add(klass)
     const label = document.createElement(boxLabel)
     label.setAttribute("for", boxLabel)
     label.innerHTML = labelText
@@ -20,25 +20,21 @@
     select.setAttribute("id", domId)
     
     const fakeOption = document.createElement('option')
-    fakeOption.setAttribute("value", -wss.length)
+    fakeOption.setAttribute("value", -items.length)
     //fakeOption.setAttribute("selected", "selected")
     fakeOption.innerHTML = '- No selection  -'
     select.appendChild(fakeOption)
 
-    wss.forEach((ws, idx) => {
-      console.log(ws)
-
+    items.forEach((item, idx) => {
+      console.log(item)
       const option = document.createElement('option')
-      //if (idx == 0) {
-      //  option.setAttribute("selected", "selected")
-      //}
-      option.setAttribute("value", ws.id)
-      option.innerHTML = ws.name
+      option.setAttribute("value", item.id)
+      option.innerHTML = item.name
       select.appendChild(option)
     })
-    wsDiv.appendChild(label)
-    wsDiv.appendChild(select)
-    return (wsDiv)
+    itemDiv.appendChild(label)
+    itemDiv.appendChild(select)
+    return (itemDiv)
   }
 
   export { selectBoxBuilder }

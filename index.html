@@ -103,6 +103,33 @@
         </div>
     </div>
 
+    <!-- Popup pour ajouter/éditer une tâche -->
+    <div id="modal">
+    </div>
+
+    <dialog id="projectDialog" closedby="any">
+        <form id="projectForm" method="dialog">
+            <h2>Create new project</h2>
+            <div id="projectNameDiv">
+                <label for="name">Project Name: </label>
+                <input type="text" id="projectName" name="name" />
+            </div>
+            <div id="projectDescriptionDiv">
+                <label for="description">Description: </label>
+                <input type="text" id="projectDescription" name="column" />
+            </div>
+            <div id="columnsDiv">
+            </div>
+            <div id="projectIs_openDiv">
+                <label for="is_open">Open </label>
+                <input type="checkbox" id="projectIs_open" checked />
+            </div>
+                <button type="button" value="save" name="saveProjectBtn" id="saveProjectBtn">Save</button>
+                <button type="button" value="cancel" name="cancelProjectBtn" id="cancelProjectBtn">Cancel</button>
+           </form>
+    </dialog>
+
+
 
 </body>
 

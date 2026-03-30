@@ -9,6 +9,7 @@ import { Kontext } from './classes/Kontext.mjs';
 import { Workspace } from './classes/Workspace.mjs';
 import { Project } from './classes/Project.mjs';
 import { selectBoxBuilder } from './utils/selectBoxBuilder.mjs'
+import { ProjectDialog } from './classes/ProjectDialog.mjs'
 
 await Kontext.loadConfig()
 buildWorkspacesSelectBox()
@@ -56,7 +57,9 @@ async function buildKanbearProjectsSelectBox() {
     console.log("buildKanbearProjectsSelectBox() <workspaceId>", workspaceId)
     if (workspaceId) {
         projects = await Project.getAll('projects', { workspace_id: workspaceId })
+        projects.unshift({ id: -1, name: '* Create new project' })
     }
+
     let boxName = "kanbearProjectSelectBox"
     let boxParams = {
         domId: boxName,
@@ -71,6 +74,10 @@ async function buildKanbearProjectsSelectBox() {
     document.getElementById("kanbearProjectsDiv").replaceChildren(wsDiv)
     document.getElementById(boxName).addEventListener('change', async (e) => {
         console.log({ boxName }, e.target)
+        let projectId = e.target.value;
+        if (projectId == -1) {
+            let newProjectId =new ProjectDialog("create",workspaceId)
+        }
         //Kontext.setProject(e.target.value);
         const projectSelectedEvent = new CustomEvent("projectSelected", {
             detail: { projectId: e.target.value },
