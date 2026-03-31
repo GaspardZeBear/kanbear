@@ -46,7 +46,7 @@ class SqlBuilder {
         const bindVariables = []
         const qmarks = []
         const filter = req.query ?? {}
-        console.log("SqlBuilder.generateGetStatement() <req.query>", req.query, "<filter>", filter)
+        console.log("SqlBuilder.generateGetStatement() <req.query>", req.query, "<req.params>",req.params,"<filter>", filter)
         // quick and darty, does not work for strings !
         let filters = []
         Object.entries(filter).forEach(([key, val]) => {

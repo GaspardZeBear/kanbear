@@ -62,6 +62,12 @@ class KanbearEntity {
         return (resp.data)
     }
 
+    //-------------------------------------------------------------------------------
+    async get(kind, params) {
+        const resp = await new ApiCaller().get(`/api/${this.kind}s/${this.id}`, params)
+        console.log("KanbearObject.get()", resp.data)
+        return (resp.data)
+    }
 
     //-------------------------------------------------------------------------------
     async patch(kind, params) {

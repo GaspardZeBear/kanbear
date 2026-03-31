@@ -69,12 +69,31 @@ class KanbanPanel {
     //removeEventListener("click", addColumnFn)
     addColumnButton.addEventListener('click', addColumnFn, { once: true });
 
-    let resultTitle = document.createElement('h2')
+    const href = document.createElement("a")
+    href.setAttribute("id", `projectHref_${this.project.id}`)
+    href.setAttribute("href", "javascript:void(0)")
+    href.innerHTML = `${this.project.name}`
+    let myProject = this.project
+    let editProjectFn = function (ev) {
+      console.log("editProjectHref event Listener fired ")
+      ev.stopPropagation();
+      const project = new ProjectDialog()
+      project.modify(myProject.id);
+    }
+    href.addEventListener('click', editProjectFn, { once: true });
+
+
+    let resultTitle = document.createElement('h3')
     resultTitle.appendChild(addSwimlaneButton)
     resultTitle.appendChild(addColumnButton)
     let title = document.createElement("span")
-    title.innerHTML = `Project <${this.project.name}> filtered by ...`
+    title.innerHTML = `Project `
     resultTitle.appendChild(title)
+    resultTitle.appendChild(href)
+    let filters=document.createElement("span")
+    filters.innerHTML=" filtered by..."
+    resultTitle.appendChild(filters)
+
     document.getElementById(this.htmlElement).replaceChildren(resultTitle)
 
     this.buildKanbanDivsForProject(this.project)
@@ -145,7 +164,7 @@ class KanbanPanel {
         addTaskButton.innerHTML = "+T"
 
         let addTaskFn = function (ev) {
-          console.log("addTaskButton event Listener fired <swimlane>",swimlane.id,"<column>",col.id)
+          console.log("addTaskButton event Listener fired <swimlane>", swimlane.id, "<column>", col.id)
           ev.stopPropagation();
           const task = new TaskDialog('task')
           task.create(swimlane.id, col.id);

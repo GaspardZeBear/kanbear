@@ -1,5 +1,6 @@
 import { Dialog } from './Dialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
+import { Task } from './Task.mjs'
 
 class TaskDialog extends Dialog {
 
@@ -17,6 +18,19 @@ class TaskDialog extends Dialog {
     create(swimlaneId,columnId) {
         this.swimlaneId = swimlaneId
         this.columnId = columnId
+        this.createDialog()
+        this.showDialog()
+    }
+
+    //----------------------------------------------------------------------------
+    async modify(taskId) {
+        this.taskId=taskId
+        this.task = new Task({id:taskId})
+        const ta = await this.task.get()
+        console.log(ta)
+        let taskForm=document.getElementById("taskForm")
+        taskForm.taskNote.value="Tempo unavailable"
+        taskForm.taskColor.value="blue"
         this.createDialog()
         this.showDialog()
     }

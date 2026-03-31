@@ -47,8 +47,9 @@ class UnifiedModel {
 
     //------------------------------------------------------------------
     static getById(table, req, opParms, callback) {
-        console.log("UnifiedModel.getById(), <params>", params, "<body>", req.body)
-        const sql = `SELECT * FROM ${table} WHERE id = ${params["id"]}`;
+        console.log("UnifiedModel.getById(), <params>", req.params, "<body>", req.body)
+        // const { sql, bindVariables } = new SqlBuilder().generateGetStatement(table, req.params["id"], req.body)
+        const sql = `SELECT * FROM ${table} WHERE id = ${req.params["id"]}`;
         db.get(sql, [], callback);
     }
 

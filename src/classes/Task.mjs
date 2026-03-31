@@ -71,9 +71,10 @@ class Task extends KanbearEntity {
         href.innerHTML=`${this.task.name}`
         let myTask=this.task
         let editTaskFn = function (ev) {
-          console.log("ediTaskButton event Listener fired <swimlane>",myTask.swimlane_id,"<column>",myTask.column_id)
+          console.log("editTaskHref event Listener fired <swimlane>",myTask.swimlane_id,"<column>",myTask.column_id)
           ev.stopPropagation();
-          const task = new TaskDialog('create', myTask.swimlane_id, myTask.column_id);
+          const task = new TaskDialog()
+          task.modify(myTask.id);
         }
         href.addEventListener('click', editTaskFn, { once: true });
  

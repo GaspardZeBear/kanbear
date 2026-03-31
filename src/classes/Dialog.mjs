@@ -30,7 +30,7 @@ class Dialog {
     }
 
     //------------------------------------------------------------------------------------------
-    buildHtmlDialog() {
+    XbuildHtmlDialog() {
         switch (this.dialogName) {
             case "create":
                 this.createDialog()
