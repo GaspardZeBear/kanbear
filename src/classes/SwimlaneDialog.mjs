@@ -24,28 +24,6 @@ class SwimlaneDialog extends Dialog {
     }
 
     //-------------------------------------------------------------------------------------
-    XcreateDialog() {
-        this.dialog = document.getElementById("swimlaneDialog")
-        let dialog = this.dialog
-        let close = this.closeDialog.bind(this)
-        let save = this.save.bind(this)
-        //document.getElementById("projectNameDiv").setAttribute("hidden","")
-        let saveFn = function (event) {
-            console.log("eventListener saveSwimlaneBtn dialog")
-            save()
-        }
-        removeEventListener("click", saveFn)
-        document.getElementById("saveSwimlaneBtn").addEventListener("click", saveFn);
-
-        let cancelFn = function (event) {
-            console.log("eventListener cancelBtn dialog")
-            close();
-        }
-        removeEventListener("click", cancelFn)
-        document.getElementById("cancelSwimlaneBtn").addEventListener("click", cancelFn);
-    }
-
-    //-------------------------------------------------------------------------------------
     async save() {
         console.log("Swimlane.save() dialog, field name", swimlaneForm.swimlaneName.value)
         const sw = await KanbearEntityFactory.generate('swimlane')

@@ -19,7 +19,7 @@ class Dialog {
     }
 
     showDialog() {
-        console.log("dialog",this.dialog)
+        console.log("Dialog.showDialog()",this.dialog)
         this.dialog.showModal();
     }
 
@@ -27,6 +27,17 @@ class Dialog {
         console.log("closeDialog()", this.dialog)
         console.log("close clickListeners",Dialog.clickListeners)
         this.dialog.close();
+    }
+
+        //------------------------------------------------------------------------------------------
+    XbuildHtmlDialog() {
+        switch (this.dialogName) {
+            case "create":
+                this.createDialog()
+                break
+            default:
+                console.log("ProjectDialog.buildHtmlDialog() unknown dialogName ", this.dialogName)
+        }
     }
 
     //-------------------------------------------------------------------------------------
@@ -37,7 +48,7 @@ class Dialog {
         let save = this.save.bind(this)
         //document.getElementById("projectNameDiv").setAttribute("hidden","")
         let saveBtnId="save"+this.upperFirstKind+"Btn"
-        console.log("create savefn")
+        console.log("Dialog.createDialog() create savefn function for <saveBtnId>", saveBtnId)
         let saveFn=async function (event) {
             console.log("eventListener ",saveBtnId," dialog")
             console.log("eventListener ",save)
@@ -46,7 +57,9 @@ class Dialog {
         //Dialog.clickListeners.push(saveFn)
         //console.log("createDialog() saveListeners after push",Dialog.clickListeners)
         //removeEventListener("click",saveFn)
+        console.log("Dialog.createDialog <saveBtn>",document.getElementById(saveBtnId))
         document.getElementById(saveBtnId).addEventListener("click", saveFn, {once: true});
+        document.getElementById(saveBtnId).addEventListener("mouseover", () => {console.log("Mouseover")});
 
         let cancelBtnId="cancel"+this.upperFirstKind+"Btn"
         let cancelFn=function (event) {
@@ -56,6 +69,7 @@ class Dialog {
         //Dialog.clickListeners.push(cancelFn)
         //removeEventListener("click",cancelFn)
         document.getElementById(cancelBtnId).addEventListener("click", cancelFn, { once:true} );
+        document.getElementById(cancelBtnId).addEventListener("mouseover", () => {console.log("Mouseover cancel")});
     }
 
 

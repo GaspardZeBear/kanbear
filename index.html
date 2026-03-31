@@ -99,7 +99,7 @@
             <h2 id="popupTitle">Ajouter une tâche</h2>
             <input type="text" id="taskTitle" placeholder="Titre de la tâche" autocomplete="off">
             <textarea id="taskDescription" placeholder="Description..." rows="3"></textarea>
-            <button id="saveTaskBtn">Enregistrer</button>
+            <button id="XsaveTaskBtn">Enregistrer</button>
         </div>
     </div>
 
@@ -165,11 +165,45 @@
         </form>
     </dialog>
 
-
-
-
-
-
+    <dialog id="taskDialog" closedby="any">
+        <form id="taskForm" method="dialog">
+            <h2>Create new task</h2>
+            <div id="taskNameDiv">
+                <label for="name">Task Name: </label>
+                <input type="text" id="taskName" name="taskName" />
+            </div>
+            <div id="taskDescriptionDiv">
+                <label for="description">Description: </label>
+                <input type="text" id="taskDescription" name="taskDescription" />
+            </div>
+            <div id="taskNoteDiv">
+                <label for="note">Note: </label>
+                <input type="text" id="taskNote" name="taskNote" />
+            </div>
+            <div id="colorDescriptionDiv">
+                <label for="color">Color: </label>
+                <input type="text" id="taskColor" name="taskColor" />
+            </div>
+            <div id="taskIs_openDiv">
+                <label for="is_open">Open </label>
+                <input type="checkbox" id="taskIs_open" checked />
+            </div>
+            <div id="taskDueDateDiv">
+                <label for="due">Due date</label>
+                <input type="date" id="taskDueDate"></input>
+            </div>
+            <div id="taskDueTimeDiv">
+                <label for="due">Due time</label>
+                <input type="time" id="taskDueTime"></input>
+            </div>
+            <div id="taskDueDiv">
+                <label for="due">Due time</label>
+                <input type="datetime-local" id="taskDueDateTime"></input>
+            </div>
+            <button type="button" value="save" name="saveTaskBtn" id="saveTaskBtn">Save</button>
+            <button type="button" value="cancel" name="cancelTaskBtn" id="cancelTaskBtn">Cancel</button>
+        </form>
+    </dialog>
 
 </body>
 

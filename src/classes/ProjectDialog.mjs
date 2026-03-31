@@ -24,23 +24,6 @@ class ProjectDialog extends Dialog {
     }
 
     //-------------------------------------------------------------------------------------
-    XcreateDialog() {
-        this.dialog = document.getElementById("projectDialog")
-        let dialog = this.dialog
-        let close = this.closeDialog.bind(this)
-        let save = this.save.bind(this)
-        //document.getElementById("projectNameDiv").setAttribute("hidden","")
-        document.getElementById("saveProjectBtn").addEventListener("click", function (event) {
-            console.log("eventListener saveProjectBtn dialog")
-            save()
-        });
-        document.getElementById("cancelProjectBtn").addEventListener("click", function (event) {
-            console.log("eventListener cancelBtn dialog")
-            close();
-        });
-    }
-
-    //-------------------------------------------------------------------------------------
     async save() {
         console.log("processSave() dialog, field name", projectForm.projectName.value)
         const pr = await KanbearEntityFactory.generate('project')

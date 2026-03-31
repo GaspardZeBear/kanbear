@@ -2,8 +2,6 @@ import { Dialog } from './Dialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 
 class ColumnDialog extends Dialog {
-    
-  
 
     constructor(dialogName, projectId) {
         super('column')
@@ -25,24 +23,7 @@ class ColumnDialog extends Dialog {
         }
     }
 
-    //-------------------------------------------------------------------------------------
-    XcreateDialog() {
-        this.dialog = document.getElementById("columnDialog")
-        let dialog = this.dialog
-        let close = this.closeDialog.bind(this)
-        let save = this.save.bind(this)
-        //document.getElementById("projectNameDiv").setAttribute("hidden","")
-        document.getElementById("saveColumnBtn").addEventListener("click", function (event) {
-            console.log("eventListener saveSwimlaneBtn dialog")
-            save()
-        });
-        document.getElementById("cancelColumnBtn").addEventListener("click", function (event) {
-            console.log("eventListener cancelBtn dialog")
-            close();
-        });
-    }
-
-    //-------------------------------------------------------------------------------------
+     //-------------------------------------------------------------------------------------
     async save() {
         console.log("save() dialog, field name", columnForm.columnName.value)
         const co = await KanbearEntityFactory.generate('column')

@@ -49,6 +49,12 @@ document.addEventListener("columnCreated", async (ev) => {
     const kb=await KanbanPanel.builder('results', getFiltersMap())
     kb.render()
 })
+
+document.addEventListener("taskCreated", async (ev) => {
+    console.log("index.mjs() task listener fired <ev>", ev)
+    const kb=await KanbanPanel.builder('results', getFiltersMap())
+    kb.render()
+})
 //document.getElementById(project.id).addEventListener("taskModified", (ev) => {
 
 
