@@ -3,24 +3,20 @@ import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 
 class SwimlaneDialog extends Dialog {
 
-    constructor(dialogName, projectId) {
+    constructor(dialogName) {
         super('swimlane')
         this.dialogName = dialogName
-        this.projectId = projectId
-        this.buildHtmlDialog()
-        this.showDialog()
+        //this.projectId = projectId
+        //this.buildHtmlDialog()
+        //this.showDialog()
         this.swimlane = null
     }
 
-    //------------------------------------------------------------------------------------------
-    buildHtmlDialog() {
-        switch (this.dialogName) {
-            case "create":
-                this.createDialog()
-                break
-            default:
-                console.log("ProjectDialog.buildHtmlDialog() unknown dialogName ", this.dialogName)
-        }
+    //----------------------------------------------------------------------------
+    create(projectId) {
+        this.projectId = projectId
+        this.createDialog()
+        this.showDialog()
     }
 
     //-------------------------------------------------------------------------------------

@@ -3,25 +3,22 @@ import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 
 class TaskDialog extends Dialog {
 
-    constructor(dialogName, swimlaneId, columnId) {
+    constructor(dialogName) {
         super('task')
         this.dialogName = dialogName
-        this.swimlaneId = swimlaneId
-        this.columnId = columnId
-        this.buildHtmlDialog()
-        this.showDialog()
+        //this.swimlaneId = swimlaneId
+        //this.columnId = columnId
+        //this.buildHtmlDialog()
+        //this.showDialog()
         this.task=null
     }
 
-    //------------------------------------------------------------------------------------------
-    buildHtmlDialog() {
-        switch (this.dialogName) {
-            case "create":
-                this.createDialog()
-                break
-            default:
-                console.log("TaskDialog.buildHtmlDialog() unknown dialogName ", this.dialogName)
-        }
+    //----------------------------------------------------------------------------
+    create(swimlaneId,columnId) {
+        this.swimlaneId = swimlaneId
+        this.columnId = columnId
+        this.createDialog()
+        this.showDialog()
     }
 
    //-------------------------------------------------------------------------------------

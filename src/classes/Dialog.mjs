@@ -29,8 +29,8 @@ class Dialog {
         this.dialog.close();
     }
 
-        //------------------------------------------------------------------------------------------
-    XbuildHtmlDialog() {
+    //------------------------------------------------------------------------------------------
+    buildHtmlDialog() {
         switch (this.dialogName) {
             case "create":
                 this.createDialog()
@@ -50,8 +50,8 @@ class Dialog {
         let saveBtnId="save"+this.upperFirstKind+"Btn"
         console.log("Dialog.createDialog() create savefn function for <saveBtnId>", saveBtnId)
         let saveFn=async function (event) {
-            console.log("eventListener ",saveBtnId," dialog")
-            console.log("eventListener ",save)
+        //    console.log("eventListener ",saveBtnId," dialog")
+        //    console.log("eventListener ",save)
             await save()
         }
         //Dialog.clickListeners.push(saveFn)
@@ -69,7 +69,7 @@ class Dialog {
         //Dialog.clickListeners.push(cancelFn)
         //removeEventListener("click",cancelFn)
         document.getElementById(cancelBtnId).addEventListener("click", cancelFn, { once:true} );
-        document.getElementById(cancelBtnId).addEventListener("mouseover", () => {console.log("Mouseover cancel")});
+        //document.getElementById(cancelBtnId).addEventListener("mouseover", () => {console.log("Mouseover cancel")});
     }
 
 

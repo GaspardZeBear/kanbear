@@ -3,27 +3,23 @@ import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 
 class ColumnDialog extends Dialog {
 
-    constructor(dialogName, projectId) {
+    constructor(dialogName) {
         super('column')
         this.dialogName = dialogName
-        this.projectId = projectId
-        this.buildHtmlDialog()
-        this.showDialog()
+        //this.projectId = projectId
+        //this.buildHtmlDialog()
+        //this.showDialog()
         this.column=null
     }
 
-    //------------------------------------------------------------------------------------------
-    buildHtmlDialog() {
-        switch (this.dialogName) {
-            case "create":
-                this.createDialog()
-                break
-            default:
-                console.log("ColumnDialog.buildHtmlDialog() unknown dialogName ", this.dialogName)
-        }
+     //----------------------------------------------------------------------------
+    create(projectId) {
+        this.projectId = projectId
+        this.createDialog()
+        this.showDialog()
     }
 
-     //-------------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------------
     async save() {
         console.log("save() dialog, field name", columnForm.columnName.value)
         const co = await KanbearEntityFactory.generate('column')

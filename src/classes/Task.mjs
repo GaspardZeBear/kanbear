@@ -1,4 +1,5 @@
 import { KanbearEntity } from "./KanbearEntity.mjs"
+import { TaskDialog } from "./TaskDialog.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { Ref } from "./Ref.mjs"
 
@@ -62,6 +63,20 @@ class Task extends KanbearEntity {
         const headerDiv = document.createElement("div")
         headerDiv.classList.add("kanban-item-header")
 
+       
+
+        const href = document.createElement("a")
+        href.setAttribute("id",`taskHref_${this.task.id}`)
+        href.setAttribute("href","javascript:void(0)")
+        href.innerHTML=`${this.task.name}`
+        let myTask=this.task
+        let editTaskFn = function (ev) {
+          console.log("ediTaskButton event Listener fired <swimlane>",myTask.swimlane_id,"<column>",myTask.column_id)
+          ev.stopPropagation();
+          const task = new TaskDialog('create', myTask.swimlane_id, myTask.column_id);
+        }
+        href.addEventListener('click', editTaskFn, { once: true });
+ 
         const top = document.createElement("div")
         top.classList.add("kanban-item-name")
         top.innerHTML = `#${this.task.id} ${this.task.name}`
@@ -78,15 +93,18 @@ class Task extends KanbearEntity {
         editBtn.setAttribute("data-task-id", `${this.task.id}`)
         editBtn.innerHTML = "Edit"
 
-        headerDiv.appendChild(top)
+        //headerDiv.appendChild(top)
+        
         headerDiv.appendChild(tDesc)
 
 
         // Strange behaviour : edit button clickable or not  !!!!!!!!!!!!!!!!!!!!!!!!!
         // append editBtn to headerDiv Does not work : click listener not activatide 
         //headerDiv.append(editBtn)
+        taskElement.appendChild(href)
         taskElement.appendChild(headerDiv)
         // append editBtn append to taskElement works
+   
         taskElement.appendChild(editBtn)
 
         taskElement.addEventListener('dragstart', (ev) => {
@@ -132,6 +150,23 @@ class Task extends KanbearEntity {
                 composed: true
               })
         document.dispatchEvent(taskModifiedEvent)
+    }
+
+    //---------------------------------------------------------------------------------
+    async ZopenEditModalAsync() {
+            const addTaskButton = document.createElement('button')
+        addTaskButton.classList.add("add-item-btn")
+        addTaskButton.setAttribute("id", `addTaskButton_${swimlane.id}_${col.id}`)
+        addTaskButton.setAttribute("data-swimlane-id", swimlane.id)
+        addTaskButton.setAttribute("data-column-id", col.id)
+        addTaskButton.innerHTML = "+T"
+
+        let addTaskFn = function (ev) {
+          console.log("addTaskButton event Listener fired <swimlane>",swimlane.id,"<column>",col.id)
+          ev.stopPropagation();
+          const task = new TaskDialog('create', swimlane.id, col.id);
+        }
+        addTaskButton.addEventListener('click', addTaskFn, { once: true });
     }
 
     //---------------------------------------------------------------------------------------------

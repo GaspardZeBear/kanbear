@@ -48,7 +48,8 @@ class KanbanPanel {
     let addSwimlaneFn = function (ev) {
       console.log("addSwimlaneButton event Listener fired")
       ev.stopPropagation();
-      const swimlane = new SwimlaneDialog('create', projectId);
+      const swimlane = new SwimlaneDialog('swimlane')
+      swimlane.create(projectId);
     }
     //removeEventListener("click", addSwimlaneFn)
     addSwimlaneButton.addEventListener('click', addSwimlaneFn, { once: true });
@@ -62,7 +63,8 @@ class KanbanPanel {
     let addColumnFn = function (ev) {
       console.log("addColumnButton event Listener fired")
       ev.stopPropagation();
-      const column = new ColumnDialog('create', projectId);
+      const column = new ColumnDialog('column')
+      column.create(projectId);
     }
     //removeEventListener("click", addColumnFn)
     addColumnButton.addEventListener('click', addColumnFn, { once: true });
@@ -145,11 +147,10 @@ class KanbanPanel {
         let addTaskFn = function (ev) {
           console.log("addTaskButton event Listener fired <swimlane>",swimlane.id,"<column>",col.id)
           ev.stopPropagation();
-          const task = new TaskDialog('create', swimlane.id, col.id);
+          const task = new TaskDialog('task')
+          task.create(swimlane.id, col.id);
         }
         addTaskButton.addEventListener('click', addTaskFn, { once: true });
-
-
 
         // link all
         kColumnHeaderDiv.appendChild(kColumnHeaderDivH3)

@@ -96,7 +96,10 @@ async function buildKanbearProjectsSelectBox() {
         console.log({ boxName }, e.target)
         let projectId = e.target.value;
         if (projectId == -1) {
-            let newProject =new ProjectDialog("create",workspaceId)
+            //let newProject =new ProjectDialog("create",workspaceId)
+            let newProject =new ProjectDialog()
+            newProject.create(workspaceId)
+            return
             projectId=newProject.getProject().getId()
         }
         //Kontext.setProject(e.target.value);
