@@ -3,26 +3,27 @@ import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 
 class ProjectDialog extends Dialog {
 
-    constructor(dialogName, workspaceId) {
+    //constructor(dialogName, workspaceId) {
+    constructor(dialogName) {
         super('project')
         this.dialogName = dialogName
-        this.workspaceId = workspaceId
-        this.buildHtmlDialog()
-        this.showDialog()
+        //this.workspaceId = workspaceId
+        //this.buildHtmlDialog()
+        //this.showDialog()
         this.project=null
     }
 
-    //------------------------------------------------------------------------------------------
-    buildHtmlDialog() {
-        switch (this.dialogName) {
-            case "create":
-                this.createDialog()
-                break
-            default:
-                console.log("ProjectDialog.buildHtmlDialog() unknown dialogName ", this.dialogName)
-        }
+    //----------------------------------------------------------------------------
+    create(workspaceId) {
+        this.workspaceId = workspaceId
+        this.createDialog()
+        this.showDialog()
     }
 
+    //----------------------------------------------------------------------------
+    getProject() {
+        return(this.project)
+    }
     //-------------------------------------------------------------------------------------
     async save() {
         console.log("processSave() dialog, field name", projectForm.projectName.value)
@@ -32,7 +33,9 @@ class ProjectDialog extends Dialog {
         pr.setDescription(projectForm.projectDescription.value)
         pr.setOpen(projectForm.projectIs_open.value)
         await pr.create()
+              this.project=pr
         this.closeDialog()
+
         const projectCreatedEvent = new CustomEvent("projectCreated", {
             detail: { projectId: pr.getId() },
             bubbles: true,
@@ -41,7 +44,7 @@ class ProjectDialog extends Dialog {
         })
         //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
         document.dispatchEvent(projectCreatedEvent)
-        this.project=pr
+  
     }
 
 }
