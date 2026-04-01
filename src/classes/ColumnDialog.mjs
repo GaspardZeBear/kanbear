@@ -1,5 +1,6 @@
 import { Dialog } from './Dialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
+import { sendEvent } from '../utils/sendEvent.mjs'
 
 class ColumnDialog extends Dialog {
 
@@ -15,7 +16,7 @@ class ColumnDialog extends Dialog {
      //----------------------------------------------------------------------------
     create(projectId) {
         this.projectId = projectId
-        this.createDialog()
+        this.createDialog(this.save.bind(this))
         this.showDialog()
     }
 
@@ -28,14 +29,7 @@ class ColumnDialog extends Dialog {
         co.setDescription(columnForm.columnDescription.value)
         await co.create()
         this.closeDialog()
-        const columnCreatedEvent = new CustomEvent("columnCreated", {
-            detail: { columnId: co.getId() },
-            bubbles: true,
-            cancelable: true,
-            composed: true
-        })
-        //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
-        document.dispatchEvent(columnCreatedEvent)
+        sendEvent("columnCreated",{ columnId: co.getId() })
         this.column=co
     }
 

@@ -1,5 +1,6 @@
 import { Dialog } from './Dialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
+import { sendEvent } from '../utils/sendEvent.mjs'
 
 class ProjectDialog extends Dialog {
 
@@ -17,7 +18,7 @@ class ProjectDialog extends Dialog {
     create(workspaceId) {
         this.workspaceId = workspaceId
         this.createDialog()
-        this.showDialog()
+        this.showDialog(this.save.bind(this))
     }
 
     //----------------------------------------------------------------------------
@@ -33,17 +34,10 @@ class ProjectDialog extends Dialog {
         pr.setDescription(projectForm.projectDescription.value)
         pr.setOpen(projectForm.projectIs_open.value)
         await pr.create()
-              this.project=pr
+        this.project=pr
         this.closeDialog()
 
-        const projectCreatedEvent = new CustomEvent("projectCreated", {
-            detail: { projectId: pr.getId() },
-            bubbles: true,
-            cancelable: true,
-            composed: true
-        })
-        //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
-        document.dispatchEvent(projectCreatedEvent)
+        sendEvent("projectCreated",{ projectId: pr.getId() })
   
     }
 

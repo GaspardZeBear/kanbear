@@ -29,23 +29,14 @@ class Dialog {
         this.dialog.close();
     }
 
-    //------------------------------------------------------------------------------------------
-    XbuildHtmlDialog() {
-        switch (this.dialogName) {
-            case "create":
-                this.createDialog()
-                break
-            default:
-                console.log("ProjectDialog.buildHtmlDialog() unknown dialogName ", this.dialogName)
-        }
-    }
-
-    //-------------------------------------------------------------------------------------
-    createDialog() {
+     //-------------------------------------------------------------------------------------
+     // Build event listener on "Save" and "cancel" buttons, accordind to the action (create, modify etc..)
+    createDialog(save=()=>{}) {
         this.dialog = document.getElementById(this.kind+"Dialog")
         let dialog = this.dialog
         let close = this.closeDialog.bind(this)
-        let save = this.save.bind(this)
+        //let save = this.save.bind(this)
+
         //document.getElementById("projectNameDiv").setAttribute("hidden","")
         let saveBtnId="save"+this.upperFirstKind+"Btn"
         console.log("Dialog.createDialog() create savefn function for <saveBtnId>", saveBtnId)

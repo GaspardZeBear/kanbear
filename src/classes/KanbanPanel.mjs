@@ -44,7 +44,7 @@ class KanbanPanel {
     addSwimlaneButton.classList.add("add-item-btn")
     addSwimlaneButton.setAttribute("id", "addSwimlaneButton")
     addSwimlaneButton.setAttribute("data-project-id", this.project.id)
-    addSwimlaneButton.innerHTML = "+S"
+    addSwimlaneButton.innerHTML = "+\u25A4"
     let addSwimlaneFn = function (ev) {
       console.log("addSwimlaneButton event Listener fired")
       ev.stopPropagation();
@@ -59,7 +59,7 @@ class KanbanPanel {
     addColumnButton.classList.add("add-item-btn")
     addColumnButton.setAttribute("id", "addColumnButton")
     addColumnButton.setAttribute("data-project-id", this.project.id)
-    addColumnButton.innerHTML = "+C"
+    addColumnButton.innerHTML = "+\u25A5"
     let addColumnFn = function (ev) {
       console.log("addColumnButton event Listener fired")
       ev.stopPropagation();
@@ -161,7 +161,7 @@ class KanbanPanel {
         addTaskButton.setAttribute("id", `addTaskButton_${swimlane.id}_${col.id}`)
         addTaskButton.setAttribute("data-swimlane-id", swimlane.id)
         addTaskButton.setAttribute("data-column-id", col.id)
-        addTaskButton.innerHTML = "+T"
+        addTaskButton.innerHTML = "+\u{1F3CB}"
 
         let addTaskFn = function (ev) {
           console.log("addTaskButton event Listener fired <swimlane>", swimlane.id, "<column>", col.id)

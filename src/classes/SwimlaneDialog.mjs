@@ -1,5 +1,6 @@
 import { Dialog } from './Dialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
+import { sendEvent } from '../utils/sendEvent.mjs'
 
 class SwimlaneDialog extends Dialog {
 
@@ -15,7 +16,7 @@ class SwimlaneDialog extends Dialog {
     //----------------------------------------------------------------------------
     create(projectId) {
         this.projectId = projectId
-        this.createDialog()
+        this.createDialog(this.save.bind(this))
         this.showDialog()
     }
 
@@ -29,15 +30,7 @@ class SwimlaneDialog extends Dialog {
         sw.setOpen(swimlaneForm.swimlaneIs_open.value)
         await sw.create()
         console.log("Swimlane.save() dialog, created, <name>",sw.name,"<swimlaneId>=", sw.getId())
-        //alert("Created")
-        const swimlaneCreatedEvent = new CustomEvent("swimlaneCreated", {
-            detail: { swimlaneId: sw.getId() },
-            bubbles: true,
-            cancelable: true,
-            composed: true
-        })
-        //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
-        document.dispatchEvent(swimlaneCreatedEvent)
+        sendEvent("swimlaneCreated",{ swimlaneId: sw.getId() })
         this.closeDialog()
         this.swimlane = sw
     }
