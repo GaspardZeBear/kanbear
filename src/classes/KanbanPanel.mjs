@@ -9,6 +9,7 @@ import { Ref } from "./Ref.mjs"
 
 class KanbanPanel {
   //------------------------------------------------------------------------
+  // Please, dont call it directly, use builder
   constructor(element, filtersMap) {
     this.projects = Kontext.getJsonBulkData()
     console.log("KanbanPanel.constructor() projectId", Kontext.getCurrentProjectId())
@@ -29,17 +30,10 @@ class KanbanPanel {
     return new KanbanPanel(element, filterMap)
   }
 
+    
   //------------------------------------------------------------------------
-  async render() {
-    console.log("KanbanPanel.render() <project>", this.project)
-    let [displayable, cause] = new ProjectManager(this.project).isDisplayable()
-    if (!displayable) {
-      document.getElementById(this.htmlElement).innerHTML = `Project not displayable ${cause}`
-      return
-    }
-
-    let projectId = this.project.id
-
+  buildAddSwimlaneButton(projectId) {
+    //let projectId = this.project.id
     const addSwimlaneButton = document.createElement('button')
     addSwimlaneButton.classList.add("add-item-btn")
     addSwimlaneButton.setAttribute("id", "addSwimlaneButton")
@@ -53,8 +47,13 @@ class KanbanPanel {
     }
     //removeEventListener("click", addSwimlaneFn)
     addSwimlaneButton.addEventListener('click', addSwimlaneFn, { once: true });
+    return(addSwimlaneButton)
+  }
 
-
+    
+  //------------------------------------------------------------------------
+  buildAddColumnButton(projectId) {
+    //let projectId = this.project.id
     const addColumnButton = document.createElement('button')
     addColumnButton.classList.add("add-item-btn")
     addColumnButton.setAttribute("id", "addColumnButton")
@@ -68,11 +67,14 @@ class KanbanPanel {
     }
     //removeEventListener("click", addColumnFn)
     addColumnButton.addEventListener('click', addColumnFn, { once: true });
-
+      return(addColumnButton)
+  }
+  //------------------------------------------------------------------------
+  buildProjectLink(projectId,projectName) {
     const href = document.createElement("a")
-    href.setAttribute("id", `projectHref_${this.project.id}`)
+    href.setAttribute("id", `projectHref_${projectId}`)
     href.setAttribute("href", "javascript:void(0)")
-    href.innerHTML = `${this.project.name}`
+    href.innerHTML = `${projectName}`
     let myProject = this.project
     let editProjectFn = function (ev) {
       console.log("editProjectHref event Listener fired ")
@@ -81,7 +83,22 @@ class KanbanPanel {
       project.modify(myProject.id);
     }
     href.addEventListener('click', editProjectFn, { once: true });
+    return(href)
+  }
 
+
+  //------------------------------------------------------------------------
+  async render() {
+    console.log("KanbanPanel.render() <project>", this.project)
+    let [displayable, cause] = new ProjectManager(this.project).isDisplayable()
+    if (!displayable) {
+      document.getElementById(this.htmlElement).innerHTML = `Project not displayable ${cause}`
+      return
+    }
+
+    const addSwimlaneButton=this.buildAddSwimlaneButton(this.project.id)
+    const addColumnButton=this.buildAddColumnButton(this.project.id)
+    const projectLink=this.buildProjectLink(this.project.id,this.project.name)
 
     let resultTitle = document.createElement('h3')
     resultTitle.appendChild(addSwimlaneButton)
@@ -89,7 +106,7 @@ class KanbanPanel {
     let title = document.createElement("span")
     title.innerHTML = `Project `
     resultTitle.appendChild(title)
-    resultTitle.appendChild(href)
+    resultTitle.appendChild(projectLink)
     let filters=document.createElement("span")
     filters.innerHTML=" filtered by..."
     resultTitle.appendChild(filters)
@@ -98,7 +115,7 @@ class KanbanPanel {
 
     this.buildKanbanDivsForProject(this.project)
     //this.buildkColumnsQuerySelectors(this.projects[0])
-    this.setDropZones(this.project)
+    this.setDropZones(this.project.id)
     this.loadTasksForProject(this.project)
   }
 

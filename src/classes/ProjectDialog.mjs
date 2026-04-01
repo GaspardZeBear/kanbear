@@ -17,8 +17,8 @@ class ProjectDialog extends Dialog {
     //----------------------------------------------------------------------------
     create(workspaceId) {
         this.workspaceId = workspaceId
-        this.createDialog()
-        this.showDialog(this.save.bind(this))
+        this.createDialog(this.save.bind(this))
+        this.showDialog()
     }
 
     //----------------------------------------------------------------------------
