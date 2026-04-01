@@ -10,6 +10,7 @@ import { Workspace } from './classes/Workspace.mjs';
 import { Project } from './classes/Project.mjs';
 import { selectBoxBuilder } from './utils/selectBoxBuilder.mjs'
 import { ProjectDialog } from './classes/ProjectDialog.mjs'
+import { WorkspaceDialog } from './classes/WorkspaceDialog.mjs'
 
 await Kontext.loadConfig()
 buildWorkspacesSelectBox()
@@ -124,6 +125,7 @@ async function buildKanbearProjectsSelectBox() {
 async function buildWorkspacesSelectBox() {
     let wss = await Workspace.getAll('workspaces')
     // let wsDiv = await this.buildTargetWorkspaceSelectBox("targetWorspaceSelectBox", wss, "target workspace")
+    wss.unshift({ id: -1, name: '* Create new workspace' })
     let boxName = "kanbearWorkspaceSelectBox"
     let boxParams = {
         domId: boxName,
@@ -137,6 +139,25 @@ async function buildWorkspacesSelectBox() {
     document.getElementById("kanbearWorkspacesDiv").replaceChildren(wsDiv)
     document.getElementById(boxName).addEventListener('change', async (e) => {
         Kontext.setWorkspaceId(e.target.value);
+        let workspaceId=parseInt(e.target.value)
+        if (workspaceId == -1) {
+            //let newProject =new ProjectDialog("create",workspaceId)
+            let newWorkspace =new WorkspaceDialog()
+            newWorkspace.create()
+            return
+        }
+        if (workspaceId < 0) {
+            return
+        }
+        //console.log("wss",e.wss)
+        let box=document.getElementById("kanbearWorkspaceSelectBox")
+
+        // Buggy !!? If lot of elements with value < 0!!
+        let index=workspaceId+1
+        console.log("box index",index)
+        console.log("box",box)
+        console.log("box",box[index].innerText)
+        document.getElementById("workspace").innerHTML=box[index].innerText
         buildKanbearProjectsSelectBox()
         console.log({ boxName }, e.target.value)
     });

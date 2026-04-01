@@ -29,6 +29,7 @@
       console.log(item)
       const option = document.createElement('option')
       option.setAttribute("value", item.id)
+      option.setAttribute("name", item.name)
       option.innerHTML = item.name
       select.appendChild(option)
     })
