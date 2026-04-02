@@ -2,6 +2,7 @@ import { KanboardFilter } from "./KanboardFilter.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { Task } from "./Task.mjs"
 import { ProjectManager } from "./ProjectManager.mjs"
+import { ProjectDialog } from "./ProjectDialog.mjs"
 import { SwimlaneDialog } from "./SwimlaneDialog.mjs"
 import { ColumnDialog } from "./ColumnDialog.mjs"
 import { TaskDialog } from "./TaskDialog.mjs"
@@ -119,8 +120,8 @@ class KanbanPanel {
     const addColumnButton = this.buildAddColumnButton(this.project.id)
     const projectLink = this.buildProjectLink(this.project.id, this.project.name)
 
-    let resultTitleWorkspace = document.createElement('h2')
-    resultTitleWorkspace.innerHTML="Workspace " + this.project.workspace_id
+    //let resultTitleWorkspace = document.createElement('h2')
+    //resultTitleWorkspace.innerHTML="Workspace " + this.project.workspace_id
     let resultTitleProject = document.createElement('h3')
     resultTitleProject.appendChild(addSwimlaneButton)
     resultTitleProject.appendChild(addColumnButton)
@@ -133,7 +134,7 @@ class KanbanPanel {
     resultTitleProject.appendChild(filters)
 
     let resultTitle=document.createElement("div")
-    resultTitle.appendChild(resultTitleWorkspace)
+    //resultTitle.appendChild(resultTitleWorkspace)
     resultTitle.appendChild(resultTitleProject)
 
     document.getElementById(this.htmlElement).replaceChildren(resultTitle)

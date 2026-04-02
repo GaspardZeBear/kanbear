@@ -25,20 +25,35 @@ class TaskDialog extends Dialog {
 
     //----------------------------------------------------------------------------
     async modify(taskId) {
+        console.log("TaskDialog.modify() <form2Db>",Task.form2Db)
+        console.log("TaskDialog.modify() <db2Form>",Task.db2Form)
         this.taskId=taskId
+
         this.task = new Task({id:taskId})
         const ta = await this.task.get()
-        console.log(ta)
+        console.log("TaskDialog.modify() <ta>",ta)
+        
         let taskForm=document.getElementById("taskForm")
-        taskForm.taskNote.value="Tempo unavailable"
-        taskForm.taskColor.value="blue"
+        console.log("TaskDialog.modify() <form.elements>",taskForm.elements)
+        Object.entries(taskForm.elements).forEach( (item) => {
+           console.log("TaskDialog.modify() <form.elements>",item,item[1].id)
+           let id=item[1].id
+           taskForm[id].value="xxx"
+           console.log("TaskDialog.modify() <taskForm>",taskForm[id])
+        })
+
+        
+        //taskForm.taskNote.value="Tempo unavailable"
+        //taskForm.taskColor.value="blue"
         this.createDialog(this.saveModify.bind(this))
         this.showDialog()
     }
 //-------------------------------------------------------------------------------------
     async saveModify() {
         console.log("TaskDialog.saveModify()")
+        console.log("TaskDialog.saveModify() color",taskForm.taskColor.value)
         this.task.setData("description",taskForm.taskDescription.value)
+        this.task.setData("color",taskForm.taskColor.value)
         await this.task.patch({})
         this.closeDialog()
         sendEvent("taskModified",{ taskId : this.task.getId() })
@@ -63,7 +78,7 @@ class TaskDialog extends Dialog {
         ta.setData("color",taskForm.taskColor.value)
         ta.setName(taskForm.taskName.value)
         ta.setDescription(taskForm.taskDescription.value)
-        ta.setOpen(taskForm.taskIs_open.value)
+        ta.setOpen(taskForm.taskIsOpen.value)
         console.log("TaskDialog.save() <due>",taskForm.taskDueDate.value,"<time>",taskForm.taskDueTime.value,"<datetime>",taskForm.taskDueDateTime.value)
         await ta.create()
         this.closeDialog()

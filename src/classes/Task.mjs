@@ -5,6 +5,42 @@ import { Ref } from "./Ref.mjs"
 
 class Task extends KanbearEntity {
 
+    static db2Form={
+      'id':'',
+      'name':'taskName',
+      'description':'taskDescription',
+      'note':'taskNote',
+      'color':'taskColor',
+      'color_rules':'taskColorRules',
+      'column_id':'',
+      'user_id':'',
+      'assignee_id':'taskAssignee',
+      'position':'',
+      'is_open':'taskIsOpen',
+      'priority':'taskPriority',
+      'swimlane_id':'',
+      'date_created':'',
+      'date_started':'taskDateStarted',
+      'date_moved':'',
+      'date_closed':'',
+      'date_due':'taskDateDue',
+      'date_checked':'',
+      'date_modified':'',
+      'moved_warning':'taskMovedWarning',
+      'due_warning':'taskDueWarning',
+      'checked_warning ':'taskCheckedWarning'
+    }
+
+    static form2Db = {}
+
+    static {
+        Object.entries(Task.db2Form).forEach( ([col,form]) => {
+            if (form.length > 0) {
+                Task.form2Db[form]=col
+            }
+        })
+    }
+
     //------------------------------------------------------------------------
     constructor(task) {
         super('task',task)
