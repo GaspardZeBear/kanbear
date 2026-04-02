@@ -40,8 +40,10 @@ class ApiCaller {
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
+            let res={status:error,data:error.res?.data || error.message}
             console.error(`get() Error when calling  `, error.res?.data || error.message);
             //throw error;
+            return(res)
         }
     }
 

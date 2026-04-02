@@ -39,7 +39,7 @@ class KanbearEntity {
 
     setData(dataKey, dataval) {
         this.data[dataKey] = dataval
-        console.log(`${this.kind} setData() ${dataKey}`, this.data)
+        console.log(`KanbearEntity.setData() ${this.kind} setData() ${dataKey}`, this.data)
     }
 
     //----------------------------------------------------------------------------
@@ -58,14 +58,14 @@ class KanbearEntity {
     //-------------------------------------------------------------------------------
     static async getAll(kind, params) {
         const resp = await new ApiCaller().get(`/api/${kind}`, params)
-        console.log("KanbearObject.getAll()", resp.data)
+        console.log("KanbearEntity.getAll()", resp.data)
         return (resp.data)
     }
 
     //-------------------------------------------------------------------------------
     async get(kind, params) {
         const resp = await new ApiCaller().get(`/api/${this.kind}s/${this.id}`, params)
-        console.log("KanbearObject.get()", resp.data)
+        console.log("KanbearEntity.get()", resp.data)
         return (resp.data)
     }
 
@@ -77,7 +77,7 @@ class KanbearEntity {
         })
         console.log(data)
         const resp = await new ApiCaller().patch(`/api/${this.kind}s/${this.id}`, data)
-        console.log("KanbearObject.patch()", resp.data)
+        console.log("KanbearEntity.patch()", resp.data)
         return (resp.data)
     }
 
@@ -89,7 +89,7 @@ class KanbearEntity {
         })
         console.log("KanbearEntity.delete() <kind>",this.kind,"<id>",this.id, "<data>",data)
         const resp = await new ApiCaller().erase(`/api/${this.kind}s/${this.id}`, data)
-        console.log("KanbearObject.delete()", resp.data)
+        console.log("KanbearEntity.delete()", resp.data)
         return (resp.data)
     }
 

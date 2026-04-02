@@ -11,6 +11,7 @@ import { Project } from './classes/Project.mjs';
 import { selectBoxBuilder } from './utils/selectBoxBuilder.mjs'
 import { ProjectDialog } from './classes/ProjectDialog.mjs'
 import { WorkspaceDialog } from './classes/WorkspaceDialog.mjs'
+import { sendEvent } from './utils/sendEvent.mjs';
 
 await Kontext.loadConfig()
 buildWorkspacesSelectBox()
@@ -30,7 +31,7 @@ document.addEventListener("projectSelected", async (ev) => {
     console.log("projectSelected listener fired <ev>", ev)
     buildKanbearProjectsSelectBox()
     await Kontext.setProject(ev.detail.projectId);
-    const kb=await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder('results', getFiltersMap())
     kb.render()
     //new KanbanPanel('results', getFiltersMap()).render()
 })
@@ -41,24 +42,24 @@ document.addEventListener("projectDeleted", (ev) => {
 
 document.addEventListener("swimlaneCreated", async (ev) => {
     console.log("index.mjs() swimlane listener fired <ev>", ev)
-    const kb=await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder('results', getFiltersMap())
     kb.render()
 })
 
 document.addEventListener("columnCreated", async (ev) => {
     console.log("index.mjs() column listener fired <ev>", ev)
-    const kb=await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder('results', getFiltersMap())
     kb.render()
 })
 
 document.addEventListener("taskCreated", async (ev) => {
     console.log("index.mjs() task listener fired <ev>", ev)
-    const kb=await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder('results', getFiltersMap())
     kb.render()
 })
 document.addEventListener("taskModified", async (ev) => {
     console.log("index.mjs() task modified listener fired <ev>", ev)
-    const kb=await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder('results', getFiltersMap())
     kb.render()
 })
 //document.getElementById(project.id).addEventListener("taskModified", (ev) => {
@@ -103,12 +104,14 @@ async function buildKanbearProjectsSelectBox() {
         let projectId = e.target.value;
         if (projectId == -1) {
             //let newProject =new ProjectDialog("create",workspaceId)
-            let newProject =new ProjectDialog()
+            let newProject = new ProjectDialog()
             newProject.create(workspaceId)
             return
-            projectId=newProject.getProject().getId()
+            projectId = newProject.getProject().getId()
         }
         //Kontext.setProject(e.target.value);
+        sendEvent("projectSelected", { projectId: projectId })
+        /*
         const projectSelectedEvent = new CustomEvent("projectSelected", {
             //detail: { projectId: e.target.value },
             detail: { projectId: projectId },
@@ -118,13 +121,25 @@ async function buildKanbearProjectsSelectBox() {
         })
         //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
         document.dispatchEvent(projectSelectedEvent)
+        */
     });
 }
 
 //---------------------------------------------------------------------------------
 async function buildWorkspacesSelectBox() {
-    let wss = await Workspace.getAll('workspaces')
+    let wss0 = await Workspace.getAll('workspaces')
     // let wsDiv = await this.buildTargetWorkspaceSelectBox("targetWorspaceSelectBox", wss, "target workspace")
+    console.log("buildWorkspacesSelectBox()", wss0)
+    let wss = []
+    if (!Array.isArray(wss0)) {
+        document.getElementById("message").innerHTML = wss0
+        setTimeout(function () {
+            location.reload();
+        }, 3000);
+    } else {
+        document.getElementById("message").innerHTML = "Ready"
+        wss = wss0
+    }
     wss.unshift({ id: -1, name: '* Create new workspace' })
     let boxName = "kanbearWorkspaceSelectBox"
     let boxParams = {
@@ -139,10 +154,10 @@ async function buildWorkspacesSelectBox() {
     document.getElementById("kanbearWorkspacesDiv").replaceChildren(wsDiv)
     document.getElementById(boxName).addEventListener('change', async (e) => {
         Kontext.setWorkspaceId(e.target.value);
-        let workspaceId=parseInt(e.target.value)
+        let workspaceId = parseInt(e.target.value)
         if (workspaceId == -1) {
             //let newProject =new ProjectDialog("create",workspaceId)
-            let newWorkspace =new WorkspaceDialog()
+            let newWorkspace = new WorkspaceDialog()
             newWorkspace.create()
             return
         }
@@ -150,14 +165,14 @@ async function buildWorkspacesSelectBox() {
             return
         }
         //console.log("wss",e.wss)
-        let box=document.getElementById("kanbearWorkspaceSelectBox")
+        let box = document.getElementById("kanbearWorkspaceSelectBox")
 
         // Buggy !!? If lot of elements with value < 0!!
-        let index=workspaceId+1
-        console.log("box index",index)
-        console.log("box",box)
-        console.log("box",box[index].innerText)
-        document.getElementById("workspace").innerHTML=box[index].innerText
+        let index = workspaceId + 1
+        console.log("box index", index)
+        console.log("box", box)
+        console.log("box", box[index].innerText)
+        document.getElementById("workspace").innerHTML = box[index].innerText
         buildKanbearProjectsSelectBox()
         console.log({ boxName }, e.target.value)
     });
