@@ -94,7 +94,7 @@ async function buildKanbearProjectsSelectBox() {
         items: projects,
         labelText: "kanbear project",
         klass: "filter-group",
-        //headItems:[['* Create new workspace',-1]]
+        //selected: "myProject"
     }
     let wsDiv = await selectBoxBuilder(boxParams)
     wsDiv.classList.add("projectCreated")
@@ -111,17 +111,6 @@ async function buildKanbearProjectsSelectBox() {
         }
         //Kontext.setProject(e.target.value);
         sendEvent("projectSelected", { projectId: projectId })
-        /*
-        const projectSelectedEvent = new CustomEvent("projectSelected", {
-            //detail: { projectId: e.target.value },
-            detail: { projectId: projectId },
-            bubbles: true,
-            cancelable: true,
-            composed: true
-        })
-        //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
-        document.dispatchEvent(projectSelectedEvent)
-        */
     });
 }
 
@@ -129,6 +118,8 @@ async function buildKanbearProjectsSelectBox() {
 async function buildWorkspacesSelectBox() {
     let wss0 = await Workspace.getAll('workspaces')
     // let wsDiv = await this.buildTargetWorkspaceSelectBox("targetWorspaceSelectBox", wss, "target workspace")
+
+    // maybe apigateway is not prsent -----------------------
     console.log("buildWorkspacesSelectBox()", wss0)
     let wss = []
     if (!Array.isArray(wss0)) {
@@ -140,6 +131,8 @@ async function buildWorkspacesSelectBox() {
         document.getElementById("message").innerHTML = "Ready"
         wss = wss0
     }
+
+
     wss.unshift({ id: -1, name: '* Create new workspace' })
     let boxName = "kanbearWorkspaceSelectBox"
     let boxParams = {

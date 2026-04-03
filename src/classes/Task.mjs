@@ -114,25 +114,34 @@ class Task extends KanbearEntity {
         }
         href.addEventListener('click', editTaskFn, { once: true });
  
+        /*
         const top = document.createElement("div")
         top.classList.add("kanban-item-name")
         top.innerHTML = `#${this.task.id} ${this.task.name}`
+*/
+        const description = this.task.description ?? "noDescription"
+        const tDescription = document.createElement("div")
+        tDescription.classList.add("kanban-item-name")
+        tDescription.innerHTML = `${description}`
 
-        const description = this.task.description ?? "noDesc"
-        const tDesc = document.createElement("div")
-        tDesc.classList.add("kanban-item-name")
-        tDesc.innerHTML = description
+        const note = this.task.note ?? "noNote"
+        const tNote = document.createElement("div")
+        tNote.classList.add("kanban-item-name")
+        tNote.innerHTML = `Note : ${note}`
 
+        /*
         //let editBtnDiv=document.createElement("div")
         let editBtn = document.createElement("button")
         editBtn.classList.add("edit-task-btn")
         editBtn.setAttribute("id", `taskEditButton-${this.task.id}`)
         editBtn.setAttribute("data-task-id", `${this.task.id}`)
         editBtn.innerHTML = "Edit"
+        */
 
         //headerDiv.appendChild(top)
         
-        headerDiv.appendChild(tDesc)
+        headerDiv.appendChild(tDescription)
+        headerDiv.appendChild(tNote)
 
 
         // Strange behaviour : edit button clickable or not  !!!!!!!!!!!!!!!!!!!!!!!!!
@@ -140,9 +149,10 @@ class Task extends KanbearEntity {
         //headerDiv.append(editBtn)
         taskElement.appendChild(href)
         taskElement.appendChild(headerDiv)
+        taskElement.appendChild(tNote)
         // append editBtn append to taskElement works
    
-        taskElement.appendChild(editBtn)
+        //taskElement.appendChild(editBtn)
 
         taskElement.addEventListener('dragstart', (ev) => {
             console.log("dragstart")
@@ -160,6 +170,7 @@ class Task extends KanbearEntity {
             ev.target.classList.remove("dragging")
         })
 
+        /*
         editBtn = taskElement.querySelector('.edit-task-btn');
         //console.log(editBtn)
         let task=this
@@ -169,6 +180,7 @@ class Task extends KanbearEntity {
             task.openEditModal();
         });
         //console.log(editBtn)
+        */
         return (taskElement)
     }
 

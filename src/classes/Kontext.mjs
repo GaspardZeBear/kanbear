@@ -7,6 +7,7 @@ class Kontext {
     static kanbearConfig
     static projects
     static kanboardProjects
+    static currentProject
     static currentProjectId
     static currentProjectName
     static workspaceId
@@ -22,8 +23,11 @@ class Kontext {
     static async setProject(projectId) {
         Kontext.currentProjectId=projectId
         //Kontext.currentProjectName=projectName
+        //Kontext.currentProjectName=projectName
         console.log("Kontext setProject() bulk ",Kontext.currentProjectId)
         await Kontext.loadKanbearJsonBulkData()
+        
+        Kontext.currentProjectName=this.jsonBulkData.name
         //await Kontext.loadKanboardJsonBulkData()
     }
 
@@ -93,6 +97,9 @@ class Kontext {
             console.log("Kontext.loadKanbearJsonBulkData() from kanbear",url)
             const response = await fetch(url);
             Kontext.jsonBulkData = await response.json();
+            //Kontext.currentProject = Kontext.jsonBulkData
+           //Kontext.currentProjectId=this.jsonBulkData.id
+           // Kontext.currentProjectName=this.jsonBulkData.name
             console.log("Kontext.loadKanbearJsonBulkData() from updated loaded",Kontext.jsonBulkData)
         } catch (error) {
             throw new Error(`Kontext.loadKanbearJsonBulkData() error ${error.message}`)

@@ -182,7 +182,7 @@
             </div>
             <div id="taskAssigneeDiv">
                 <label for="assignee">Assignee: </label>
-                <select id="taskAssignee">
+                <select id="taskAssignee" name="taskAssignee">
                     <option value="0">toto</option>
                     <option value="1">titi</option>
                 </select>
@@ -190,7 +190,7 @@
             <div id="taskColorDiv">
                 <label for="color">Color: </label>
                 <!-- input type="text" id="taskColor" name="taskColor" / -->
-                <select id="taskColor">
+                <select id="taskColor" name="taskColor">
                     <option value="white">white</option>
                     <option value="blue">blue</option>
                     <option value="red">red</option>
@@ -198,19 +198,19 @@
             </div>
             <div id="taskIs_openDiv">
                 <label for="is_open">Open </label>
-                <input type="checkbox" id="taskIsOpen" checked />
+                <input type="checkbox" id="taskIsOpen" name="taskIsOpen" checked />
             </div>
             <div id="taskDateDueDiv">
                 <label for="due">Due date</label>
-                <input type="date" id="taskDateDue"></input>
+                <input type="date" id="taskDateDue" name="taskDateDue"></input>
             </div>
             <div id="taskTimeDueDiv">
                 <label for="due">Due time</label>
-                <input type="time" id="taskTimeDue"></input>
+                <input type="time" id="taskTimeDue" name="taskTimeDue"></input>
             </div>
             <div id="taskDateTimeDueDiv">
                 <label for="due">Due time</label>
-                <input type="datetime-local" id="taskDateTimeDue"></input>
+                <input type="datetime-local" id="taskDateTimeDue" name="taskDateTimeDue"></input>
             </div>
             <button type="button" value="save" name="saveTaskBtn" id="saveTaskBtn">Save</button>
             <button type="button" value="cancel" name="cancelTaskBtn" id="cancelTaskBtn">Cancel</button>
