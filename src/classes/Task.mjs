@@ -84,7 +84,6 @@ class Task extends KanbearEntity {
         }
     }
 
-
     //-----------------------------------------------------------------------------------------------------
     createKanbanTaskElement() {
         //const dragId = `drag-${task.id}`
@@ -94,12 +93,14 @@ class Task extends KanbearEntity {
         taskElement.setAttribute("id", dragId)
         taskElement.classList.add('kanban-item');
         taskElement.setAttribute("draggable", true)
+        let style=`background-color:${this.task.color}`
+        //taskElement.setAttribute("style", style)
+        //taskElement.style.setAttribute("background-color",this.task.color)
+        //taskElement.style.setAttribute("style","italic")
 
         //const dummyDiv = document.createElement("div")
         const headerDiv = document.createElement("div")
         headerDiv.classList.add("kanban-item-header")
-
-       
 
         const href = document.createElement("a")
         href.setAttribute("id",`taskHref_${this.task.id}`)
@@ -127,6 +128,8 @@ class Task extends KanbearEntity {
         const note = this.task.note ?? "noNote"
         const tNote = document.createElement("div")
         tNote.classList.add("kanban-item-name")
+        let noteStyle=`font-style:italic`
+        tNote.setAttribute("style", noteStyle)
         tNote.innerHTML = `Note : ${note}`
 
         /*
