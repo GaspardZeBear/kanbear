@@ -2,6 +2,7 @@ import { Dialog } from './Dialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 import { Task } from './Task.mjs'
 import { sendEvent } from '../utils/sendEvent.mjs'
+import { fromDateTime, toDateTime } from '../utils/formatDuration.mjs'
 import { colorBoxBuilder } from '../utils/selectBoxBuilder.mjs'
 
 class TaskDialog extends Dialog {
@@ -29,48 +30,44 @@ class TaskDialog extends Dialog {
         // document.getElementById("taskColorDiv").appendChild(taskColor)
     }
 
+    
     //----------------------------------------------------------------------------
-    create(swimlaneId, columnId) {
-        this.swimlaneId = swimlaneId
-        this.columnId = columnId
-        let taskColor=this.buildColorSelectBox()
-        document.getElementById("taskColorDiv").appendChild(taskColor)
-        this.createDialog(this.save.bind(this))
-        this.showDialog()
-    }
-
-    //----------------------------------------------------------------------------
-    async modify(taskId) {
-
-        this.taskId = taskId
-
-        this.task = new Task({ id: taskId })
-        const ta = await this.task.get()
-        console.log("TaskDialog.modify() <ta>", ta)
+    async fillFormFromDb(task) {
         let taskColor=await this.buildColorSelectBox()
+        // fill in the form with db vales
         console.log("taskColorDiv",document.getElementById("taskColorDiv"))
         //let x=document.createElement('div')
         document.getElementById("taskColorDiv").appendChild(taskColor)
-        taskForm.taskName.value = ta.name
-        taskForm.taskColor.value = ta.color
-        taskForm.taskDescription.value = ta.description
-        taskForm.taskNote.value = ta.note
-
-
-        this.createDialog(this.saveModify.bind(this))
-        this.showDialog()
+        taskForm.taskName.value = task.name
+        taskForm.taskColor.value = task.color
+        taskForm.taskDescription.value = task.description
+        taskForm.taskNote.value = task.note
+        let dt=fromDateTime(task.date_due)
+        console.log(dt)
+        taskForm.taskDateDue.value=dt.date
+        taskForm.taskTimeDue.value=dt.time
     }
-    //-------------------------------------------------------------------------------------
-    async saveModify() {
-        console.log("TaskDialog.saveModify()")
-        console.log("TaskDialog.saveModify() color", taskForm.taskColor.value)
-        this.task.setData("name", taskForm.taskName.value)
-        this.task.setData("description", taskForm.taskDescription.value)
-        this.task.setData("note", taskForm.taskNote.value)
-        this.task.setData("color", taskForm.taskColor.value)
-        await this.task.patch({})
-        this.closeDialog()
-        sendEvent("taskModified", { taskId: this.task.getId() })
+
+    //----------------------------------------------------------------------------
+    async fillDbFromForm(task) {
+        task.setData("name", taskForm.taskName.value)
+        task.setData("description", taskForm.taskDescription.value)
+        task.setData("date_due",toDateTime(taskForm.taskDateDue.value,taskForm.taskTimeDue.value))
+        task.setData("note", taskForm.taskNote.value)
+        task.setData("color", taskForm.taskColor.value)
+        task.setName(taskForm.taskName.value)
+        task.setDescription(taskForm.taskDescription.value)
+        task.setOpen(taskForm.taskIsOpen.value)
+    }
+
+//----------------------------------------------------------------------------
+    async create(swimlaneId, columnId) {
+        this.swimlaneId = swimlaneId
+        this.columnId = columnId
+        let taskColor=await this.buildColorSelectBox()
+        document.getElementById("taskColorDiv").replaceChildren(taskColor)
+        this.createDialog(this.save.bind(this))
+        this.showDialog()
     }
 
     //-------------------------------------------------------------------------------------
@@ -79,16 +76,32 @@ class TaskDialog extends Dialog {
         const ta = await KanbearEntityFactory.generate('task')
         ta.setData("swimlane_id", this.swimlaneId)
         ta.setData("column_id", this.columnId)
-        ta.setData("color", taskForm.taskColor.value)
-        ta.setName(taskForm.taskName.value)
-        ta.setDescription(taskForm.taskDescription.value)
-        ta.setOpen(taskForm.taskIsOpen.value)
-        console.log("TaskDialog.save() <due>", taskForm.taskDueDate.value, "<time>", taskForm.taskDueTime.value, "<datetime>", taskForm.taskDueDateTime.value)
+            this.fillDbFromForm(ta)
         await ta.create()
         this.closeDialog()
         sendEvent("taskCreated", { taskId: ta.getId() })
     }
 
+    
+    //----------------------------------------------------------------------------
+    async modify(taskId) {
+        this.taskId = taskId
+        this.task = new Task({ id: taskId })
+        const ta = await this.task.get()
+        console.log("TaskDialog.modify() <ta>", ta)
+        await this.fillFormFromDb(ta)
+        this.createDialog(this.saveModify.bind(this))
+        this.showDialog()
+    }
+    //-------------------------------------------------------------------------------------
+    async saveModify() {
+        console.log("TaskDialog.saveModify()")
+        this.fillDbFromForm(this.task)
+        await this.task.patch({})
+        this.closeDialog()
+        sendEvent("taskModified", { taskId: this.task.getId() })
+    }
+    
     //----------------------------------------------------------------------------
     async Xmodify(taskId) {
 

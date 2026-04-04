@@ -1,3 +1,4 @@
+//-------------------------------------------------------------------------
 function getDurationFromNow(date, string) {
   let d = (Date.now() / 1000) - date
   if ( date == 0) {
@@ -9,6 +10,8 @@ function getDurationFromNow(date, string) {
     return (formatDuration(d))
   }
 }
+
+//-----------------------------------------------------------------------
 
 function formatDuration(seconds) {
   // Vérifier que l'entrée est un nombre valide
@@ -32,6 +35,7 @@ function formatDuration(seconds) {
   return `${formattedHours}<b>h</b>${formattedMinutes}`;
 }
 
+//----------------------------------------------------------------------------
 function dateToString(sinceEpochMs) {
   // Vérifier que l'entrée est un nombre valide
   if (typeof sinceEpochMs !== 'number' || isNaN(sinceEpochMs) || sinceEpochMs < 0) {
@@ -42,7 +46,29 @@ function dateToString(sinceEpochMs) {
   } else {
     return ('')
   }
-
 }
 
-export { formatDuration, dateToString, getDurationFromNow }
+  //-----------------------------------------------------------------------------
+  function toDateTime(yyyymmdd,hhmm) {
+    if (yyyymmdd.length == 0) {
+      return('')
+    }
+    let hhmm1=hhmm||'00:00'
+    //let d=Date.parse(`${yyyymmdd}T${hhmm1}:00`)
+    let d=`${yyyymmdd} ${hhmm1}:00`
+    console.log("toDateTime() <yyymmdd>",yyyymmdd,"<hhmm>",hhmm,"<hhmm1>",hhmm1,"<d>",d)
+    return(d)
+  }
+
+  //-----------------------------------------------------------------------------
+  function fromDateTime(yyyymmddhhmm) {
+    if (yyyymmddhhmm.length == 0) {
+      return('','')
+    }
+    let t=yyyymmddhhmm.split(' ')
+    console.log("fromDateTime() <yyymmddhhmm>",yyyymmddhhmm,"<date>",t[0],"<time>",t[1])
+    return({date:t[0],time:t[1]})
+  }
+
+
+export { formatDuration, dateToString, getDurationFromNow, toDateTime, fromDateTime }

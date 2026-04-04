@@ -35,13 +35,13 @@ import {db } from './config/database.mjs'
   `);
 
   db.exec(`
-    CREATE TABLE IF NOT EXISTS projects_users (
-      project_id INTEGER NOT NULL DEFAULT 0,
+    CREATE TABLE IF NOT EXISTS workspaces_users (
+      workspace_id INTEGER NOT NULL DEFAULT 0,
       user_id INTEGER NOT NULL DEFAULT 0,
       right INTEGER NOT NULL DEFAULT 0,
-      FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE SET DEFAULT,
+      FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE SET DEFAULT,
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET DEFAULT,
-      UNIQUE(project_id, user_id)
+      UNIQUE(workspace_id, user_id)
     )
   `);
 
@@ -87,12 +87,12 @@ import {db } from './config/database.mjs'
       priority INTEGER DEFAULT 0,
       swimlane_id INTEGER NOT NULL DEFAULT 0,
       date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
-      date_started INTEGER DEFAULT 0,
-      date_moved INTEGER DEFAULT 0,
-      date_closed INTEGER DEFAULT 0,
-      date_due INTEGER DEFAULT 0,
-      date_checked INTEGER DEFAULT '0',
-      date_modified INTEGER DEFAULT '0',
+      date_started DATETIME,
+      date_moved DATETIME,
+      date_closed DATETIME,
+      date_due DATETIME,
+      date_checked DATETIME,
+      date_modified DATETIME,
       moved_warning TEXT,
       due_warning TEXT,
       checked_warning TEXT,
@@ -107,10 +107,10 @@ import {db } from './config/database.mjs'
       id INTEGER PRIMARY KEY,
       task_id INTEGER NOT NULL DEFAULT 0,
       user_id INTEGER NOT NULL DEFAULT 0,
-      date_created INTEGER NOT NULL,
+      date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
       comment TEXT NOT NULL,
       reference VARCHAR(50),
-      date_modified INTEGER,
+      date_modified DATETIME,
       FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE SET DEFAULT,
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET DEFAULT
     )
