@@ -19,9 +19,12 @@ class UnifiedController {
                 console.log("UnifiedController callback fired table=", table, "op=", op, "req.params=", req.params)
                 console.log("UnifiedController callback fired table=", table, "op=", op, "req.query=", req.query)
                 UnifiedModel[op](table, req, opParms, (err, httpCode, params) => {
-                    console.log(`UnifiedModel workspaces.${op}_${table}() callback function err`, err, 'params (result)', 'params')
+                    console.log(`UnifiedModel ${op}_${table}() callback function err`, err, 'params (result)', 'params')
                     if (err) {
-                        return res.status(httpCode).json({ error: err.message });
+                        console.log(`UnifiedModel ${op}_${table}() callback function <err>`, JSON.stringify(err.message))
+                        //return res.status(httpCode).json({ error: JSON.stringify(err.message) });
+                        //return res.status(httpCode).json(JSON.stringify(err.message));
+                        return res.status(httpCode).json(err.message)
                     }
                     res.status(httpCode).json(params);
                 }
