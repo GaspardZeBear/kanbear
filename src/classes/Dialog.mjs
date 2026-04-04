@@ -1,4 +1,5 @@
 import { KanbearEntity } from "./KanbearEntity.mjs"
+import { sendEvent } from "../utils/sendEvent.mjs"
 
 class Dialog {
 
@@ -23,11 +24,19 @@ class Dialog {
         this.dialog.showModal();
     }
 
+    //------------------------------------------------------------------------------------------------
     closeDialog() {
         console.log("closeDialog()", this.dialog)
         console.log("close clickListeners",Dialog.clickListeners)
         this.dialog.close();
     }
+
+    //-------------------------------------------------------------
+    cancelDialog() {
+        sendEvent("dialogCanceled", {})
+        this.closeDialog();
+    }
+
 
      //-------------------------------------------------------------------------------------
      // Build event listener on "Save" and "cancel" buttons, accordind to the action (create, modify etc..)
@@ -50,12 +59,13 @@ class Dialog {
         //removeEventListener("click",saveFn)
         console.log("Dialog.createDialog <saveBtn>",document.getElementById(saveBtnId))
         document.getElementById(saveBtnId).addEventListener("click", saveFn, {once: true});
-        document.getElementById(saveBtnId).addEventListener("mouseover", () => {console.log("Mouseover")});
+        //document.getElementById(saveBtnId).addEventListener("mouseover", () => {console.log("Mouseover")});
 
         let cancelBtnId="cancel"+this.upperFirstKind+"Btn"
+        let cancel = this.cancelDialog.bind(this)
         let cancelFn=function (event) {
             console.log("eventListener",cancelBtnId,"dialog")
-            close();
+            cancel();
         }
         //Dialog.clickListeners.push(cancelFn)
         //removeEventListener("click",cancelFn)

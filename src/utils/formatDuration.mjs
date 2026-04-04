@@ -62,7 +62,8 @@ function dateToString(sinceEpochMs) {
 
   //-----------------------------------------------------------------------------
   function fromDateTime(yyyymmddhhmm) {
-    if (yyyymmddhhmm.length == 0) {
+
+    if (!yyyymmddhhmm || yyyymmddhhmm.length == 0) {
       return('','')
     }
     let t=yyyymmddhhmm.split(' ')

@@ -32,14 +32,17 @@ class TaskDialog extends Dialog {
     
     //----------------------------------------------------------------------------
     async fillFormFromDb(task) {
+        console.log("TaskDialog.fillFormFromDb() <task>",task)
         let taskColor=await this.buildColorSelectBox()
         // fill in the form with db vales
-        console.log("taskColorDiv",document.getElementById("taskColorDiv"))
+        console.log("TaskDialog.fillFormFromDb() taskColorDiv",document.getElementById("taskColorDiv"))
         //let x=document.createElement('div')
         document.getElementById("taskColorDiv").replaceChildren(taskColor)
         taskForm.taskName.value = task.name
-        taskForm.taskColor.value = task.color
+         console.log("TaskDialog.fillFormFromDb() taskName OK")
+        //taskForm.taskColor.value = task.color
         taskForm.taskDescription.value = task.description
+         console.log("TaskDialog.fillFormFromDb() tasDescription OK")
         taskForm.taskNote.value = task.note
         let dt=fromDateTime(task.date_due)
         console.log(dt)
