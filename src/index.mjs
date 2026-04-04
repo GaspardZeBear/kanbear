@@ -62,6 +62,10 @@ document.addEventListener("taskModified", async (ev) => {
     const kb = await KanbanPanel.builder('results', getFiltersMap())
     kb.render()
 })
+document.addEventListener("error", async (ev) => {
+    console.log("index.mjs() error listener fired <ev>", ev)
+    document.getElementById("message").innerHTML = "Error : "+ ev.detail.error
+})
 //document.getElementById(project.id).addEventListener("taskModified", (ev) => {
 
 

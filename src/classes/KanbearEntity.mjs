@@ -49,10 +49,10 @@ class KanbearEntity {
         Object.entries(this.data).forEach(([key, val]) => {
             val ? data[key] = val : 1
         })
-        console.log(data)
+        console.log("KanbearEntity.create() <data>",data)
         const resp = await new ApiCaller().post(`/api/${this.kind}s`, data)
-        console.log("resp ", resp.data)
-        this.id = resp.data.lastInsertRowid
+        console.log("KanbearEntity.create() <resp>", resp)
+        resp.data.lastInsertRowid ? this.id = resp.data.lastInsertRowid : this.id=undefined
     }
 
     //-------------------------------------------------------------------------------

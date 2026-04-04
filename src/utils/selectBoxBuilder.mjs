@@ -57,7 +57,8 @@ async function colorBoxBuilder(params) {
     { id: "green", name: "green", inner: "\u{1F7E9}green" },
     { id: "blue", name: "blue", inner: "\u{1F7E6}blue" },
     { id: "purple", name: "purple", inner: "\u{1F7EA}purple" },
-    { id: "orange", name: "orange", inner: "\u{1F7E8}orange" },
+    { id: "orange", name: "orange", inner: "\u{1F7E7}orange" },
+    { id: "yellow", name: "yellow", inner: "\u{1F7E8}yellow" },
   ]
   params["items"] = colors
   //console.log("colorBox <params>",params)

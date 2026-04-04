@@ -29,7 +29,6 @@ class TaskDialog extends Dialog {
         return(taskColor)
         // document.getElementById("taskColorDiv").appendChild(taskColor)
     }
-
     
     //----------------------------------------------------------------------------
     async fillFormFromDb(task) {
@@ -37,7 +36,7 @@ class TaskDialog extends Dialog {
         // fill in the form with db vales
         console.log("taskColorDiv",document.getElementById("taskColorDiv"))
         //let x=document.createElement('div')
-        document.getElementById("taskColorDiv").appendChild(taskColor)
+        document.getElementById("taskColorDiv").replaceChildren(taskColor)
         taskForm.taskName.value = task.name
         taskForm.taskColor.value = task.color
         taskForm.taskDescription.value = task.description
@@ -54,7 +53,8 @@ class TaskDialog extends Dialog {
         task.setData("description", taskForm.taskDescription.value)
         task.setData("date_due",toDateTime(taskForm.taskDateDue.value,taskForm.taskTimeDue.value))
         task.setData("note", taskForm.taskNote.value)
-        task.setData("color", taskForm.taskColor.value)
+        let color = taskForm.taskColor.value < 0 ? "white":taskForm.taskColor.value
+        task.setData("color", color)
         task.setName(taskForm.taskName.value)
         task.setDescription(taskForm.taskDescription.value)
         task.setOpen(taskForm.taskIsOpen.value)
@@ -76,12 +76,11 @@ class TaskDialog extends Dialog {
         const ta = await KanbearEntityFactory.generate('task')
         ta.setData("swimlane_id", this.swimlaneId)
         ta.setData("column_id", this.columnId)
-            this.fillDbFromForm(ta)
+        this.fillDbFromForm(ta)
         await ta.create()
         this.closeDialog()
         sendEvent("taskCreated", { taskId: ta.getId() })
     }
-
     
     //----------------------------------------------------------------------------
     async modify(taskId) {
@@ -93,6 +92,7 @@ class TaskDialog extends Dialog {
         this.createDialog(this.saveModify.bind(this))
         this.showDialog()
     }
+
     //-------------------------------------------------------------------------------------
     async saveModify() {
         console.log("TaskDialog.saveModify()")
@@ -101,7 +101,7 @@ class TaskDialog extends Dialog {
         this.closeDialog()
         sendEvent("taskModified", { taskId: this.task.getId() })
     }
-    
+
     //----------------------------------------------------------------------------
     async Xmodify(taskId) {
 

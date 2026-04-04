@@ -70,7 +70,8 @@ class Db {
 
         } catch (error) {
             console.log("Db.run() exception ", error)
-            callAfterRun({ message: "Error see log" })
+            //callAfterRun({ message: "Error see log" })
+            callAfterRun({ message: error })
         }
         //return(res)
     }

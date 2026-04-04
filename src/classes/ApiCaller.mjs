@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Kontext } from './Kontext.mjs';
+import { sendEvent } from '../utils/sendEvent.mjs';
 
 axios.defaults.timeout = 3000;
 const apiUrl = 'http://A6.mshome.net:3002'
@@ -8,7 +9,7 @@ const apiUrl = 'http://A6.mshome.net:3002'
 class ApiCaller {
 
     constructor(url, apiToken = "dummyToken") {
-        
+
         if (url === undefined) {
             this.kanbearUrl = Kontext.getKanbearUrl()
         } else {
@@ -16,6 +17,7 @@ class ApiCaller {
         }
         this.apiToken = apiToken;
         axios.defaults.headers.post['Authorization'] = apiToken;
+        this.headerArray = []
     }
 
     //-----------------------------------------------------------------
@@ -27,37 +29,54 @@ class ApiCaller {
 
     //-----------------------------------------------------------------
     header(parms) {
+        this.headerArray = parms
         console.log("----> ApiCaller ", ...parms)
     }
 
     //-----------------------------------------------------------------
-    async get(uri,params={}) {
-        this.header(["GET", uri, {params}])
-        console.log("url ", await this.url(uri), {params : params})
+    async processError(error) {
+        console.log("ApiCaller.processError() <headerArray>", ...this.headerArray)
+        console.log("ApiCaller.processError() <error>", error.response.status, "<data>", error.response.data.code);
+        let res = {
+            status: error.response.status,
+            data: error.response.data.code,
+        }
+        //throw error;
+
+        console.log("ApiCaller.processError() <return>", res);
+        sendEvent("error", { error: error.response.data.code })
+        return(res)
+    }
+
+    //-----------------------------------------------------------------
+    async get(uri, params = {}) {
+        this.header(["GET", uri, { params }])
+        console.log("url ", await this.url(uri), { params: params })
         try {
-            const res = await axios.get(await this.url(uri),{ params: params});
+            const res = await axios.get(await this.url(uri), { params: params });
             console.log(res.status); // Status Code
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
-            let res={status:error,data:error.res?.data || error.message}
-            console.error(`get() Error when calling  `, error.res?.data || error.message);
-            //throw error;
-            return(res)
+            let res = await this.processError(error)
+            return (res)
         }
     }
 
     //------------------------------------------------------------------------------------
     async post(uri, body = {}) {
         this.header(["POST", uri, body])
+        let res
         try {
-            const res = await axios.post(await this.url(uri), body);
+            res = await axios.post(await this.url(uri), body);
             console.log(res.status); // Status Code
             //console.log(res.data); // Response Data
-            return (res)
+            //return (res)
         } catch (error) {
-            console.error(`post() Error when calling  `, error.res?.data || error.message);
-            throw error;
+            res = await this.processError(error)
+        } finally {
+            console.log("ApiCaller.post() <res>",res); // Status Code
+            return(res)
         }
     }
 
@@ -71,8 +90,8 @@ class ApiCaller {
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
-            console.error(`put() Error when calling  `, error.res?.data || error.message);
-            //throw error;
+            let res = await this.processError(error)
+            return (res)
         }
     }
 
@@ -85,8 +104,8 @@ class ApiCaller {
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
-            console.error(`patch() Error when calling  `, error.res?.data || error.message);
-            //throw error;
+            let res = await this.processError(error)
+            return (res)
         }
     }
 
@@ -99,8 +118,8 @@ class ApiCaller {
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
-            console.error(`erase() Error when calling  `, error.res?.data || error.message);
-            //throw error;
+            let res = await this.processError(error)
+            return (res)
         }
     }
 
