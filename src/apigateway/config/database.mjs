@@ -48,20 +48,6 @@ class Db {
     run(sql, parms, callAfterRun) {
         console.log("Db.run() <sql>", sql, "<parms>", parms, "<callAfterRun>", callAfterRun)
         try {
-            //const res = stmt.run(...parms)
-            //console.log("<...parms>",...parms)
-            /*
-                        const trans = this.db.transaction((parms) => {
-                            const stmt = this.db.prepare(sql, [])
-                            //console.log("Db.run() <expandeSql>", stmt.expandedSQL)
-                            const res = stmt.run(...parms)
-                            console.log("Db.run() res", res)
-                            //res.lastID=res.lastInsertRowid
-                            console.log("Db.run() calling callback")
-                            callAfterRun(res, res.lastInsertRowid)
-                        })
-                        trans(parms)
-                        */
             const stmt = this.db.prepare(sql, [])
             const res = stmt.run(...parms)
             console.log("Db.run() res", res)
