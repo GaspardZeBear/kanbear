@@ -38,6 +38,7 @@ class ApiCaller {
         console.log("ApiCaller.processError() <headerArray>", ...this.headerArray)
         console.log("ApiCaller.processError() <error>", error.response.status, "<data>", error.response.data.code);
         let res = {
+            error:true,
             status: error.response.status,
             data: error.response.data.code,
         }

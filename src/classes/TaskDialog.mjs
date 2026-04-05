@@ -80,9 +80,14 @@ class TaskDialog extends Dialog {
         ta.setData("swimlane_id", this.swimlaneId)
         ta.setData("column_id", this.columnId)
         this.fillDbFromForm(ta)
-        await ta.create()
+        let resp=await ta.create()
+        console.log(resp)
+        if (! resp.error) {
         this.closeDialog()
         sendEvent("taskCreated", { taskId: ta.getId() })
+        } else {
+            this.create(this.swimlaneId,this.columnId)
+        }
     }
     
     //----------------------------------------------------------------------------
@@ -100,9 +105,14 @@ class TaskDialog extends Dialog {
     async saveModify() {
         console.log("TaskDialog.saveModify()")
         this.fillDbFromForm(this.task)
-        await this.task.patch({})
-        this.closeDialog()
-        sendEvent("taskModified", { taskId: this.task.getId() })
+        let resp=await this.task.patch({})
+        console.log(resp)
+        if (! resp.error) {
+          this.closeDialog()
+          sendEvent("taskModified", { taskId: this.task.getId() })
+        } else {
+          this.modify(this.task.id)
+        }
     }
 
     //----------------------------------------------------------------------------

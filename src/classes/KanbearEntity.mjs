@@ -52,7 +52,10 @@ class KanbearEntity {
         console.log("KanbearEntity.create() <data>",data)
         const resp = await new ApiCaller().post(`/api/${this.kind}s`, data)
         console.log("KanbearEntity.create() <resp>", resp)
-        resp.data.lastInsertRowid ? this.id = resp.data.lastInsertRowid : this.id=undefined
+        if ( ! resp.error ) {
+           resp.data.lastInsertRowid ? this.id = resp.data.lastInsertRowid : this.id=undefined
+        } 
+        return(resp)
     }
 
     //-------------------------------------------------------------------------------
