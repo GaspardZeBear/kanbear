@@ -10,67 +10,56 @@ class TaskDialog extends Dialog {
     constructor(dialogName) {
         super('task')
         this.dialogName = dialogName
-        //this.swimlaneId = swimlaneId
-        //this.columnId = columnId
-        //this.buildHtmlDialog()
-        //this.showDialog()
         this.task = null
     }
 
     //---------------------------------------------------------------------------
-    async buildColorSelectBox() {
+    async buildColorSelectBox(selectedColor) {
         let taskColor = await colorBoxBuilder({
             domId: 'taskColor',
             label: 'taskColor',
             labelText: 'Task color',
             boxLabel: 'taskColor',
-            klass: 'filter-group'
+            klass: 'filter-group',
+            selected: selectedColor
         })
-        return(taskColor)
-        // document.getElementById("taskColorDiv").appendChild(taskColor)
+        return (taskColor)
     }
-    
+
     //----------------------------------------------------------------------------
     async fillFormFromDb(task) {
-        console.log("TaskDialog.fillFormFromDb() <task>",task)
-        let taskColor=await this.buildColorSelectBox()
-        // fill in the form with db vales
-        console.log("TaskDialog.fillFormFromDb() taskColorDiv",document.getElementById("taskColorDiv"))
-        //let x=document.createElement('div')
+        console.log("TaskDialog.fillFormFromDb() <task>", task)
+        let taskColor = await this.buildColorSelectBox(task.color)
         document.getElementById("taskColorDiv").replaceChildren(taskColor)
         taskForm.taskName.value = task.name
-         console.log("TaskDialog.fillFormFromDb() taskName OK")
-        //taskForm.taskColor.value = task.color
         taskForm.taskDescription.value = task.description
-         console.log("TaskDialog.fillFormFromDb() tasDescription OK")
         taskForm.taskNote.value = task.note
-        let dt=fromDateTime(task.date_due)
-        console.log(dt)
-        taskForm.taskDateDue.value=dt.date
-        taskForm.taskTimeDue.value=dt.time
+        let dt = fromDateTime(task.date_due)
+        taskForm.taskDateDue.value = dt.date
+        taskForm.taskTimeDue.value = dt.time
     }
 
     //----------------------------------------------------------------------------
     async fillDbFromForm(task) {
         task.setData("name", taskForm.taskName.value)
         task.setData("description", taskForm.taskDescription.value)
-        task.setData("date_due",toDateTime(taskForm.taskDateDue.value,taskForm.taskTimeDue.value))
+        task.setData("date_due", toDateTime(taskForm.taskDateDue.value, taskForm.taskTimeDue.value))
         task.setData("note", taskForm.taskNote.value)
-        let color = taskForm.taskColor.value < 0 ? "white":taskForm.taskColor.value
+        let color = taskForm.taskColor.value < 0 ? "white" : taskForm.taskColor.value
         task.setData("color", color)
         task.setName(taskForm.taskName.value)
         task.setDescription(taskForm.taskDescription.value)
         task.setOpen(taskForm.taskIsOpen.value)
     }
 
-//----------------------------------------------------------------------------
+    //----------------------------------------------------------------------------
     async create(swimlaneId, columnId) {
         this.swimlaneId = swimlaneId
         this.columnId = columnId
-        let taskColor=await this.buildColorSelectBox()
+        let taskColor = await this.buildColorSelectBox()
         document.getElementById("taskColorDiv").replaceChildren(taskColor)
         this.createDialog(this.save.bind(this))
-        this.showDialog("Create Task")
+        this.showDialog("Create task")
     }
 
     //-------------------------------------------------------------------------------------
@@ -81,82 +70,44 @@ class TaskDialog extends Dialog {
         ta.setData("column_id", this.columnId)
         this.fillDbFromForm(ta)
         try {
-          let resp=await ta.create()
-           console.log(resp)
-           this.closeDialog()
-           sendEvent("taskCreated", { taskId: ta.getId() })
-        } catch(error) {
-            this.setMessage(error.cause.msg)
-            console.log("TaskDialog.save() err",error)
-            console.log("TaskDialog.save() err.message",error.msg)
-            console.log("TaskDialog.save() cause",error.cause)
-            this.create(this.swimlaneId,this.columnId)
+            let resp = await ta.create()
+            this.closeDialog()
+            sendEvent("taskCreated", { taskId: ta.getId() })
+        } catch (error) {
+            this.setMessage(error.cause?.msg)
+            this.create(this.swimlaneId, this.columnId)
         }
     }
-    
+
     //----------------------------------------------------------------------------
     async modify(taskId) {
         this.taskId = taskId
         this.task = new Task({ id: taskId })
-        const ta = await this.task.get()
-        console.log("TaskDialog.modify() <ta>", ta)
-        await this.fillFormFromDb(ta)
-        this.createDialog(this.saveModify.bind(this))
-        this.showDialog("Modify Task")
+        try {
+            const ta = await this.task.get()
+            console.log("TaskDialog.modify() <ta>", ta)
+            await this.fillFormFromDb(ta)
+            this.createDialog(this.saveModify.bind(this))
+            this.showDialog("Modify task")
+        } catch (error) {
+            this.setMessage(error.cause?.msg)
+            this.modify(this.taskId)
+        }
     }
 
     //-------------------------------------------------------------------------------------
     async saveModify() {
         console.log("TaskDialog.saveModify()")
         this.fillDbFromForm(this.task)
-        let resp=await this.task.patch({})
-        console.log(resp)
-        if (! resp.error) {
-          this.closeDialog()
-          sendEvent("taskModified", { taskId: this.task.getId() })
-        } else {
-          this.modify(this.task.id)
+        try {
+            let resp = await this.task.patch({})
+            this.closeDialog()
+            sendEvent("taskModified", { taskId: this.task.getId() })
+        } catch (error) {
+            this.setMessage(error.cause?.msg)
+            this.modify(this.task.id)
         }
     }
-
-    //----------------------------------------------------------------------------
-    async Xmodify(taskId) {
-
-        this.taskId = taskId
-
-        this.task = new Task({ id: taskId })
-        const ta = await this.task.get()
-        console.log("TaskDialog.modify() <ta>", ta)
-
-        let taskForm = document.getElementById("taskForm")
-
-        let formData = new FormData(taskForm)
-        console.log("TaskDialog.modify() <form2Db>", Task.form2Db)
-        console.log("TaskDialog.modify() <db2Form>", Task.db2Form)
-        for (let entry of formData.entries()) {
-            let name = entry[0]
-            let key = Task.form2Db[name]
-            console.log("TaskDialog.modify() <name>", name); // key1 = value1, ensuite key2 = value2
-            console.log("TaskDialog.modify() <ta key>", Task.form2Db[name])
-            console.log("TaskDialog.modify() <ta>", ta[key])
-            formData.set(name, ta[key])
-            //taskForm[name].value=ta[key]
-        }
-        console.log("formData", formData)
-
-        console.log("TaskDialog.modify() <form.elements>", taskForm.elements)
-        Object.entries(taskForm.elements).forEach((item) => {
-            console.log("TaskDialog.modify() <form.elements>", item, item[1].id)
-            let name = item[1].id
-            let key = Task.form2Db[name]
-            taskForm[name].value = ta[key]
-            console.log("TaskDialog.modify() <taskForm>", taskForm[name])
-        })
-
-        this.createDialog(this.saveModify.bind(this))
-        this.showDialog()
-    }
-
 }
 
 

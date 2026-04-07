@@ -94,7 +94,7 @@ class Task extends KanbearEntity {
         taskElement.classList.add('kanban-item');
         taskElement.setAttribute("draggable", true)
         let style=`background-color:${this.task.color}`
-        //taskElement.setAttribute("style", style)
+        taskElement.setAttribute("style", style)
         //taskElement.style.setAttribute("background-color",this.task.color)
         //taskElement.style.setAttribute("style","italic")
 

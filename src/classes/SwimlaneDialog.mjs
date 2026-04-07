@@ -17,7 +17,7 @@ class SwimlaneDialog extends Dialog {
     create(projectId) {
         this.projectId = projectId
         this.createDialog(this.save.bind(this))
-        this.showDialog()
+        this.showDialog("Create swimlane")
     }
 
     //-------------------------------------------------------------------------------------
