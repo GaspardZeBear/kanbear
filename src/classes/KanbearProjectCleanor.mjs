@@ -1,5 +1,5 @@
 import { KanboardFilter } from "./KanboardFilter.mjs"
-import { formatDuration, dateToString, getDurationFromNow } from "../utils/formatDuration.mjs";
+import { formatDuration, dateToString, getDurationFromNow } from "../utils/dateAndTime.mjs";
 import { Kontext } from "./Kontext.mjs";
 import { Workspace } from "./Workspace.mjs";
 import { Project } from "./Project.mjs";

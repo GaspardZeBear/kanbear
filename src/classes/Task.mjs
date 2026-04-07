@@ -172,18 +172,6 @@ class Task extends KanbearEntity {
             //console.log(ev.dataTransfer)
             ev.target.classList.remove("dragging")
         })
-
-        /*
-        editBtn = taskElement.querySelector('.edit-task-btn');
-        //console.log(editBtn)
-        let task=this
-        editBtn.addEventListener('click', function (ev) {
-            console.log("Edit task")
-            ev.stopPropagation();
-            task.openEditModal();
-        });
-        //console.log(editBtn)
-        */
         return (taskElement)
     }
 
@@ -204,33 +192,10 @@ class Task extends KanbearEntity {
         document.dispatchEvent(taskModifiedEvent)
     }
 
-    //---------------------------------------------------------------------------------
-    async ZopenEditModalAsync() {
-            const addTaskButton = document.createElement('button')
-        addTaskButton.classList.add("add-item-btn")
-        addTaskButton.setAttribute("id", `addTaskButton_${swimlane.id}_${col.id}`)
-        addTaskButton.setAttribute("data-swimlane-id", swimlane.id)
-        addTaskButton.setAttribute("data-column-id", col.id)
-        addTaskButton.innerHTML = "+T"
-
-        let addTaskFn = function (ev) {
-          console.log("addTaskButton event Listener fired <swimlane>",swimlane.id,"<column>",col.id)
-          ev.stopPropagation();
-          const task = new TaskDialog('create', swimlane.id, col.id);
-        }
-        addTaskButton.addEventListener('click', addTaskFn, { once: true });
-    }
-
     //---------------------------------------------------------------------------------------------
     openEditModal() {
         this.openEditModalAsync()
     }
-
-    // Fermer la popup
-    //closeBtn.addEventListener('click', function() {
-    //    popup.style.display = 'none';
-    //});
-
 
 }
 export { Task }

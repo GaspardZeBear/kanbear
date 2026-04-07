@@ -2,7 +2,7 @@ import { Dialog } from './Dialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 import { Task } from './Task.mjs'
 import { sendEvent } from '../utils/sendEvent.mjs'
-import { fromDateTime, toDateTime } from '../utils/formatDuration.mjs'
+import { fromDateTime, toDateTime } from '../utils/dateAndTime.mjs'
 import { colorBoxBuilder } from '../utils/selectBoxBuilder.mjs'
 
 class TaskDialog extends Dialog {
