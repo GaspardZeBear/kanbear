@@ -10,6 +10,8 @@ class Dialog {
         this.kind=kind
         this.upperFirstKind=this.kind.charAt(0).toUpperCase() + this.kind.slice(1)
         this.dialog = null
+        
+        //document.getElementById("dialogMessage").innerHTML="blal"
         //console.log("Dialog clickListeners before",Dialog.clickListeners)
        // for ( let listenerFunction of Dialog.clickListeners) {
         //    console.log("Dialog clickListeners remove ",listenerFunction)
@@ -19,8 +21,14 @@ class Dialog {
         //console.log("Dialog clickListeners after",Dialog.clickListeners)
     }
 
-    showDialog() {
-        console.log("Dialog.showDialog()",this.dialog)
+    //------------------------------------------------------------------------------------------
+    setMessage(message) {
+        document.getElementById(`${this.kind}DialogMessage`).innerHTML=message
+    }
+
+    //------------------------------------------------------------------------------------------
+    showDialog(title="No title") {
+        document.getElementById(`${this.kind}DialogTitle`).innerHTML=title
         this.dialog.showModal();
     }
 

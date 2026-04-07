@@ -2,13 +2,13 @@ import { ApiCaller } from "./ApiCaller.mjs"
 
 class KanbearEntity {
     //------------------------------------------------------------------------
-    constructor(kind,from={}) {
+    constructor(kind, from = {}) {
         console.log("KanbearEntity.constructor() <kind>", kind, "<from>", from)
         this.kind = kind
         this.data = {}
-        from.id ? this.id=from.id : undefined
-        console.log("KanbearEntity.constructor() <from>",from)
-        console.log("KanbearEntity.constructor() <this>",this)
+        from.id ? this.id = from.id : undefined
+        console.log("KanbearEntity.constructor() <from>", from)
+        console.log("KanbearEntity.constructor() <this>", this)
     }
 
     //----------------------------------------------------------------------------
@@ -18,7 +18,7 @@ class KanbearEntity {
 
     //----------------------------------------------------------------------------
     setId(id) {
-        this.id=id
+        this.id = id
     }
 
 
@@ -49,14 +49,20 @@ class KanbearEntity {
         Object.entries(this.data).forEach(([key, val]) => {
             val ? data[key] = val : 1
         })
-        console.log("KanbearEntity.create() <data>",data)
-        const resp = await new ApiCaller().post(`/api/${this.kind}s`, data)
-        console.log("KanbearEntity.create() <resp>", resp)
-        if ( ! resp.error ) {
-           resp.data.lastInsertRowid ? this.id = resp.data.lastInsertRowid : this.id=undefined
-        } 
-        return(resp)
+        console.log("KanbearEntity.create() <data>", data)
+        try {
+            const resp = await new ApiCaller().post(`/api/${this.kind}s`, data)
+        } catch (error) {
+            console.log("KanbearEntity.create() <error>", error)
+            throw error
+        }
     }
+    //console.log("KanbearEntity.create() <resp>", resp)
+    //if ( ! resp.error ) {
+    //   resp.data.lastInsertRowid ? this.id = resp.data.lastInsertRowid : this.id=undefined
+    //} 
+    //return(resp)
+
 
     //-------------------------------------------------------------------------------
     static async getAll(kind, params) {
@@ -90,7 +96,7 @@ class KanbearEntity {
         Object.entries(this.data).forEach(([key, val]) => {
             val ? data[key] = val : 1
         })
-        console.log("KanbearEntity.delete() <kind>",this.kind,"<id>",this.id, "<data>",data)
+        console.log("KanbearEntity.delete() <kind>", this.kind, "<id>", this.id, "<data>", data)
         const resp = await new ApiCaller().erase(`/api/${this.kind}s/${this.id}`, data)
         console.log("KanbearEntity.delete()", resp.data)
         return (resp.data)

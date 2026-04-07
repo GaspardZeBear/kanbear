@@ -70,7 +70,7 @@ class TaskDialog extends Dialog {
         let taskColor=await this.buildColorSelectBox()
         document.getElementById("taskColorDiv").replaceChildren(taskColor)
         this.createDialog(this.save.bind(this))
-        this.showDialog()
+        this.showDialog("Create Task")
     }
 
     //-------------------------------------------------------------------------------------
@@ -80,12 +80,16 @@ class TaskDialog extends Dialog {
         ta.setData("swimlane_id", this.swimlaneId)
         ta.setData("column_id", this.columnId)
         this.fillDbFromForm(ta)
-        let resp=await ta.create()
-        console.log(resp)
-        if (! resp.error) {
-        this.closeDialog()
-        sendEvent("taskCreated", { taskId: ta.getId() })
-        } else {
+        try {
+          let resp=await ta.create()
+           console.log(resp)
+           this.closeDialog()
+           sendEvent("taskCreated", { taskId: ta.getId() })
+        } catch(error) {
+            this.setMessage(error.cause.msg)
+            console.log("TaskDialog.save() err",error)
+            console.log("TaskDialog.save() err.message",error.msg)
+            console.log("TaskDialog.save() cause",error.cause)
             this.create(this.swimlaneId,this.columnId)
         }
     }
@@ -98,7 +102,7 @@ class TaskDialog extends Dialog {
         console.log("TaskDialog.modify() <ta>", ta)
         await this.fillFormFromDb(ta)
         this.createDialog(this.saveModify.bind(this))
-        this.showDialog()
+        this.showDialog("Modify Task")
     }
 
     //-------------------------------------------------------------------------------------

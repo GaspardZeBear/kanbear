@@ -37,16 +37,14 @@ class ApiCaller {
     async processError(error) {
         console.log("ApiCaller.processError() <headerArray>", ...this.headerArray)
         console.log("ApiCaller.processError() <error>", error.response.status, "<data>", error.response.data.code);
-        let res = {
-            error:true,
-            status: error.response.status,
-            data: error.response.data.code,
-        }
-        //throw error;
-
-        console.log("ApiCaller.processError() <return>", res);
-        sendEvent("error", { error: error.response.data.code })
-        return(res)
+        //let myError = {
+        //    error:true,
+        //    status: error.response.status,
+        //    data: error.response.data.code,
+        //}
+        //console.log("ApiCaller <myError>",myError)
+        let error0=new Error("ApicallerError()",{cause: {"status":error.response.status,"msg":error.response.data.code}})
+        throw error0;
     }
 
     //-----------------------------------------------------------------
@@ -55,30 +53,23 @@ class ApiCaller {
         console.log("url ", await this.url(uri), { params: params })
         try {
             const res = await axios.get(await this.url(uri), { params: params });
-            console.log(res.status); // Status Code
-            //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
-            let res = await this.processError(error)
-            return (res)
+            const res = await this.processError(error)
         }
     }
 
     //------------------------------------------------------------------------------------
     async post(uri, body = {}) {
         this.header(["POST", uri, body])
-        let res
-        try {
-            res = await axios.post(await this.url(uri), body);
+          try {
+            let res = await axios.post(await this.url(uri), body);
             console.log(res.status); // Status Code
             //console.log(res.data); // Response Data
-            //return (res)
+            return (res)
         } catch (error) {
-            res = await this.processError(error)
-        } finally {
-            console.log("ApiCaller.post() <res>",res); // Status Code
-            return(res)
-        }
+            const res = await this.processError(error)
+        } 
     }
 
 
@@ -91,8 +82,7 @@ class ApiCaller {
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
-            let res = await this.processError(error)
-            return (res)
+            const res = await this.processError(error)
         }
     }
 
@@ -105,8 +95,7 @@ class ApiCaller {
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
-            let res = await this.processError(error)
-            return (res)
+            const res = await this.processError(error)
         }
     }
 
@@ -119,8 +108,7 @@ class ApiCaller {
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
-            let res = await this.processError(error)
-            return (res)
+            const res = await this.processError(error)
         }
     }
 

@@ -61,7 +61,7 @@
     <div class="workspace" id="workspace">
         <p></p>
     </div>
-    
+
     <div class="message" id="message">
         <p></p>
     </div>
@@ -87,9 +87,11 @@
     <div id="modal">
     </div>
 
-<dialog id="workspaceDialog" closedby="any">
+    <dialog id="workspaceDialog" closedby="any">
+        <h2 id="workspaceDialogTitle"></h2>
+        <div id="workspaceDialogMessage">
+        </div>
         <form id="workspaceForm" method="dialog">
-            <h2>Create new Workspace</h2>
             <div id="workspaceNameDiv">
                 <label for="name">Project Name: </label>
                 <input type="text" id="workspaceName" name="name" />
@@ -108,8 +110,10 @@
     </dialog>
 
     <dialog id="projectDialog" closedby="any">
+        <h2 id="projectDialogTitle"></h2>
+        <div id="projectDialogMessage">
+        </div>
         <form id="projectForm" method="dialog">
-            <h2>Create new project</h2>
             <div id="projectNameDiv">
                 <label for="name">Project Name: </label>
                 <input type="text" id="projectName" name="name" />
@@ -130,6 +134,9 @@
     </dialog>
 
     <dialog id="swimlaneDialog" closedby="any">
+        <h2 id="swimlaneDialogTitle"></h2>
+        <div id="swimlaneDialogMessage">
+        </div>
         <form id="swimlaneForm" method="dialog">
             <h2>Create new swimlane</h2>
             <div id="swimlaneNameDiv">
@@ -150,8 +157,10 @@
     </dialog>
 
     <dialog id="columnDialog" closedby="any">
+        <h2 id="columnDialogTitle"></h2>
+        <div id="columnDialogMessage">
+        </div>
         <form id="columnForm" method="dialog">
-            <h2>Create new column</h2>
             <div id="columnNameDiv">
                 <label for="name">Column Name: </label>
                 <input type="text" id="columnName" name="name" />
@@ -166,8 +175,11 @@
     </dialog>
 
     <dialog id="taskDialog" closedby="any">
+        <h2 id="taskDialogTitle"></h2>
+        <div id="taskDialogMessage">
+        </div>
         <form id="taskForm" method="dialog">
-            <h2>Create new task</h2>
+
             <div id="taskNameDiv">
                 <label for="name">Task Name: </label>
                 <input type="text" id="taskName" name="taskName" />
@@ -191,7 +203,7 @@
                 <!-- 
                 <label for="color">Color: </label>
                 input type="text" id="taskColor" name="taskColor" / -->
-                 <!--
+                <!--
                 <select id="taskColor" name="taskColor">
                     <option value="white">white</option>
                     <option value="blue">blue</option>
