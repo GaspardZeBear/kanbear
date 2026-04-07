@@ -6,6 +6,7 @@ import { ProjectDialog } from "./ProjectDialog.mjs"
 import { SwimlaneDialog } from "./SwimlaneDialog.mjs"
 import { ColumnDialog } from "./ColumnDialog.mjs"
 import { TaskDialog } from "./TaskDialog.mjs"
+import { buildProjectLink } from "../utils/linkBuilder.mjs"
 import { Ref } from "./Ref.mjs"
 
 class KanbanPanel {
@@ -71,7 +72,7 @@ class KanbanPanel {
     return (addColumnButton)
   }
   //------------------------------------------------------------------------
-  buildProjectLink(projectId, projectName) {
+  XbuildProjectLink(projectId, projectName) {
     const href = document.createElement("a")
     href.setAttribute("id", `projectHref_${projectId}`)
     href.setAttribute("href", "javascript:void(0)")
@@ -118,7 +119,8 @@ class KanbanPanel {
 
     const addSwimlaneButton = this.buildAddSwimlaneButton(this.project.id)
     const addColumnButton = this.buildAddColumnButton(this.project.id)
-    const projectLink = this.buildProjectLink(this.project.id, this.project.name)
+    //const projectLink = this.buildProjectLink(this.project.id, this.project.name)
+    const projectLink = buildProjectLink(this.project.id, this.project.name)
 
     //let resultTitleWorkspace = document.createElement('h2')
     //resultTitleWorkspace.innerHTML="Workspace " + this.project.workspace_id
@@ -324,13 +326,10 @@ class KanbanPanel {
             if (task.column_id == columnId) {
               const newTask = new Task(task)
               container.appendChild(newTask.createKanbanTaskElement());
-
-
               //document.getElementById(project.id).addEventListener("taskModified", (ev) => {
               document.addEventListener("taskModified", (ev) => {
                 console.log("taskModified listener <ev>", ev)
               })
-
               //Mettre à jour le compteur
               this.updateCounter(columnId, kSwimlaneId);
             }
