@@ -37,6 +37,11 @@ class TaskDialog extends Dialog {
         let dt = fromDateTime(task.date_due)
         taskForm.taskDateDue.value = dt.date
         taskForm.taskTimeDue.value = dt.time
+        taskForm.taskIsOpen.value=task.is_open
+        console.log("TaskDialog() fillFormIsOpen ",task.is_open)
+        if ( task.is_open > 0) {
+            document.getElementById("taskIsOpen").setAttribute("checked","")
+        } 
     }
 
     //----------------------------------------------------------------------------
@@ -49,7 +54,13 @@ class TaskDialog extends Dialog {
         task.setData("color", color)
         task.setName(taskForm.taskName.value)
         task.setDescription(taskForm.taskDescription.value)
-        task.setOpen(taskForm.taskIsOpen.value)
+        //task.setOpen(taskForm.taskIsOpen.value)
+        if (taskForm.taskIsOpen.checked) {
+            task.setData("is_open", 1)
+        } else {
+            task.setData("is_open", 0)
+        }
+        console.log("TaskDialog() fillDb IsOpen ",taskForm.taskIsOpen.checked)
     }
 
     //----------------------------------------------------------------------------
