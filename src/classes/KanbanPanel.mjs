@@ -249,7 +249,7 @@ class KanbanPanel {
         let taskElement = document.getElementById(data)
 
         //remove old taskElment
-        taskElement.parentElement.removeChild(taskElement)
+        //taskElement.parentElement.removeChild(taskElement)
 
         //---------------------------------------------------------------------------
         // Todo 
@@ -285,12 +285,14 @@ class KanbanPanel {
         // update the DOM
         // If drop over column (ex :empty column, appendChild)
         // Drop over another taskElement : must insert before it (choice, seems most convenient)
+        
         let itemsDiv = ev.target.closest(".kanban-items")
         if (ev.target === itemsDiv) {
           itemsDiv.appendChild(taskElementNew)
         } else {
           itemsDiv.insertBefore(taskElementNew, ev.target)
         }
+        taskElement.parentElement.removeChild(taskElement)
         this.updateCounter(cId, sId)
         this.updateCounter(targetColumnId, targetSwimlaneId)
       })
