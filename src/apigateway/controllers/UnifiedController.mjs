@@ -15,6 +15,7 @@ class UnifiedController {
         console.log("UnifiedController.getFunction called", table, op)
         return (
             (req, res) => {
+                console.log("---------------------------------------------------------------------")
                 console.log("UnifiedController callback fired table=", table, "op=", op, "req.body=", req.body)
                 console.log("UnifiedController callback fired table=", table, "op=", op, "req.params=", req.params)
                 console.log("UnifiedController callback fired table=", table, "op=", op, "req.query=", req.query)
