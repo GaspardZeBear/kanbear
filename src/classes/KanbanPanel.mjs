@@ -6,7 +6,7 @@ import { ProjectDialog } from "./ProjectDialog.mjs"
 import { SwimlaneDialog } from "./SwimlaneDialog.mjs"
 import { ColumnDialog } from "./ColumnDialog.mjs"
 import { TaskDialog } from "./TaskDialog.mjs"
-import { buildProjectLink } from "../utils/linkBuilder.mjs"
+import { buildProjectLink, buildSwimlaneLink } from "../utils/linkBuilder.mjs"
 import { Ref } from "./Ref.mjs"
 
 class KanbanPanel {
@@ -165,7 +165,9 @@ class KanbanPanel {
       kSwimlaneHeaderDiv.classList.add("swimlane-header")
       // create fill-in header
       const kSwimlaneDivH2 = document.createElement('h2')
-      kSwimlaneDivH2.innerHTML = `${project.name}>${swimlane.name}`
+      const swimlaneLink = buildSwimlaneLink(swimlane.id, swimlane.name)
+      kSwimlaneDivH2.innerHTML = `${project.name}>`
+      kSwimlaneDivH2.appendChild(swimlaneLink)
 
       kSwimlaneHeaderDiv.appendChild(kSwimlaneDivH2)
       kSwimlaneDiv.appendChild(kSwimlaneHeaderDiv)

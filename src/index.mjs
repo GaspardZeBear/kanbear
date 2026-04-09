@@ -52,6 +52,12 @@ document.addEventListener("swimlaneCreated", async (ev) => {
     kb.render()
 })
 
+document.addEventListener("swimlaneModified", async (ev) => {
+    console.log("index.mjs() swimlane listener fired <ev>", ev)
+    const kb = await KanbanPanel.builder('results', getFiltersMap())
+    kb.render()
+})
+
 document.addEventListener("columnCreated", async (ev) => {
     console.log("index.mjs() column listener fired <ev>", ev)
     const kb = await KanbanPanel.builder('results', getFiltersMap())
@@ -122,7 +128,6 @@ async function buildKanbearProjectsSelectBox() {
             let newProject = new ProjectDialog()
             newProject.create(workspaceId)
             return
-            projectId = newProject.getProject().getId()
         }
         //Kontext.setProject(e.target.value);
         sendEvent("projectSelected", { projectId: projectId })

@@ -1,5 +1,7 @@
   
-  import { ProjectDialog} from '../classes/ProjectDialog.mjs'
+import { ProjectDialog} from '../classes/ProjectDialog.mjs'
+import { SwimlaneDialog } from '../classes/SwimlaneDialog.mjs'
+  
   //------------------------------------------------------------------------
   function buildProjectLink(projectId, projectName) {
     const href = document.createElement("a")
@@ -18,4 +20,22 @@
     return (href)
   }
 
-  export { buildProjectLink }
+  //----------------------------------------------------------------------------------
+  function buildSwimlaneLink(swimlaneId, swimlaneName) {
+    const href = document.createElement("a")
+    href.setAttribute("id", `swimlaneHref_${swimlaneId}`)
+    href.setAttribute("href", "javascript:void(0)")
+    href.innerHTML = `${swimlaneName}`
+    //let myProject = this.project
+    let sId=swimlaneId
+    let editSwimlaneFn = function (ev) {
+      console.log("editSwimlaneHref event Listener fired ")
+      ev.stopPropagation();
+      const swimlane = new SwimlaneDialog()
+      swimlane.modify(sId);
+    }
+    href.addEventListener('click', editSwimlaneFn, { once: true });
+    return (href)
+  }
+
+  export { buildProjectLink, buildSwimlaneLink }

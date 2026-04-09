@@ -89,8 +89,7 @@
 
     <dialog id="workspaceDialog" closedby="any">
         <h2 id="workspaceDialogTitle"></h2>
-        <div id="workspaceDialogMessage">
-        </div>
+        <div id="workspaceDialogMessage"></div>
         <form id="workspaceForm" method="dialog">
             <div id="workspaceNameDiv">
                 <label for="name">Project Name: </label>
@@ -111,21 +110,19 @@
 
     <dialog id="projectDialog" closedby="any">
         <h2 id="projectDialogTitle"></h2>
-        <div id="projectDialogMessage">
-        </div>
+        <div id="projectDialogMessage"></div>
         <form id="projectForm" method="dialog">
             <div id="projectNameDiv">
                 <label for="name">Project Name: </label>
-                <input type="text" id="projectName" name="name" />
+                <input type="text" id="projectName" name="projectName" />
             </div>
             <div id="projectDescriptionDiv">
                 <label for="description">Description: </label>
-                <input type="text" id="projectDescription" name="description" />
+                <input type="text" id="projectDescription" name="projectDescription" />
             </div>
             <div id="columnsDiv">
             </div>
-                        <div id="projectColorDiv">
-            </div>
+            <div id="projectColorDiv"></div>
             <div id="projectIsOpenDiv">
                 <label for="projectIsOpen">Open </label>
                 <input type="checkbox" id="projectIsOpen" checked />
@@ -137,21 +134,19 @@
 
     <dialog id="swimlaneDialog" closedby="any">
         <h2 id="swimlaneDialogTitle"></h2>
-        <div id="swimlaneDialogMessage">
-        </div>
+        <div id="swimlaneDialogMessage"></div>
         <form id="swimlaneForm" method="dialog">
-            <h2>Create new swimlane</h2>
             <div id="swimlaneNameDiv">
                 <label for="name">Swimlane Name: </label>
-                <input type="text" id="swimlaneName" name="name" />
+                <input type="text" id="swimlaneName" name="swimlaneName" />
             </div>
             <div id="swimlaneDescriptionDiv">
                 <label for="description">Description: </label>
-                <input type="text" id="swimlaneDescription" name="swimlane" />
+                <input type="text" id="swimlaneDescription" name="swimlaneDescription" />
             </div>
-            <div id="swimlaneIs_openDiv">
-                <label for="is_open">Open </label>
-                <input type="checkbox" id="swimlaneIs_open" checked />
+            <div id="swimlaneIsOpenDiv">
+                <label for="isOpen">Open </label>
+                <input type="checkbox" id="swimlaneIsOpen" checked />
             </div>
             <button type="button" value="save" name="saveSwimlaneBtn" id="saveSwimlaneBtn">Save</button>
             <button type="button" value="cancel" name="cancelSwimlaneBtn" id="cancelSwimlaneBtn">Cancel</button>
@@ -160,8 +155,7 @@
 
     <dialog id="columnDialog" closedby="any">
         <h2 id="columnDialogTitle"></h2>
-        <div id="columnDialogMessage">
-        </div>
+        <div id="columnDialogMessage"></div>
         <form id="columnForm" method="dialog">
             <div id="columnNameDiv">
                 <label for="name">Column Name: </label>
@@ -178,10 +172,8 @@
 
     <dialog id="taskDialog" closedby="any">
         <h2 id="taskDialogTitle"></h2>
-        <div id="taskDialogMessage">
-        </div>
+        <div id="taskDialogMessage"></div>
         <form id="taskForm" method="dialog">
-
             <div id="taskNameDiv">
                 <label for="name">Task Name: </label>
                 <input type="text" id="taskName" name="taskName" />
