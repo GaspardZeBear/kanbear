@@ -66,5 +66,21 @@ async function colorBoxBuilder(params) {
 
   return(box)
 }
-export { colorBoxBuilder, selectBoxBuilder }
+
+        //---------------------------------------------------------------------------
+async function buildColorSelectBox(selectedColor,name,labelText) {
+        let color = colorBoxBuilder({
+            domId: name,
+            label: name,
+            labelText: labelText,
+            boxLabel: name,
+            klass: 'filter-group',
+            selected: selectedColor
+        })
+        return(color)
+    }
+
+
+
+export { colorBoxBuilder, buildColorSelectBox, selectBoxBuilder }
 

@@ -132,15 +132,6 @@ class Task extends KanbearEntity {
         tNote.setAttribute("style", noteStyle)
         tNote.innerHTML = `Note : ${note}`
 
-        /*
-        //let editBtnDiv=document.createElement("div")
-        let editBtn = document.createElement("button")
-        editBtn.classList.add("edit-task-btn")
-        editBtn.setAttribute("id", `taskEditButton-${this.task.id}`)
-        editBtn.setAttribute("data-task-id", `${this.task.id}`)
-        editBtn.innerHTML = "Edit"
-        */
-
         //headerDiv.appendChild(top)
         
         headerDiv.appendChild(tDescription)
@@ -175,27 +166,5 @@ class Task extends KanbearEntity {
         return (taskElement)
     }
 
-    //---------------------------------------------------------------------------------
-    async openEditModalAsync() {
-        let popup = document.getElementById('taskPopup')
-        let description=prompt("description : ")
-        this.setDescription(description)
-        this.task.description=description
-        await this.patch()
-        document.getElementById(this.elementId).replaceWith(this.createKanbanTaskElement())
-        const taskModifiedEvent = new CustomEvent("taskModified", {
-                detail: {taskId:this.task.id},
-                bubbles: true,
-                cancelable: true,
-                composed: true
-              })
-        document.dispatchEvent(taskModifiedEvent)
-    }
-
-    //---------------------------------------------------------------------------------------------
-    openEditModal() {
-        this.openEditModalAsync()
-    }
-
-}
+ }
 export { Task }

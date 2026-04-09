@@ -3,7 +3,7 @@ import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 import { Task } from './Task.mjs'
 import { sendEvent } from '../utils/sendEvent.mjs'
 import { fromDateTime, toDateTime } from '../utils/dateAndTime.mjs'
-import { colorBoxBuilder } from '../utils/selectBoxBuilder.mjs'
+import { colorBoxBuilder, buildColorSelectBox } from '../utils/selectBoxBuilder.mjs'
 
 class TaskDialog extends Dialog {
 
@@ -13,23 +13,11 @@ class TaskDialog extends Dialog {
         this.task = null
     }
 
-    //---------------------------------------------------------------------------
-    async buildColorSelectBox(selectedColor) {
-        let taskColor = await colorBoxBuilder({
-            domId: 'taskColor',
-            label: 'taskColor',
-            labelText: 'Task color',
-            boxLabel: 'taskColor',
-            klass: 'filter-group',
-            selected: selectedColor
-        })
-        return (taskColor)
-    }
-
     //----------------------------------------------------------------------------
     async fillFormFromDb(task) {
         console.log("TaskDialog.fillFormFromDb() <task>", task)
-        let taskColor = await this.buildColorSelectBox(task.color)
+        //let taskColor = await this.buildColorSelectBox(task.color)
+        let taskColor = await buildColorSelectBox(task.color,'taskColor','Task Color')
         document.getElementById("taskColorDiv").replaceChildren(taskColor)
         taskForm.taskName.value = task.name
         taskForm.taskDescription.value = task.description
@@ -67,7 +55,8 @@ class TaskDialog extends Dialog {
     async create(swimlaneId, columnId) {
         this.swimlaneId = swimlaneId
         this.columnId = columnId
-        let taskColor = await this.buildColorSelectBox()
+        //let taskColor = await this.buildColorSelectBox()
+        let taskColor =  await buildColorSelectBox('','taskColor','Task Color')
         document.getElementById("taskColorDiv").replaceChildren(taskColor)
         this.createDialog(this.save.bind(this))
         this.showDialog("Create task")

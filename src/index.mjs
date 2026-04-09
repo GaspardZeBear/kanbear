@@ -35,6 +35,12 @@ document.addEventListener("projectSelected", async (ev) => {
     kb.render()
     //new KanbanPanel('results', getFiltersMap()).render()
 })
+
+document.addEventListener("projectModified", async (ev) => {
+    console.log("index.mjs() project modified listener fired <ev>", ev)
+    const kb = await KanbanPanel.builder('results', getFiltersMap())
+    kb.render()
+})
 document.addEventListener("projectDeleted", (ev) => {
     console.log("projectDeleted listener fired <ev>", ev)
     buildKanbearProjectsSelectBox()
