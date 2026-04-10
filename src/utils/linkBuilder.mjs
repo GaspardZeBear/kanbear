@@ -1,14 +1,19 @@
   
 import { ProjectDialog} from '../classes/ProjectDialog.mjs'
 import { SwimlaneDialog } from '../classes/SwimlaneDialog.mjs'
-  
+import { ColumnDialog } from '../classes/ColumnDialog.mjs'
+
+class LinkCounter {
+  static counter=0
+}
+
   //------------------------------------------------------------------------
   function buildProjectLink(projectId, projectName) {
     const href = document.createElement("a")
-    href.setAttribute("id", `projectHref_${projectId}`)
+    LinkCounter.counter++
+    href.setAttribute("id", `projectHref_${projectId}_${LinkCounter.counter}`)
     href.setAttribute("href", "javascript:void(0)")
     href.innerHTML = `${projectName}`
-    //let myProject = this.project
     let pId=projectId
     let editProjectFn = function (ev) {
       console.log("editProjectHref event Listener fired ")
@@ -26,7 +31,6 @@ import { SwimlaneDialog } from '../classes/SwimlaneDialog.mjs'
     href.setAttribute("id", `swimlaneHref_${swimlaneId}`)
     href.setAttribute("href", "javascript:void(0)")
     href.innerHTML = `${swimlaneName}`
-    //let myProject = this.project
     let sId=swimlaneId
     let editSwimlaneFn = function (ev) {
       console.log("editSwimlaneHref event Listener fired ")
@@ -38,4 +42,22 @@ import { SwimlaneDialog } from '../classes/SwimlaneDialog.mjs'
     return (href)
   }
 
-  export { buildProjectLink, buildSwimlaneLink }
+  //----------------------------------------------------------------------------------
+  function buildColumnLink(columnId, columnName) {
+    const href = document.createElement("a")
+    href.setAttribute("id", `columnHref_${columnId}`)
+    href.setAttribute("href", "javascript:void(0)")
+    href.innerHTML = `${columnName}`
+    //let myProject = this.project
+    let cId=columnId
+    let editColumnFn = function (ev) {
+      console.log("editColumnHref event Listener fired ")
+      ev.stopPropagation();
+      const column = new ColumnDialog()
+      column.modify(cId);
+    }
+    href.addEventListener('click', editColumnFn, { once: true });
+    return (href)
+  }
+
+  export { buildProjectLink, buildSwimlaneLink , buildColumnLink }

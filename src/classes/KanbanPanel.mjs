@@ -6,7 +6,7 @@ import { ProjectDialog } from "./ProjectDialog.mjs"
 import { SwimlaneDialog } from "./SwimlaneDialog.mjs"
 import { ColumnDialog } from "./ColumnDialog.mjs"
 import { TaskDialog } from "./TaskDialog.mjs"
-import { buildProjectLink, buildSwimlaneLink } from "../utils/linkBuilder.mjs"
+import { buildProjectLink, buildSwimlaneLink, buildColumnLink } from "../utils/linkBuilder.mjs"
 import { Ref } from "./Ref.mjs"
 
 class KanbanPanel {
@@ -154,6 +154,8 @@ class KanbanPanel {
     kanbanDiv.classList.add("kanban-board")
     kanbanDiv.setAttribute("id", project.id)
     kanbanDiv.setAttribute("data-projectid", project.id)
+    //const projectLink = buildProjectLink(project.id, project.name)
+
     Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
       if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
       // create kanban-swimlane
@@ -165,8 +167,11 @@ class KanbanPanel {
       kSwimlaneHeaderDiv.classList.add("swimlane-header")
       // create fill-in header
       const kSwimlaneDivH2 = document.createElement('h2')
+      const projectLink = buildProjectLink(project.id, project.name)
       const swimlaneLink = buildSwimlaneLink(swimlane.id, swimlane.name)
-      kSwimlaneDivH2.innerHTML = `${project.name}>`
+      kSwimlaneDivH2.innerHTML = `${project.name}::`
+      //console.log(this.projectLink)
+      kSwimlaneDivH2.appendChild(projectLink)
       kSwimlaneDivH2.appendChild(swimlaneLink)
 
       kSwimlaneHeaderDiv.appendChild(kSwimlaneDivH2)
@@ -190,8 +195,10 @@ class KanbanPanel {
         kColumnHeaderDiv.classList.add("kanban-column-header")
 
         // fillin column header
+        const columnLink = buildColumnLink(col.id, col.name)
         const kColumnHeaderDivH3 = document.createElement('h3')
-        kColumnHeaderDivH3.innerHTML = col.name
+        //kColumnHeaderDivH3.innerHTML = col.name
+        kColumnHeaderDivH3.appendChild(columnLink)
         const kCounterDiv = document.createElement('span')
         kCounterDiv.classList.add("kanban-count")
         kCounterDiv.setAttribute("id", `counter:${project.id}:${swimlane.id}:_:${col.id}`)
