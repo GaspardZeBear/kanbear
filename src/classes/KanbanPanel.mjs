@@ -73,23 +73,6 @@ class KanbanPanel {
   }
   
   //------------------------------------------------------------------------
-  XbuildProjectLink(projectId, projectName) {
-    const href = document.createElement("a")
-    href.setAttribute("id", `projectHref_${projectId}`)
-    href.setAttribute("href", "javascript:void(0)")
-    href.innerHTML = `${projectName}`
-    let myProject = this.project
-    let editProjectFn = function (ev) {
-      console.log("editProjectHref event Listener fired ")
-      ev.stopPropagation();
-      const project = new ProjectDialog()
-      project.modify(myProject.id);
-    }
-    href.addEventListener('click', editProjectFn, { once: true });
-    return (href)
-  }
-
-  //------------------------------------------------------------------------
   buildAddTaskButton(swimlaneId,columnId) {
     const addTaskButton = document.createElement('button')
     addTaskButton.classList.add("add-item-btn")
@@ -102,7 +85,7 @@ class KanbanPanel {
       console.log("addTaskButton event Listener fired <swimlane>", swimlaneId, "<column>", columnId)
       ev.stopPropagation();
       const task = new TaskDialog('task')
-      task.create(swimlaneId, columnId);
+      task.create({swimlaneId:swimlaneId, columnId:columnId});
     }
     addTaskButton.addEventListener('click', addTaskFn, { once: true });
     return (addTaskButton)

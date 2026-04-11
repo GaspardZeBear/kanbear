@@ -111,7 +111,7 @@ class Task extends KanbearEntity {
           console.log("editTaskHref event Listener fired <swimlane>",myTask.swimlane_id,"<column>",myTask.column_id)
           ev.stopPropagation();
           const task = new TaskDialog()
-          task.modify(myTask.id);
+          task.modify({taskId:myTask.id});
         }
         href.addEventListener('click', editTaskFn, { once: true });
  
