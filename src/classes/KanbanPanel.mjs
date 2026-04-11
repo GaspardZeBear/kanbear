@@ -45,7 +45,7 @@ class KanbanPanel {
       console.log("addSwimlaneButton event Listener fired")
       ev.stopPropagation();
       const swimlane = new SwimlaneDialog('swimlane')
-      swimlane.create(projectId);
+      swimlane.create({projectId:projectId});
     }
     //removeEventListener("click", addSwimlaneFn)
     addSwimlaneButton.addEventListener('click', addSwimlaneFn, { once: true });

@@ -43,15 +43,35 @@ class SwimlaneDialog extends Dialog {
 
 
     //----------------------------------------------------------------------------
-    create(projectId) {
+    Xcreate(projectId) {
         console.log("Swimlane.create() dialog, for  <projectId>",projectId)
         this.projectId = projectId
         this.createDialog(this.save.bind(this))
         this.showDialog("Create swimlane")
     }
 
+    //----------------------------------------------------------------------------
+    subCreate(params) {
+        console.log("SwimlanDialog.create() dialog, for  <projectId>",params)
+        this.projectId = params["projectId"]
+    }
+
     //-------------------------------------------------------------------------------------
-    async save() {
+    async subSave(sw) {
+        console.log("SwimlaneDialog.subSave() <name>", swimlaneForm.swimlaneName.value)
+        //const pr = await KanbearEntityFactory.generate('project')
+        sw.setData("project_id", this.projectId)
+        this.fillDbFromForm(sw)
+    }
+
+    //----------------------------------------------------------------------------
+    async subModify(params) {
+        console.log("SwimlaneDialog.subModify() <params>", params)
+        return( params["swimlaneId"])
+    }
+
+    //-------------------------------------------------------------------------------------
+    async Xsave() {
         console.log("Swimlane.save() dialog, <name>", swimlaneForm.swimlaneName.value)
         const sw = await KanbearEntityFactory.generate('swimlane')
         sw.setData("project_id", this.projectId)
@@ -67,7 +87,7 @@ class SwimlaneDialog extends Dialog {
     }
 
     //----------------------------------------------------------------------------
-    async modify(swimlaneId) {
+    async Xmodify(swimlaneId) {
         this.swimlaneId = swimlaneId
         this.swimlane = new Swimlane({ id: swimlaneId })
         try {
@@ -84,7 +104,7 @@ class SwimlaneDialog extends Dialog {
     }
 
     //-------------------------------------------------------------------------------------
-    async saveModify() {
+    async XsaveModify() {
         console.log("SwimlaneDialog.saveModify()")
         this.fillDbFromForm(this.swimlane)
         try {
