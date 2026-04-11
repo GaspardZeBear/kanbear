@@ -37,7 +37,7 @@ class LinkCounter {
       console.log("editSwimlaneHref event Listener fired ")
       ev.stopPropagation();
       const swimlane = new SwimlaneDialog()
-      swimlane.modify(sId);
+      swimlane.modify({swimlaneId:sId});
     }
     href.addEventListener('click', editSwimlaneFn, { once: true });
     return (href)
@@ -56,7 +56,7 @@ class LinkCounter {
       console.log("editColumnHref event Listener fired ")
       ev.stopPropagation();
       const column = new ColumnDialog()
-      column.modify(cId);
+      column.modify({columnId:cId});
     }
     href.addEventListener('click', editColumnFn, { once: true });
     return (href)

@@ -65,12 +65,13 @@ class KanbanPanel {
       console.log("addColumnButton event Listener fired")
       ev.stopPropagation();
       const column = new ColumnDialog('column')
-      column.create(projectId);
+      column.create({projectId:projectId});
     }
     //removeEventListener("click", addColumnFn)
     addColumnButton.addEventListener('click', addColumnFn, { once: true });
     return (addColumnButton)
   }
+  
   //------------------------------------------------------------------------
   XbuildProjectLink(projectId, projectName) {
     const href = document.createElement("a")
