@@ -19,7 +19,7 @@ class LinkCounter {
       console.log("editProjectHref event Listener fired ")
       ev.stopPropagation();
       const project = new ProjectDialog()
-      project.modify(pId);
+      project.modify({projectId:pId});
     }
     href.addEventListener('click', editProjectFn, { once: true });
     return (href)
@@ -28,7 +28,8 @@ class LinkCounter {
   //----------------------------------------------------------------------------------
   function buildSwimlaneLink(swimlaneId, swimlaneName) {
     const href = document.createElement("a")
-    href.setAttribute("id", `swimlaneHref_${swimlaneId}`)
+    LinkCounter.counter++
+    href.setAttribute("id", `swimlaneHref_${swimlaneId}_${LinkCounter.counter}`)
     href.setAttribute("href", "javascript:void(0)")
     href.innerHTML = `${swimlaneName}`
     let sId=swimlaneId
@@ -45,7 +46,8 @@ class LinkCounter {
   //----------------------------------------------------------------------------------
   function buildColumnLink(columnId, columnName) {
     const href = document.createElement("a")
-    href.setAttribute("id", `columnHref_${columnId}`)
+    LinkCounter.counter++
+    href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
     href.setAttribute("href", "javascript:void(0)")
     href.innerHTML = `${columnName}`
     //let myProject = this.project

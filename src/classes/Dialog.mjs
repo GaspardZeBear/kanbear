@@ -1,4 +1,5 @@
 import { KanbearEntity } from "./KanbearEntity.mjs"
+import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 import { sendEvent } from "../utils/sendEvent.mjs"
 
 class Dialog {
@@ -10,15 +11,73 @@ class Dialog {
         this.kind=kind
         this.upperFirstKind=this.kind.charAt(0).toUpperCase() + this.kind.slice(1)
         this.dialog = null
-        
-        //document.getElementById("dialogMessage").innerHTML="blal"
-        //console.log("Dialog clickListeners before",Dialog.clickListeners)
-       // for ( let listenerFunction of Dialog.clickListeners) {
-        //    console.log("Dialog clickListeners remove ",listenerFunction)
-        //    removeEventListener("click",listenerFunction)
-        //}
-        //Dialog.clickListeners=[]
-        //console.log("Dialog clickListeners after",Dialog.clickListeners)
+    }
+
+    //----------------------------------------------------------------------------
+    async create(params={}) {
+        //this.workspaceId = workspaceId
+        this.params=params
+        await this.subCreate(params)
+        this.createDialog(this.save.bind(this))
+        this.showDialog("Create New "+this.kind)
+    }
+
+    //-------------------------------------------------------------------------------------
+    async save() {
+        console.log("Dialog.save() dialog, <name>")
+        const entity = await KanbearEntityFactory.generate(this.kind)
+        await this.subSave(entity)
+        //pr.setData("workspace_id", this.workspaceId)
+        //this.fillDbFromForm(pr)
+        try {
+            let resp = await entity.create()
+            this.closeDialog()
+            let eventId=`${this.kind}Id`
+            sendEvent(`${this.kind}Created`, { [eventId] : entity.getId() })
+        } catch (error) {
+            this.setMessage(error.cause?.msg)
+            this.create(this.params)
+        }
+    }
+
+    //----------------------------------------------------------------------------
+    async modify(params) {
+        this.params=params
+        //this.projectId = projectId
+        try {
+            //this.project = new Project({ id: projectId })
+            this.entity = await KanbearEntityFactory.generate(this.kind)
+            let id=await this.subModify(params)
+            this.entity.setId(id)
+            this.entity.project = await this.entity.get()
+            
+            await this.fillFormFromDb(this.entity.project)
+            console.log("Dialog.modify() <entity>", this.entity)
+            //console.log("Dialog.modify() <ent>", this.ent)
+            this.createDialog(this.saveModify.bind(this))
+            this.showDialog("Modify " + this.kind )
+        } catch (error) {
+            console.log(error)
+            this.setMessage(error.cause?.msg)
+            //this.modify(this.params)
+        }
+    }
+
+    //-------------------------------------------------------------------------------------
+    async saveModify() {
+        console.log("Dialog.saveModify() <this.ent>",this.ent)
+        this.fillDbFromForm(this.entity)
+        try {
+            let resp = await this.entity.patch({})
+            this.closeDialog()
+            //sendEvent("projectModified", { projectId: this.project.getId() })
+            let eventId=`${this.kind}Id`
+            sendEvent(`${this.kind}Modified`, { [eventId] : this.entity.getId() })
+        } catch (error) {
+            console.log("Dialog.saveModify() error", error)
+            this.setMessage(error.cause?.msg)
+            this.modify(this.params)
+        }
     }
 
     //------------------------------------------------------------------------------------------
