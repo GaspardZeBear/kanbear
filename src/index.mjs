@@ -2,6 +2,7 @@
 //import { renderTable } from './report.mjs'
 //import { KanboardFilter } from './classes/KanboardFilter.mjs'
 import { KanbanPanel } from './classes/KanbanPanel.mjs';
+import { KanbearEntityFactory } from './classes/KanbearEntityFactory.mjs';
 import { KanboardListPanel } from './classes/KanboardListPanel.mjs';
 import { KanbearMigrator } from './classes/KanbearMigrator.mjs';
 import { KanbearProjectCleanor } from './classes/KanbearProjectCleanor.mjs';
@@ -20,6 +21,20 @@ document.addEventListener("workspaceCreated", (ev) => {
     console.log("workspaceCreated listener fired <ev>", ev)
     buildWorkspacesSelectBox()
 })
+
+document.addEventListener("workspaceModified", async (ev) => {
+    console.log("workspaceModified listener fired <ev>", ev)
+    const wsEntity = await KanbearEntityFactory.generate('workspace')
+    wsEntity.setId(ev.detail.workspaceId)
+    let ws=await wsEntity.get()
+    console.log("workspaceModified ws",ws)
+    //document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
+    let workspaceLink=buildWorkspaceLink(ws.id,ws.name)
+    document.getElementById("workspace").replaceChildren(workspaceLink)
+    buildWorkspacesSelectBox()
+})
+
+
 buildKanbearProjectsSelectBox()
 //document.querySelectorAll("projectCreated").addEventListener("projectCreated", (ev) => {
 document.addEventListener("projectCreated", async (ev) => {

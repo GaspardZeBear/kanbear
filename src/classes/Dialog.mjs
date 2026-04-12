@@ -73,7 +73,8 @@ class Dialog {
             this.closeDialog()
             //sendEvent("projectModified", { projectId: this.project.getId() })
             let eventId=`${this.kind}Id`
-            sendEvent(`${this.kind}Modified`, { [eventId] : this.entity.getId() })
+            let eventName=`${this.kind}Name`
+            sendEvent(`${this.kind}Modified`, { [eventId] : this.entity.getId(), [eventName] : this.entity.getName()  })
         } catch (error) {
             console.log("Dialog.saveModify() error", error)
             this.setMessage(error.cause?.msg)
