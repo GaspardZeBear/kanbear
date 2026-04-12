@@ -8,37 +8,65 @@
     <title>Kanbear</title>
     <link rel="stylesheet" href="src/assets/kanbear.css">
     <link rel="stylesheet" href="src/assets/kanban.css">
+    <link rel="stylesheet" href="src/assets/menu.css">
     <script type="module" src="src/index.mjs"></script>
     <!-- <script type="module" src="src/report.mjs"></script> -->
 </head>
 
 <body>
-    <div><b>Kanbear</b>&nbsp;<a id="kanboard" target="kanboard">kanboard</a></div>
+    <div>
+        <h1>Kanbear</h1>
+    </div>
+
+    <div class="topbar" id="workspaceAndProject">
+        <div id="kanbearWorkspacesDiv">
+        </div>
+        <div id="kanbearProjectsDiv">
+        </div>
+
+
+        <!-- https://www.pierre-giraud.com/html-css-apprendre-coder-cours/creation-menu-deroulant/ -->
+        <div id="dropdown">
+            <nav>
+                <ul>
+                    <li class="dropdown"><a href="#">People</a>
+                        <ul class="under">
+                            <li><a href="#">Users</a></li>
+                            <li><a href="#">Assignees</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown"><a href="#">Tags</a>
+                        <ul class="under">
+                            <li><a href="#">Tags</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown"><a href="#">Kanboard</a>
+                        <ul class="under">
+                            <li><a id="kanboard" target="kanboard">Open kanboard</a></li>
+                            <!-- <li><a href="#">Migrate</a></li> -->
+                            <li><span id="migrateFromKanboard">Migrate</span></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">About</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- <div class="conteneur">
+  <p>Du contenu sous le menu</p>
+</div>
+-->
+
     <!-- Filtres Regex -->
     <div class="filters">
         <!-- Filtres Regex -->
-
-
-        <div id="kanbearWorkspacesDiv" class="filter-group">
-        </div>
-
-        <div id="kanbearProjectsDiv" class="filter-group">
-        </div>
-
-        <!--
-        <div id="projectsDiv" class="filter-group">
-            <label for="projects">kanboard project</label>
-            <select name="project" id="projectsSelectBox">
-             </select>
-        </div>
-    -->
 
         <div class="filter-group">
             <label for="project">ProjectBoxFilter</label>
             <input type="text" id="projectFilter" placeholder=".*">
         </div>
-
-
         <div class="filter-group">
             <label for="swimLane">Swimlane</label>
             <input type="text" id="swimlaneFilter" placeholder=".*">
@@ -57,6 +85,8 @@
         </div>
 
     </div>
+
+
 
     <div class="workspace" id="workspace">
         <label for="workspace">Workspace</label>
@@ -205,7 +235,7 @@
                 <input type="text" id="taskNote" name="taskNote" />
             </div>
             <div id="taskAssigneeDiv">
-            <!--    <label for="assignee">Assignee: </label>
+                <!--    <label for="assignee">Assignee: </label>
                 <select id="taskAssignee" name="taskAssignee">
                     <option value="0">toto</option>
                     <option value="1">titi</option>

@@ -236,6 +236,15 @@ function getFiltersMap() {
     })
 }
 
+//------------------- migrate from kanboard to kanbear --------------------------------------
+function migrateFromKanboard() {
+     new KanbearMigrator('results', getFiltersMap()).migrate()
+}
+
+//------------------- migrate from kanboard to kanbear --------------------------------------
+document.getElementById('migrateFromKanboard').addEventListener('click', () => {
+    new KanbearMigrator('results', getFiltersMap()).migrate()
+});
 
 //------------------- migrate from kanboard to kanbear --------------------------------------
 document.getElementById('migrate').addEventListener('click', () => {
