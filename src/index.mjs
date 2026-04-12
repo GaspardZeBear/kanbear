@@ -12,6 +12,7 @@ import { selectBoxBuilder } from './utils/selectBoxBuilder.mjs'
 import { ProjectDialog } from './classes/ProjectDialog.mjs'
 import { WorkspaceDialog } from './classes/WorkspaceDialog.mjs'
 import { sendEvent } from './utils/sendEvent.mjs';
+import { buildWorkspaceLink } from './utils/linkBuilder.mjs';
 
 await Kontext.loadConfig()
 buildWorkspacesSelectBox()
@@ -158,6 +159,12 @@ async function buildWorkspacesSelectBox() {
         wss = wss0
     }
 
+    // as wss will be modified, let's keep a copy
+    let wssOrigin=[]
+    for (let i=0;i<wss.length;i++) {
+      wssOrigin[i]=wss[i]
+    }
+    console.log("wssOrigin init", wssOrigin)
 
     wss.unshift({ id: -1, name: '* Create new workspace' })
     let boxName = "kanbearWorkspaceSelectBox"
@@ -186,12 +193,24 @@ async function buildWorkspacesSelectBox() {
         //console.log("wss",e.wss)
         let box = document.getElementById("kanbearWorkspaceSelectBox")
 
+        
+        //let addedElementsCount=box.length-wssOrigin.length
+        console.log("wssOrigin in listener", wssOrigin)
+        const ws=wssOrigin.find( (element) => element.id == workspaceId)
+        
+        console.log("ws", ws)
+        document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
+        let workspaceLink=buildWorkspaceLink(ws.id,ws.name)
+        document.getElementById("workspace").replaceChildren(workspaceLink)
+
         // Buggy !!? If lot of elements with value < 0!!
-        let index = workspaceId + 1
-        console.log("box index", index)
-        console.log("box", box)
-        console.log("box", box[index].innerText)
-        document.getElementById("workspace").innerHTML = box[index].innerText
+        //let index = workspaceId + 1
+        //console.log("box index", index)
+        //console.log("box", box)
+        //console.log("box", box[index].innerText)
+        //document.getElementById("workspace").innerHTML = box[index].innerText
+        
+
         buildKanbearProjectsSelectBox()
         console.log({ boxName }, e.target.value)
     });

@@ -87,21 +87,38 @@
     <div id="modal">
     </div>
 
+    <dialog id="assigneeDialog" closedby="any">
+        <h2 id="assigneeDialogTitle"></h2>
+        <div id="assigneeDialogMessage"></div>
+        <form id="assigneeForm" method="dialog">
+            <div id="assigneeNameDiv">
+                <label for="name">Assignee Name: </label>
+                <input type="text" id="assigneeName" name="assigneeName" />
+            </div>
+            <div id="assigneeDescriptionDiv">
+                <label for="assignee">Description: </label>
+                <input type="text" id="assigneeDescription" name="assigneeDescription" />
+            </div>
+            <button type="button" value="save" name="saveAssigneeBtn" id="saveAssigneeBtn">Save</button>
+            <button type="button" value="cancel" name="cancelAssigneeBtn" id="cancelAssigneeBtn">Cancel</button>
+        </form>
+    </dialog>
+
     <dialog id="workspaceDialog" closedby="any">
         <h2 id="workspaceDialogTitle"></h2>
         <div id="workspaceDialogMessage"></div>
         <form id="workspaceForm" method="dialog">
             <div id="workspaceNameDiv">
-                <label for="name">Project Name: </label>
-                <input type="text" id="workspaceName" name="name" />
+                <label for="name">Workspace Name: </label>
+                <input type="text" id="workspaceName" name="workspaceName" />
             </div>
             <div id="workspaceDescriptionDiv">
                 <label for="description">Description: </label>
-                <input type="text" id="workspaceDescription" name="description" />
+                <input type="text" id="workspaceDescription" name="workspaceDescription" />
             </div>
-            <div id="workspaceIs_openDiv">
-                <label for="is_open">Open </label>
-                <input type="checkbox" id="workspaceIs_open" checked />
+            <div id="workspaceIsOpenDiv">
+                <label for="isOpen">Open </label>
+                <input type="checkbox" id="workspaceIsOpen" checked />
             </div>
             <button type="button" value="save" name="saveWorkspaceBtn" id="saveWorkspaceBtn">Save</button>
             <button type="button" value="cancel" name="cancelWorkspaceBtn" id="cancelWorkspaceBtn">Cancel</button>
@@ -165,6 +182,8 @@
                 <label for="description">Description: </label>
                 <input type="text" id="columnDescription" name="column" />
             </div>
+            <div id="columnColorDiv">
+            </div>
             <button type="button" value="save" name="saveColumnBtn" id="saveColumnBtn">Save</button>
             <button type="button" value="cancel" name="cancelColumnBtn" id="cancelColumnBtn">Cancel</button>
         </form>
@@ -187,17 +206,18 @@
                 <input type="text" id="taskNote" name="taskNote" />
             </div>
             <div id="taskAssigneeDiv">
-                <label for="assignee">Assignee: </label>
+            <!--    <label for="assignee">Assignee: </label>
                 <select id="taskAssignee" name="taskAssignee">
                     <option value="0">toto</option>
                     <option value="1">titi</option>
                 </select>
+            -->
             </div>
             <div id="taskColorDiv">
             </div>
             <div id="taskIs_openDiv">
                 <label for="is_open">Open </label>
-                <input type="checkbox" id="taskIsOpen" name="taskIsOpen" value="1"/>
+                <input type="checkbox" id="taskIsOpen" name="taskIsOpen" value="1" />
             </div>
             <div id="taskDateDueDiv">
                 <label for="due">Due date</label>

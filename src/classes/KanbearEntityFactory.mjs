@@ -1,4 +1,5 @@
 import { ApiCaller } from "./ApiCaller.mjs"
+import { Assignee} from './Assignee.mjs'
 import { Column} from './Column.mjs'
 import { Project} from './Project.mjs'
 import { Swimlane} from './Swimlane.mjs'
@@ -9,6 +10,9 @@ class KanbearEntityFactory {
     //------------------------------------------------------------------------
     static async generate(entity) {
         switch (entity) {
+            case 'assignee': 
+            return new Assignee({})
+                break
             case 'column': 
             return new Column({})
                 break

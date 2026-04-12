@@ -2,10 +2,30 @@
 import { ProjectDialog} from '../classes/ProjectDialog.mjs'
 import { SwimlaneDialog } from '../classes/SwimlaneDialog.mjs'
 import { ColumnDialog } from '../classes/ColumnDialog.mjs'
+import { WorkspaceDialog } from '../classes/WorkspaceDialog.mjs'
 
 class LinkCounter {
   static counter=0
 }
+
+//------------------------------------------------------------------------
+  function buildWorkspaceLink(workspaceId, workspaceName) {
+    const href = document.createElement("a")
+    LinkCounter.counter++
+    //href.setAttribute("id", `projectHref_${projectId}_${LinkCounter.counter}`)
+    href.setAttribute("href", "javascript:void(0)")
+    href.innerHTML = `${workspaceName}`
+    let wId=workspaceId
+    let editWorkspaceFn = function (ev) {
+      console.log("editWorkspaceHref event Listener fired ")
+      ev.stopPropagation();
+      const workspace = new WorkspaceDialog()
+      workspace.modify({workspaceId:wId});
+    }
+    href.addEventListener('click', editWorkspaceFn, { once: true });
+    return (href)
+  }
+
 
   //------------------------------------------------------------------------
   function buildProjectLink(projectId, projectName) {
@@ -47,7 +67,7 @@ class LinkCounter {
   function buildColumnLink(columnId, columnName) {
     const href = document.createElement("a")
     LinkCounter.counter++
-    href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
+    //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
     href.setAttribute("href", "javascript:void(0)")
     href.innerHTML = `${columnName}`
     //let myProject = this.project
@@ -62,4 +82,4 @@ class LinkCounter {
     return (href)
   }
 
-  export { buildProjectLink, buildSwimlaneLink , buildColumnLink }
+  export { buildWorkspaceLink, buildProjectLink, buildSwimlaneLink , buildColumnLink }

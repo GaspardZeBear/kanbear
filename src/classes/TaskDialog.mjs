@@ -1,9 +1,11 @@
 import { Dialog } from './Dialog.mjs'
+import { AssigneeDialog } from './AssigneeDialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 import { Task } from './Task.mjs'
+import { Assignee } from './Assignee.mjs'
 import { sendEvent } from '../utils/sendEvent.mjs'
 import { fromDateTime, toDateTime } from '../utils/dateAndTime.mjs'
-import { colorBoxBuilder, buildColorSelectBox } from '../utils/selectBoxBuilder.mjs'
+import { selectBoxBuilder, buildColorSelectBox } from '../utils/selectBoxBuilder.mjs'
 
 class TaskDialog extends Dialog {
 
@@ -22,6 +24,9 @@ class TaskDialog extends Dialog {
         taskForm.taskName.value = task.name
         taskForm.taskDescription.value = task.description
         taskForm.taskNote.value = task.note
+
+        await this.setAssignees(task)
+
         let dt = fromDateTime(task.date_due)
         taskForm.taskDateDue.value = dt.date
         taskForm.taskTimeDue.value = dt.time
@@ -30,6 +35,36 @@ class TaskDialog extends Dialog {
         if (task.is_open > 0) {
             document.getElementById("taskIsOpen").setAttribute("checked", "")
         }
+    }
+
+    //----------------------------------------------------------------------------
+    async setAssignees() {
+        let ass = await Assignee.getAll('assignees')
+        ass.unshift({ id: -1, name: '* Create new assignee' })
+        let boxName = "kanbearAssigneeSelectBox"
+        let boxParams = {
+            domId: boxName,
+            boxLabel: "assignee",
+            items: ass,
+            labelText: "assignee",
+            klass: "filter-group",
+            //headItems:[['* Create new workspace',-1]]
+        }
+        let asDiv = await selectBoxBuilder(boxParams)
+        console.log("TaskDialog.fillFormFronDb() <asDiv>", asDiv)
+        document.getElementById("taskAssigneeDiv").replaceChildren(asDiv)
+        document.getElementById(boxName).addEventListener('change', async (e) => {
+            let assigneeId = parseInt(e.target.value)
+            if (assigneeId == -1) {
+                //let newProject =new ProjectDialog("create",workspaceId)
+                let newAssignee = new AssigneeDialog()
+                newAssignee.create()
+                return
+            }
+            if (assigneeId < 0) {
+                return
+            }
+        })
     }
 
     //----------------------------------------------------------------------------
@@ -59,6 +94,7 @@ class TaskDialog extends Dialog {
         //let taskColor = await this.buildColorSelectBox()
         let taskColor = await buildColorSelectBox('', 'taskColor', 'Task Color')
         document.getElementById("taskColorDiv").replaceChildren(taskColor)
+        await this.setAssignees()
     }
 
     //-------------------------------------------------------------------------------------

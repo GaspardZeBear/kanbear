@@ -49,9 +49,10 @@ class Dialog {
             this.entity = await KanbearEntityFactory.generate(this.kind)
             let id=await this.subModify(params)
             this.entity.setId(id)
-            this.entity.project = await this.entity.get()
+            console.log("Dialog.modify() this.entity",this.entity)
+            this.entity[this.kind] = await this.entity.get()
             
-            await this.fillFormFromDb(this.entity.project)
+            await this.fillFormFromDb(this.entity[this.kind])
             console.log("Dialog.modify() <entity>", this.entity)
             //console.log("Dialog.modify() <ent>", this.ent)
             this.createDialog(this.saveModify.bind(this))

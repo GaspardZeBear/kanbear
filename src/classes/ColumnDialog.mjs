@@ -2,6 +2,8 @@ import { Dialog } from './Dialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 import { sendEvent } from '../utils/sendEvent.mjs'
 import { Column } from './Column.mjs'
+import { selectBoxBuilder, colorBoxBuilder, buildColorSelectBox } from '../utils/selectBoxBuilder.mjs'
+
 
 class ColumnDialog extends Dialog {
 
@@ -16,6 +18,8 @@ class ColumnDialog extends Dialog {
         console.log("columnDialog.fillFormFromDb() column>", column)
         columnForm.columnName.value = column.name
         columnForm.columnDescription.value = column.description
+        let columnColor = await buildColorSelectBox(column.color, 'columnColor', 'Column Color')
+        document.getElementById("columnColorDiv").replaceChildren(columnColor)
     }
 
     //----------------------------------------------------------------------------
@@ -23,6 +27,8 @@ class ColumnDialog extends Dialog {
         column.setData("name", columnForm.columnName.value)
         column.setData("description", columnForm.columnDescription.value)
         column.setName(columnForm.columnName.value)
+        let color = columnForm.columnColor.value < 0 ? "white" : columnForm.columnColor.value
+        column.setData("color", color)
         column.setDescription(columnForm.columnDescription.value)
     }
 
