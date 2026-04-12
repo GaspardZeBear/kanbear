@@ -134,3 +134,9 @@ th {
     padding: 8px;
     box-sizing: border-box;
 }
+
+.workspace {
+    font-size: 19px;
+    font-weight: bold;
+    background-color : lightgreen;
+}

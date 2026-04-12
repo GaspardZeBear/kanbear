@@ -30,7 +30,7 @@ class AssigneeDialog extends Dialog {
 
     //----------------------------------------------------------------------------
     subCreate(params) {
-        console.log("AssigneeDialog.create() dialog, for  <projectId>",params)
+        console.log("AssigneeDialog.create() dialog, for  <params>",params)
         //this.projectId = params["projectId"]
     }
 

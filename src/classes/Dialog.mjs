@@ -24,7 +24,7 @@ class Dialog {
 
     //-------------------------------------------------------------------------------------
     async save() {
-        console.log("Dialog.save() dialog, <name>")
+        console.log("Dialog.save() dialog, <kind>",this.kind)
         const entity = await KanbearEntityFactory.generate(this.kind)
         await this.subSave(entity)
         //pr.setData("workspace_id", this.workspaceId)
@@ -34,7 +34,9 @@ class Dialog {
             this.closeDialog()
             let eventId=`${this.kind}Id`
             sendEvent(`${this.kind}Created`, { [eventId] : entity.getId() })
+            console.log("Dialog.save() <sendEvent>",`${this.kind}Created`)
         } catch (error) {
+            console.log("Dialog.save() <error>",error)
             this.setMessage(error.cause?.msg)
             this.create(this.params)
         }
@@ -77,6 +79,7 @@ class Dialog {
             // Name does not work !!!
             let eventName=`${this.kind}Name`
             sendEvent(`${this.kind}Modified`, { [eventId] : this.entity.getId(), [eventName] : this.entity.getName()  })
+            console.log("Dialog.save() <sendEvent>",`${this.kind}Modified`)
         } catch (error) {
             console.log("Dialog.saveModify() error", error)
             this.setMessage(error.cause?.msg)

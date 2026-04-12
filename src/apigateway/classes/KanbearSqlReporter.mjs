@@ -12,6 +12,7 @@ class KanbearSqlReporter {
     this.db = db
     this.PCSTResp = []
     this.usersMap = {}
+    this.assigneesMap = {}
     if (runOnCreate) {
       this.run()
     }
@@ -114,7 +115,28 @@ class KanbearSqlReporter {
     console.log("KanbearSqlReporter.callAfterUsers() <params>", params)
 
     for (let row of params) {
-      this.usersMap[row.uId] = { name: row.uName, username: row.uUsername }
+      this.usersMap[row.uId] = { name: row.uName}
+    }
+    //return (usersMap)
+  }
+  
+  //-----------------------------------------------------
+  async selectAssignees() {
+    console.log("KanbearSqlReporter.selectAssignees()")
+    let reqAssignees = `select a.id aId,a.name aName from assignees as a`
+    //let usersMap = { '0': 'nobody' }
+    db.all(reqAssignees, [], this.callAfterAssignees.bind(this));
+  }
+
+
+  //--------------------------------------------------------
+  callAfterAssignees(err, httpCode, params) {
+    console.log("KanbearSqlReporter.callAfterAssignees() <err>", err)
+    console.log("KanbearSqlReporter.callAfterAssignees() <httpCode>", httpCode)
+    console.log("KanbearSqlReporter.callAfterAssignees() <params>", params)
+
+    for (let row of params) {
+      this.assigneesMap[row.aId] = { name: row.aName }
     }
     //return (usersMap)
   }
@@ -127,7 +149,8 @@ class KanbearSqlReporter {
     const cPromises = this.selectC(projectId)
     //console.log("<pcstPromises>", pcstPromises)
     const usersPromise = this.selectUsers()
-    let [pst, pc, usersMap] = await Promise.all([pstPromises, cPromises, usersPromise])
+    const assigneesPromise = this.selectAssignees()
+    let [pst, pc, usersMap,assigneesMap] = await Promise.all([pstPromises, cPromises, usersPromise,assigneesPromise])
 
     //console.log("<pcst>", this.PSTResp)
     //-- turn into table
@@ -142,6 +165,7 @@ class KanbearSqlReporter {
         projectsMap[row.pId].columns = {}
         projectsMap[row.pId].tags = {}
         projectsMap[row.pId].users = this.usersMap
+        projectsMap[row.pId].assignees = this.assigneesMap
       }
 
       if (row.sId == null) {
@@ -167,7 +191,7 @@ class KanbearSqlReporter {
         date_moved: row.tMoved,
         date_due: row.tDue,
         color: row.tColor,
-        owner_id: row.tAssigneeId
+        assignee_id: row.tAssigneeId
       }
     }
     //console.log("pc", pc)
