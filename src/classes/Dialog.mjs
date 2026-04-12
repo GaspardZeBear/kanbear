@@ -66,13 +66,15 @@ class Dialog {
 
     //-------------------------------------------------------------------------------------
     async saveModify() {
-        console.log("Dialog.saveModify() <this.ent>",this.ent)
+        console.log("Dialog.saveModify() <this.entity>",this.entity)
         this.fillDbFromForm(this.entity)
         try {
             let resp = await this.entity.patch({})
             this.closeDialog()
             //sendEvent("projectModified", { projectId: this.project.getId() })
             let eventId=`${this.kind}Id`
+            
+            // Name does not work !!!
             let eventName=`${this.kind}Name`
             sendEvent(`${this.kind}Modified`, { [eventId] : this.entity.getId(), [eventName] : this.entity.getName()  })
         } catch (error) {

@@ -207,25 +207,14 @@ async function buildWorkspacesSelectBox() {
         }
         //console.log("wss",e.wss)
         let box = document.getElementById("kanbearWorkspaceSelectBox")
-
-        
+       
         //let addedElementsCount=box.length-wssOrigin.length
         console.log("wssOrigin in listener", wssOrigin)
         const ws=wssOrigin.find( (element) => element.id == workspaceId)
-        
         console.log("ws", ws)
         document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
         let workspaceLink=buildWorkspaceLink(ws.id,ws.name)
         document.getElementById("workspace").replaceChildren(workspaceLink)
-
-        // Buggy !!? If lot of elements with value < 0!!
-        //let index = workspaceId + 1
-        //console.log("box index", index)
-        //console.log("box", box)
-        //console.log("box", box[index].innerText)
-        //document.getElementById("workspace").innerHTML = box[index].innerText
-        
-
         buildKanbearProjectsSelectBox()
         console.log({ boxName }, e.target.value)
     });

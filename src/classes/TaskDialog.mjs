@@ -44,9 +44,9 @@ class TaskDialog extends Dialog {
         let boxName = "kanbearAssigneeSelectBox"
         let boxParams = {
             domId: boxName,
-            boxLabel: "assignee",
+            boxLabel: "taskAssignee",
             items: ass,
-            labelText: "assignee",
+            labelText: "taskAssignee",
             klass: "filter-group",
             //headItems:[['* Create new workspace',-1]]
         }
@@ -75,6 +75,8 @@ class TaskDialog extends Dialog {
         task.setData("note", taskForm.taskNote.value)
         let color = taskForm.taskColor.value < 0 ? "white" : taskForm.taskColor.value
         task.setData("color", color)
+        let assignee = taskForm.taskAssignee.value < 0 ? "" : taskForm.taskAssignee.value
+        task.setData("assignee_id", assignee)
         task.setName(taskForm.taskName.value)
         task.setDescription(taskForm.taskDescription.value)
         //task.setOpen(taskForm.taskIsOpen.value)
