@@ -126,8 +126,8 @@ class KanbanPanel {
     resultTitle.appendChild(resultTitleProject)
 
     const elementHeader=`${this.htmlElement}Header`
-    //document.getElementById(this.htmlElement).replaceChildren(resultTitle)
     document.getElementById(elementHeader).replaceChildren(resultTitle)
+    document.getElementById(this.htmlElement).replaceChildren()
 
     this.buildKanbanDivsForProject(this.project)
     //this.buildkColumnsQuerySelectors(this.projects[0])
@@ -163,8 +163,8 @@ class KanbanPanel {
       const separator1=document.createElement('span')
       separator1.innerHTML=' Swimlane '
       //console.log(this.projectLink)
-      kSwimlaneDivH2.appendChild(separator0)
-      kSwimlaneDivH2.appendChild(projectLink)
+      //kSwimlaneDivH2.appendChild(separator0)
+      //kSwimlaneDivH2.appendChild(projectLink)
       kSwimlaneDivH2.appendChild(separator1)
       kSwimlaneDivH2.appendChild(swimlaneLink)
 

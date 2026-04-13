@@ -73,15 +73,17 @@ class KanboardListPanel {
     const result = document.getElementById(this.htmlElement);
     //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
     let resultTitle = document.createElement('h2')
-    resultTitle.innerHTML = `Projects list filtered by ...`
-    document.getElementById(this.htmlElement).replaceChildren(resultTitle)
+    resultTitle.innerHTML = `Projects list filtered by .....`
+    const elementHeader=`${this.htmlElement}Header`
+    document.getElementById(this.htmlElement).replaceChildren()
+    document.getElementById(elementHeader).replaceChildren(resultTitle)
     //  document.body.appendChild(dueShiftButton)
     //result.replaceChildren(this.buttons['dueShift'])
     result.appendChild(this.buttons['dueShift'])
     result.appendChild(this.buttons['move'])
     result.appendChild(this.buttons['close'])
     result.appendChild(this.table)
-    this.setPopup()
+    //this.setPopup()
   }
 
   //-----------------------------------------------------------------

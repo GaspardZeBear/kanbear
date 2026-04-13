@@ -20,7 +20,12 @@ class KanbearMigrator {
     this.table = undefined
     let resultTitle = document.createElement('h2')
     resultTitle.innerHTML = `Migrating from kanboard`
-    document.getElementById(this.htmlElement).replaceChildren(resultTitle)
+    //document.getElementById(this.htmlElement).replaceChildren(resultTitle)
+
+    const elementHeader = `${this.htmlElement}Header`
+    //document.getElementById(this.htmlElement).replaceChildren(resultTitle)
+    document.getElementById(elementHeader).replaceChildren(resultTitle)
+    document.getElementById(this.htmlElement).replaceChildren()
   }
 
   //----------------------------------------------------------------
@@ -225,7 +230,7 @@ class KanbearMigrator {
     log(logDiv, `Project envelop created `, pr)
     console.log(`Project envelop created `, pr)
 
-    
+
     log(logDiv, "Waiting for columns")
     console.log("Waiting for columns")
     const newColumnsId = await this.createColumns(pr)
@@ -249,7 +254,7 @@ class KanbearMigrator {
           ta.setName(task.name)
           ta.setDescription(task.description)
           ta.setData("position", task.position)
-          let swName=this.project.swimlanes[task.swimlane_id].name
+          let swName = this.project.swimlanes[task.swimlane_id].name
           ta.setData("swimlane_id", newSwimlanesId[swName])
           console.log(tKey, "source project cols", this.project.columns)
           console.log(tKey, "source task.column_id=", task.column_id)
@@ -275,7 +280,7 @@ class KanbearMigrator {
 
 
     log(logDiv, "Project migrated")
-    
+
     document.getElementById(this.htmlElement).appendChild(logDiv)
     const projectCreatedEvent = new CustomEvent("projectCreated", {
       detail: { projectId: pr.getId() },
