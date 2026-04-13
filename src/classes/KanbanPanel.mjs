@@ -125,7 +125,9 @@ class KanbanPanel {
     //resultTitle.appendChild(resultTitleWorkspace)
     resultTitle.appendChild(resultTitleProject)
 
-    document.getElementById(this.htmlElement).replaceChildren(resultTitle)
+    const elementHeader=`${this.htmlElement}Header`
+    //document.getElementById(this.htmlElement).replaceChildren(resultTitle)
+    document.getElementById(elementHeader).replaceChildren(resultTitle)
 
     this.buildKanbanDivsForProject(this.project)
     //this.buildkColumnsQuerySelectors(this.projects[0])
