@@ -247,9 +247,9 @@ document.getElementById('migrateFromKanboard').addEventListener('click', () => {
 });
 
 //------------------- migrate from kanboard to kanbear --------------------------------------
-document.getElementById('migrate').addEventListener('click', () => {
-    new KanbearMigrator('results', getFiltersMap()).migrate()
-});
+//document.getElementById('migrate').addEventListener('click', () => {
+//    new KanbearMigrator('results', getFiltersMap()).migrate()
+//});
 
 
 //------------------- showDetails --------------------------------------

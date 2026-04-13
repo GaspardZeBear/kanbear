@@ -8,6 +8,7 @@ async function selectBoxBuilder(params) {
   let labelText = params.labelText
   let klass = params.klass
   let selected = params.selected
+  let selectedOption = params.selectedOption
   ////"filter-group") {
 
   console.log("selectBoxBuilder", items)
@@ -32,6 +33,9 @@ async function selectBoxBuilder(params) {
     console.log(item)
     const option = document.createElement('option')
     option.setAttribute("value", item.id)
+    if (item.id == selectedOption) {
+      option.setAttribute("selected", "")
+    }
     if (item.name == selected) {
       option.setAttribute("selected", "")
     }

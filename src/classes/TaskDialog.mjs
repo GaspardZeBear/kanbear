@@ -38,9 +38,9 @@ class TaskDialog extends Dialog {
     }
 
     //----------------------------------------------------------------------------
-    async setAssignees() {
+    async setAssignees(task) {
         let ass = await Assignee.getAll('assignees')
-        ass.unshift({ id: -1, name: '* Create new assignee' })
+        //ass.unshift({ id: -1, name: '* Create new assignee' })
         let boxName = "kanbearAssigneeSelectBox"
         let boxParams = {
             domId: boxName,
@@ -48,6 +48,7 @@ class TaskDialog extends Dialog {
             items: ass,
             labelText: "taskAssignee",
             klass: "filter-group",
+            selectedOption: task.assignee_id
             //headItems:[['* Create new workspace',-1]]
         }
         let asDiv = await selectBoxBuilder(boxParams)
@@ -55,12 +56,14 @@ class TaskDialog extends Dialog {
         document.getElementById("taskAssigneeDiv").replaceChildren(asDiv)
         document.getElementById(boxName).addEventListener('change', async (e) => {
             let assigneeId = parseInt(e.target.value)
+            /*
             if (assigneeId == -1) {
                 //let newProject =new ProjectDialog("create",workspaceId)
                 let newAssignee = new AssigneeDialog()
                 newAssignee.create()
                 return
             }
+                */
             if (assigneeId < 0) {
                 return
             }
