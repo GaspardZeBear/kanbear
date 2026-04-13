@@ -80,7 +80,8 @@ class KanbanPanel {
     addTaskButton.setAttribute("id", `addTaskButton_${swimlaneId}_${columnId}`)
     addTaskButton.setAttribute("data-swimlane-id", swimlaneId)
     addTaskButton.setAttribute("data-column-id", columnId)
-    addTaskButton.innerHTML = "+\u{1F3CB}"
+    //addTaskButton.innerHTML = "+\u{1F3CB}"
+    addTaskButton.innerHTML = "+\u{1F0F5}"
 
     let addTaskFn = function (ev) {
       console.log("addTaskButton event Listener fired <swimlane>", swimlaneId, "<column>", columnId)
@@ -113,7 +114,7 @@ class KanbanPanel {
     resultTitleProject.appendChild(addSwimlaneButton)
     resultTitleProject.appendChild(addColumnButton)
     let titleProject = document.createElement("span")
-    titleProject.innerHTML = `Project `
+    titleProject.innerHTML = `\u{1F5C4}Project `
     resultTitleProject.appendChild(titleProject)
     resultTitleProject.appendChild(projectLink)
     let filters = document.createElement("span")
@@ -154,9 +155,15 @@ class KanbanPanel {
       const kSwimlaneDivH2 = document.createElement('h2')
       const projectLink = buildProjectLink(project.id, project.name)
       const swimlaneLink = buildSwimlaneLink(swimlane.id, swimlane.name)
-      kSwimlaneDivH2.innerHTML = `${project.name}::`
+      //kSwimlaneDivH2.innerHTML = `${project.name}::`
+      const separator0=document.createElement('span')
+      separator0.innerHTML=' Project '
+      const separator1=document.createElement('span')
+      separator1.innerHTML=' Swimlane '
       //console.log(this.projectLink)
+      kSwimlaneDivH2.appendChild(separator0)
       kSwimlaneDivH2.appendChild(projectLink)
+      kSwimlaneDivH2.appendChild(separator1)
       kSwimlaneDivH2.appendChild(swimlaneLink)
 
       kSwimlaneHeaderDiv.appendChild(kSwimlaneDivH2)

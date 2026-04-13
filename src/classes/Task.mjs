@@ -98,7 +98,7 @@ class Task extends KanbearEntity {
         //taskElement.style.setAttribute("background-color",this.task.color)
         //taskElement.style.setAttribute("style","italic")
 
-        //const dummyDiv = document.createElement("div")
+       
         const headerDiv = document.createElement("div")
         headerDiv.classList.add("kanban-item-header")
 
@@ -133,20 +133,36 @@ class Task extends KanbearEntity {
         tNote.innerHTML = `Note : ${note}`
 
         //headerDiv.appendChild(top)
+        const assignee = Kontext.getCurrentProject().assignees[this.task.assignee_id].name ?? "noAssignee"
+        const tAssignee = document.createElement("div")
+        tAssignee.classList.add("kanban-item-name")
+        tAssignee.innerHTML = `${assignee}`
+        
         
         headerDiv.appendChild(tDescription)
-        headerDiv.appendChild(tNote)
+        //headerDiv.appendChild(tNote)
+        headerDiv.appendChild(tAssignee)
 
 
-        // Strange behaviour : edit button clickable or not  !!!!!!!!!!!!!!!!!!!!!!!!!
-        // append editBtn to headerDiv Does not work : click listener not activatide 
-        //headerDiv.append(editBtn)
-        taskElement.appendChild(href)
+        // !!!!!!!!!!!!!!!!!!! Append link to headerDiv does not work !!!! 
+        // Must append it to taskElement
+        // //////:headerDiv.appendChild(href)
+        //taskElement.appendChild(href)
+
+        // let's try 
+        const topLineDiv = document.createElement("div")
+        topLineDiv.classList.add("kanban-item-topline")
+        topLineDiv.appendChild(href)
+        const dummyDiv = document.createElement("div")
+        dummyDiv.innerHTML="Open/close,Del,Comment"
+        topLineDiv.appendChild(dummyDiv)
+        taskElement.appendChild(topLineDiv)
+
+
+     
+
         taskElement.appendChild(headerDiv)
         taskElement.appendChild(tNote)
-        // append editBtn append to taskElement works
-   
-        //taskElement.appendChild(editBtn)
 
         taskElement.addEventListener('dragstart', (ev) => {
             console.log("dragstart")
