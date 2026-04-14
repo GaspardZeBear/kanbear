@@ -16,15 +16,9 @@
 <body>
 
     <div class="topbar" id="workspaceAndProject">
-        <div>
-            <h1>Kanbear&nbsp;&nbsp;</h1>
+        <div class="topbar-name">
+            <h1 style="margin-top: 0;">Kanbear</h1>
         </div>
-        <div id="kanbearWorkspacesDiv">
-        </div>
-        <div id="kanbearProjectsDiv">
-        </div>
-
-
         <!-- https://www.pierre-giraud.com/html-css-apprendre-coder-cours/creation-menu-deroulant/ -->
         <div id="dropdown">
             <nav>
@@ -37,7 +31,7 @@
                     </li>
                     <li class="dropdown"><a href="#">Tags</a>
                         <ul class="under">
-                            <li><a href="#">Tags</a></li>
+                            <li><a href="#">Tags management</a></li>
                         </ul>
                     </li>
                     <li class="dropdown"><a href="#">Kanboard</a>
@@ -62,20 +56,36 @@
         </div>
     </div>
 
-    <!-- <div class="conteneur">
-  <p>Du contenu sous le menu</p>
-</div>
--->
-
-    <!-- Filtres Regex -->
-    <div class="filters">
-        <!-- Filtres Regex -->
-        <div>
-            <h2>Filters&nbsp;&nbsp;</h2>
+ <!-- Working items -->
+    <div class="topbar">
+        <div class="topbar-name">
+            <h3 style="margin-top:0px">Working on</h3>
+        </div>
+        <div id="kanbearWorkspacesDiv">
+        </div>
+        <div id="kanbearProjectsDiv">
+        </div>
+        <div class="infos">
+            <b>Workspace</b>
+        </div>
+        <div class="infos" id="workspace">
+            <p>No selection</p>
+        </div>
+        <div class="infos">
+            <b>Status</b>
+        </div>
+        <div class="infos" id="message">
+        </div>
+    </div>
+  
+    <!-- Filtres Regexp -->
+    <div class="topbar">
+        <div class="topbar-name">
+            <h3 style="margin-top:0px">Filters</h3>
         </div>
 
         <div class="filter-group">
-            <label for="project">ProjectBoxFilter</label>
+            <label for="project">Project</label>
             <input type="text" id="projectFilter" placeholder=".*">
         </div>
         <div class="filter-group">
@@ -96,22 +106,6 @@
         </div>
 
     </div>
-
-
-    <div class="infos">
-        <div class="infos">
-            <b>Workspace</b>
-        </div>
-        <div class="infos" id="workspace">
-            <p>No selection</p>
-        </div>
-        <div class="infos">
-            <b>Status</b>
-        </div>
-        <div class="infos" id="message">
-        </div>
-    </div>
-
 
     <!-- Boutons d'Actions -->
     <div class="content">
@@ -289,6 +283,6 @@
         </form>
     </dialog>
 
-</body>
+    </body>
 
 </html>

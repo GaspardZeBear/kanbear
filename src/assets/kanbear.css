@@ -29,20 +29,28 @@ body {
 
 
 .topbar {
-    background: orange;
-    padding: 5px;
+    background: pink;
+    padding: 0px;
     border-radius: 5px;
-    margin-bottom: 20px;
+    margin-top:px;
+    margin-bottom: 5px;
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
 }
 
+.topbar-name {
+    width:10%;
+    background-color:greenyellow
+}
+
 .filter-group {
     background: lightblue;
     display: flex;
+        margin-top:0px;
+    margin-bottom: 0px;
     flex-direction: column;
-    gap: 3px;
+    gap: 1px;
 }
 
 label {
@@ -50,7 +58,7 @@ label {
 }
 
 input[type="text"] {
-    padding: 8px;
+    padding: 0px;
     border: 1px solid #ddd;
     border-radius: 4px;
 }

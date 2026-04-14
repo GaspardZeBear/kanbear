@@ -1,11 +1,11 @@
 /*Reset CSS*/
-/*
+
 *{
     margin: 0px;
     padding: 0px;
     font-family: Avenir, sans-serif;
 }
-    */
+
 
 nav{
     width: 800px;
@@ -17,6 +17,7 @@ nav{
 
 nav ul{
     list-style-type: none;
+    background-color: yellow;
 }
 
 nav ul li{
@@ -24,6 +25,7 @@ nav ul li{
     width: 20%;
     text-align: center;
     position: relative;
+    gap:1px;
 }
 
 nav ul::after{
@@ -49,8 +51,10 @@ nav a:hover{
     display: none;
     box-shadow: 0px 1px 2px #CCC;
     background-color: white;
+    gap : 1px;
     position: absolute;
-    width: 100%;
+    /* width: 100%; */
+    width: fit-content(200px);
     z-index: 1000;
 }
 nav > ul li:hover .under{
@@ -58,9 +62,11 @@ nav > ul li:hover .under{
 }
 .under li{
     float: none;
-    padding: 10px;
-    width: 100%;
+    padding: 1px;
+    gap : 1px;
+    width: fit-content(200px);
     text-align: left;
+    font-weight: normal;
     list-style-type: disc;
 }
 .under a{
@@ -71,12 +77,18 @@ nav > ul li:hover .under{
     border-bottom: none;
     background-color: RGBa(200,200,200,0.1);
 }
+
+.dropdown {
+ font-weight: bold;
+}
+
 .dropdown > a::after{
     content:" ▼";
     font-size: 12px;
+    font-weight: normal;
 }
 
-.conteneur{
+.Xconteneur{
   margin: 50px 20px;
   height: 1500px;
 }
