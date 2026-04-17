@@ -26,7 +26,7 @@
                     <li class="dropdown"><a href="#">People</a>
                         <ul class="under">
                             <li><a href="#">Users</a></li>
-                            <li><a href="#">Assignees</a></li>
+                            <li><a href="#" id="assigneePanel">Assignees</a></li>
                         </ul>
                     </li>
                     <li class="dropdown"><a href="#">Tags</a>
@@ -56,7 +56,7 @@
         </div>
     </div>
 
- <!-- Working items -->
+    <!-- Working items -->
     <div class="topbar">
         <div class="topbar-name">
             <h3 style="margin-top:0px">Working on</h3>
@@ -77,7 +77,7 @@
         <div class="infos" id="message">
         </div>
     </div>
-  
+
     <!-- Filtres Regexp -->
     <div class="topbar">
         <div class="topbar-name">
@@ -145,6 +145,14 @@
             <div id="assigneeDescriptionDiv">
                 <label for="assignee">Description: </label>
                 <input type="text" id="assigneeDescription" name="assigneeDescription" />
+            </div>
+            <div id="assigneeTelDiv">
+                <label for="assignee">Tel: </label>
+                <input type="text" id="assigneeTel" name="assigneeTel" />
+            </div>
+            <div id="assigneeEmailDiv">
+                <label for="assignee">Email: </label>
+                <input type="text" id="assigneeEmail" name="assigneeEmail" />
             </div>
             <button type="button" value="save" name="saveAssigneeBtn" id="saveAssigneeBtn">Save</button>
             <button type="button" value="cancel" name="cancelAssigneeBtn" id="cancelAssigneeBtn">Cancel</button>
@@ -283,6 +291,6 @@
         </form>
     </dialog>
 
-    </body>
+</body>
 
 </html>

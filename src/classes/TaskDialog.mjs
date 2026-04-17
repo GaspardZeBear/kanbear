@@ -48,7 +48,7 @@ class TaskDialog extends Dialog {
             items: ass,
             labelText: "taskAssignee",
             klass: "filter-group",
-            selectedOption: task.assignee_id
+            selectedOption: task?.task.assignee_id ?? ''
             //headItems:[['* Create new workspace',-1]]
         }
         let asDiv = await selectBoxBuilder(boxParams)

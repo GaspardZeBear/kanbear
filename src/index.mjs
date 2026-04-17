@@ -3,6 +3,7 @@
 //import { KanboardFilter } from './classes/KanboardFilter.mjs'
 import { KanbanPanel } from './classes/KanbanPanel.mjs';
 import { KanbearEntityFactory } from './classes/KanbearEntityFactory.mjs';
+import { KanbearAssigneePanel } from './classes/KanbearAssigneePanel.mjs';
 import { KanboardListPanel } from './classes/KanboardListPanel.mjs';
 import { KanbearMigrator } from './classes/KanbearMigrator.mjs';
 import { KanbearProjectCleanor } from './classes/KanbearProjectCleanor.mjs';
@@ -251,6 +252,10 @@ document.getElementById('migrateFromKanboard').addEventListener('click', () => {
 //    new KanbearMigrator('results', getFiltersMap()).migrate()
 //});
 
+//------------------- showDetails --------------------------------------
+document.getElementById('assigneePanel').addEventListener('click', () => {
+    new KanbearAssigneePanel('results', getFiltersMap()).render()
+});
 
 //------------------- showDetails --------------------------------------
 document.getElementById('showDetails').addEventListener('click', () => {

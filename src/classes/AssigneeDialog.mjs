@@ -18,12 +18,16 @@ class AssigneeDialog extends Dialog {
         console.log("AssigneeDialog.fillFormFromDb() column>", assignee)
         assigneeForm.assigneeName.value = assignee.name
         assigneeForm.assigneeDescription.value = assignee.description
+        assigneeForm.assigneeTel.value = assignee.tel
+        assigneeForm.assigneeEmail.value = assignee.email
     }
 
     //----------------------------------------------------------------------------
     async fillDbFromForm(assignee) {
         assignee.setData("name", assigneeForm.assigneeName.value)
         assignee.setData("description", assigneeForm.assigneeDescription.value)
+        assignee.setData("tel", assigneeForm.assigneeTel.value)
+        assignee.setData("email", assigneeForm.assigneeEmail.value)
         assignee.setName(assigneeForm.assigneeName.value)
         assignee.setDescription(assigneeForm.assigneeDescription.value)
     }

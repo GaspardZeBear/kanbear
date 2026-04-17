@@ -5,7 +5,9 @@ import {db } from './config/database.mjs'
     CREATE TABLE IF NOT EXISTS assignees (
       id INTEGER PRIMARY KEY,
       name TEXT NOCASE NOT NULL,
-      description TEXT
+      description TEXT,
+      tel TEXT,
+      email TEXT
     )
   `);
 
@@ -131,6 +133,8 @@ import {db } from './config/database.mjs'
       description TEXT,
       name TEXT NOT NULL,
       password TEXT,
+      tel TEXT,
+      email TEXT,
       is_admin INTEGER DEFAULT 0
     )
   `);
