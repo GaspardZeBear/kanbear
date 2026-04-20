@@ -133,7 +133,7 @@ class Task extends KanbearEntity {
         tNote.innerHTML = `Note : ${note}`
 
         //headerDiv.appendChild(top)
-        const assignee = Kontext.getCurrentProject().assignees[this.task.assignee_id].name ?? "noAssignee"
+        const assignee = Kontext.getCurrentProject().assignees[this.task.assignee_id]?.name || "noAssignee"
         const tAssignee = document.createElement("div")
         tAssignee.classList.add("kanban-item-name")
         tAssignee.innerHTML = `${assignee}`

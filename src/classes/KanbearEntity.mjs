@@ -62,12 +62,6 @@ class KanbearEntity {
             throw error
         }
     }
-    //console.log("KanbearEntity.create() <resp>", resp)
-    //if ( ! resp.error ) {
-    //   resp.data.lastInsertRowid ? this.id = resp.data.lastInsertRowid : this.id=undefined
-    //} 
-    //return(resp)
-
 
     //-------------------------------------------------------------------------------
     static async getAll(kind, params) {
@@ -86,11 +80,13 @@ class KanbearEntity {
     //-------------------------------------------------------------------------------
     async patch(kind, params) {
         const data = {}
+        console.log("KanbearEntity.patch() <this.data>",this.data)
         Object.entries(this.data).forEach(([key, val]) => {
             val ? data[key] = val : 1
         })
-        console.log(data)
-        const resp = await new ApiCaller().patch(`/api/${this.kind}s/${this.id}`, data)
+        console.log("KanbearEntity.patch() effective <data>",data)
+        // !!!! send this.data and noot data (not useful) ??????????
+        const resp = await new ApiCaller().patch(`/api/${this.kind}s/${this.id}`, this.data)
         console.log("KanbearEntity.patch()", resp.data)
         return (resp.data)
     }

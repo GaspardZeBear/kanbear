@@ -42,13 +42,14 @@ class TaskDialog extends Dialog {
         let ass = await Assignee.getAll('assignees')
         //ass.unshift({ id: -1, name: '* Create new assignee' })
         let boxName = "kanbearAssigneeSelectBox"
+        
         let boxParams = {
             domId: boxName,
             boxLabel: "taskAssignee",
             items: ass,
             labelText: "taskAssignee",
             klass: "filter-group",
-            selectedOption: task?.task.assignee_id ?? ''
+            selectedOption: task?.assignee_id ?? ''
             //headItems:[['* Create new workspace',-1]]
         }
         let asDiv = await selectBoxBuilder(boxParams)
@@ -78,8 +79,13 @@ class TaskDialog extends Dialog {
         task.setData("note", taskForm.taskNote.value)
         let color = taskForm.taskColor.value < 0 ? "white" : taskForm.taskColor.value
         task.setData("color", color)
-        let assignee = taskForm.taskAssignee.value < 0 ? "" : taskForm.taskAssignee.value
-        task.setData("assignee_id", assignee)
+        //let assignee = taskForm.taskAssignee.value < 0 ? "" : taskForm.taskAssignee.value
+        //console.log("TaskDialog.fillDbFromForm() <assignee>",assignee)
+        if ( taskForm.taskAssignee.value > 0 ) {
+           task.setData("assignee_id", taskForm.taskAssignee.value)
+        } else {
+           task.setData("assignee_id", null)
+        }
         task.setName(taskForm.taskName.value)
         task.setDescription(taskForm.taskDescription.value)
         //task.setOpen(taskForm.taskIsOpen.value)
