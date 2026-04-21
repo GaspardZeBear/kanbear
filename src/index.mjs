@@ -75,6 +75,14 @@ document.addEventListener("swimlaneModified", async (ev) => {
     kb.render()
 })
 
+document.addEventListener("assigneeCreated", async (ev) => {
+    new KanbearAssigneePanel('results', getFiltersMap()).render()
+})
+
+document.addEventListener("assigneeModified", async (ev) => {
+    new KanbearAssigneePanel('results', getFiltersMap()).render()
+})
+
 document.addEventListener("columnCreated", async (ev) => {
     console.log("index.mjs() column listener fired <ev>", ev)
     const kb = await KanbanPanel.builder('results', getFiltersMap())
