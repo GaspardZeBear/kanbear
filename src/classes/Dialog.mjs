@@ -45,9 +45,7 @@ class Dialog {
     //----------------------------------------------------------------------------
     async modify(params) {
         this.params=params
-        //this.projectId = projectId
         try {
-            //this.project = new Project({ id: projectId })
             this.entity = await KanbearEntityFactory.generate(this.kind)
             let id=await this.subModify(params)
             this.entity.setId(id)

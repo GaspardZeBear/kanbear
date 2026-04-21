@@ -3,6 +3,7 @@ import { formatDuration, dateToString, getDurationFromNow } from "../utils/dateA
 import { Kontext } from "./Kontext.mjs";
 import { Assignee } from "./Assignee.mjs"
 import { AssigneeDialog } from "./AssigneeDialog.mjs"
+import { buildAssigneeLink } from "../utils/linkBuilder.mjs";
 
 class KanbearAssigneePanel {
   constructor(element, filtersMap) {
@@ -79,13 +80,22 @@ class KanbearAssigneePanel {
       const assignee=assigneeEntity[1]
       console.log("KanbearAssigneePanel.createTable() <assignee>",assignee)
       const row = document.createElement('tr');
-      row.innerHTML = `
-        <td><input type="checkbox"/></td>
-        <td>${assignee.name}</td>
-        <td>${assignee.description}</td>
-        <td>${assignee.tel}</td>
-        <td>${assignee.email}</td>
-        `;
+      
+      const td=(p)=>{
+        const td =document.createElement('td')
+        td.innerHTML=p
+        return(td)
+      }
+      const tdHref=(href)=>{
+        const td =document.createElement('td')
+        td.appendChild(href)
+        return(td)
+      }
+      row.appendChild(td('<input type="checkbox"/>'))
+      row.appendChild(tdHref(buildAssigneeLink(assignee.id,assignee.name)))
+      row.appendChild(td(assignee.description))
+      row.appendChild(td(assignee.tel))
+      row.appendChild(td(assignee.email))
       tbody.appendChild(row);
     }
     );

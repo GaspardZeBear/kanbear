@@ -3,6 +3,7 @@ import { ProjectDialog} from '../classes/ProjectDialog.mjs'
 import { SwimlaneDialog } from '../classes/SwimlaneDialog.mjs'
 import { ColumnDialog } from '../classes/ColumnDialog.mjs'
 import { WorkspaceDialog } from '../classes/WorkspaceDialog.mjs'
+import { AssigneeDialog } from '../classes/AssigneeDialog.mjs'
 
 class LinkCounter {
   static counter=0
@@ -82,4 +83,24 @@ class LinkCounter {
     return (href)
   }
 
-  export { buildWorkspaceLink, buildProjectLink, buildSwimlaneLink , buildColumnLink }
+  //----------------------------------------------------------------------------------
+  function buildAssigneeLink(assigneeId, assigneeName) {
+    const href = document.createElement("a")
+    LinkCounter.counter++
+    //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
+    href.setAttribute("href", "javascript:void(0)")
+    href.innerHTML = `${assigneeName}`
+    //let myProject = this.project
+    let aId=assigneeId
+    let editAssigneeFn = function (ev) {
+      console.log("editAssigneeHref event Listener fired ")
+      ev.stopPropagation();
+      const assignee = new AssigneeDialog()
+      assignee.modify({assigneeId:aId});
+    }
+    href.addEventListener('click', editAssigneeFn, { once: true });
+    console.log(href)
+    return(href)
+  }
+
+  export { buildAssigneeLink, buildWorkspaceLink, buildProjectLink, buildSwimlaneLink , buildColumnLink }
