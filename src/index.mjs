@@ -138,15 +138,15 @@ async function buildKanbearProjectsSelectBox() {
         projects = await Project.getAll('projects', { workspace_id: workspaceId })
         projects.unshift({ id: -1, name: '* Create new project' })
     }
-
+    console.log("buildKanbearProjectsSelectBox <Kontext.getCurrentProjectId>", Kontext.getCurrentProjectId())
     let boxName = "kanbearProjectSelectBox"
     let boxParams = {
         domId: boxName,
         boxLabel: "project",
         items: projects,
-        labelText: "kanbear project",
+        labelText: "project",
         klass: "filter-group",
-        //selected: "myProject"
+        selectedOption: Kontext.getCurrentProjectId()
     }
     let wsDiv = await selectBoxBuilder(boxParams)
     wsDiv.classList.add("projectCreated")

@@ -49,6 +49,12 @@ class Kontext {
     }
 
     //--------------------------------------------------------------
+    static getCurrentProjectName() {
+        console.log("Kontext getCurrentProjectName() ",Kontext.currentProjectName)
+        return(Kontext.currentProjectName)
+    }
+
+    //--------------------------------------------------------------
     static getKanboardUrl() {
         return(`${Kontext.kanbearConfig.kanboard.url}:${Kontext.kanbearConfig.kanboard.port}/${Kontext.kanbearConfig.kanboard.uri}`)
     }
@@ -98,8 +104,8 @@ class Kontext {
             const response = await fetch(url);
             Kontext.jsonBulkData = await response.json();
             //Kontext.currentProject = Kontext.jsonBulkData
-           //Kontext.currentProjectId=this.jsonBulkData.id
-           // Kontext.currentProjectName=this.jsonBulkData.name
+            //Kontext.currentProjectId=this.jsonBulkData.id
+            //Kontext.currentProjectName=this.jsonBulkData.name
             console.log("Kontext.loadKanbearJsonBulkData() from updated loaded",Kontext.jsonBulkData)
         } catch (error) {
             throw new Error(`Kontext.loadKanbearJsonBulkData() error ${error.message}`)
