@@ -79,6 +79,10 @@ document.addEventListener("assigneeCreated", async (ev) => {
     new KanbearAssigneePanel('results', getFiltersMap()).render()
 })
 
+document.addEventListener("assigneeDeleted", async (ev) => {
+    new KanbearAssigneePanel('results', getFiltersMap()).render()
+})
+
 document.addEventListener("assigneeModified", async (ev) => {
     new KanbearAssigneePanel('results', getFiltersMap()).render()
 })
