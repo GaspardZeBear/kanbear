@@ -98,8 +98,8 @@ class KanbearEntity {
             val ? data[key] = val : 1
         })
         console.log("KanbearEntity.delete() <kind>", this.kind, "<id>", this.id, "<data>", data)
-        const resp = await new ApiCaller().erase(`/api/${this.kind}s/${this.id}`, data)
-        console.log("KanbearEntity.delete()", resp.data)
+        const resp=await new ApiCaller().erase(`/api/${this.kind}s/${this.id}`, data)
+        console.log("KanbearEntity.delete() <resp>", resp)
         return (resp.data)
     }
 

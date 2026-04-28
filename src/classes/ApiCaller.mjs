@@ -53,6 +53,7 @@ class ApiCaller {
         console.log("url ", await this.url(uri), { params: params })
         try {
             const res = await axios.get(await this.url(uri), { params: params });
+            console.log("ApiCaller.get() <res.status>",res.status); // Status Code
             return (res)
         } catch (error) {
             const res = await this.processError(error)
@@ -64,7 +65,7 @@ class ApiCaller {
         this.header(["POST", uri, body])
           try {
             let res = await axios.post(await this.url(uri), body);
-            console.log(res.status); // Status Code
+            console.log("ApiCaller.post() <res.status>",res.status); // Status Code
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
@@ -78,7 +79,7 @@ class ApiCaller {
         this.header(["PUT", uri, body])
         try {
             const res = await axios.put(await url(this.uri), body);
-            console.log(res.status); // Status Code
+            console.log("ApiCaller.put() <res.status>",res.status); // Status Code
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
@@ -91,7 +92,7 @@ class ApiCaller {
         this.header(["PATCH", uri, body])
         try {
             const res = await axios.patch(await this.url(uri), body);
-            console.log(res.status); // Status Code
+            console.log("ApiCaller.patch() <res.status>",res.status); // Status Code
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {
@@ -103,8 +104,9 @@ class ApiCaller {
     async erase(uri) {
         this.header(["DELETE", uri])
         try {
+            console.log("ApiCaller.erase() before"); // Status Code
             const res = await axios.delete(await this.url(uri));
-            console.log(res.status); // Status Code
+            console.log("ApiCaller.erase() <res.status>",res.status); // Status Code
             //console.log(res.data); // Response Data
             return (res)
         } catch (error) {

@@ -76,10 +76,12 @@ document.addEventListener("swimlaneModified", async (ev) => {
 })
 
 document.addEventListener("assigneeCreated", async (ev) => {
+    console.log("index.mjs() assigneeCreated listener fired <ev>", ev)
     new KanbearAssigneePanel('results', getFiltersMap()).render()
 })
 
 document.addEventListener("assigneeDeleted", async (ev) => {
+    console.log("index.mjs() assigneeDeleted listener fired <ev>", ev)
     new KanbearAssigneePanel('results', getFiltersMap()).render()
 })
 
