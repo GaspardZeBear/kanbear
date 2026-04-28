@@ -31,6 +31,7 @@ class Dialog {
         //this.fillDbFromForm(pr)
         try {
             let resp = await entity.create()
+            console.log("Dialog.save() <entity>",entity)
             this.closeDialog()
             let eventId=`${this.kind}Id`
             sendEvent(`${this.kind}Created`, { [eventId] : entity.getId() })

@@ -8,25 +8,36 @@ import { WorkspaceDialog } from "./WorkspaceDialog.mjs"
 import { ColumnDialog } from "./ColumnDialog.mjs"
 import { TaskDialog } from "./TaskDialog.mjs"
 import { buildProjectLink, buildSwimlaneLink, buildColumnLink } from "../utils/linkBuilder.mjs"
+import { getFiltersMap } from "../utils/filters.mjs"
 import { Ref } from "./Ref.mjs"
 
 class KanbanPanel {
   //------------------------------------------------------------------------
   // Please, dont call it directly, use builder
-  constructor(element, filtersMap) {
+  constructor() {
     this.projects = Kontext.getJsonBulkData()
     console.log("KanbanPanel.constructor() projectId", Kontext.getCurrentProjectId())
     this.project = Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()] || undefined
-    this.htmlElement = element
-    this.kanboardFilter = new KanboardFilter(filtersMap)
+    this.htmlElement = 'results'
+    this.kanboardFilter = new KanboardFilter(getFiltersMap())
     this.buttons = {}
     this.table = undefined
     this.kColumns = {}
   }
+
   //------------------------------------------------------------------------
   // hint to have a kind of async construtor
   //----------------------------------------------------------
-  static async builder(element, filterMap) {
+  static async builder() {
+    console.log("KanbanPanel.reload()")
+    await Kontext.loadKanbearJsonBulkData()
+    console.log("KanbanPanel.reload() done")
+    return new KanbanPanel()
+  }
+  //------------------------------------------------------------------------
+  // hint to have a kind of async construtor
+  //----------------------------------------------------------
+  static async Xbuilder(element, filterMap) {
     console.log("KanbanPanel.reload()")
     await Kontext.loadKanbearJsonBulkData()
     console.log("KanbanPanel.reload() done")

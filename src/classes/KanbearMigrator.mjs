@@ -10,12 +10,13 @@ import { Task } from "./Task.mjs";
 import { Ref } from "./Ref.mjs"
 import { selectBoxBuilder } from "../utils/selectBoxBuilder.mjs";
 import { log } from '../utils/logListBuilder.mjs'
+import { getFiltersMap } from "../utils/filters.mjs";
 
 class KanbearMigrator {
-  constructor(element, filtersMap) {
+  constructor() {
     //this.project = Kontext.getCurrentProject()
-    this.htmlElement = element
-    this.kanboardFilter = new KanboardFilter(filtersMap)
+    this.htmlElement = 'results'
+    this.kanboardFilter = new KanboardFilter(getFiltersMap())
     this.buttons = {}
     this.table = undefined
     let resultTitle = document.createElement('h2')

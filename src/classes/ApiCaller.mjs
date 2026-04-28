@@ -52,6 +52,7 @@ class ApiCaller {
         this.header(["GET", uri, { params }])
         console.log("url ", await this.url(uri), { params: params })
         try {
+            console.log("ApiCaller.get() before");
             const res = await axios.get(await this.url(uri), { params: params });
             console.log("ApiCaller.get() <res.status>",res.status); // Status Code
             return (res)
@@ -64,6 +65,7 @@ class ApiCaller {
     async post(uri, body = {}) {
         this.header(["POST", uri, body])
           try {
+            console.log("ApiCaller.post() before");
             let res = await axios.post(await this.url(uri), body);
             console.log("ApiCaller.post() <res.status>",res.status); // Status Code
             //console.log(res.data); // Response Data
@@ -78,6 +80,7 @@ class ApiCaller {
     async put(uri, body = {}) {
         this.header(["PUT", uri, body])
         try {
+            console.log("ApiCaller.put() before");
             const res = await axios.put(await url(this.uri), body);
             console.log("ApiCaller.put() <res.status>",res.status); // Status Code
             //console.log(res.data); // Response Data
@@ -91,6 +94,7 @@ class ApiCaller {
     async patch(uri, body = {}) {
         this.header(["PATCH", uri, body])
         try {
+            console.log("ApiCaller.patch() before");
             const res = await axios.patch(await this.url(uri), body);
             console.log("ApiCaller.patch() <res.status>",res.status); // Status Code
             //console.log(res.data); // Response Data

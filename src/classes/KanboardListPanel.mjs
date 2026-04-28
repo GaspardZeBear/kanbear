@@ -2,12 +2,13 @@ import { KanboardFilter } from "./KanboardFilter.mjs"
 import { formatDuration, dateToString, getDurationFromNow } from "../utils/dateAndTime.mjs";
 import { Kontext } from "./Kontext.mjs";
 import { Ref} from "./Ref.mjs"
+import { getFiltersMap } from "../utils/filters.mjs";
 
 class KanboardListPanel {
   constructor(element, filtersMap) {
     this.projects = Kontext.getJsonBulkData()
-    this.htmlElement = element
-    this.kanboardFilter = new KanboardFilter(filtersMap)
+    this.htmlElement = 'results'
+    this.kanboardFilter = new KanboardFilter(getFiltersMap())
     this.buttons = {}
     this.table = undefined
   }

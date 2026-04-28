@@ -40,22 +40,23 @@ buildKanbearProjectsSelectBox()
 //document.querySelectorAll("projectCreated").addEventListener("projectCreated", (ev) => {
 document.addEventListener("projectCreated", async (ev) => {
     console.log("projectCreated listener fired <ev>", ev)
+    console.log("projectCreated listener fired <ev.detail.projectId>", ev.detail.projectId)
     buildKanbearProjectsSelectBox()
     await Kontext.setProject(ev.detail.projectId);
-    new KanbanPanel('results', getFiltersMap()).render()
+    new KanbanPanel().render()
 })
 document.addEventListener("projectSelected", async (ev) => {
     console.log("projectSelected listener fired <ev>", ev)
     buildKanbearProjectsSelectBox()
     await Kontext.setProject(ev.detail.projectId);
-    const kb = await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder()
     kb.render()
     //new KanbanPanel('results', getFiltersMap()).render()
 })
 
 document.addEventListener("projectModified", async (ev) => {
     console.log("index.mjs() project modified listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder()
     kb.render()
 })
 document.addEventListener("projectDeleted", (ev) => {
@@ -65,55 +66,55 @@ document.addEventListener("projectDeleted", (ev) => {
 
 document.addEventListener("swimlaneCreated", async (ev) => {
     console.log("index.mjs() swimlane listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder()
     kb.render()
 })
 
 document.addEventListener("swimlaneModified", async (ev) => {
     console.log("index.mjs() swimlane listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder()
     kb.render()
 })
 
 document.addEventListener("assigneeCreated", async (ev) => {
     console.log("index.mjs() assigneeCreated listener fired <ev>", ev)
-    new KanbearAssigneePanel('results', getFiltersMap()).render()
+    new KanbearAssigneePanel().render()
 })
 
 document.addEventListener("assigneeDeleted", async (ev) => {
     console.log("index.mjs() assigneeDeleted listener fired <ev>", ev)
-    new KanbearAssigneePanel('results', getFiltersMap()).render()
+    new KanbearAssigneePanel().render()
 })
 
 document.addEventListener("assigneeModified", async (ev) => {
-    new KanbearAssigneePanel('results', getFiltersMap()).render()
+    new KanbearAssigneePanel().render()
 })
 
 document.addEventListener("columnCreated", async (ev) => {
     console.log("index.mjs() column listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder()
     kb.render()
 })
 
 document.addEventListener("columnModified", async (ev) => {
     console.log("index.mjs() column listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder()
     kb.render()
 })
 
 document.addEventListener("taskCreated", async (ev) => {
     console.log("index.mjs() task listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder()
     kb.render()
 })
 document.addEventListener("taskModified", async (ev) => {
     console.log("index.mjs() task modified listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder()
     kb.render()
 })
 document.addEventListener("dialogCanceled", async (ev) => {
     console.log("index.mjs() dialogCanceled listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder('results', getFiltersMap())
+    const kb = await KanbanPanel.builder()
     kb.render()
 })
 document.addEventListener("error", async (ev) => {
@@ -235,30 +236,14 @@ async function buildWorkspacesSelectBox() {
     });
 }
 
-//---------------------------------------------------------------------------------
-function getFiltersMap() {
-    const projectFilter = document.getElementById('projectFilter').value
-    const swimlaneFilter = document.getElementById('swimlaneFilter').value
-    const taskFilter = document.getElementById('taskFilter').value
-    const columnFilter = document.getElementById('columnFilter').value
-    const assigneeFilter = document.getElementById('assigneeFilter').value
-    return ({
-        projectFilter: projectFilter,
-        swimlaneFilter, swimlaneFilter,
-        taskFilter: taskFilter,
-        columnFilter: columnFilter,
-        assigneeFilter: assigneeFilter
-    })
-}
-
 //------------------- migrate from kanboard to kanbear --------------------------------------
 function migrateFromKanboard() {
-     new KanbearMigrator('results', getFiltersMap()).migrate()
+     new KanbearMigrator().migrate()
 }
 
 //------------------- migrate from kanboard to kanbear --------------------------------------
 document.getElementById('migrateFromKanboard').addEventListener('click', () => {
-    new KanbearMigrator('results', getFiltersMap()).migrate()
+    new KanbearMigrator().migrate()
 });
 
 //------------------- migrate from kanboard to kanbear --------------------------------------
@@ -268,7 +253,7 @@ document.getElementById('migrateFromKanboard').addEventListener('click', () => {
 
 //------------------- showDetails --------------------------------------
 document.getElementById('assigneePanel').addEventListener('click', () => {
-    new KanbearAssigneePanel('results', getFiltersMap()).render()
+    new KanbearAssigneePanel().render()
 });
 
 //------------------- showDetails --------------------------------------
@@ -278,13 +263,13 @@ document.getElementById('showDetails').addEventListener('click', () => {
 
 //------------------- kanban --------------------------------------
 document.getElementById('kanban').addEventListener('click', () => {
-    new KanbanPanel('results', getFiltersMap()).render()
+    new KanbanPanel().render()
 });
 
 
 // Effacer les données
 document.getElementById('clearProjects').addEventListener('click', () => {
-    new KanbearProjectCleanor('results', getFiltersMap()).cleanup()
+    new KanbearProjectCleanor().cleanup()
 });
 
 

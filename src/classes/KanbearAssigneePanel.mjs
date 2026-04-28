@@ -5,13 +5,14 @@ import { Assignee } from "./Assignee.mjs"
 import { AssigneeDialog } from "./AssigneeDialog.mjs"
 import { buildAssigneeLink } from "../utils/linkBuilder.mjs";
 import { sendEvent } from "../utils/sendEvent.mjs";
+import { getFiltersMap } from "../utils/filters.mjs";
 
 
 class KanbearAssigneePanel {
-  constructor(element, filtersMap) {
+  constructor() {
     this.projects = Kontext.getJsonBulkData()
-    this.htmlElement = element
-    this.kanboardFilter = new KanboardFilter(filtersMap)
+    this.htmlElement = 'results'
+    this.kanboardFilter = new KanboardFilter(getFiltersMap())
     this.buttons = {}
     this.table = undefined
   }

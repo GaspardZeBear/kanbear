@@ -57,6 +57,8 @@ class KanbearEntity {
         console.log("KanbearEntity.create() <data>", data)
         try {
             const resp = await new ApiCaller().post(`/api/${this.kind}s`, data)
+            console.log("KanbearEntity.create() <resp>", resp)
+            this.setId(resp.data.lastInsertRowid)
         } catch (error) {
             console.log("KanbearEntity.create() <error>", error)
             throw error
