@@ -22,12 +22,12 @@ class Kontext {
 //--------------------------------------------------------------
     static async setProject(projectId) {
         Kontext.currentProjectId=projectId
-        //Kontext.currentProjectName=projectName
+        //Kontext.currentProjectName=projectName[]
         //Kontext.currentProjectName=projectName
         console.log("Kontext setProject() bulk ",Kontext.currentProjectId)
         await Kontext.loadKanbearJsonBulkData()
-        
-        Kontext.currentProjectName=this.jsonBulkData.name
+        console.log("Kontext setProject() after bulk ",Kontext.jsonBulkData)
+        Kontext.currentProjectName=Kontext.jsonBulkData[projectId].name
         //await Kontext.loadKanboardJsonBulkData()
     }
 
@@ -109,6 +109,18 @@ class Kontext {
             console.log("Kontext.loadKanbearJsonBulkData() from updated loaded",Kontext.jsonBulkData)
         } catch (error) {
             throw new Error(`Kontext.loadKanbearJsonBulkData() error ${error.message}`)
+        }
+    }
+    //--------------------------------------------------------------
+    static async resetKanbearJsonBulkData() {
+        try {
+             Kontext.jsonBulkData = {}
+            //Kontext.currentProject = Kontext.jsonBulkData
+             Kontext.currentProjectId=undefined
+             Kontext.currentProjectName=undefined
+            console.log("Kontext.resetKanbearJsonBulkData() done",Kontext.jsonBulkData)
+        } catch (error) {
+            throw new Error(`Kontext.resetKanbearJsonBulkData() error ${error.message}`)
         }
     }
 

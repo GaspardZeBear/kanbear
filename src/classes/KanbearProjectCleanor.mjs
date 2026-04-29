@@ -100,6 +100,7 @@ class KanbearProjectCleanor {
             composed: true
         })
         //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
+        Kontext.resetKanbearJsonBulkData()
         document.dispatchEvent(projectDeletedEvent)
     }
 
