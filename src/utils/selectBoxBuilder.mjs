@@ -6,6 +6,7 @@ async function selectBoxBuilder(params) {
   let boxLabel = params.boxLabel
   let items = params.items
   let labelText = params.labelText
+  let buttons=params.buttons ? params.buttons : []
   let klass = params.klass
   let selected = params.selected
   let selectedOption = params.selectedOption
@@ -18,7 +19,15 @@ async function selectBoxBuilder(params) {
 
   const label = document.createElement('label')
   label.setAttribute("for", boxLabel)
+
+  // visible title
   label.innerHTML = labelText
+  for (let button of buttons) {
+    label.appendChild(button)
+  }
+  // label.innerHTML = labelText
+
+
   const select = document.createElement("select")
   select.setAttribute("name", boxLabel)
   select.setAttribute("id", domId)

@@ -10,6 +10,7 @@ import { TaskDialog } from "./TaskDialog.mjs"
 import { buildProjectLink, buildSwimlaneLink, buildColumnLink } from "../utils/linkBuilder.mjs"
 import { getFiltersMap } from "../utils/filters.mjs"
 import { Ref } from "./Ref.mjs"
+import { buildAddColumnButton, buildAddTaskButton, buildAddSwimlaneButton } from "../utils/buttonBuilder.mjs"
 
 class KanbanPanel {
   //------------------------------------------------------------------------
@@ -46,7 +47,7 @@ class KanbanPanel {
 
 
   //------------------------------------------------------------------------
-  buildAddSwimlaneButton(projectId) {
+  XbuildAddSwimlaneButton(projectId) {
     //let projectId = this.project.id
     const addSwimlaneButton = document.createElement('button')
     addSwimlaneButton.classList.add("add-item-btn")
@@ -57,7 +58,7 @@ class KanbanPanel {
       console.log("addSwimlaneButton event Listener fired")
       ev.stopPropagation();
       const swimlane = new SwimlaneDialog('swimlane')
-      swimlane.create({projectId:projectId});
+      swimlane.create({ projectId: projectId });
     }
     //removeEventListener("click", addSwimlaneFn)
     addSwimlaneButton.addEventListener('click', addSwimlaneFn, { once: true });
@@ -66,7 +67,7 @@ class KanbanPanel {
 
 
   //------------------------------------------------------------------------
-  buildAddColumnButton(projectId) {
+  XbuildAddColumnButton(projectId) {
     //let projectId = this.project.id
     const addColumnButton = document.createElement('button')
     addColumnButton.classList.add("add-item-btn")
@@ -77,15 +78,15 @@ class KanbanPanel {
       console.log("addColumnButton event Listener fired")
       ev.stopPropagation();
       const column = new ColumnDialog('column')
-      column.create({projectId:projectId});
+      column.create({ projectId: projectId });
     }
     //removeEventListener("click", addColumnFn)
     addColumnButton.addEventListener('click', addColumnFn, { once: true });
     return (addColumnButton)
   }
-  
+
   //------------------------------------------------------------------------
-  buildAddTaskButton(swimlaneId,columnId) {
+  XbuildAddTaskButton(swimlaneId, columnId) {
     const addTaskButton = document.createElement('button')
     addTaskButton.classList.add("add-item-btn")
     addTaskButton.setAttribute("id", `addTaskButton_${swimlaneId}_${columnId}`)
@@ -98,7 +99,7 @@ class KanbanPanel {
       console.log("addTaskButton event Listener fired <swimlane>", swimlaneId, "<column>", columnId)
       ev.stopPropagation();
       const task = new TaskDialog('task')
-      task.create({swimlaneId:swimlaneId, columnId:columnId});
+      task.create({ swimlaneId: swimlaneId, columnId: columnId });
     }
     addTaskButton.addEventListener('click', addTaskFn, { once: true });
     return (addTaskButton)
@@ -114,8 +115,11 @@ class KanbanPanel {
       return
     }
 
-    const addSwimlaneButton = this.buildAddSwimlaneButton(this.project.id)
-    const addColumnButton = this.buildAddColumnButton(this.project.id)
+    //const addSwimlaneButton = this.buildAddSwimlaneButton(this.project.id)
+    //const addColumnButton = this.buildAddColumnButton(this.project.id)
+
+    const addSwimlaneButton = buildAddSwimlaneButton(this.project.id)
+    const addColumnButton = buildAddColumnButton(this.project.id)
     //const projectLink = this.buildProjectLink(this.project.id, this.project.name)
     const projectLink = buildProjectLink(this.project.id, this.project.name)
 
@@ -132,11 +136,11 @@ class KanbanPanel {
     filters.innerHTML = " filtered by..."
     resultTitleProject.appendChild(filters)
 
-    let resultTitle=document.createElement("div")
+    let resultTitle = document.createElement("div")
     //resultTitle.appendChild(resultTitleWorkspace)
     resultTitle.appendChild(resultTitleProject)
 
-    const elementHeader=`${this.htmlElement}Header`
+    const elementHeader = `${this.htmlElement}Header`
     document.getElementById(elementHeader).replaceChildren(resultTitle)
     document.getElementById(this.htmlElement).replaceChildren()
 
@@ -169,10 +173,10 @@ class KanbanPanel {
       const projectLink = buildProjectLink(project.id, project.name)
       const swimlaneLink = buildSwimlaneLink(swimlane.id, swimlane.name)
       //kSwimlaneDivH2.innerHTML = `${project.name}::`
-      const separator0=document.createElement('span')
-      separator0.innerHTML=' Project '
-      const separator1=document.createElement('span')
-      separator1.innerHTML=' Swimlane '
+      const separator0 = document.createElement('span')
+      separator0.innerHTML = ' Project '
+      const separator1 = document.createElement('span')
+      separator1.innerHTML = ' Swimlane '
       //console.log(this.projectLink)
       //kSwimlaneDivH2.appendChild(separator0)
       //kSwimlaneDivH2.appendChild(projectLink)
@@ -215,7 +219,9 @@ class KanbanPanel {
         kColumnItemsDiv.setAttribute("data-column-id", col.id)
         kColumnItemsDiv.setAttribute("data-swimlane-id", swimlane.id)
 
-       const addTaskButton =this.buildAddTaskButton(swimlane.id,col.id)
+        //const addTaskButton =this.buildAddTaskButton(swimlane.id,col.id)
+        const addTaskButton = buildAddTaskButton(swimlane.id, col.id)
+
 
         // link all
         kColumnHeaderDiv.appendChild(kColumnHeaderDivH3)
@@ -299,7 +305,7 @@ class KanbanPanel {
         // update the DOM
         // If drop over column (ex :empty column, appendChild)
         // Drop over another taskElement : must insert before it (choice, seems most convenient)
-        
+
         let itemsDiv = ev.target.closest(".kanban-items")
         if (ev.target === itemsDiv) {
           itemsDiv.appendChild(taskElementNew)

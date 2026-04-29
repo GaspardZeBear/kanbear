@@ -15,6 +15,7 @@ import { ProjectDialog } from './classes/ProjectDialog.mjs'
 import { WorkspaceDialog } from './classes/WorkspaceDialog.mjs'
 import { sendEvent } from './utils/sendEvent.mjs';
 import { buildWorkspaceLink } from './utils/linkBuilder.mjs';
+import { buildAddProjectButton, buildAddWorkspaceButton } from './utils/buttonBuilder.mjs';
 
 await Kontext.loadConfig()
 buildWorkspacesSelectBox()
@@ -143,15 +144,17 @@ async function buildKanbearProjectsSelectBox() {
     console.log("buildKanbearProjectsSelectBox() <workspaceId>", workspaceId)
     if (workspaceId) {
         projects = await Project.getAll('projects', { workspace_id: workspaceId })
-        projects.unshift({ id: -1, name: '* Create new project' })
+        //projects.unshift({ id: -1, name: '* Create new project' })
     }
     console.log("buildKanbearProjectsSelectBox <Kontext.getCurrentProjectId>", Kontext.getCurrentProjectId())
     let boxName = "kanbearProjectSelectBox"
+    let addProjectButton=buildAddProjectButton(workspaceId)
     let boxParams = {
         domId: boxName,
-        boxLabel: "project",
+        boxLabel: "Project",
+        buttons: [addProjectButton],
         items: projects,
-        labelText: "project",
+        labelText: "Project",
         klass: "filter-group",
         selectedOption: Kontext.getCurrentProjectId()
     }
@@ -161,12 +164,13 @@ async function buildKanbearProjectsSelectBox() {
     document.getElementById(boxName).addEventListener('change', async (e) => {
         console.log({ boxName }, e.target)
         let projectId = e.target.value;
-        if (projectId == -1) {
+        /*if (projectId == -1) {
             //let newProject =new ProjectDialog("create",workspaceId)
             let newProject = new ProjectDialog()
             newProject.create({workspaceId:workspaceId})
             return
         }
+            */
         //Kontext.setProject(e.target.value);
         sendEvent("projectSelected", { projectId: projectId })
     });
@@ -197,13 +201,15 @@ async function buildWorkspacesSelectBox() {
     }
     console.log("wssOrigin init", wssOrigin)
 
-    wss.unshift({ id: -1, name: '* Create new workspace' })
+    //wss.unshift({ id: -1, name: '* Create new workspace' })
+    let addWorkspaceButton=buildAddWorkspaceButton()
     let boxName = "kanbearWorkspaceSelectBox"
     let boxParams = {
         domId: boxName,
         boxLabel: "workspace",
+        buttons:[addWorkspaceButton],
         items: wss,
-        labelText: "workspace",
+        labelText: "Workspace",
         klass: "filter-group",
         //headItems:[['* Create new workspace',-1]]
     }
@@ -212,12 +218,14 @@ async function buildWorkspacesSelectBox() {
     document.getElementById(boxName).addEventListener('change', async (e) => {
         Kontext.setWorkspaceId(e.target.value);
         let workspaceId = parseInt(e.target.value)
+        /*
         if (workspaceId == -1) {
             //let newProject =new ProjectDialog("create",workspaceId)
             let newWorkspace = new WorkspaceDialog()
             newWorkspace.create()
             return
         }
+            */
         if (workspaceId < 0) {
             return
         }

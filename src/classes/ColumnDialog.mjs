@@ -15,10 +15,11 @@ class ColumnDialog extends Dialog {
 
     //----------------------------------------------------------------------------
     async fillFormFromDb(column) {
-        console.log("columnDialog.fillFormFromDb() column>", column)
+        console.log("columnDialog.fillFormFromDb() <column>", column)
         columnForm.columnName.value = column.name
         columnForm.columnDescription.value = column.description
         let columnColor = await buildColorSelectBox(column.color, 'columnColor', 'Column Color')
+        console.log("columnDialog.fillFormFromDb() <columnColor>", columnColor)
         document.getElementById("columnColorDiv").replaceChildren(columnColor)
     }
 
@@ -33,9 +34,11 @@ class ColumnDialog extends Dialog {
     }
 
     //----------------------------------------------------------------------------
-    subCreate(params) {
+    async subCreate(params) {
         console.log("ColumnDialog.create() dialog, for  <projectId>",params)
         this.projectId = params["projectId"]
+        let columnColor = await buildColorSelectBox('', 'columnColor', 'Column Color')
+        document.getElementById("columnColorDiv").replaceChildren(columnColor)
     }
 
     //-------------------------------------------------------------------------------------
