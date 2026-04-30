@@ -5,7 +5,7 @@ import { Ref} from "./Ref.mjs"
 import { getFiltersMap } from "../utils/filters.mjs";
 
 class KanboardListPanel {
-  constructor(element, filtersMap) {
+  constructor() {
     this.projects = Kontext.getJsonBulkData()
     this.htmlElement = 'results'
     this.kanboardFilter = new KanboardFilter(getFiltersMap())

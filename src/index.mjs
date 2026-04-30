@@ -237,6 +237,7 @@ async function buildWorkspacesSelectBox() {
         items: wss,
         labelText: "Workspace",
         klass: "filter-group",
+        selectedOption: Kontext.getWorkspaceId()
         //headItems:[['* Create new workspace',-1]]
     }
     let wsDiv = await selectBoxBuilder(boxParams)
@@ -272,11 +273,6 @@ document.getElementById('migrateFromKanboard').addEventListener('click', () => {
     new KanbearMigrator().migrate()
 });
 
-//------------------- migrate from kanboard to kanbear --------------------------------------
-//document.getElementById('migrate').addEventListener('click', () => {
-//    new KanbearMigrator('results', getFiltersMap()).migrate()
-//});
-
 //------------------- showDetails --------------------------------------
 document.getElementById('assigneePanel').addEventListener('click', () => {
     new KanbearAssigneePanel().render()
@@ -284,7 +280,7 @@ document.getElementById('assigneePanel').addEventListener('click', () => {
 
 //------------------- showDetails --------------------------------------
 document.getElementById('showDetails').addEventListener('click', () => {
-    new KanboardListPanel('results', getFiltersMap()).render()
+    new KanboardListPanel().render()
 });
 
 //------------------- kanban --------------------------------------
