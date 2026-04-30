@@ -35,78 +35,8 @@ class KanbanPanel {
     console.log("KanbanPanel.reload() done")
     return new KanbanPanel()
   }
-  //------------------------------------------------------------------------
-  // hint to have a kind of async construtor
-  //----------------------------------------------------------
-  static async Xbuilder(element, filterMap) {
-    console.log("KanbanPanel.reload()")
-    await Kontext.loadKanbearJsonBulkData()
-    console.log("KanbanPanel.reload() done")
-    return new KanbanPanel(element, filterMap)
-  }
-
-
-  //------------------------------------------------------------------------
-  XbuildAddSwimlaneButton(projectId) {
-    //let projectId = this.project.id
-    const addSwimlaneButton = document.createElement('button')
-    addSwimlaneButton.classList.add("add-item-btn")
-    addSwimlaneButton.setAttribute("id", "addSwimlaneButton")
-    addSwimlaneButton.setAttribute("data-project-id", this.project.id)
-    addSwimlaneButton.innerHTML = "+\u25A4"
-    let addSwimlaneFn = function (ev) {
-      console.log("addSwimlaneButton event Listener fired")
-      ev.stopPropagation();
-      const swimlane = new SwimlaneDialog('swimlane')
-      swimlane.create({ projectId: projectId });
-    }
-    //removeEventListener("click", addSwimlaneFn)
-    addSwimlaneButton.addEventListener('click', addSwimlaneFn, { once: true });
-    return (addSwimlaneButton)
-  }
-
-
-  //------------------------------------------------------------------------
-  XbuildAddColumnButton(projectId) {
-    //let projectId = this.project.id
-    const addColumnButton = document.createElement('button')
-    addColumnButton.classList.add("add-item-btn")
-    addColumnButton.setAttribute("id", "addColumnButton")
-    addColumnButton.setAttribute("data-project-id", this.project.id)
-    addColumnButton.innerHTML = "+\u25A5"
-    let addColumnFn = function (ev) {
-      console.log("addColumnButton event Listener fired")
-      ev.stopPropagation();
-      const column = new ColumnDialog('column')
-      column.create({ projectId: projectId });
-    }
-    //removeEventListener("click", addColumnFn)
-    addColumnButton.addEventListener('click', addColumnFn, { once: true });
-    return (addColumnButton)
-  }
-
-  //------------------------------------------------------------------------
-  XbuildAddTaskButton(swimlaneId, columnId) {
-    const addTaskButton = document.createElement('button')
-    addTaskButton.classList.add("add-item-btn")
-    addTaskButton.setAttribute("id", `addTaskButton_${swimlaneId}_${columnId}`)
-    addTaskButton.setAttribute("data-swimlane-id", swimlaneId)
-    addTaskButton.setAttribute("data-column-id", columnId)
-    //addTaskButton.innerHTML = "+\u{1F3CB}"
-    addTaskButton.innerHTML = "+\u{1F0F5}"
-
-    let addTaskFn = function (ev) {
-      console.log("addTaskButton event Listener fired <swimlane>", swimlaneId, "<column>", columnId)
-      ev.stopPropagation();
-      const task = new TaskDialog('task')
-      task.create({ swimlaneId: swimlaneId, columnId: columnId });
-    }
-    addTaskButton.addEventListener('click', addTaskFn, { once: true });
-    return (addTaskButton)
-  }
-
-
-  //------------------------------------------------------------------------
+  
+    //------------------------------------------------------------------------
   async render() {
     console.log("KanbanPanel.render() <project>", this.project)
     let [displayable, cause] = new ProjectManager(this.project).isDisplayable()
@@ -114,9 +44,6 @@ class KanbanPanel {
       document.getElementById(this.htmlElement).innerHTML = `Project not displayable ${cause}`
       return
     }
-
-    //const addSwimlaneButton = this.buildAddSwimlaneButton(this.project.id)
-    //const addColumnButton = this.buildAddColumnButton(this.project.id)
 
     const addSwimlaneButton = buildAddSwimlaneButton(this.project.id)
     const addColumnButton = buildAddColumnButton(this.project.id)
