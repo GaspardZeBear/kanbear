@@ -279,8 +279,9 @@ document.getElementById('assigneePanel').addEventListener('click', () => {
 });
 
 //------------------- showDetails --------------------------------------
-document.getElementById('showDetails').addEventListener('click', () => {
-    new KanbearListPanel().render()
+document.getElementById('showDetails').addEventListener('click', async () => {
+    let kl = await KanbearListPanel.builder()
+    kl.render()
 });
 
 //------------------- kanban --------------------------------------

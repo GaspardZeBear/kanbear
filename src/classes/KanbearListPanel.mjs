@@ -1,16 +1,27 @@
 import { KanboardFilter } from "./KanboardFilter.mjs"
 import { formatDuration, dateToString, getDurationFromNow } from "../utils/dateAndTime.mjs";
 import { Kontext } from "./Kontext.mjs";
-import { Ref} from "./Ref.mjs"
+import { Ref } from "./Ref.mjs"
 import { getFiltersMap } from "../utils/filters.mjs";
+import { Project } from "./Project.mjs"
 
 class KanbearListPanel {
-  constructor() {
-    this.projects = Kontext.getJsonBulkData()
+
+  constructor(projects) {
+    this.projects = projects
     this.htmlElement = 'results'
     this.kanboardFilter = new KanboardFilter(getFiltersMap())
     this.buttons = {}
     this.table = undefined
+  }
+
+  //------------------------------------------------------------------------
+  // hint to have a kind of async construtor
+  //----------------------------------------------------------
+  static async builder() {
+    console.log("KanbearListPanel.builder()")
+    const projects = await Project.getAll('projects', { workspace_id: Kontext.getWorkspaceId() })
+    return new KanbearListPanel(projects)
   }
 
   //-----------------------------------------------------------------------------------------
@@ -75,7 +86,7 @@ class KanbearListPanel {
     //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
     let resultTitle = document.createElement('h2')
     resultTitle.innerHTML = `Projects list filtered by .....`
-    const elementHeader=`${this.htmlElement}Header`
+    const elementHeader = `${this.htmlElement}Header`
     document.getElementById(this.htmlElement).replaceChildren()
     document.getElementById(elementHeader).replaceChildren(resultTitle)
     //  document.body.appendChild(dueShiftButton)
@@ -94,8 +105,25 @@ class KanbearListPanel {
     this.buttons['close'] = this.createButton('close', this.closeTask.bind(this))
   }
 
+  //---------------------------------------------------------------------------------------
+  async getJsonBulkData(projectId) {
+    try {
+      const url = `${Kontext.getKanbearUrl()}/api/sql/report/${projectId}`
+      console.log("KanbearListPanel.getJsonBulkData() from kanbear", url)
+      const response = await fetch(url);
+      const jsonBulkData = await response.json();
+      //Kontext.currentProject = Kontext.jsonBulkData
+      //Kontext.currentProjectId=this.jsonBulkData.id
+      //Kontext.currentProjectName=this.jsonBulkData.name
+      console.log("KanbearListPanel.getJsonBulkData() loaded", jsonBulkData)
+      return(jsonBulkData)
+    } catch (error) {
+      throw new Error(`KanbearListPanel.getJsonBulkData() error ${error.message}`)
+    }
+  }
+
   //-----------------------------------------------------------------
-  createTable() {
+  async createTable() {
     this.table = document.createElement('table')
     const thead = document.createElement('thead')
     const hrow = document.createElement('tr')
@@ -116,10 +144,15 @@ class KanbearListPanel {
     this.table.appendChild(thead)
     const tbody = document.createElement('tbody')
 
-    //this.projects.forEach((project, projectIndex) => {
-    Object.entries(this.projects).forEach(([projectId, project]) => {
-      if (!this.kanboardFilter.keepProject(project.name)) { return }
-      const projectStyle = Kontext.getProjectStyle(project.name)
+    console.log(this.projects)
+    //Object.entries(this.projects).forEach(([projectId, project]) => {
+
+    for (let p of this.projects)  {
+      const projectM=await this.getJsonBulkData(p.id)
+      console.log("KanbearListPanel.createTable() <project>", projectM)
+      console.log("KanbearListPanel.createTable() <project p.id>", projectM[p.id])
+      if (!this.kanboardFilter.keepProject(projectM.name)) { return }
+      const project=projectM[p.id]
       Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
         if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
         Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
@@ -131,12 +164,12 @@ class KanbearListPanel {
           }
           const row = document.createElement('tr');
           const duration = formatDuration((Date.now() / 1000 - task.date_moved))
-          const checkBoxId = Ref.getRef('checkbox',projectId,swimlane.id,task.id)
-          const commentLinkId = Ref.getRef('commentLink',projectId,swimlane.id,task.id)
+          const checkBoxId = Ref.getRef('checkbox', project.id, swimlane.id, task.id)
+          const commentLinkId = Ref.getRef('commentLink', project.id, swimlane.id, task.id)
           row.innerHTML = `
               <td><input type="checkbox" name="tasks" id="${checkBoxId}" class="taskCheckbox"/></td>
               <td><a href="#" class="taskCommentLink" id="${commentLinkId}">c</a></td>
-              <td style="${projectStyle}">${project.name}</td>
+              <td>${project.name}</td>
               <td>${swimlane.name}</td>
               <td>${task.name}</td>
               <td style="background-color:${task.color}">${project.columns[task.column_id].name}</td>
@@ -150,7 +183,7 @@ class KanbearListPanel {
         })
       });
       this.table.appendChild(tbody)
-    });
+    };
   }
 
   //-----------------------------------------------------------------
