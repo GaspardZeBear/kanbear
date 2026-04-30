@@ -112,9 +112,6 @@ class KanbearListPanel {
       console.log("KanbearListPanel.getJsonBulkData() from kanbear", url)
       const response = await fetch(url);
       const jsonBulkData = await response.json();
-      //Kontext.currentProject = Kontext.jsonBulkData
-      //Kontext.currentProjectId=this.jsonBulkData.id
-      //Kontext.currentProjectName=this.jsonBulkData.name
       console.log("KanbearListPanel.getJsonBulkData() loaded", jsonBulkData)
       return(jsonBulkData)
     } catch (error) {
@@ -149,10 +146,11 @@ class KanbearListPanel {
 
     for (let p of this.projects)  {
       const projectM=await this.getJsonBulkData(p.id)
-      console.log("KanbearListPanel.createTable() <project>", projectM)
-      console.log("KanbearListPanel.createTable() <project p.id>", projectM[p.id])
-      if (!this.kanboardFilter.keepProject(projectM.name)) { return }
+      console.log("KanbearListPanel.createTable() <projectM>", projectM)
+       
       const project=projectM[p.id]
+      console.log("KanbearListPanel.createTable() <project>", project)
+      if (!this.kanboardFilter.keepProject(project.name)) { continue }
       Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
         if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
         Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
@@ -177,7 +175,7 @@ class KanbearListPanel {
               <td>${getDurationFromNow(task.date_moved, true)}</td>
               <td>${dateToString(task.date_due)}</td>
               <td>${getDurationFromNow(task.date_due, true) ?? ''}</td>
-              <td>${userName}</td>
+              <td>${project.assignees[task.assignee_id]?.name||""}</td>
             `;
           tbody.appendChild(row);
         })
