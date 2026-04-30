@@ -4,7 +4,7 @@ import { Kontext } from "./Kontext.mjs";
 import { Ref} from "./Ref.mjs"
 import { getFiltersMap } from "../utils/filters.mjs";
 
-class KanboardListPanel {
+class KanbearListPanel {
   constructor() {
     this.projects = Kontext.getJsonBulkData()
     this.htmlElement = 'results'
@@ -188,4 +188,4 @@ class KanboardListPanel {
 
 
 }
-export { KanboardListPanel }
+export { KanbearListPanel }

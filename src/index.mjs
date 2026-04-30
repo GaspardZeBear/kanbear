@@ -4,7 +4,7 @@
 import { KanbanPanel } from './classes/KanbanPanel.mjs';
 import { KanbearEntityFactory } from './classes/KanbearEntityFactory.mjs';
 import { KanbearAssigneePanel } from './classes/KanbearAssigneePanel.mjs';
-import { KanboardListPanel } from './classes/KanboardListPanel.mjs';
+import { KanbearListPanel } from './classes/KanbearListPanel.mjs';
 import { KanbearMigrator } from './classes/KanbearMigrator.mjs';
 import { KanbearProjectCleanor } from './classes/KanbearProjectCleanor.mjs';
 import { Kontext } from './classes/Kontext.mjs';
@@ -280,7 +280,7 @@ document.getElementById('assigneePanel').addEventListener('click', () => {
 
 //------------------- showDetails --------------------------------------
 document.getElementById('showDetails').addEventListener('click', () => {
-    new KanboardListPanel().render()
+    new KanbearListPanel().render()
 });
 
 //------------------- kanban --------------------------------------
