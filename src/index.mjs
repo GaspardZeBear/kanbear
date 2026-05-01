@@ -151,10 +151,10 @@ document.getElementById('kanboard').href = Kontext.getKanboardUrl()
 document.getElementById('loadJson').addEventListener('click', async () => {
     try {
         const response = await Kontext.loadKanbearJsonBulkData()
-        document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(Kontext.getJsonBulkData(), null, 2) + '</pre>';
-        document.getElementById('message').innerHTML = '<p>Loaded</p>';
+        //document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(Kontext.getJsonBulkData(), null, 2) + '</pre>';
+        //document.getElementById('message').innerHTML = '<p>Loaded</p>';
     } catch (error) {
-        document.getElementById('message').innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
+        //document.getElementById('message').innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
     }
 })
 

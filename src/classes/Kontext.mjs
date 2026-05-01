@@ -1,4 +1,5 @@
 import { Project } from './Project.mjs'
+import {sendMessage, sendErrorMessage } from '../utils/sendMessage.mjs'
 
 class Kontext {
 
@@ -22,6 +23,10 @@ class Kontext {
 //--------------------------------------------------------------
     static async setProject(projectId) {
         Kontext.currentProjectId=projectId
+        if (projectId < 1) {
+            Kontext.resetKanbearJsonBulkData()
+            return
+        }
         //Kontext.currentProjectName=projectName[]
         //Kontext.currentProjectName=projectName
         console.log("Kontext setProject() bulk ",Kontext.currentProjectId)
@@ -102,12 +107,20 @@ class Kontext {
             const url=`${Kontext.getKanbearUrl()}/api/sql/report/${Kontext.currentProjectId}`
             console.log("Kontext.loadKanbearJsonBulkData() from kanbear",url)
             const response = await fetch(url);
+            console.log(response)
+            if (!response.ok) {
+                
+                throw new Error(`Kontext.loadKanbearJsonBulkData() error ${response.message}`)
+            }
             Kontext.jsonBulkData = await response.json();
             //Kontext.currentProject = Kontext.jsonBulkData
             //Kontext.currentProjectId=this.jsonBulkData.id
             //Kontext.currentProjectName=this.jsonBulkData.name
             console.log("Kontext.loadKanbearJsonBulkData() from updated loaded",Kontext.jsonBulkData)
+            sendMessage("Project loaded")
         } catch (error) {
+            sendErrorMessage(`Could not  load project ${Kontext.currentProjectId}`)
+            console.log(`Kontext.loadKanbearJsonBulkData() error ${error.message}`)
             throw new Error(`Kontext.loadKanbearJsonBulkData() error ${error.message}`)
         }
     }

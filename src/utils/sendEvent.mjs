@@ -9,4 +9,5 @@
         //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
         document.dispatchEvent(event)
   }
+
   export { sendEvent }

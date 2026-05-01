@@ -98,16 +98,16 @@ import { TaskDialog } from "../classes/TaskDialog.mjs"
     return (addWorkspaceButton)
   }
   //------------------------------------------------------------------------
-  function buildAddDummyButton() {
+  function buildAddDummyButton(parms={inner:"?",alert:"Message"}) {
     const addDummyButton = document.createElement('button')
     addDummyButton.classList.add("add-item-btn")
     addDummyButton.setAttribute("id", `addDummyButton`)
     //addTaskButton.innerHTML = "+\u{1F3CB}"
-    addDummyButton.innerHTML = "?"
+    addDummyButton.innerHTML = parms ?.inner || "inner"
     let addDummyFn = function (ev) {
       console.log("addDummyButton event Listener fired")
       ev.stopPropagation();
-      alert("Select a workspace")
+      alert(parms ?.message || "message")
     }
     addDummyButton.addEventListener('click', addDummyFn, { once: false });
     return (addDummyButton)
