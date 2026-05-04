@@ -2,6 +2,8 @@ import { KanbearEntity } from "./KanbearEntity.mjs"
 import { TaskDialog } from "./TaskDialog.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { Ref } from "./Ref.mjs"
+import { buildAddDummyButton, buildAddOpenCloseButton } from "../utils/buttonBuilder.mjs"
+import { getOpenCloseSymbol } from "../utils/misc.mjs"
 
 class Task extends KanbearEntity {
 
@@ -153,13 +155,44 @@ class Task extends KanbearEntity {
         const topLineDiv = document.createElement("div")
         topLineDiv.classList.add("kanban-item-topline")
         topLineDiv.appendChild(href)
+        
+        
+
+        const commentDiv=document.createElement("div")
+        commentDiv.appendChild(buildAddDummyButton({inner:"Co",message:"AddComment"}))
+        topLineDiv.appendChild(commentDiv)
+
+        
+        const tagDiv=document.createElement("div")
+        tagDiv.appendChild(buildAddDummyButton({inner:"Ta",message:"AddTag"}))
+        topLineDiv.appendChild(tagDiv)
+
+
+        const noteDiv=document.createElement("div")
+        noteDiv.appendChild(buildAddDummyButton({inner:"No",message:"SetNote"}))
+        topLineDiv.appendChild(noteDiv)
+
+
+        console.log("this.task", this.task)
+        const openCloseDiv=document.createElement("div")
+        //let callback=(val) => {
+        //    alert(val)
+        //  const task = new TaskDialog()
+        //  task.modify({taskId:myTask.id});
+        //}
+        //openCloseDiv.appendChild(buildAddOpenCloseButton(this.task.id,this.task.is_open,callback))
+        //this.task.is_open ? addAddOpenCloseButton.innerHTML='O/c' : addAddOpenCloseButton.innerHTML='o/C'
+        //let oc
+        //this.task.is_open ? oc="O" : oc="C"
+        openCloseDiv.innerHTML=getOpenCloseSymbol(this.task.is_open)
+        topLineDiv.appendChild(openCloseDiv)
+
         const dummyDiv = document.createElement("div")
         dummyDiv.innerHTML="Open/close,Del,Comment"
-        topLineDiv.appendChild(dummyDiv)
+        //topLineDiv.appendChild(dummyDiv)
+
         taskElement.appendChild(topLineDiv)
-
-
-     
+    
 
         taskElement.appendChild(headerDiv)
         taskElement.appendChild(tNote)

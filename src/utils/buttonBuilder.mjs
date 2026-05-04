@@ -113,4 +113,27 @@ import { TaskDialog } from "../classes/TaskDialog.mjs"
     return (addDummyButton)
   }
 
-export { buildAddColumnButton, buildAddSwimlaneButton,buildAddTaskButton,buildAddProjectButton, buildAddWorkspaceButton, buildAddDummyButton}
+  //------------------------------------------------------------------------
+  function buildAddOpenCloseButton(id,value,callback) {
+    const addAddOpenCloseButton = document.createElement('button')
+    addAddOpenCloseButton.classList.add("add-item-btn")
+    addAddOpenCloseButton.setAttribute("id", `addAddOpenCloseButton_${id}`)
+    value ? addAddOpenCloseButton.innerHTML='O/c' : addAddOpenCloseButton.innerHTML='o/C' 
+    let addAddOpenCloseFn = function (ev) {
+      console.log("addAddOpenCloseButton event Listener fired")
+      ev.stopPropagation();
+      callback( !value)
+    }
+    addAddOpenCloseButton.addEventListener('click', addAddOpenCloseFn, { once: false });
+    return (addAddOpenCloseButton)
+  }
+
+export {
+   buildAddColumnButton,
+   buildAddSwimlaneButton,
+   buildAddTaskButton,
+   buildAddProjectButton, 
+   buildAddWorkspaceButton, 
+   buildAddDummyButton, 
+   buildAddOpenCloseButton
+  }

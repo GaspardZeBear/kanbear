@@ -4,6 +4,7 @@ import { Kontext } from "./Kontext.mjs";
 import { Ref } from "./Ref.mjs"
 import { getFiltersMap } from "../utils/filters.mjs";
 import { Project } from "./Project.mjs"
+import { getOpenCloseSymbol } from "../utils/misc.mjs";
 
 class KanbearListPanel {
 
@@ -167,9 +168,9 @@ class KanbearListPanel {
           row.innerHTML = `
               <td><input type="checkbox" name="tasks" id="${checkBoxId}" class="taskCheckbox"/></td>
               <td><a href="#" class="taskCommentLink" id="${commentLinkId}">c</a></td>
-              <td>${project.name}</td>
-              <td>${swimlane.name}</td>
-              <td>${task.name}</td>
+              <td>${project.name} ${getOpenCloseSymbol(project.is_open)}</td>
+              <td>${swimlane.name} ${getOpenCloseSymbol(swimlane.is_open)}</td>
+              <td>${task.name} ${getOpenCloseSymbol(task.is_open)}</td>
               <td style="background-color:${task.color}">${project.columns[task.column_id].name}</td>
               <td>${dateToString(task.date_moved)}</td>
               <td>${getDurationFromNow(task.date_moved, true)}</td>

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Kanbear</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="src/assets/kanbear.css">
     <link rel="stylesheet" href="src/assets/kanban.css">
     <link rel="stylesheet" href="src/assets/menu.css">
@@ -97,6 +98,21 @@
     <div class="topbar">
         <div class="topbar-name">
             <h3 style="margin-top:0px">Filters</h3>
+        </div>
+
+        <div>
+        <div class="Xfilter-group">
+            <label>Opened Projects only</label>
+            <input type="checkbox" id="projectOpenOnly" checked>
+        </div>
+        <div class="Xfilter-group">
+            <label>Opened swimlanes only</label>
+            <input type="checkbox" id="swimlaneOpenOnly" checked>
+        </div>
+        <div class="Xfilter-group">
+            <label>Opened task only</label>
+            <input type="checkbox" id="taskOpenOnly" checked>
+        </div>
         </div>
 
         <div class="filter-group">
