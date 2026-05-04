@@ -33,6 +33,7 @@ class KanbanPanel {
     console.log("KanbanPanel.reload()")
     await Kontext.loadKanbearJsonBulkData()
     console.log("KanbanPanel.reload() done")
+    Kontext.setPanelClass(KanbanPanel)
     return new KanbanPanel()
   }
   

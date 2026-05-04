@@ -1,4 +1,6 @@
 import { Project } from './Project.mjs'
+import { KanbanPanel } from './KanbanPanel.mjs'
+import { KanbearListPanel} from "./KanbearListPanel.mjs"
 import {sendMessage, sendErrorMessage } from '../utils/sendMessage.mjs'
 
 class Kontext {
@@ -12,6 +14,7 @@ class Kontext {
     static currentProjectId
     static currentProjectName
     static workspaceId
+    static panelClass
 
 
     //--------------------------------------------------------------
@@ -45,6 +48,24 @@ class Kontext {
     static getCurrentProject() {
         console.log("Kontext getCurrentProject() ",Kontext.currentProjectId)
         return(Kontext.jsonBulkData[Kontext.currentProjectId])
+    }
+
+    //--------------------------------------------------------------
+    static setPanelClass(panelClass) {
+        Kontext.panelClass=panelClass
+    }
+
+    //--------------------------------------------------------------
+    static getPanelClass() {
+        return(Kontext.panelClass)
+    }
+
+    //--------------------------------------------------------------
+    static async renderPanel() {
+        console.log("Kontext.renderPanel panelClass",Kontext.panelClass)
+        let panel=await Kontext.panelClass.builder()
+        console.log("Kontext.renderPanel panel",panel)
+        panel.render()
     }
 
     //--------------------------------------------------------------
@@ -102,9 +123,21 @@ class Kontext {
     }
 
     //--------------------------------------------------------------
-    static async loadKanbearJsonBulkData() {
+    static async loadKanbearJsonBulkData(parms={useKontext:true,projectId:null}) {
         try {
-            const url=`${Kontext.getKanbearUrl()}/api/sql/report/${Kontext.currentProjectId}`
+            let taskOpenOnly=document.getElementById("taskOpenOnly")
+            console.log("Kontext.loadKanbearJsonBulkData() taskOpenOnly",taskOpenOnly.checked)
+            let queries=[]
+            if ( taskOpenOnly.checked) {
+                queries.push("task.openOnly=true")
+            }
+            let query=""
+            if (queries.length > 0 ) {
+                query="?" + queries.join("&")
+            }
+            let projectId= parms.useKontext ? Kontext.currentProjectId : parms.projectId
+           
+            const url=`${Kontext.getKanbearUrl()}/api/sql/report/${projectId}${query}`
             console.log("Kontext.loadKanbearJsonBulkData() from kanbear",url)
             const response = await fetch(url);
             console.log(response)
@@ -112,12 +145,14 @@ class Kontext {
                 
                 throw new Error(`Kontext.loadKanbearJsonBulkData() error ${response.message}`)
             }
-            Kontext.jsonBulkData = await response.json();
-            //Kontext.currentProject = Kontext.jsonBulkData
-            //Kontext.currentProjectId=this.jsonBulkData.id
-            //Kontext.currentProjectName=this.jsonBulkData.name
-            console.log("Kontext.loadKanbearJsonBulkData() from updated loaded",Kontext.jsonBulkData)
+            const resp=await response.json();
+            console.log("Kontext.loadKanbearJsonBulkData() from updated loaded",resp)
+            if ( parms.useKontext ) {
+               Kontext.jsonBulkData = resp
+            }
+            
             sendMessage("Project loaded")
+            return(resp)
         } catch (error) {
             sendErrorMessage(`Could not  load project ${Kontext.currentProjectId}`)
             console.log(`Kontext.loadKanbearJsonBulkData() error ${error.message}`)

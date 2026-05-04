@@ -22,6 +22,7 @@ class KanbearListPanel {
   static async builder() {
     console.log("KanbearListPanel.builder()")
     const projects = await Project.getAll('projects', { workspace_id: Kontext.getWorkspaceId() })
+    Kontext.setPanelClass(KanbearListPanel)
     return new KanbearListPanel(projects)
   }
 
@@ -107,7 +108,7 @@ class KanbearListPanel {
   }
 
   //---------------------------------------------------------------------------------------
-  async getJsonBulkData(projectId) {
+  async XgetJsonBulkData(projectId) {
     try {
       const url = `${Kontext.getKanbearUrl()}/api/sql/report/${projectId}`
       console.log("KanbearListPanel.getJsonBulkData() from kanbear", url)
@@ -118,6 +119,11 @@ class KanbearListPanel {
     } catch (error) {
       throw new Error(`KanbearListPanel.getJsonBulkData() error ${error.message}`)
     }
+  }
+  //---------------------------------------------------------------------------------------
+  async getJsonBulkData(projectId) {
+      let  jsonBulkData=await Kontext.loadKanbearJsonBulkData({useKontext:false,projectId:projectId})
+      return(jsonBulkData)
   }
 
   //-----------------------------------------------------------------
@@ -142,13 +148,12 @@ class KanbearListPanel {
     this.table.appendChild(thead)
     const tbody = document.createElement('tbody')
 
-    console.log(this.projects)
+    console.log("KanbearListPanel.createTable() <projects>",this.projects)
     //Object.entries(this.projects).forEach(([projectId, project]) => {
 
     for (let p of this.projects)  {
       const projectM=await this.getJsonBulkData(p.id)
       console.log("KanbearListPanel.createTable() <projectM>", projectM)
-       
       const project=projectM[p.id]
       console.log("KanbearListPanel.createTable() <project>", project)
       if (!this.kanboardFilter.keepProject(project.name)) { continue }

@@ -13,6 +13,7 @@ class KanbearSqlReporter {
     this.PCSTResp = []
     this.usersMap = {}
     this.assigneesMap = {}
+    //this.query=query
     if (runOnCreate) {
       this.run()
     }
@@ -25,15 +26,32 @@ class KanbearSqlReporter {
 
   //-----------------------------------------------------
   async selectPST(projectId) {
-    console.log("KanboardSqlReporter.selectPST()")
+    console.log("KanboardSqlReporter.selectPST() query",this.query)
+    let filters=[]
+    if  ( this.query["project.openOnly"] ) {
+      filters.push("p.is_open=true")
+    }
+    if  ( this.query["swimlane.openOnly"] ) {
+      filters.push("s.is_open=true")
+    }
+    if  ( this.query["task.openOnly"] ) {
+      filters.push("t.is_open=true")
+    }
+    let filter=""
+    if (filters.length > 0 ) {
+      filter=" AND " + filters.join(" AND ")
+    }
+    console.log("filter",filter)
     let reqPST = `
       select 
         p.id pId,
 	      p.name pName,
         p.description pDescription,
+        p.is_open pIsOpen,
         s.id sId,
 	      s.name sName,
         s.description sDescription,
+        s.is_open sIsOpen,
  	      t.name tName,
         t.note tNote,
         t.id tId,
@@ -41,6 +59,7 @@ class KanbearSqlReporter {
         t.description tDescription,
         t.assignee_id tAssigneeId,
         t.color tColor,
+        t.is_open tIsOpen,
 	      t.date_moved tMoved,
 	      t.date_due tDue,
 	      datetime(t.date_moved,'unixepoch') tMovedDatetime
@@ -49,7 +68,7 @@ class KanbearSqlReporter {
         on p.id=s.project_id
       left join tasks as t
         on s.id = t.swimlane_id
-      where p.id=${projectId}
+      where p.id=${projectId} ${filter}
       order by s.name,t.name
       `
     db.all(reqPST, [], this.callAfterPST.bind(this));
@@ -81,29 +100,29 @@ class KanbearSqlReporter {
 
   //--------------------------------------------------------
   callAfterPST(err, httpCode, params) {
-    console.log("KanbearSqlReporter.callAfterPST() <err>", err)
-    console.log("KanbearSqlReporter.callAfterPST() <httpCode>", httpCode)
+    //console.log("KanbearSqlReporter.callAfterPST() <err>", err)
+    //console.log("KanbearSqlReporter.callAfterPST() <httpCode>", httpCode)
     //console.log("KanbearSqlReporter.callAfterPST() <params>", params)
-    console.log("KanbearSqlReporter.callAfterPST() <db>", this.db)
-    console.log("PCSTResp", params)
+    //console.log("KanbearSqlReporter.callAfterPST() <db>", this.db)
+    //console.log("PSTResp", params)
     this.PSTResp = params
     //return (params)
   }
 
   //--------------------------------------------------------
   callAfterC(err, httpCode, params) {
-    console.log("KanbearSqlReporter.callAfterC() <err>", err)
-    console.log("KanbearSqlReporter.callAfterC() <httpCode>", httpCode)
+    //console.log("KanbearSqlReporter.callAfterC() <err>", err)
+    //console.log("KanbearSqlReporter.callAfterC() <httpCode>", httpCode)
     //console.log("KanbearSqlReporter.callAfterPCST() <params>", params)
-    console.log("KanbearSqlReporter.callAfterC() <db>", this.db)
-    console.log("CResp", params)
+    //console.log("KanbearSqlReporter.callAfterC() <db>", this.db)
+    //console.log("CResp", params)
     this.CResp = params
     //return (params)
   }
 
   //-----------------------------------------------------
   async selectUsers() {
-    console.log("KanbearSqlReporter.selectPCST()")
+    console.log("KanbearSqlReporter.selectUsers()")
     let reqUsers = `select u.id uId,u.name uName from users as u`
     //let usersMap = { '0': 'nobody' }
     db.all(reqUsers, [], this.callAfterUsers.bind(this));
@@ -111,9 +130,9 @@ class KanbearSqlReporter {
 
   //--------------------------------------------------------
   callAfterUsers(err, httpCode, params) {
-    console.log("KanbearSqlReporter.callAfterUsers() <err>", err)
-    console.log("KanbearSqlReporter.callAfterUsers() <httpCode>", httpCode)
-    console.log("KanbearSqlReporter.callAfterUsers() <params>", params)
+    //console.log("KanbearSqlReporter.callAfterUsers() <err>", err)
+    //console.log("KanbearSqlReporter.callAfterUsers() <httpCode>", httpCode)
+    //console.log("KanbearSqlReporter.callAfterUsers() <params>", params)
 
     for (let row of params) {
       this.usersMap[row.uId] = { name: row.uName}
@@ -132,9 +151,9 @@ class KanbearSqlReporter {
 
   //--------------------------------------------------------
   callAfterAssignees(err, httpCode, params) {
-    console.log("KanbearSqlReporter.callAfterAssignees() <err>", err)
-    console.log("KanbearSqlReporter.callAfterAssignees() <httpCode>", httpCode)
-    console.log("KanbearSqlReporter.callAfterAssignees() <params>", params)
+    //console.log("KanbearSqlReporter.callAfterAssignees() <err>", err)
+    //console.log("KanbearSqlReporter.callAfterAssignees() <httpCode>", httpCode)
+    //console.log("KanbearSqlReporter.callAfterAssignees() <params>", params)
 
     for (let row of params) {
       this.assigneesMap[row.aId] = { name: row.aName }
@@ -143,9 +162,10 @@ class KanbearSqlReporter {
   }
 
   //-----------------------------------------------------
-  async getJsonReport(projectId) {
+  async getJsonReport(projectId,query={}) {
     let report = []
     let projectsMap = {}
+    this.query=query
     const pstPromises = this.selectPST(projectId)
     const cPromises = this.selectC(projectId)
     //console.log("<pcstPromises>", pcstPromises)
@@ -156,11 +176,12 @@ class KanbearSqlReporter {
     //console.log("<pcst>", this.PSTResp)
     //-- turn into table
     for (let row of this.PSTResp) {
-      console.log(row)
+      //console.log(row)
       if (!projectsMap[row.pId]) {
         projectsMap[row.pId] = {}
         projectsMap[row.pId].name = row.pName
         projectsMap[row.pId].id = row.pId
+        projectsMap[row.pId].is_open = row.pIsOpen
         projectsMap[row.pId].description = row.pDescription
         projectsMap[row.pId].swimlanes = {}
         projectsMap[row.pId].columns = {}
@@ -174,7 +195,15 @@ class KanbearSqlReporter {
         continue
       }
       if (!projectsMap[row.pId].swimlanes[row.sId]) {
-        projectsMap[row.pId].swimlanes[row.sId] = { id: row.sId, project_id: row.pId, name: row.sName, description: row.sDescription, tasks: {} }
+        projectsMap[row.pId].swimlanes[row.sId] = { 
+          id: row.sId, 
+          project_id: row.pId,
+          is_open: row.sIsOpen,
+          name: row.sName, 
+          description: 
+          row.sDescription, 
+          tasks: {}
+         }
       }
       // Beware of left/righ join, task may be null 
       //console.log("row.tId",row.tId)
@@ -186,7 +215,7 @@ class KanbearSqlReporter {
         id: row.tId,
         description: row.tDescription,
         name: row.tName,
-        note: row.tNote,
+        is_open: row.tIsOpen,
         project_id: row.pId,
         swimlane_id: row.sId,
         column_id: row.cId,

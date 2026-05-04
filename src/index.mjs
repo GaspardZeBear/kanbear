@@ -21,10 +21,21 @@ await Kontext.loadConfig()
 buildWorkspacesSelectBox()
 buildKanbearProjectsSelectBox()
 
+document.getElementById("taskOpenOnly").addEventListener("change", async (ev) => {
+    console.log("index.mjs() taskOpenOnly listener fired <ev>", ev)
+    //if (ev.currentTarget.checked) {
+    //    console.log('checked');
+    //} else {
+     //   console.log('not checked');
+    //}
+    Kontext.loadKanbearJsonBulkData()
+    Kontext.renderPanel()
+})
 
 document.addEventListener("workspaceCreated", (ev) => {
     console.log("workspaceCreated listener fired <ev>", ev)
     buildWorkspacesSelectBox()
+
 })
 
 document.addEventListener("workspaceModified", async (ev) => {

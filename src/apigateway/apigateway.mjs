@@ -43,10 +43,16 @@ app.use('/api/tasks_comments', taskCommentRoutes);
 //------------------------------------------------------------------------------
 app.get('/api/sql/report/:projectId', async (req, res) => {
   const projectId=parseInt(req.params.projectId)
-   console.log("/api/sql/report invokated pId",projectId)
+  console.log("--------------------------------------------------------------------------------------------")
+  console.log("/api/sql/report params",req.params)
+  console.log("/api/sql/report body",req.body)
+  console.log("/api/sql/report query",req.query)
+  console.log("--------------------------------------------------------------------------------------------")
+
+  console.log("/api/sql/report invokated pId",projectId)
   try {
     const sqlReporter=new KanbearSqlReporter(false)
-    const report = await sqlReporter.getJsonReport(projectId);
+    const report = await sqlReporter.getJsonReport(projectId,req.query);
     console.log("api.get() ", report)
     res.json(report);
   } catch (error) {
