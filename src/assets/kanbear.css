@@ -41,13 +41,19 @@ body {
 
 .topbar-name {
     width:10%;
+    background-color:greenyellow;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.openCloseDiv {
+    display:grid;
     background-color:greenyellow
 }
 
 .filter-group {
     background: lightblue;
     display: flex;
-        margin-top:0px;
+    margin-top:0px;
     margin-bottom: 0px;
     flex-direction: column;
     gap: 1px;

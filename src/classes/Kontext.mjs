@@ -2,6 +2,7 @@ import { Project } from './Project.mjs'
 import { KanbanPanel } from './KanbanPanel.mjs'
 import { KanbearListPanel} from "./KanbearListPanel.mjs"
 import {sendMessage, sendErrorMessage } from '../utils/sendMessage.mjs'
+import { getOpenCloseSymbol, getOpenCloseQueryParms } from '../utils/openClose.mjs'
 
 class Kontext {
 
@@ -125,16 +126,21 @@ class Kontext {
     //--------------------------------------------------------------
     static async loadKanbearJsonBulkData(parms={useKontext:true,projectId:null}) {
         try {
+
+            /*
             let taskOpenOnly=document.getElementById("taskOpenOnly")
             console.log("Kontext.loadKanbearJsonBulkData() taskOpenOnly",taskOpenOnly.checked)
             let queries=[]
-            if ( taskOpenOnly.checked) {
-                queries.push("task.openOnly=true")
-            }
+            queries.push(getOpenCloseParm('project',document.getElementById("projectOpen").checked,document.getElementById("projectClosed").checked))
+            queries.push(getOpenCloseParm('swimlane',document.getElementById("swimlaneOpen").checked,document.getElementById("swimlaneClosed").checked))
+            queries.push(getOpenCloseParm('task',document.getElementById("taskOpen").checked,document.getElementById("taskClosed").checked))
+            
             let query=""
             if (queries.length > 0 ) {
                 query="?" + queries.join("&")
             }
+                */
+            let query=getOpenCloseQueryParms()
             let projectId= parms.useKontext ? Kontext.currentProjectId : parms.projectId
            
             const url=`${Kontext.getKanbearUrl()}/api/sql/report/${projectId}${query}`

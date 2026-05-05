@@ -21,16 +21,22 @@ await Kontext.loadConfig()
 buildWorkspacesSelectBox()
 buildKanbearProjectsSelectBox()
 
-document.getElementById("taskOpenOnly").addEventListener("change", async (ev) => {
-    console.log("index.mjs() taskOpenOnly listener fired <ev>", ev)
-    //if (ev.currentTarget.checked) {
-    //    console.log('checked');
-    //} else {
-     //   console.log('not checked');
-    //}
-    Kontext.loadKanbearJsonBulkData()
-    Kontext.renderPanel()
-})
+for (let item of ['project', 'swimlane', 'task']) {
+    for (let status of ['Open', 'Closed']) {
+        const id = `${item}${status}`
+        console.log(`index.mjs() ${id} listener creation`)
+        document.getElementById(id).addEventListener("change", async (ev) => {
+            console.log(`index.mjs() ${id} listener fired <ev>`, ev)
+            //if (ev.currentTarget.checked) {
+            //    console.log('checked');
+            //} else {
+            //   console.log('not checked');
+            //}
+            Kontext.loadKanbearJsonBulkData()
+            Kontext.renderPanel()
+        })
+    }
+}
 
 document.addEventListener("workspaceCreated", (ev) => {
     console.log("workspaceCreated listener fired <ev>", ev)
@@ -175,7 +181,8 @@ async function buildKanbearProjectsSelectBox() {
     let projects = []
     console.log("buildKanbearProjectsSelectBox() <workspaceId>", workspaceId)
     if (workspaceId) {
-        projects = await Project.getAll('projects', { workspace_id: workspaceId })
+        //const isOpen=document.getElementById;
+        projects = await Project.getAll('projects', { workspace_id: workspaceId, is_open:true })
         //projects.unshift({ id: -1, name: '* Create new project' })
     }
     console.log("buildKanbearProjectsSelectBox <Kontext.getCurrentProjectId>", Kontext.getCurrentProjectId())
@@ -187,10 +194,13 @@ async function buildKanbearProjectsSelectBox() {
     } else {
         buttons.push(buildAddDummyButton())
     }
+    let checkboxes = []
+
     let boxParams = {
         domId: boxName,
         boxLabel: "Project",
         buttons: buttons,
+        checkboxes : checkboxes,
         items: projects,
         labelText: "Project",
         klass: "filter-group",

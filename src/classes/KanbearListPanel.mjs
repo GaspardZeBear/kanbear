@@ -4,7 +4,7 @@ import { Kontext } from "./Kontext.mjs";
 import { Ref } from "./Ref.mjs"
 import { getFiltersMap } from "../utils/filters.mjs";
 import { Project } from "./Project.mjs"
-import { getOpenCloseSymbol } from "../utils/misc.mjs";
+import { getOpenCloseSymbol } from "../utils/openClose.mjs";
 
 class KanbearListPanel {
 
@@ -154,6 +154,7 @@ class KanbearListPanel {
     for (let p of this.projects)  {
       const projectM=await this.getJsonBulkData(p.id)
       console.log("KanbearListPanel.createTable() <projectM>", projectM)
+      if ( !projectM[p.id]) { continue }
       const project=projectM[p.id]
       console.log("KanbearListPanel.createTable() <project>", project)
       if (!this.kanboardFilter.keepProject(project.name)) { continue }

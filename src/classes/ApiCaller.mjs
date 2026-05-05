@@ -57,7 +57,7 @@ class ApiCaller {
     //-----------------------------------------------------------------
     async get(uri, params = {}) {
         this.header(["GET", uri, { params }])
-        console.log("url ", await this.url(uri), { params: params })
+        console.log("ApiCaller.get() url ", await this.url(uri), { params: params })
         try {
             console.log("ApiCaller.get() before");
             const res = await axios.get(await this.url(uri), { params: params });
