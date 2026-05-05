@@ -28,20 +28,29 @@ class KanbearSqlReporter {
   async selectPST(projectId) {
     console.log("KanboardSqlReporter.selectPST() query",this.query)
     let filters=[]
-    if  ( this.query["project.openOnly"] ) {
+    if  ( this.query["project.open"] ) {
       filters.push("p.is_open=true")
     }
-    if  ( this.query["swimlane.openOnly"] ) {
+    if  ( this.query["project.closed"] ) {
+      filters.push("p.is_open=false")
+    }
+    if  ( this.query["swimlane.open"] ) {
       filters.push("s.is_open=true")
     }
-    if  ( this.query["task.openOnly"] ) {
+    if  ( this.query["swimlane.closed"] ) {
+      filters.push("s.is_open=false")
+    }
+    if  ( this.query["task.open"] ) {
       filters.push("t.is_open=true")
+    }
+    if  ( this.query["task.closed"] ) {
+      filters.push("t.is_open=false")
     }
     let filter=""
     if (filters.length > 0 ) {
       filter=" AND " + filters.join(" AND ")
     }
-    console.log("filter",filter)
+    console.log("KanbearSqlReporter.selectPST(projectId) filter",filter)
     let reqPST = `
       select 
         p.id pId,
@@ -104,7 +113,7 @@ class KanbearSqlReporter {
     //console.log("KanbearSqlReporter.callAfterPST() <httpCode>", httpCode)
     //console.log("KanbearSqlReporter.callAfterPST() <params>", params)
     //console.log("KanbearSqlReporter.callAfterPST() <db>", this.db)
-    //console.log("PSTResp", params)
+    console.log("PSTResp", params)
     this.PSTResp = params
     //return (params)
   }
@@ -173,8 +182,12 @@ class KanbearSqlReporter {
     const assigneesPromise = this.selectAssignees()
     let [pst, pc, usersMap,assigneesMap] = await Promise.all([pstPromises, cPromises, usersPromise,assigneesPromise])
 
-    //console.log("<pcst>", this.PSTResp)
+    console.log("KanbearSqlReporter.getJsonReport <PSTResp>", this.PSTResp)
     //-- turn into table
+    if ( this.PSTResp.length == 0) {
+      return(projectsMap)
+    }
+    
     for (let row of this.PSTResp) {
       //console.log(row)
       if (!projectsMap[row.pId]) {
@@ -226,6 +239,7 @@ class KanbearSqlReporter {
       }
     }
     //console.log("pc", pc)
+    console.log("KanbearSqlReporter.getJsonReport() before col <projectsMap>",projectsMap)
     //console.log("this.CResp", this.CResp)
     for (let c of this.CResp) {
       projectsMap[projectId].columns[c.cId] = {

@@ -79,6 +79,7 @@
         <div>
             <div class="infos">
                 <b>Project</b>
+                
             </div>
             <div class="infos" id="project">
                 <p>No selection</p>
@@ -100,31 +101,45 @@
             <h3 style="margin-top:0px">Filters</h3>
         </div>
 
-        <div>
-        <div class="Xfilter-group">
-            <label>Opened Projects only</label>
-            <input type="checkbox" id="projectOpenOnly" checked>
+        <!--
+        <div class="openCloseDiv">
+            <div class="Xfilter-group">
+                <label>Opened Projects only</label>
+                <input type="checkbox" id="XprojectOpenOnly" checked>
+            </div>
+            <div class="Xfilter-group">
+                <label>Opened swimlanes only</label>
+                <input type="checkbox" id="XswimlaneOpenOnly" checked>
+            </div>
+            <div class="Xfilter-group">
+                <label>Opened task only</label>
+                <input type="checkbox" id="XtaskOpenOnly" checked>
+            </div>
         </div>
-        <div class="Xfilter-group">
-            <label>Opened swimlanes only</label>
-            <input type="checkbox" id="swimlaneOpenOnly" checked>
-        </div>
-        <div class="Xfilter-group">
-            <label>Opened task only</label>
-            <input type="checkbox" id="taskOpenOnly" checked>
-        </div>
-        </div>
+    -->
 
         <div class="filter-group">
+            <div style="display:flex;flex-direction:row;">
             <label for="project">Project</label>
+            &nbsp;&#x01F513;<input type="checkbox" id="projectOpen" checked>
+            &#x01F512;<input type="checkbox" id="projectClosed" checked>
+            </div>
             <input type="text" id="projectFilter" placeholder=".*">
         </div>
         <div class="filter-group">
-            <label for="swimLane">Swimlane</label>
+            <div style="display:flex;flex-direction:row;">
+            <label for="swimlane">Swimlane</label>
+            &nbsp;&#x01F513;<input type="checkbox" id="swimlaneOpen" checked>
+            &#x01F512;<input type="checkbox" id="swimlaneClosed" checked>
+            </div>
             <input type="text" id="swimlaneFilter" placeholder=".*">
         </div>
         <div class="filter-group">
-            <label for="taskFilter">Task</label>
+            <div style="display:flex;flex-direction:row;">
+            <label for="task">Task</label>
+            &nbsp;&#x01F513;<input type="checkbox" id="taskOpen" checked>
+            &#x01F512;<input type="checkbox" id="taskClosed" checked>
+            </div>
             <input type="text" id="taskFilter" placeholder=".*">
         </div>
         <div class="filter-group">
