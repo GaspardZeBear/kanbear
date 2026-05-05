@@ -16,6 +16,7 @@ import { WorkspaceDialog } from './classes/WorkspaceDialog.mjs'
 import { sendEvent } from './utils/sendEvent.mjs';
 import { buildWorkspaceLink, buildProjectLink } from './utils/linkBuilder.mjs';
 import { buildAddDummyButton, buildAddProjectButton, buildAddWorkspaceButton } from './utils/buttonBuilder.mjs';
+import { getOpenCloseParmBoolean} from './utils/openClose.mjs'
 
 await Kontext.loadConfig()
 buildWorkspacesSelectBox()
@@ -32,11 +33,22 @@ for (let item of ['project', 'swimlane', 'task']) {
             //} else {
             //   console.log('not checked');
             //}
+            //
             Kontext.loadKanbearJsonBulkData()
             Kontext.renderPanel()
         })
     }
 }
+
+document.getElementById("projectOpen").addEventListener("change", async (ev) => {
+    console.log(`index.mjs() projectOpen2 listener fired <ev>`, ev)
+    buildKanbearProjectsSelectBox()
+})
+
+document.getElementById("projectClosed").addEventListener("change", async (ev) => {
+    console.log(`index.mjs() projectClosed22 listener fired <ev>`, ev)
+    buildKanbearProjectsSelectBox()
+})
 
 document.addEventListener("workspaceCreated", (ev) => {
     console.log("workspaceCreated listener fired <ev>", ev)
@@ -181,8 +193,14 @@ async function buildKanbearProjectsSelectBox() {
     let projects = []
     console.log("buildKanbearProjectsSelectBox() <workspaceId>", workspaceId)
     if (workspaceId) {
-        //const isOpen=document.getElementById;
-        projects = await Project.getAll('projects', { workspace_id: workspaceId, is_open:true })
+        const isOpen=document.getElementById("projectOpen").checked;
+        const isClosed=document.getElementById("projectClosed").checked;
+        const openClosed=getOpenCloseParmBoolean('project',isOpen,isClosed)
+        const parms={ workspace_id: workspaceId }
+        if ( ! openClosed === undefined ) {
+            parms["is_open"] = openClosed
+        }
+        projects = await Project.getAll('projects', parms)
         //projects.unshift({ id: -1, name: '* Create new project' })
     }
     console.log("buildKanbearProjectsSelectBox <Kontext.getCurrentProjectId>", Kontext.getCurrentProjectId())

@@ -3,7 +3,7 @@ import { TaskDialog } from "./TaskDialog.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { Ref } from "./Ref.mjs"
 import { buildAddDummyButton, buildAddOpenCloseButton } from "../utils/buttonBuilder.mjs"
-import { getOpenCloseSymbol } from "../utils/misc.mjs"
+import { getOpenCloseSymbol } from "../utils/openClose.mjs"
 
 class Task extends KanbearEntity {
 

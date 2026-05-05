@@ -1,16 +1,29 @@
+//--------------------------------------------------------------------------------------------
 function getOpenCloseSymbol(val) {
     return (val ? "\u{1F513}" : "\u{1F512}")
     //return(val ? '<i class="material-icons">lock</i>':'<i class="material-icons">lock</i>')
 }
 
+//--------------------------------------------------------------------------------------------
+function getOpenCloseParmBoolean(kind, openSelected, closeSelected) {
+    console.log("getOpenCloseParmBoolean() <kind>", kind, openSelected, closeSelected)
+    if (openSelected && closeSelected) return(undefined)
+    if (openSelected) return (true)
+    if (closeSelected) return (false)
+    return(undefined)
+}
+
+
+//--------------------------------------------------------------------------------------------
 function getOpenCloseParm(kind, openSelected, closeSelected) {
-    console.log("getOpenCloseParms() <kind>", kind, openSelected, closeSelected)
+    console.log("getOpenCloseParm() <kind>", kind, openSelected, closeSelected)
     if (openSelected && closeSelected) return("")
     if (openSelected) return (`${kind}.open=true`)
     if (closeSelected) return (`${kind}.closed=true`)
     return("")
 }
 
+//--------------------------------------------------------------------------------------------
 function getOpenCloseQueryParms(item, openSelected, closeSelected) {
 
     let queries = []
@@ -30,4 +43,7 @@ function getOpenCloseQueryParms(item, openSelected, closeSelected) {
     return (query)
 }
 
-export { getOpenCloseSymbol, getOpenCloseQueryParms }
+//--------------------------------------------------------------------------------------------
+
+
+export { getOpenCloseSymbol, getOpenCloseQueryParms, getOpenCloseParmBoolean }
