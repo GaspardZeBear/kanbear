@@ -7,9 +7,19 @@ function getOpenCloseSymbol(val) {
 //--------------------------------------------------------------------------------------------
 function getOpenCloseParmBoolean(kind, openSelected, closeSelected) {
     console.log("getOpenCloseParmBoolean() <kind>", kind, openSelected, closeSelected)
-    if (openSelected && closeSelected) return(undefined)
-    if (openSelected) return (true)
-    if (closeSelected) return (false)
+    if (openSelected && closeSelected) {
+        console.log("getOpenCloseParmBoolean() openSelected && closeSelected")
+        return(undefined)
+    }
+    if (openSelected) {
+        console.log("getOpenCloseParmBoolean() openSelected")
+        return (true)
+    }
+    if (closeSelected) {
+        console.log("getOpenCloseParmBoolean() closeSelected")
+        return (false)
+    }
+    console.log("getOpenCloseParmBoolean() default")
     return(undefined)
 }
 
@@ -24,10 +34,10 @@ function getOpenCloseParm(kind, openSelected, closeSelected) {
 }
 
 //--------------------------------------------------------------------------------------------
-function getOpenCloseQueryParms(item, openSelected, closeSelected) {
+function getOpenCloseQueryParms(kinds=['project', 'swimlane', 'task']) {
 
     let queries = []
-    for (let kind of ['project', 'swimlane', 'task']) {
+    for (let kind of kinds) {
         const openChecked = document.getElementById(`${kind}Open`).checked
         const closeChecked = document.getElementById(`${kind}Closed`).checked
         const parm = getOpenCloseParm(kind, openChecked, closeChecked)

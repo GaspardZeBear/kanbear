@@ -142,7 +142,9 @@ class Kontext {
                 query="?" + queries.join("&")
             }
                 */
-            let query = getOpenCloseQueryParms()
+               
+            // Do not take in account project open or closed !!!!
+            let query = getOpenCloseQueryParms(['swimlane', 'task'])
             let projectId = parms.useKontext ? Kontext.currentProjectId : parms.projectId
             if ( projectId === undefined ) {
                 console.log("Kontext.loadKanbearJsonBulkData() from kanbear projectId is undefined")

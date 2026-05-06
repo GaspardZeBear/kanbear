@@ -16,9 +16,12 @@ class KanbanPanel {
   //------------------------------------------------------------------------
   // Please, dont call it directly, use builder
   constructor() {
-    this.projects = Kontext.getJsonBulkData()
+    //this.projects = Kontext.getJsonBulkData()
     console.log("KanbanPanel.constructor() projectId", Kontext.getCurrentProjectId())
-    this.project = Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()] || undefined
+    this.project=undefined
+    if (Kontext.getCurrentProjectId()) {
+       this.project = Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()]
+    } 
     this.htmlElement = 'results'
     this.kanboardFilter = new KanboardFilter(getFiltersMap())
     this.buttons = {}

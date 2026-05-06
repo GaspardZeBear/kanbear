@@ -197,7 +197,7 @@ async function buildKanbearProjectsSelectBox() {
         const isClosed=document.getElementById("projectClosed").checked;
         const openClosed=getOpenCloseParmBoolean('project',isOpen,isClosed)
         const parms={ workspace_id: workspaceId }
-        if ( ! openClosed === undefined ) {
+        if ( ! (openClosed === undefined) ) {
             parms["is_open"] = openClosed
         }
         projects = await Project.getAll('projects', parms)

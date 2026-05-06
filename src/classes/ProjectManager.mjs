@@ -10,7 +10,7 @@ class ProjectManager {
     //----------------------------------------------------------------
     isDisplayable() {
         console.log("ProjectManager", this.project)
-        if (!this.project) return ([false, "Not exists"])
+        if (!this.project) return ([false, "or no project selected"])
         console.log("ProjectManager", "exist !")
         if (!Kontext.getJsonBulkData()[this.project.id]) return ([false, "Not loaded"])
         console.log("ProjectManager", "is in Bulk")

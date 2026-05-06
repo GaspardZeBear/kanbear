@@ -4,7 +4,7 @@ import { Kontext } from "./Kontext.mjs";
 import { Ref } from "./Ref.mjs"
 import { getFiltersMap } from "../utils/filters.mjs";
 import { Project } from "./Project.mjs"
-import { getOpenCloseSymbol } from "../utils/openClose.mjs";
+import { getOpenCloseSymbol, getOpenCloseParmBoolean } from "../utils/openClose.mjs";
 
 class KanbearListPanel {
 
@@ -21,7 +21,15 @@ class KanbearListPanel {
   //----------------------------------------------------------
   static async builder() {
     console.log("KanbearListPanel.builder()")
-    const projects = await Project.getAll('projects', { workspace_id: Kontext.getWorkspaceId() })
+    const isOpen = document.getElementById("projectOpen").checked;
+    const isClosed = document.getElementById("projectClosed").checked;
+    const openClosed = getOpenCloseParmBoolean('project', isOpen, isClosed)
+    const parms = { workspace_id: Kontext.getWorkspaceId() }
+    if (!(openClosed === undefined)) {
+      parms["is_open"] = openClosed
+    }
+    console.log("KanbearListPanel.builder() <parms>",parms)
+    const projects = await Project.getAll('projects', parms)
     Kontext.setPanelClass(KanbearListPanel)
     return new KanbearListPanel(projects)
   }
@@ -115,15 +123,15 @@ class KanbearListPanel {
       const response = await fetch(url);
       const jsonBulkData = await response.json();
       console.log("KanbearListPanel.getJsonBulkData() loaded", jsonBulkData)
-      return(jsonBulkData)
+      return (jsonBulkData)
     } catch (error) {
       throw new Error(`KanbearListPanel.getJsonBulkData() error ${error.message}`)
     }
   }
   //---------------------------------------------------------------------------------------
   async getJsonBulkData(projectId) {
-      let  jsonBulkData=await Kontext.loadKanbearJsonBulkData({useKontext:false,projectId:projectId})
-      return(jsonBulkData)
+    let jsonBulkData = await Kontext.loadKanbearJsonBulkData({ useKontext: false, projectId: projectId })
+    return (jsonBulkData)
   }
 
   //-----------------------------------------------------------------
@@ -148,14 +156,14 @@ class KanbearListPanel {
     this.table.appendChild(thead)
     const tbody = document.createElement('tbody')
 
-    console.log("KanbearListPanel.createTable() <projects>",this.projects)
+    console.log("KanbearListPanel.createTable() <projects>", this.projects)
     //Object.entries(this.projects).forEach(([projectId, project]) => {
 
-    for (let p of this.projects)  {
-      const projectM=await this.getJsonBulkData(p.id)
+    for (let p of this.projects) {
+      const projectM = await this.getJsonBulkData(p.id)
       console.log("KanbearListPanel.createTable() <projectM>", projectM)
-      if ( !projectM[p.id]) { continue }
-      const project=projectM[p.id]
+      if (!projectM[p.id]) { continue }
+      const project = projectM[p.id]
       console.log("KanbearListPanel.createTable() <project>", project)
       if (!this.kanboardFilter.keepProject(project.name)) { continue }
       Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
@@ -176,13 +184,13 @@ class KanbearListPanel {
               <td><a href="#" class="taskCommentLink" id="${commentLinkId}">c</a></td>
               <td>${project.name} ${getOpenCloseSymbol(project.is_open)}</td>
               <td>${swimlane.name} ${getOpenCloseSymbol(swimlane.is_open)}</td>
-              <td>${task.name} ${getOpenCloseSymbol(task.is_open)}</td>
-              <td style="background-color:${task.color}">${project.columns[task.column_id].name}</td>
+              <td style="background-color:${task.color}">${task.name} ${getOpenCloseSymbol(task.is_open)}</td>
+              <td>${project.columns[task.column_id].name}</td>
               <td>${dateToString(task.date_moved)}</td>
               <td>${getDurationFromNow(task.date_moved, true)}</td>
               <td>${dateToString(task.date_due)}</td>
               <td>${getDurationFromNow(task.date_due, true) ?? ''}</td>
-              <td>${project.assignees[task.assignee_id]?.name||""}</td>
+              <td>${project.assignees[task.assignee_id]?.name || ""}</td>
             `;
           tbody.appendChild(row);
         })
