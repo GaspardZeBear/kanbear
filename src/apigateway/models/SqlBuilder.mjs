@@ -1,3 +1,4 @@
+import { Konsol } from "../classes/Konsol.mjs"
 class SqlBuilder {
 
     //----------------------------------------------------------------------------------
@@ -46,7 +47,7 @@ class SqlBuilder {
         const bindVariables = []
         const qmarks = []
         const filter = req.query ?? {}
-        console.log("SqlBuilder.generateGetStatement() <req.query>", req.query, "<req.params>",req.params,"<filter>", filter)
+        Konsol.log("SqlBuilder.generateGetStatement() <req.query>", req.query, "<req.params>",req.params,"<filter>", filter)
         // quick and darty, does not work for strings !
         let filters = []
         Object.entries(filter).forEach(([key, val]) => {
@@ -66,7 +67,7 @@ class SqlBuilder {
         whereStr ? whereStr = 'WHERE ' + whereStr : ''
 
         const qmarksStr = qmarks.join(', ');
-        console.log("SqlBuilder.generateGetStatement() <whereStr>", whereStr)
+        Konsol.log("SqlBuilder.generateGetStatement() <whereStr>", whereStr)
 
         const sql = `SELECT * FROM ${tableName} ${whereStr}`;
         //const sql = `INSERT INTO  ${tableName} (${setClausesStr}) VALUES (${qmarksStr})`;

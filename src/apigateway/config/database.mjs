@@ -3,6 +3,7 @@ import Database from 'better-sqlite3';
 import path from 'path'
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { Konsol } from '../classes/Konsol.mjs'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,33 +26,33 @@ class Db {
     //------------------------------------------------------------------------------
     // wraps native db.all() sqlite3 methods
     all(sql, parms, callAfterAll) {
-        console.log("Db.all() <sql>", sql, "<parms>", parms, "<callAfterAll>", callAfterAll)
+        Konsol.log("Db.all() <sql>", sql, "<parms>", parms, "<callAfterAll>", callAfterAll)
         const stmt = this.db.prepare(sql, [])
         //console.log("Db.run() <expandeSql>", stmt.expandedSQL)
         const res = stmt.all(parms)
-        console.log("Db.all() over <res>", 'res')
+        Konsol.log("Db.all() over <res>",res)
         callAfterAll(null, 200, res)
     }
 
     //------------------------------------------------------------------------------
     // wraps native db.get() sqlite3 methods
     get(sql, id, callAfterGet) {
-        console.log("Db.get() <sql>", sql, "<id>", id, "<callAfterGet>", callAfterGet)
+        Konsol.log("Db.get() <sql>", sql, "<id>", id, "<callAfterGet>", callAfterGet)
         const stmt = this.db.prepare(sql)
         //console.log("Db.run() <expandeSql>", stmt.expandedSQL)
         const res = stmt.get(id)
-        console.log("Db.get() <res>", res)
+        Konsol.log("Db.get() <res>", res)
         callAfterGet(null, 200, res)
     }
     //------------------------------------------------------------------------------
     // wraps native run() sqlite3 methods
     run(sql, parms, callAfterRun) {
-        console.log("Db.run() <sql>", sql, "<parms>", parms, "<callAfterRun>", callAfterRun)
+        Konsol.log("Db.run() <sql>", sql, "<parms>", parms, "<callAfterRun>", callAfterRun)
         try {
             const stmt = this.db.prepare(sql, [])
             const res = stmt.run(...parms)
-            console.log("Db.run() res", res)
-            console.log("Db.run() calling callback")
+            Konsol.log("Db.run() res", res)
+            Konsol.log("Db.run() calling callback")
             callAfterRun(res, res.lastInsertRowid)
 
         } catch (error) {
@@ -68,7 +69,7 @@ class Db {
         console.log("Db.exec() <sql>", sql)
         const stmt = this.db.prepare(sql, [])
         const res = stmt.run()
-        console.log("Db.exec() res", res)
+        Konsol.log("Db.exec() res", res)
 
     }
 

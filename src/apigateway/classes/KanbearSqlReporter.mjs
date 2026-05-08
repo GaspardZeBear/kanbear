@@ -27,7 +27,7 @@ class KanbearSqlReporter {
 
   //-----------------------------------------------------
   async selectPST(projectId) {
-    console.log("KanboardSqlReporter.selectPST() query",this.query)
+    Konsol.log("KanboardSqlReporter.selectPST() query",this.query)
     let filters=[]
     if  ( this.query["project.open"] ) {
       filters.push("p.is_open=true")
@@ -51,7 +51,7 @@ class KanbearSqlReporter {
     if (filters.length > 0 ) {
       filter=" AND " + filters.join(" AND ")
     }
-    console.log("KanbearSqlReporter.selectPST(projectId) filter",filter)
+    Konsol.log("KanbearSqlReporter.selectPST(projectId) filter",filter)
     let reqPST = `
       select 
         p.id pId,
@@ -88,7 +88,7 @@ class KanbearSqlReporter {
 
    //-----------------------------------------------------
   async selectC(projectId) {
-    console.log("KanboardSqlReporter.selectC()")
+    Konsol.log("KanboardSqlReporter.selectC()")
     let reqC = `
       select 
         p.id pId,
@@ -132,7 +132,7 @@ class KanbearSqlReporter {
 
   //-----------------------------------------------------
   async selectUsers() {
-    console.log("KanbearSqlReporter.selectUsers()")
+    Konsol.log("KanbearSqlReporter.selectUsers()")
     let reqUsers = `select u.id uId,u.name uName from users as u`
     //let usersMap = { '0': 'nobody' }
     db.all(reqUsers, [], this.callAfterUsers.bind(this));
@@ -152,7 +152,7 @@ class KanbearSqlReporter {
   
   //-----------------------------------------------------
   async selectAssignees() {
-    console.log("KanbearSqlReporter.selectAssignees()")
+    Konsol.log("KanbearSqlReporter.selectAssignees()")
     let reqAssignees = `select a.id aId,a.name aName from assignees as a`
     //let usersMap = { '0': 'nobody' }
     db.all(reqAssignees, [], this.callAfterAssignees.bind(this));
@@ -205,7 +205,7 @@ class KanbearSqlReporter {
       }
 
       if (row.sId == null) {
-        console.log("row.sId skip ")
+        //console.log("row.sId skip ")
         continue
       }
       if (!projectsMap[row.pId].swimlanes[row.sId]) {
@@ -222,7 +222,7 @@ class KanbearSqlReporter {
       // Beware of left/righ join, task may be null 
       //console.log("row.tId",row.tId)
       if (row.tId == null) {
-        console.log("row.tId skip ")
+        //console.log("row.tId skip ")
         continue
       }
       projectsMap[row.pId].swimlanes[row.sId].tasks[row.tId] = {

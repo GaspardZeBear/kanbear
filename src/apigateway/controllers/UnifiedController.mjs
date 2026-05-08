@@ -1,4 +1,5 @@
 import { UnifiedModel } from '../models/UnifiedModel.mjs'
+import { Konsol } from '../classes/Konsol.mjs'
 
 //------------------------------------------------------------------------
 // Class to avoid having lots of individual controllers that have the same look
@@ -12,17 +13,17 @@ class UnifiedController {
     // When fired, the returned function will call the UnifiedModel function that executes the SQL sttament
     //----------------------------------------------------------------------
     static getFunction(table, op, opParms={}) {
-        console.log("UnifiedController.getFunction called", table, op)
+        Konsol.log("UnifiedController.getFunction called", table, op)
         return (
             (req, res) => {
-                console.log("---------------------------------------------------------------------")
-                console.log("UnifiedController callback fired table=", table, "op=", op, "req.body=", req.body)
-                console.log("UnifiedController callback fired table=", table, "op=", op, "req.params=", req.params)
-                console.log("UnifiedController callback fired table=", table, "op=", op, "req.query=", req.query)
+                //console.log("---------------------------------------------------------------------")
+                Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.body=", req.body)
+                Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.params=", req.params)
+                Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.query=", req.query)
                 UnifiedModel[op](table, req, opParms, (err, httpCode, params) => {
-                    console.log(`UnifiedModel ${op}_${table}() callback function err`, err, 'params (result)', 'params')
+                    Konsol.log(`UnifiedModel ${op}_${table}() callback function err`, err, 'params (result)', 'params')
                     if (err) {
-                        console.log(`UnifiedModel ${op}_${table}() callback function <err>`, JSON.stringify(err.message))
+                        Konsol.log(`UnifiedModel ${op}_${table}() callback function <err>`, JSON.stringify(err.message))
                         //return res.status(httpCode).json({ error: JSON.stringify(err.message) });
                         //return res.status(httpCode).json(JSON.stringify(err.message));
                         return res.status(httpCode).json(err.message)

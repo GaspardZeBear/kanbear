@@ -31,7 +31,7 @@ import { KanbearSqlReporter } from './classes/KanbearSqlReporter.mjs';
 import { createServer } from 'http';
 import { Konsol } from './classes/Konsol.mjs';
 
-
+app.use(express.static('public'))
 // Crud api
 app.use('/api/assignees', assigneeRoutes);
 app.use('/api/columns', columnRoutes);
