@@ -48,29 +48,29 @@ app.use('/api/tasks_comments', taskCommentRoutes);
 //------------------------------------------------------------------------------
 app.get('/api/sql/report/:projectId', async (req, res) => {
   const projectId = parseInt(req.params.projectId)
-  console.log("--------------------------------------------------------------------------------------------")
-  console.log("/api/sql/report params", req.params)
-  console.log("/api/sql/report body", req.body)
-  console.log("/api/sql/report query", req.query)
-  console.log("--------------------------------------------------------------------------------------------")
+  //console.log("--------------------------------------------------------------------------------------------")
+  Konsol.log("/api/sql/report params", req.params)
+  Konsol.log("/api/sql/report body", req.body)
+  Konsol.log("/api/sql/report query", req.query)
+  //console.log("--------------------------------------------------------------------------------------------")
 
   console.log("/api/sql/report invokated pId", projectId)
   try {
     const sqlReporter = new KanbearSqlReporter(false)
     const report = await sqlReporter.getJsonReport(projectId, req.query);
-    console.log("api.get() ", report)
+    Konsol.log("api.get() ", report)
     res.json(report);
   } catch (error) {
     console.log("/api/sql/report error ", error.message)
     res.status(500).json({ error: error.message });
   }
-  console.log("/api/sql/report done")
+  //console.log("/api/sql/report done")
 });
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 3002;
 const server = app.listen(PORT, () => {
-  console.log(`Serveur démarré sur le port ${PORT}`);
+  console.log(`Serveur http démarré sur le port ${PORT}`);
 });
 Konsol.init(server)
 

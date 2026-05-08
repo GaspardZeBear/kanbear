@@ -20,7 +20,8 @@ class Db {
 
     constructor(dbFile) {
         //this.db = new DatabaseSync(dbFile);
-        this.db = new Database(dbFile, { verbose: console.log });
+        //this.db = new Database(dbFile, { verbose: console.log });
+        this.db = new Database(dbFile)
     }
 
     //------------------------------------------------------------------------------
@@ -56,7 +57,7 @@ class Db {
             callAfterRun(res, res.lastInsertRowid)
 
         } catch (error) {
-            console.log("Db.run() exception ", error)
+            Konsol.log("Db.run() exception ", error)
             //callAfterRun({ message: "Error see log" })
             callAfterRun({ message: error })
         }
@@ -66,7 +67,7 @@ class Db {
     //------------------------------------------------------------------------------
     // wraps native run() sqlite3 methods
     exec(sql) {
-        console.log("Db.exec() <sql>", sql)
+        Konsol.log("Db.exec() <sql>", sql)
         const stmt = this.db.prepare(sql, [])
         const res = stmt.run()
         Konsol.log("Db.exec() res", res)

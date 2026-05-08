@@ -73,7 +73,7 @@ class UnifiedModel {
         //const sql = `UPDATE ${table} SET name = ?, is_open = ? WHERE id = ?`;
         const { sql, bindVariables } = new SqlBuilder().generatePatchStatement(table, req.params["id"], req.body)
         db.run(sql, bindVariables, (res) => {
-            console.log("UnifiedModel.update() onRes fired, will call callback res=", res)
+            Konsol.log("UnifiedModel.update() onRes fired, will call callback res=", res)
             //res.lastInsertRowid != null ? callback(null, res.lastInsertRowid) : callback(res, null)
             res.lastInsertRowid != null ? callback(null, 200, res) : callback(res, 500, null)
         });
@@ -85,7 +85,7 @@ class UnifiedModel {
         Konsol.log("UnifiedModel.patch(), <params>", req.params, "<body>", req.body)
         const { sql, bindVariables } = new SqlBuilder().generatePatchStatement(table, req.params["id"], req.body)
         db.run(sql, bindVariables, (res) => {
-            console.log("UnifiedModel.patch() fired, will call callback res=", res)
+            Konsol.log("UnifiedModel.patch() fired, will call callback res=", res)
             //res.lastInsertRowid != null ? callback(null, res.lastInsertRowid) : callback(res, null)
             res.lastInsertRowid != null ? callback(null, 200, res) : callback(res, 500, null)
         });

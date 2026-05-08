@@ -5,45 +5,58 @@
     <title>Apigateway Konsol.log</title>
     <script>
         let konsol;
-        let fieldDisplayLength=160
+        let fieldDisplayLength = 160
+        let fieldDisplayCount = 3
 
-        function setFieldDisplayLength() {
-                fieldDisplayLength = parseInt(document.getElementById("fieldDisplayLength").value)
-                console.log("setFieldDisplayLength() fieldDisplayLength",document.getElementById("fieldDisplayLength"))
+        //---------------------------------------------------------------------------------------
+        function setParms() {
+            fieldDisplayLength = parseInt(document.getElementById("fieldDisplayLength").value)
+            console.log("setParms() fieldDisplayLength", document.getElementById("fieldDisplayLength").value)
+            fieldDisplayCount = parseInt(document.getElementById("fieldDisplayCount").value)
+            console.log("setParms() fieldDisplayCount", document.getElementById("fieldDisplayCount").value)
         }
 
+        //---------------------------------------------------------------------------------------
         function getFieldDisplayLength() {
-                return(fieldDisplayLength)
+            return (fieldDisplayLength)
+        }
+        //---------------------------------------------------------------------------------------
+        function writeMark() {
+            append('<hr>')
         }
 
+        //---------------------------------------------------------------------------------------
         append = function (text) {
             //console.log(text)
             try {
                 jEvent = JSON.parse(text)
                 //let jEvent = JSON.parse(text)
                 let header = `${jEvent['date']}  ${jEvent['fields'][0]}`
-                let entry = document.getElementById("konsolEvents")
-                entry.insertAdjacentHTML("beforeend", `<li><b>${header}</b></li>`);
+                //let  = document.getElementById("konsolEvents")
+                let entry = document.createElement('li')
+                entry.innerHTML = `<b>${header}</b>`;
                 let table = document.createElement("table")
 
-                for (let i=1; i<jEvent['fields'].length; i++) {
+                for (let i = 1; i < jEvent['fields'].length; i++) {
                     let tr = document.createElement("tr")
                     let td = document.createElement("td")
                     //td.innerHTML = `<pre>${JSON.stringify(f,'')}</pre>`
-                    console.log("fieldDisplayLength",fieldDisplayLength)
-                    td.innerHTML = `${JSON.stringify(jEvent['fields'][i],'').substr(0,fieldDisplayLength)}`
+                    console.log("fieldDisplayLength", fieldDisplayLength)
+                    td.innerHTML = `${JSON.stringify(jEvent['fields'][i], '').substr(0, fieldDisplayLength)}`
                     tr.appendChild(td)
                     table.appendChild(tr)
                 }
                 entry.appendChild(table)
+                document.getElementById("konsolEvents").insertAdjacentElement('afterbegin', entry)
+
+
             } catch (error) {
                 let entry = document.getElementById("konsolEvents")
-                entry.insertAdjacentHTML("beforeend", `<li>${text}</li>`);
+                entry.insertAdjacentHTML("afterbegin", `<li>${text}</li>`);
             }
-
         }
 
-
+        //---------------------------------------------------------------------------------------------
         function clearEvents() {
             console.log("clear()")
             let title = document.createElement("h2")
@@ -51,33 +64,17 @@
             document.getElementById("konsolEvents").replaceChildren(title)
         }
 
-        window.onload = function () {
-            konsol = new WebSocket("ws://localhost:3002");
-            konsol.onmessage = function (event) {
-                try {
-                    append(event.data);
-                } catch (error) {
-                    console.log(error)
-                }
-            };
-            konsol.onopen = function () {
-                append("Connected to WebSocket!");
-            };
-            konsol.onclose = function () {
-                append("Connection closed");
-            };
-            konsol.onerror = function () {
-                append("Error happens");
-            };
-        };
-
+        //---------------------------------------------------------------------
         function connect() {
-            konsol = new WebSocket("ws://localhost:3002");
+            const url = "ws://localhost:3002"
+            console.log("konsolClient.connect() connecting to ", url)
+            konsol = new WebSocket(url);
             konsol.onmessage = function (event) {
                 append(event.data);
             };
             konsol.onopen = function () {
                 append("Connected to WebSocket!");
+                console.log("konsolClient.connect() connected to ", url)
             };
             konsol.onclose = function () {
                 append("Connection closed");
@@ -87,6 +84,7 @@
             };
         };
 
+        //--------------------------------------------------------------------
         function sendMessage(event) {
             console.log(event);
             let message = document.getElementById("message").value;
@@ -95,15 +93,24 @@
     </script>
 </head>
 
-<body>
+<body onload="connect()">
     <h1>Konsol.log Client</h1>
-
-    <input type="button" value="Connect" onclick="connect()" /><br />
-    fieldDisplayLength: <input value="160" id="fieldDisplayLength" onchange="setFieldDisplayLength()"/>
-    Message: <input value="Hello!" type="text" id="message" />
-    <input type="button" value="Send" onclick="sendMessage(event)" /><br />
-    <input type="button" value="Clear" onclick="clearEvents()" /><br />
-    <ul id="konsolEvents"></ul>
+    <div>
+        <input type="button" value="Connect" onclick="connect()" /><br />
+        <form>
+            fieldDisplayLength: <input value="160" id="fieldDisplayLength" /><br />
+            fieldDisplayCount : <input value="3" id="fieldDisplayCount" /></br>
+            <input type="button" value="setParams" onclick="setParms()" /><br />
+        </form>
+        <input type="button" value="writeMark" onclick="writeMark()" /><br />
+        Message: <input value="Hello!" type="text" id="message" />
+        <input type="button" value="Send" onclick="sendMessage(event)" /><br />
+        <input type="button" value="Clear" onclick="clearEvents()" /><br />
+    </div>
+    <div style="overflow:scroll;height: 800px;">
+        <ul id="konsolEvents"></ul>
+    </div>
+</body>
 
 </body>
 

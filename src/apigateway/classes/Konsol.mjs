@@ -19,12 +19,12 @@ class Konsol {
     Konsol.wss.on('connection', function connection(ws, request) {
       //Konsol.addClient(ws)
       const clientIP = request.socket.remoteAddress;
-      const clientPort = request.socket.clientPort
+      const clientPort = request.socket.remotePort
       const id=`${clientIP}:${clientPort}`
-      console.log(`New client ${id} connected`);
+      console.log(`Konsol.onConnection() New client ${id} connected`);
       Konsol.addClient(id,ws)
+      ws.send('Connected to Konsol websocket server');
 
-      ws.send('Welcome to the WebSocket server!');
       ws.on('message', function message(data) {
         try {
           const messageText = data.toString();
@@ -38,11 +38,11 @@ class Konsol {
       });
 
       ws.on('close', function close(code, reason) {
-        console.log(`Client ${id} disconnected - Code: ${code}, Reason: ${reason}`);
+        console.log(`Konsol.onClose() Client ${id} disconnected - Code: ${code}, Reason: ${reason}`);
       });
 
       ws.on('error', function error(err) {
-        console.error('WebSocket error:', err);
+        console.error('Konsol.onError() WebSocket error:', err);
       });
 
       ws.on('pong', function heartbeat() {
@@ -55,11 +55,11 @@ class Konsol {
 
     // Handle upgrade because http server reused (noServer)
     server.on('upgrade', function upgrade(request, socket, head) {
-      console.log("upgrade request")
+      console.log("Konsol.onUpgrade() handler ")
       const { pathname } = new URL(request.url, 'wss://base.url');
 
       Konsol.wss.handleUpgrade(request, socket, head, function done(ws) {
-        console.log("handleUpgrade request")
+        console.log("Konsol.handleUpgrade request")
         Konsol.wss.emit('connection', ws, request);
       })
     });
@@ -80,13 +80,11 @@ class Konsol {
     Konsol.wss.on('close', function close() {
       clearInterval(interval);
     });
-
-
   }
 
   //----------------------------------------------------------------------------------------------
   static addClient(id,wsClient) {
-    console.log("Konsol.addClient() <wsClient>",wsClient)
+    //console.log("Konsol.addClient() <wsClient>",wsClient)
     Konsol.wsClients[id]=wsClient
   }
 
@@ -120,6 +118,5 @@ class Konsol {
     }
   }
 }
-
 
 export { Konsol };

@@ -17,9 +17,14 @@ class UnifiedController {
         return (
             (req, res) => {
                 //console.log("---------------------------------------------------------------------")
-                Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.body=", req.body)
-                Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.params=", req.params)
-                Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.query=", req.query)
+                Konsol.log("UnifiedController callback fired table=", table, 
+                    "op=", op, 
+                    "req.body=", req.body,
+                    "req.params=", req.params,
+                    "req.query=", req.query
+                )
+                //Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.params=", req.params)
+                //Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.query=", req.query)
                 UnifiedModel[op](table, req, opParms, (err, httpCode, params) => {
                     Konsol.log(`UnifiedModel ${op}_${table}() callback function err`, err, 'params (result)', 'params')
                     if (err) {
