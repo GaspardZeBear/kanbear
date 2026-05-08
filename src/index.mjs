@@ -53,7 +53,6 @@ document.getElementById("projectClosed").addEventListener("change", async (ev) =
 document.addEventListener("workspaceCreated", (ev) => {
     console.log("workspaceCreated listener fired <ev>", ev)
     buildWorkspacesSelectBox()
-
 })
 
 document.addEventListener("workspaceModified", async (ev) => {
@@ -63,6 +62,7 @@ document.addEventListener("workspaceModified", async (ev) => {
     let ws = await wsEntity.get()
     console.log("workspaceModified ws", ws)
     //document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
+    wsEntity.setName(ws.name)
     let workspaceLink = buildWorkspaceLink(ws.id, ws.name)
     document.getElementById("workspace").replaceChildren(workspaceLink)
     buildWorkspacesSelectBox()
@@ -282,11 +282,12 @@ async function buildWorkspacesSelectBox() {
     let wsDiv = await selectBoxBuilder(boxParams)
     document.getElementById("kanbearWorkspacesDiv").replaceChildren(wsDiv)
     document.getElementById(boxName).addEventListener('change', async (e) => {
-        Kontext.setWorkspaceId(e.target.value);
+        
         let workspaceId = parseInt(e.target.value)
         if (workspaceId < 0) {
             return
         }
+        Kontext.setWorkspaceId(e.target.value);
         //console.log("wss",e.wss)
         let box = document.getElementById("kanbearWorkspaceSelectBox")
 
@@ -294,6 +295,7 @@ async function buildWorkspacesSelectBox() {
         console.log("wssOrigin in listener", wssOrigin)
         const ws = wssOrigin.find((element) => element.id == workspaceId)
         console.log("ws", ws)
+         Kontext.setWorkspaceName(ws.name);
         document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
         let workspaceLink = buildWorkspaceLink(ws.id, ws.name)
         document.getElementById("workspace").replaceChildren(workspaceLink)

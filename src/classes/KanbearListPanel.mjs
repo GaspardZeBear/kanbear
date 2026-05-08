@@ -5,6 +5,7 @@ import { Ref } from "./Ref.mjs"
 import { getFiltersMap } from "../utils/filters.mjs";
 import { Project } from "./Project.mjs"
 import { getOpenCloseSymbol, getOpenCloseParmBoolean } from "../utils/openClose.mjs";
+//import { buildWorkspaceLink } from "../utils/linkBuilder.mjs";
 
 class KanbearListPanel {
 
@@ -95,7 +96,8 @@ class KanbearListPanel {
     const result = document.getElementById(this.htmlElement);
     //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
     let resultTitle = document.createElement('h2')
-    resultTitle.innerHTML = `Projects list filtered by .....`
+    //let workspaceLink = buildWorkspaceLink(Kontext.getWorkspaceId(), Kontext.getWorkspaceName())
+    resultTitle.innerHTML = `Workspace ${Kontext.getWorkspaceId()} ${Kontext.getWorkspaceName()} filtered by .....`
     const elementHeader = `${this.htmlElement}Header`
     document.getElementById(this.htmlElement).replaceChildren()
     document.getElementById(elementHeader).replaceChildren(resultTitle)
@@ -115,19 +117,6 @@ class KanbearListPanel {
     this.buttons['close'] = this.createButton('close', this.closeTask.bind(this))
   }
 
-  //---------------------------------------------------------------------------------------
-  async XgetJsonBulkData(projectId) {
-    try {
-      const url = `${Kontext.getKanbearUrl()}/api/sql/report/${projectId}`
-      console.log("KanbearListPanel.getJsonBulkData() from kanbear", url)
-      const response = await fetch(url);
-      const jsonBulkData = await response.json();
-      console.log("KanbearListPanel.getJsonBulkData() loaded", jsonBulkData)
-      return (jsonBulkData)
-    } catch (error) {
-      throw new Error(`KanbearListPanel.getJsonBulkData() error ${error.message}`)
-    }
-  }
   //---------------------------------------------------------------------------------------
   async getJsonBulkData(projectId) {
     let jsonBulkData = await Kontext.loadKanbearJsonBulkData({ useKontext: false, projectId: projectId })

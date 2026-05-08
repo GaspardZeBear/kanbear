@@ -1,6 +1,7 @@
 // kanboardReporter.js
 //const axios = require('axios');
 //import { KanboardRPC } from '../classes/KanboardRPC.mjs';
+import { Konsol } from './Konsol.mjs'
 import { db } from '../config/database.mjs';
 
 class KanbearSqlReporter {
@@ -113,7 +114,7 @@ class KanbearSqlReporter {
     //console.log("KanbearSqlReporter.callAfterPST() <httpCode>", httpCode)
     //console.log("KanbearSqlReporter.callAfterPST() <params>", params)
     //console.log("KanbearSqlReporter.callAfterPST() <db>", this.db)
-    console.log("PSTResp", params)
+    Konsol.log("KanbearSqlReporter.callAfterPST() <PSTResp>", params)
     this.PSTResp = params
     //return (params)
   }
@@ -182,7 +183,7 @@ class KanbearSqlReporter {
     const assigneesPromise = this.selectAssignees()
     let [pst, pc, usersMap,assigneesMap] = await Promise.all([pstPromises, cPromises, usersPromise,assigneesPromise])
 
-    console.log("KanbearSqlReporter.getJsonReport <PSTResp>", this.PSTResp)
+    Konsol.log("KanbearSqlReporter.getJsonReport <PSTResp>", this.PSTResp)
     //-- turn into table
     if ( this.PSTResp.length == 0) {
       return(projectsMap)
@@ -239,7 +240,7 @@ class KanbearSqlReporter {
       }
     }
     //console.log("pc", pc)
-    console.log("KanbearSqlReporter.getJsonReport() before col <projectsMap>",projectsMap)
+    Konsol.log("KanbearSqlReporter.getJsonReport() before col <projectsMap>",projectsMap)
     //console.log("this.CResp", this.CResp)
     for (let c of this.CResp) {
       projectsMap[projectId].columns[c.cId] = {

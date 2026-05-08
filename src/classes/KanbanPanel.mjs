@@ -11,6 +11,7 @@ import { buildProjectLink, buildSwimlaneLink, buildColumnLink } from "../utils/l
 import { getFiltersMap } from "../utils/filters.mjs"
 import { Ref } from "./Ref.mjs"
 import { buildAddColumnButton, buildAddTaskButton, buildAddSwimlaneButton } from "../utils/buttonBuilder.mjs"
+import { getOpenCloseSymbol } from "../utils/openClose.mjs"
 
 class KanbanPanel {
   //------------------------------------------------------------------------
@@ -20,6 +21,7 @@ class KanbanPanel {
     console.log("KanbanPanel.constructor() projectId", Kontext.getCurrentProjectId())
     this.project=undefined
     if (Kontext.getCurrentProjectId()) {
+      console.log("KanbanPanel.constructor() ",Kontext.getJsonBulkData())
        this.project = Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()]
     } 
     this.htmlElement = 'results'
@@ -60,9 +62,12 @@ class KanbanPanel {
     resultTitleProject.appendChild(addSwimlaneButton)
     resultTitleProject.appendChild(addColumnButton)
     let titleProject = document.createElement("span")
-    titleProject.innerHTML = `\u{1F5C4}Project `
+    titleProject.innerHTML = ` Project `
+    let statusProject = document.createElement("span")
+    statusProject.innerHTML = ` ${getOpenCloseSymbol(this.project.is_open)}`
     resultTitleProject.appendChild(titleProject)
     resultTitleProject.appendChild(projectLink)
+    resultTitleProject.appendChild(statusProject)
     let filters = document.createElement("span")
     filters.innerHTML = " filtered by..."
     resultTitleProject.appendChild(filters)
@@ -104,15 +109,17 @@ class KanbanPanel {
       const projectLink = buildProjectLink(project.id, project.name)
       const swimlaneLink = buildSwimlaneLink(swimlane.id, swimlane.name)
       //kSwimlaneDivH2.innerHTML = `${project.name}::`
-      const separator0 = document.createElement('span')
-      separator0.innerHTML = ' Project '
+      const status = document.createElement('span')
+      status.innerHTML =  ` ${getOpenCloseSymbol(swimlane.is_open)}`
       const separator1 = document.createElement('span')
-      separator1.innerHTML = ' Swimlane '
+      separator1.innerHTML = `Swimlane `
       //console.log(this.projectLink)
       //kSwimlaneDivH2.appendChild(separator0)
       //kSwimlaneDivH2.appendChild(projectLink)
       kSwimlaneDivH2.appendChild(separator1)
       kSwimlaneDivH2.appendChild(swimlaneLink)
+      kSwimlaneDivH2.appendChild(status)
+
 
       kSwimlaneHeaderDiv.appendChild(kSwimlaneDivH2)
       kSwimlaneDiv.appendChild(kSwimlaneHeaderDiv)

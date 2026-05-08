@@ -12,7 +12,7 @@ class LinkCounter {
 //------------------------------------------------------------------------
   function buildWorkspaceLink(workspaceId, workspaceName) {
     const href = document.createElement("a")
-    LinkCounter.counter++
+    //LinkCounter.counter++
     //href.setAttribute("id", `projectHref_${projectId}_${LinkCounter.counter}`)
     href.setAttribute("href", "javascript:void(0)")
     href.innerHTML = `${workspaceName}`
@@ -31,7 +31,7 @@ class LinkCounter {
   //------------------------------------------------------------------------
   function buildProjectLink(projectId, projectName) {
     const href = document.createElement("a")
-    LinkCounter.counter++
+    //LinkCounter.counter++
     href.setAttribute("id", `projectHref_${projectId}_${LinkCounter.counter}`)
     href.setAttribute("href", "javascript:void(0)")
     href.innerHTML = `${projectName}`
@@ -49,7 +49,7 @@ class LinkCounter {
   //----------------------------------------------------------------------------------
   function buildSwimlaneLink(swimlaneId, swimlaneName) {
     const href = document.createElement("a")
-    LinkCounter.counter++
+    //LinkCounter.counter++
     href.setAttribute("id", `swimlaneHref_${swimlaneId}_${LinkCounter.counter}`)
     href.setAttribute("href", "javascript:void(0)")
     href.innerHTML = `${swimlaneName}`
@@ -67,7 +67,7 @@ class LinkCounter {
   //----------------------------------------------------------------------------------
   function buildColumnLink(columnId, columnName) {
     const href = document.createElement("a")
-    LinkCounter.counter++
+    //LinkCounter.counter++
     //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
     href.setAttribute("href", "javascript:void(0)")
     href.innerHTML = `${columnName}`
@@ -86,7 +86,7 @@ class LinkCounter {
   //----------------------------------------------------------------------------------
   function buildAssigneeLink(assigneeId, assigneeName) {
     const href = document.createElement("a")
-    LinkCounter.counter++
+    //LinkCounter.counter++
     //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
     href.setAttribute("href", "javascript:void(0)")
     href.innerHTML = `${assigneeName}`

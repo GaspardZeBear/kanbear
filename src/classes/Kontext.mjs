@@ -15,6 +15,7 @@ class Kontext {
     static currentProjectId
     static currentProjectName
     static workspaceId
+    static workspaceName
     static panelClass
 
 
@@ -109,9 +110,19 @@ class Kontext {
     }
 
     //--------------------------------------------------------------
-    static getWorkspaceId(id) {
+    static setWorkspaceName(name) {
+        Kontext.workspaceName = name
+    }
+    //--------------------------------------------------------------
+    static getWorkspaceId() {
         return (Kontext.workspaceId)
     }
+
+    //--------------------------------------------------------------
+    static getWorkspaceName() {
+        return (Kontext.workspaceName)
+    }
+
 
     //--------------------------------------------------------------
     static getProjectConfig(pName) {
@@ -129,20 +140,7 @@ class Kontext {
     static async loadKanbearJsonBulkData(parms = { useKontext: true, projectId: null }) {
         try {
 
-            /*
-            let taskOpenOnly=document.getElementById("taskOpenOnly")
-            console.log("Kontext.loadKanbearJsonBulkData() taskOpenOnly",taskOpenOnly.checked)
-            let queries=[]
-            queries.push(getOpenCloseParm('project',document.getElementById("projectOpen").checked,document.getElementById("projectClosed").checked))
-            queries.push(getOpenCloseParm('swimlane',document.getElementById("swimlaneOpen").checked,document.getElementById("swimlaneClosed").checked))
-            queries.push(getOpenCloseParm('task',document.getElementById("taskOpen").checked,document.getElementById("taskClosed").checked))
-            
-            let query=""
-            if (queries.length > 0 ) {
-                query="?" + queries.join("&")
-            }
-                */
-               
+                       
             // Do not take in account project open or closed !!!!
             let query = getOpenCloseQueryParms(['swimlane', 'task'])
             let projectId = parms.useKontext ? Kontext.currentProjectId : parms.projectId

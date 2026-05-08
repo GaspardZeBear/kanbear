@@ -11,12 +11,6 @@ class WorkspaceDialog extends Dialog {
     }
 
     //----------------------------------------------------------------------------
-    Xcreate() {
-        this.createDialog(this.save.bind(this))
-        this.showDialog()
-    }
-
-    //----------------------------------------------------------------------------
     async fillFormFromDb(workspace) {
         console.log("workspaceDialog.fillFormFromDb() workspace>", workspace)
         workspaceForm.workspaceName.value = workspace.name
@@ -43,22 +37,6 @@ class WorkspaceDialog extends Dialog {
     subCreate(params) {
         console.log("workspaceDialog.create() dialog, for  <workspace>", params)
         //this.projectId = params["projectId"]
-    }
-
-
-
-    //-------------------------------------------------------------------------------------
-    async Xsave() {
-        console.log("Workspace.save() dialog, field name", workspaceForm.workspaceName.value)
-        const ws = await KanbearEntityFactory.generate('workspace')
-        ws.setName(workspaceForm.workspaceName.value)
-        ws.setDescription(workspaceForm.workspaceDescription.value)
-        ws.setOpen(workspaceForm.workspaceIs_open.value)
-        await ws.create()
-        console.log("Workspace.save() dialog, created, <name>", ws.name, "<workspaceId>=", ws.getId())
-        sendEvent("workspaceCreated", { workspaceId: ws.getId() })
-        this.closeDialog()
-        this.workspace = ws
     }
 
     //-------------------------------------------------------------------------------------

@@ -133,10 +133,12 @@ th {
 }
 
 .scroller {
-    width: 1200px; 
-    height: 800px;
-    overflow-x: scroll;
-    overflow-y: scroll;
+    width: 90%; 
+    xwidth: 800%; 
+    height: 90%;
+    xoverflow-x: scroll;
+    xoverflow-y: scroll;
+    overflow: auto;
     scrollbar-color: rebeccapurple white;
     scrollbar-width: auto;
 }
