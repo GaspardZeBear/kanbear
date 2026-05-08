@@ -72,9 +72,10 @@ const PORT = process.env.PORT || 3002;
 const server = app.listen(PORT, () => {
   console.log(`Serveur démarré sur le port ${PORT}`);
 });
-
+Konsol.init(server)
 
 //const server = createServer(app)
+/*
 console.log(`Websocket server creation`);
 const wss = new WebSocketServer({
   //port: 3003,
@@ -114,6 +115,8 @@ wss.on('connection', function connection(ws, request) {
   ws.isAlive = true;
 
 });
+
+// Handle upgrade because http server reused (noServer)
 server.on('upgrade', function upgrade(request, socket, head) {
   console.log("upgrade request")
   const { pathname } = new URL(request.url, 'wss://base.url');
@@ -139,5 +142,6 @@ const interval = setInterval(function ping() {
 wss.on('close', function close() {
   clearInterval(interval);
 });
+*/
 
 
