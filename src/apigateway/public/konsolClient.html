@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Apigateway Konsol.log</title>
+    <script>
+        let konsol;
+        let fieldDisplayLength=160
+
+        function setFieldDisplayLength() {
+                fieldDisplayLength = parseInt(document.getElementById("fieldDisplayLength").value)
+                console.log("setFieldDisplayLength() fieldDisplayLength",document.getElementById("fieldDisplayLength"))
+        }
+
+        function getFieldDisplayLength() {
+                return(fieldDisplayLength)
+        }
+
+        append = function (text) {
+            //console.log(text)
+            try {
+                jEvent = JSON.parse(text)
+                //let jEvent = JSON.parse(text)
+                let header = `${jEvent['date']}  ${jEvent['fields'][0]}`
+                let entry = document.getElementById("konsolEvents")
+                entry.insertAdjacentHTML("beforeend", `<li><b>${header}</b></li>`);
+                let table = document.createElement("table")
+
+                for (let i=1; i<jEvent['fields'].length; i++) {
+                    let tr = document.createElement("tr")
+                    let td = document.createElement("td")
+                    //td.innerHTML = `<pre>${JSON.stringify(f,'')}</pre>`
+                    console.log("fieldDisplayLength",fieldDisplayLength)
+                    td.innerHTML = `${JSON.stringify(jEvent['fields'][i],'').substr(0,fieldDisplayLength)}`
+                    tr.appendChild(td)
+                    table.appendChild(tr)
+                }
+                entry.appendChild(table)
+            } catch (error) {
+                let entry = document.getElementById("konsolEvents")
+                entry.insertAdjacentHTML("beforeend", `<li>${text}</li>`);
+            }
+
+        }
+
+
+        function clearEvents() {
+            console.log("clear()")
+            let title = document.createElement("h2")
+            title.innerHTML = "Konsol events"
+            document.getElementById("konsolEvents").replaceChildren(title)
+        }
+
+        window.onload = function () {
+            konsol = new WebSocket("ws://localhost:3002");
+            konsol.onmessage = function (event) {
+                try {
+                    append(event.data);
+                } catch (error) {
+                    console.log(error)
+                }
+            };
+            konsol.onopen = function () {
+                append("Connected to WebSocket!");
+            };
+            konsol.onclose = function () {
+                append("Connection closed");
+            };
+            konsol.onerror = function () {
+                append("Error happens");
+            };
+        };
+
+        function connect() {
+            konsol = new WebSocket("ws://localhost:3002");
+            konsol.onmessage = function (event) {
+                append(event.data);
+            };
+            konsol.onopen = function () {
+                append("Connected to WebSocket!");
+            };
+            konsol.onclose = function () {
+                append("Connection closed");
+            };
+            konsol.onerror = function () {
+                append("Error happens");
+            };
+        };
+
+        function sendMessage(event) {
+            console.log(event);
+            let message = document.getElementById("message").value;
+            konsol.send(message);
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Konsol.log Client</h1>
+
+    <input type="button" value="Connect" onclick="connect()" /><br />
+    fieldDisplayLength: <input value="160" id="fieldDisplayLength" onchange="setFieldDisplayLength()"/>
+    Message: <input value="Hello!" type="text" id="message" />
+    <input type="button" value="Send" onclick="sendMessage(event)" /><br />
+    <input type="button" value="Clear" onclick="clearEvents()" /><br />
+    <ul id="konsolEvents"></ul>
+
+</body>
+
+</html>
