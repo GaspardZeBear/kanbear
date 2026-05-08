@@ -3,6 +3,28 @@
 
 <head>
     <title>Apigateway Konsol.log</title>
+    <style>
+        .fieldStyle0 {
+            font-style: italic;
+            font-weight: bold;
+        }
+
+        .fieldStyle1 {
+            font-style: normal;
+            xfont-weight: bolder;
+        }
+
+        #container {
+            width: 1200px;
+            height: 600px;
+            /* Hauteur fixe pour activer le défilement */
+            overflow-x: auto;
+            overflow-y: auto;
+            /* Active le défilement vertical */
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
     <script>
         let konsol;
         let fieldDisplayLength = 160
@@ -22,7 +44,8 @@
         }
         //---------------------------------------------------------------------------------------
         function writeMark() {
-            append('<hr>')
+            //
+            append('------------------- Mark ------------------')
         }
 
         //---------------------------------------------------------------------------------------
@@ -36,24 +59,40 @@
                 let entry = document.createElement('li')
                 entry.innerHTML = `<b>${header}</b>`;
                 let table = document.createElement("table")
-
-                for (let i = 1; i < jEvent['fields'].length; i++) {
+                if (document.getElementById("mergeFields").checked) {
                     let tr = document.createElement("tr")
                     let td = document.createElement("td")
-                    //td.innerHTML = `<pre>${JSON.stringify(f,'')}</pre>`
-                    console.log("fieldDisplayLength", fieldDisplayLength)
-                    td.innerHTML = `${JSON.stringify(jEvent['fields'][i], '').substr(0, fieldDisplayLength)}`
+                    let output = "-> Merged | "
+                    for (let i = 1; i < jEvent['fields'].length; i++) {
+                        output += `<span class="fieldStyle${i % 2}">${JSON.stringify(jEvent['fields'][i], '').substr(0, fieldDisplayLength)}</span>|`
+                        console.log(output)
+                    }
+                    td.innerHTML = output
                     tr.appendChild(td)
                     table.appendChild(tr)
+                } else {
+                    for (let i = 1; i < jEvent['fields'].length; i++) {
+                        let tr = document.createElement("tr")
+                        let td = document.createElement("td")
+                        //td.innerHTML = `<pre>${JSON.stringify(f,'')}</pre>`
+                        //console.log("fieldDisplayLength", fieldDisplayLength)
+                        td.innerHTML = `${JSON.stringify(jEvent['fields'][i], '').substr(0, fieldDisplayLength)}`
+                        tr.appendChild(td)
+                        table.appendChild(tr)
+                    }
+
                 }
                 entry.appendChild(table)
-                document.getElementById("konsolEvents").insertAdjacentElement('afterbegin', entry)
+                document.getElementById("konsolEvents").insertAdjacentElement('beforeend', entry)
+
 
 
             } catch (error) {
                 let entry = document.getElementById("konsolEvents")
-                entry.insertAdjacentHTML("afterbegin", `<li>${text}</li>`);
+                entry.insertAdjacentHTML("beforeend", `<li>${text}</li>`);
             }
+            const container = document.getElementById('container')
+            container.scrollTop = container.scrollHeight;
         }
 
         //---------------------------------------------------------------------------------------------
@@ -67,16 +106,21 @@
         //---------------------------------------------------------------------
         function connect() {
             const url = "ws://localhost:3002"
+            append(`konsolClient.connect() connecting to ${url}`);
             console.log("konsolClient.connect() connecting to ", url)
             konsol = new WebSocket(url);
             konsol.onmessage = function (event) {
                 append(event.data);
             };
             konsol.onopen = function () {
-                append("Connected to WebSocket!");
+                append(`konsolClient.connect() connected to ${url}`);
+                document.getElementById("connectStatus").innerHTML=" Connected"
+                document.getElementById("connectButton").setAttribute("disabled","")
                 console.log("konsolClient.connect() connected to ", url)
             };
             konsol.onclose = function () {
+                document.getElementById("connectStatus").innerHTML=" Not connected"
+                document.getElementById("connectButton").removeAttribute("disabled")
                 append("Connection closed");
             };
             konsol.onerror = function () {
@@ -96,10 +140,11 @@
 <body onload="connect()">
     <h1>Konsol.log Client</h1>
     <div>
-        <input type="button" value="Connect" onclick="connect()" /><br />
+        <input type="button" id="connectButton" value="Connect" onclick="connect()" /><span id="connectStatus">Not connected</span><br />
         <form>
             fieldDisplayLength: <input value="160" id="fieldDisplayLength" /><br />
             fieldDisplayCount : <input value="3" id="fieldDisplayCount" /></br>
+            mergeFields : <input type="checkbox" id="mergeFields" /></br>
             <input type="button" value="setParams" onclick="setParms()" /><br />
         </form>
         <input type="button" value="writeMark" onclick="writeMark()" /><br />
@@ -107,7 +152,7 @@
         <input type="button" value="Send" onclick="sendMessage(event)" /><br />
         <input type="button" value="Clear" onclick="clearEvents()" /><br />
     </div>
-    <div style="overflow:scroll;height: 800px;">
+    <div id="container">
         <ul id="konsolEvents"></ul>
     </div>
 </body>

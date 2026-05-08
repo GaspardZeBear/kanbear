@@ -110,22 +110,13 @@ class KanbearSqlReporter {
 
   //--------------------------------------------------------
   callAfterPST(err, httpCode, params) {
-    //console.log("KanbearSqlReporter.callAfterPST() <err>", err)
-    //console.log("KanbearSqlReporter.callAfterPST() <httpCode>", httpCode)
-    //console.log("KanbearSqlReporter.callAfterPST() <params>", params)
-    //console.log("KanbearSqlReporter.callAfterPST() <db>", this.db)
-    Konsol.log("KanbearSqlReporter.callAfterPST() <PSTResp>", params)
+     Konsol.log("KanbearSqlReporter.callAfterPST() <PSTResp>", params)
     this.PSTResp = params
     //return (params)
   }
 
   //--------------------------------------------------------
   callAfterC(err, httpCode, params) {
-    //console.log("KanbearSqlReporter.callAfterC() <err>", err)
-    //console.log("KanbearSqlReporter.callAfterC() <httpCode>", httpCode)
-    //console.log("KanbearSqlReporter.callAfterPCST() <params>", params)
-    //console.log("KanbearSqlReporter.callAfterC() <db>", this.db)
-    //console.log("CResp", params)
     this.CResp = params
     //return (params)
   }
@@ -140,10 +131,6 @@ class KanbearSqlReporter {
 
   //--------------------------------------------------------
   callAfterUsers(err, httpCode, params) {
-    //console.log("KanbearSqlReporter.callAfterUsers() <err>", err)
-    //console.log("KanbearSqlReporter.callAfterUsers() <httpCode>", httpCode)
-    //console.log("KanbearSqlReporter.callAfterUsers() <params>", params)
-
     for (let row of params) {
       this.usersMap[row.uId] = { name: row.uName}
     }
@@ -161,10 +148,6 @@ class KanbearSqlReporter {
 
   //--------------------------------------------------------
   callAfterAssignees(err, httpCode, params) {
-    //console.log("KanbearSqlReporter.callAfterAssignees() <err>", err)
-    //console.log("KanbearSqlReporter.callAfterAssignees() <httpCode>", httpCode)
-    //console.log("KanbearSqlReporter.callAfterAssignees() <params>", params)
-
     for (let row of params) {
       this.assigneesMap[row.aId] = { name: row.aName }
     }
@@ -240,7 +223,7 @@ class KanbearSqlReporter {
       }
     }
     //console.log("pc", pc)
-    Konsol.log("KanbearSqlReporter.getJsonReport() before col <projectsMap>",projectsMap)
+    //Konsol.log("KanbearSqlReporter.getJsonReport() before col <projectsMap>",projectsMap)
     //console.log("this.CResp", this.CResp)
     for (let c of this.CResp) {
       projectsMap[projectId].columns[c.cId] = {
