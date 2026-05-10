@@ -96,6 +96,7 @@ class KanbearSqlReporter {
         c.id cId,
 	      c.name cName,
         c.position cPosition,
+        c.color cColor,
         c.description cDescription
       from projects as p
       right join columns as c
@@ -229,6 +230,7 @@ class KanbearSqlReporter {
       projectsMap[projectId].columns[c.cId] = {
         name: c.cName,
         id: c.cId,
+        color: c.cColor,
         position: c.cPosition,
         description: c.cDescription
       }

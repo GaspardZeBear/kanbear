@@ -77,7 +77,7 @@ class TaskDialog extends Dialog {
         task.setData("description", taskForm.taskDescription.value)
         task.setData("date_due", toDateTime(taskForm.taskDateDue.value, taskForm.taskTimeDue.value))
         task.setData("note", taskForm.taskNote.value)
-        let color = taskForm.taskColor.value < 0 ? "white" : taskForm.taskColor.value
+        let color = taskForm.taskColor.value < 0 ? "" : taskForm.taskColor.value
         task.setData("color", color)
         //let assignee = taskForm.taskAssignee.value < 0 ? "" : taskForm.taskAssignee.value
         //console.log("TaskDialog.fillDbFromForm() <assignee>",assignee)

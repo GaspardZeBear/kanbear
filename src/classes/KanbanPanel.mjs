@@ -135,6 +135,7 @@ class KanbanPanel {
         kColumnDiv.classList.add("kanban-column")
         kColumnDiv.setAttribute("data-column-id", col.id)
         kColumnDiv.setAttribute("data-swimlane-id", swimlane.id)
+        kColumnDiv.setAttribute("style", `background-color:${col.color}`)
 
         // create kanban-column-header
         const kColumnHeaderDiv = document.createElement('div')

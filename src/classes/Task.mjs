@@ -87,6 +87,17 @@ class Task extends KanbearEntity {
     }
 
     //-----------------------------------------------------------------------------------------------------
+    getTaskDisplayColor() {
+        console.log("Task.getTaskDisplayColor()","task",this.task,"color")
+        console.log("Task.getTaskDisplayColor()","taskColorLen",this.task.color.length)
+        if ( this.task.color.length > 0) {
+            return(this.task.color)
+        }
+        let col=Kontext.getCurrentProject().columns[this.task.column_id]
+        console.log("Task.getTaskDisplayColor()","col",col)
+        return(col.color)
+    }
+    //-----------------------------------------------------------------------------------------------------
     createKanbanTaskElement() {
         //const dragId = `drag-${task.id}`
         const dragId = Ref.getRefFromTask('drag', this.task)
@@ -95,7 +106,8 @@ class Task extends KanbearEntity {
         taskElement.setAttribute("id", dragId)
         taskElement.classList.add('kanban-item');
         taskElement.setAttribute("draggable", true)
-        let style=`background-color:${this.task.color}`
+        //let style=`background-color:${this.task.color}`
+        let style=`background-color:${this.getTaskDisplayColor()}`
         taskElement.setAttribute("style", style)
         //taskElement.style.setAttribute("background-color",this.task.color)
         //taskElement.style.setAttribute("style","italic")
@@ -156,17 +168,13 @@ class Task extends KanbearEntity {
         topLineDiv.classList.add("kanban-item-topline")
         topLineDiv.appendChild(href)
         
-        
-
         const commentDiv=document.createElement("div")
         commentDiv.appendChild(buildAddDummyButton({inner:"Co",message:"AddComment"}))
         topLineDiv.appendChild(commentDiv)
-
         
         const tagDiv=document.createElement("div")
         tagDiv.appendChild(buildAddDummyButton({inner:"Ta",message:"AddTag"}))
         topLineDiv.appendChild(tagDiv)
-
 
         const noteDiv=document.createElement("div")
         noteDiv.appendChild(buildAddDummyButton({inner:"No",message:"SetNote"}))
@@ -193,7 +201,6 @@ class Task extends KanbearEntity {
 
         taskElement.appendChild(topLineDiv)
     
-
         taskElement.appendChild(headerDiv)
         taskElement.appendChild(tNote)
 
