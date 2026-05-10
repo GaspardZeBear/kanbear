@@ -7,45 +7,45 @@ import { getOpenCloseSymbol } from "../utils/openClose.mjs"
 
 class Task extends KanbearEntity {
 
-    static db2Form={
-      'id':'',
-      'name':'taskName',
-      'description':'taskDescription',
-      'note':'taskNote',
-      'color':'taskColor',
-      'color_rules':'taskColorRules',
-      'column_id':'',
-      'user_id':'',
-      'assignee_id':'taskAssignee',
-      'position':'',
-      'is_open':'taskIsOpen',
-      'priority':'taskPriority',
-      'swimlane_id':'',
-      'date_created':'',
-      'date_started':'taskDateStarted',
-      'date_moved':'',
-      'date_closed':'',
-      'date_due':'taskDateDue',
-      'date_checked':'',
-      'date_modified':'',
-      'moved_warning':'taskMovedWarning',
-      'due_warning':'taskDueWarning',
-      'checked_warning ':'taskCheckedWarning'
+    static db2Form = {
+        'id': '',
+        'name': 'taskName',
+        'description': 'taskDescription',
+        'note': 'taskNote',
+        'color': 'taskColor',
+        'color_rules': 'taskColorRules',
+        'column_id': '',
+        'user_id': '',
+        'assignee_id': 'taskAssignee',
+        'position': '',
+        'is_open': 'taskIsOpen',
+        'priority': 'taskPriority',
+        'swimlane_id': '',
+        'date_created': '',
+        'date_started': 'taskDateStarted',
+        'date_moved': '',
+        'date_closed': '',
+        'date_due': 'taskDateDue',
+        'date_checked': '',
+        'date_modified': '',
+        'moved_warning': 'taskMovedWarning',
+        'due_warning': 'taskDueWarning',
+        'checked_warning ': 'taskCheckedWarning'
     }
 
     static form2Db = {}
 
     static {
-        Object.entries(Task.db2Form).forEach( ([col,form]) => {
+        Object.entries(Task.db2Form).forEach(([col, form]) => {
             if (form.length > 0) {
-                Task.form2Db[form]=col
+                Task.form2Db[form] = col
             }
         })
     }
 
     //------------------------------------------------------------------------
     constructor(task) {
-        super('task',task)
+        super('task', task)
         this.task = task
         //this.id=task.id
         this.ref = null
@@ -87,48 +87,50 @@ class Task extends KanbearEntity {
     }
 
     //-----------------------------------------------------------------------------------------------------
-    getTaskDisplayColor() {
-        console.log("Task.getTaskDisplayColor()","task",this.task,"color")
-        console.log("Task.getTaskDisplayColor()","taskColorLen",this.task.color.length)
-        if ( this.task.color.length > 0) {
-            return(this.task.color)
+    getTaskDisplayColor(col = undefined) {
+        console.log("Task.getTaskDisplayColor()", "task", this.task, "color")
+        console.log("Task.getTaskDisplayColor()", "taskColorLen", this.task.color.length)
+        if (this.task.color.length > 0) {
+            return (this.task.color)
         }
-        let col=Kontext.getCurrentProject().columns[this.task.column_id]
-        console.log("Task.getTaskDisplayColor()","col",col)
-        return(col.color)
+        if (!col) {
+            col = Kontext.getCurrentProject().columns[this.task.column_id]
+        }
+        console.log("Task.getTaskDisplayColor()", "col", col)
+        return (col.color)
     }
     //-----------------------------------------------------------------------------------------------------
     createKanbanTaskElement() {
         //const dragId = `drag-${task.id}`
         const dragId = Ref.getRefFromTask('drag', this.task)
         const taskElement = document.createElement('div');
-        this.elementId=dragId
+        this.elementId = dragId
         taskElement.setAttribute("id", dragId)
         taskElement.classList.add('kanban-item');
         taskElement.setAttribute("draggable", true)
         //let style=`background-color:${this.task.color}`
-        let style=`background-color:${this.getTaskDisplayColor()}`
+        let style = `background-color:${this.getTaskDisplayColor()}`
         taskElement.setAttribute("style", style)
         //taskElement.style.setAttribute("background-color",this.task.color)
         //taskElement.style.setAttribute("style","italic")
 
-       
+
         const headerDiv = document.createElement("div")
         headerDiv.classList.add("kanban-item-header")
 
         const href = document.createElement("a")
-        href.setAttribute("id",`taskHref_${this.task.id}`)
-        href.setAttribute("href","javascript:void(0)")
-        href.innerHTML=`${this.task.name}`
-        let myTask=this.task
+        href.setAttribute("id", `taskHref_${this.task.id}`)
+        href.setAttribute("href", "javascript:void(0)")
+        href.innerHTML = `${this.task.name}`
+        let myTask = this.task
         let editTaskFn = function (ev) {
-          console.log("editTaskHref event Listener fired <swimlane>",myTask.swimlane_id,"<column>",myTask.column_id)
-          ev.stopPropagation();
-          const task = new TaskDialog()
-          task.modify({taskId:myTask.id});
+            console.log("editTaskHref event Listener fired <swimlane>", myTask.swimlane_id, "<column>", myTask.column_id)
+            ev.stopPropagation();
+            const task = new TaskDialog()
+            task.modify({ taskId: myTask.id });
         }
         href.addEventListener('click', editTaskFn, { once: true });
- 
+
         /*
         const top = document.createElement("div")
         top.classList.add("kanban-item-name")
@@ -142,7 +144,7 @@ class Task extends KanbearEntity {
         const note = this.task.note ?? "noNote"
         const tNote = document.createElement("div")
         tNote.classList.add("kanban-item-name")
-        let noteStyle=`font-style:italic`
+        let noteStyle = `font-style:italic`
         tNote.setAttribute("style", noteStyle)
         tNote.innerHTML = `Note : ${note}`
 
@@ -151,8 +153,8 @@ class Task extends KanbearEntity {
         const tAssignee = document.createElement("div")
         tAssignee.classList.add("kanban-item-name")
         tAssignee.innerHTML = `${assignee}`
-        
-        
+
+
         headerDiv.appendChild(tDescription)
         //headerDiv.appendChild(tNote)
         headerDiv.appendChild(tAssignee)
@@ -167,22 +169,22 @@ class Task extends KanbearEntity {
         const topLineDiv = document.createElement("div")
         topLineDiv.classList.add("kanban-item-topline")
         topLineDiv.appendChild(href)
-        
-        const commentDiv=document.createElement("div")
-        commentDiv.appendChild(buildAddDummyButton({inner:"Co",message:"AddComment"}))
+
+        const commentDiv = document.createElement("div")
+        commentDiv.appendChild(buildAddDummyButton({ inner: "Co", message: "AddComment" }))
         topLineDiv.appendChild(commentDiv)
-        
-        const tagDiv=document.createElement("div")
-        tagDiv.appendChild(buildAddDummyButton({inner:"Ta",message:"AddTag"}))
+
+        const tagDiv = document.createElement("div")
+        tagDiv.appendChild(buildAddDummyButton({ inner: "Ta", message: "AddTag" }))
         topLineDiv.appendChild(tagDiv)
 
-        const noteDiv=document.createElement("div")
-        noteDiv.appendChild(buildAddDummyButton({inner:"No",message:"SetNote"}))
+        const noteDiv = document.createElement("div")
+        noteDiv.appendChild(buildAddDummyButton({ inner: "No", message: "SetNote" }))
         topLineDiv.appendChild(noteDiv)
 
 
         console.log("this.task", this.task)
-        const openCloseDiv=document.createElement("div")
+        const openCloseDiv = document.createElement("div")
         //let callback=(val) => {
         //    alert(val)
         //  const task = new TaskDialog()
@@ -192,15 +194,15 @@ class Task extends KanbearEntity {
         //this.task.is_open ? addAddOpenCloseButton.innerHTML='O/c' : addAddOpenCloseButton.innerHTML='o/C'
         //let oc
         //this.task.is_open ? oc="O" : oc="C"
-        openCloseDiv.innerHTML=getOpenCloseSymbol(this.task.is_open)
+        openCloseDiv.innerHTML = getOpenCloseSymbol(this.task.is_open)
         topLineDiv.appendChild(openCloseDiv)
 
         const dummyDiv = document.createElement("div")
-        dummyDiv.innerHTML="Open/close,Del,Comment"
+        dummyDiv.innerHTML = "Open/close,Del,Comment"
         //topLineDiv.appendChild(dummyDiv)
 
         taskElement.appendChild(topLineDiv)
-    
+
         taskElement.appendChild(headerDiv)
         taskElement.appendChild(tNote)
 
@@ -222,5 +224,5 @@ class Task extends KanbearEntity {
         return (taskElement)
     }
 
- }
+}
 export { Task }

@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="src/assets/kanbear.css">
     <link rel="stylesheet" href="src/assets/kanban.css">
     <link rel="stylesheet" href="src/assets/menu.css">
+    <link rel="stylesheet" href="src/assets/Xmodal.css">
     <script type="module" src="src/index.mjs"></script>
     <!-- <script type="module" src="src/report.mjs"></script> -->
 </head>
@@ -177,10 +178,10 @@
     </div>
 
     <!-- Div for modal dialogs -->
-    <div id="modal">
+    <div id="modal" class="modal">
     </div>
 
-    <dialog id="assigneeDialog" closedby="any">
+    <dialog id="assigneeDialog" class="modal" closedby="none">
         <h2 id="assigneeDialogTitle"></h2>
         <div id="assigneeDialogMessage"></div>
         <form id="assigneeForm" method="dialog">
@@ -290,7 +291,7 @@
         </form>
     </dialog>
 
-    <dialog id="taskDialog" closedby="any">
+    <dialog id="taskDialog"  class="modal" closedby="none">
         <h2 id="taskDialogTitle"></h2>
         <div id="taskDialogMessage"></div>
         <form id="taskForm" method="dialog">

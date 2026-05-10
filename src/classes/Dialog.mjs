@@ -116,6 +116,7 @@ class Dialog {
     createDialog(save=()=>{}) {
         this.dialog = document.getElementById(this.kind+"Dialog")
         let dialog = this.dialog
+        dialog.setAttribute("closedby","none")
         let close = this.closeDialog.bind(this)
         //let save = this.save.bind(this)
 

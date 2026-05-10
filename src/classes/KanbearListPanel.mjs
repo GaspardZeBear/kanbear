@@ -3,6 +3,7 @@ import { formatDuration, dateToString, getDurationFromNow } from "../utils/dateA
 import { Kontext } from "./Kontext.mjs";
 import { Ref } from "./Ref.mjs"
 import { getFiltersMap } from "../utils/filters.mjs";
+import { Task } from "./Task.mjs"
 import { Project } from "./Project.mjs"
 import { getOpenCloseSymbol, getOpenCloseParmBoolean } from "../utils/openClose.mjs";
 //import { buildWorkspaceLink } from "../utils/linkBuilder.mjs";
@@ -29,7 +30,7 @@ class KanbearListPanel {
     if (!(openClosed === undefined)) {
       parms["is_open"] = openClosed
     }
-    console.log("KanbearListPanel.builder() <parms>",parms)
+    console.log("KanbearListPanel.builder() <parms>", parms)
     const projects = await Project.getAll('projects', parms)
     Kontext.setPanelClass(KanbearListPanel)
     return new KanbearListPanel(projects)
@@ -133,8 +134,8 @@ class KanbearListPanel {
         <th>Action</th>
         <th>Project</th>
         <th>Swimlane</th>
-        <th>Task</th>
         <th>Column</th>
+        <th>Task</th>
         <th>Since</th>
         <th>Duration</th>
         <th>Due</th>
@@ -164,17 +165,21 @@ class KanbearListPanel {
           if (project.users[task.owner_id] && project.users[task.owner_id].name) {
             userName = project.users[task.owner_id].name
           }
+          let taskEntity = new Task(task)
           const row = document.createElement('tr');
           const duration = formatDuration((Date.now() / 1000 - task.date_moved))
           const checkBoxId = Ref.getRef('checkbox', project.id, swimlane.id, task.id)
           const commentLinkId = Ref.getRef('commentLink', project.id, swimlane.id, task.id)
+
+          //<td style="background-color:${taskEntity.getTaskDisplayColor()}">${task.name} ${getOpenCloseSymbol(task.is_open)}</td>
+          //<td style="background-color:${task.color}">${task.name} ${getOpenCloseSymbol(task.is_open)}</td>
           row.innerHTML = `
               <td><input type="checkbox" name="tasks" id="${checkBoxId}" class="taskCheckbox"/></td>
               <td><a href="#" class="taskCommentLink" id="${commentLinkId}">c</a></td>
               <td>${project.name} ${getOpenCloseSymbol(project.is_open)}</td>
               <td>${swimlane.name} ${getOpenCloseSymbol(swimlane.is_open)}</td>
-              <td style="background-color:${task.color}">${task.name} ${getOpenCloseSymbol(task.is_open)}</td>
-              <td>${project.columns[task.column_id].name}</td>
+              <td style="background-color:${project.columns[task.column_id].color}">${project.columns[task.column_id].name}</td>
+              <td style="background-color:${taskEntity.getTaskDisplayColor(project.columns[task.column_id])}">${task.name} ${getOpenCloseSymbol(task.is_open)}</td>
               <td>${dateToString(task.date_moved)}</td>
               <td>${getDurationFromNow(task.date_moved, true)}</td>
               <td>${dateToString(task.date_due)}</td>
