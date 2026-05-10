@@ -4,7 +4,8 @@ import { WebSocketServer } from 'ws';
 class Konsol {
 
   static wss
-  static wsClients={}
+  static wsClients = {}
+  static stackTrace = true
 
   //----------------------------------------------------------------------------------------------
   static init(server) {
@@ -20,17 +21,19 @@ class Konsol {
       //Konsol.addClient(ws)
       const clientIP = request.socket.remoteAddress;
       const clientPort = request.socket.remotePort
-      const id=`${clientIP}:${clientPort}`
+      const id = `${clientIP}:${clientPort}`
       console.log(`Konsol.onConnection() New client ${id} connected`);
-      Konsol.addClient(id,ws)
+      Konsol.addClient(id, ws)
       ws.send('Connected to Konsol websocket server');
 
       ws.on('message', function message(data) {
+
         try {
           const messageText = data.toString();
           console.log('Konsol ws.onMessage() Received:', messageText);
           if (ws.readyState === ws.OPEN) {
-            ws.send(`Echo: ${messageText}`);
+            Konsol.stackTrace = !Konsol.stackTrace
+            ws.send(`Echo: ${messageText} stackTrace=${Konsol.stackTrace}`);
           }
         } catch (error) {
           console.error('Konsol ws.onMessage() Error processing message:', error);
@@ -68,7 +71,7 @@ class Konsol {
 
     const interval = setInterval(function ping() {
       //Konsol.wss.clients.forEach(function each(ws) {
-      Object.entries(Konsol.wsClients).forEach(([id, ws]) => {  
+      Object.entries(Konsol.wsClients).forEach(([id, ws]) => {
         if (ws.isAlive === false) {
           return ws.terminate();
         }
@@ -83,13 +86,21 @@ class Konsol {
   }
 
   //----------------------------------------------------------------------------------------------
-  static addClient(id,wsClient) {
+  static addClient(id, wsClient) {
     //console.log("Konsol.addClient() <wsClient>",wsClient)
-    Konsol.wsClients[id]=wsClient
+    Konsol.wsClients[id] = wsClient
   }
 
   //----------------------------------------------------------------------------------------------
   static log(...msg) {
+    let stack = ""
+    if (Konsol.stackTrace) {
+      try {
+        throw new Error("Konsol")
+      } catch (error) {
+        stack = error.stack
+      }
+    }
     try {
       const ddate = new Date()
       const now = Date.now()
@@ -97,6 +108,7 @@ class Konsol {
       let evt = {
         type: 'log',
         date: ddated,
+        stack: stack,
         correlationId: now,
         fields: []
       }
@@ -106,11 +118,11 @@ class Konsol {
         //console.log('Konsol.log() ', evt)
       }
       Object.entries(Konsol.wsClients).forEach(([id, ws]) => {
-      //Konsol.wsClients.forEach(function each(ws) {
+        //Konsol.wsClients.forEach(function each(ws) {
         try {
           ws.send(JSON.stringify(evt))
-        } catch(error) {
-          console.log("Konsol.log() error on send to <id>",id,"<error>", error, "<msg>", msg)
+        } catch (error) {
+          console.log("Konsol.log() error on send to <id>", id, "<error>", error, "<msg>", msg)
         }
       })
     } catch (error) {

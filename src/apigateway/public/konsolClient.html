@@ -51,24 +51,25 @@
 
         //---------------------------------------------------------------------------------------
         append = function (text) {
-            console.log(text)
+            //console.log(text)
             try {
                 jEvent = JSON.parse(text)
+                //console.log(jEvent)
                 //let jEvent = JSON.parse(text)
                 let header = `${jEvent['date']}  ${jEvent['fields'][0]}`
                 //let  = document.getElementById("konsolEvents")
                 let entry = document.createElement('li')
                 entry.innerHTML = `<b>${header}</b>`;
                 let table = document.createElement("table")
-                console.log("fieldDisplayLength",fieldDisplayLength)
+                //console.log("fieldDisplayLength", fieldDisplayLength)
                 if (document.getElementById("mergeFields").checked) {
                     let tr = document.createElement("tr")
                     let td = document.createElement("td")
-                    td.appendChild( document.createTextNode("-> Merged |"))
+                    td.appendChild(document.createTextNode("-> Merged |"))
                     for (let i = 1; i < jEvent['fields'].length; i++) {
                         //output += `<span class="fieldStyle${i % 2}">${JSON.stringify(jEvent['fields'][i], '').substr(0, fieldDisplayLength)}</span>|`
                         const span = document.createElement("span")
-                        span.setAttribute("class",`fieldStyle${i % 2}`)
+                        span.setAttribute("class", `fieldStyle${i % 2}`)
                         const txt = document.createTextNode(`${JSON.stringify(jEvent['fields'][i]).substr(0, fieldDisplayLength)}|`)
                         //txt.setAttribute("class",`fieldStyle${i % 2}`)
                         span.appendChild(txt)
@@ -87,14 +88,28 @@
                         tr.appendChild(td)
                         table.appendChild(tr)
                     }
-
                 }
                 entry.appendChild(table)
                 document.getElementById("konsolEvents").insertAdjacentElement('beforeend', entry)
-
-
-
+                if (jEvent['stack']) {
+                    //document.getElementById("konsolEvents").insertAdjacentElement('beforeend', jEvent['stack'])
+                    let lines = jEvent['stack'].split('\n')
+                    console.log("lines",lines)
+                    let table = document.createElement("table")
+                    for (let i = 2; i < lines.length -1; i++) {
+                        console.log(lines[i])
+                        let tr = document.createElement("tr")
+                        let td = document.createElement("td")
+                        td.appendChild(document.createTextNode(`${i} -- ${lines[i]}`))
+                        tr.appendChild(td)
+                        table.appendChild(tr)
+                    }
+                                      
+                    document.getElementById("konsolEvents").insertAdjacentElement('beforeend', table)
+                }
+                
             } catch (error) {
+                console.log(error)
                 let entry = document.getElementById("konsolEvents")
                 entry.insertAdjacentHTML("beforeend", `<li>${text}</li>`);
             }
@@ -121,12 +136,12 @@
             };
             konsol.onopen = function () {
                 append(`konsolClient.connect() connected to ${url}`);
-                document.getElementById("connectStatus").innerHTML=" Connected"
-                document.getElementById("connectButton").setAttribute("disabled","")
+                document.getElementById("connectStatus").innerHTML = " Connected"
+                document.getElementById("connectButton").setAttribute("disabled", "")
                 console.log("konsolClient.connect() connected to ", url)
             };
             konsol.onclose = function () {
-                document.getElementById("connectStatus").innerHTML=" Not connected"
+                document.getElementById("connectStatus").innerHTML = " Not connected"
                 document.getElementById("connectButton").removeAttribute("disabled")
                 append("Connection closed");
             };
@@ -147,14 +162,15 @@
 <body onload="connect()">
     <h1>Konsol.log Client</h1>
     <div>
-        <input type="button" id="connectButton" value="Connect" onclick="connect()" /><span id="connectStatus">Not connected</span><br />
+        <input type="button" id="connectButton" value="Connect" onclick="connect()" /><span id="connectStatus">Not
+            connected</span><br />
         <form>
             fieldDisplayLength: <input value="160" id="fieldDisplayLength" />
             fieldDisplayCount : <input value="3" id="fieldDisplayCount" />
-            mergeFields : <input type="checkbox" id="mergeFields" checked/>
-            <br/><input type="button" value="setParms" onclick="setParms()" />
+            mergeFields : <input type="checkbox" id="mergeFields" checked />
+            <br /><input type="button" value="setParms" onclick="setParms()" />
         </form>
-        
+
         Message: <input value="Hello!" type="text" id="message" />
         <input type="button" value="Send" onclick="sendMessage(event)" /><br />
         <input type="button" value="Clear" onclick="clearEvents()" />
