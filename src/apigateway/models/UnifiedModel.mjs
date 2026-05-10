@@ -42,7 +42,8 @@ class UnifiedModel {
         
         const { sql, bindVariables } = new SqlBuilder().generateGetStatement(table, req)
         //const sql = `SELECT * FROM ${table}`;
-        Konsol.log("UnifiedModel.getAll(), <table>",table,"<req.query>", req.query,"<sql>",sql)
+        Konsol.log("UnifiedModel.getAll()XXXXX, <table>",table,"<req query>", req.query,"<sql>",sql)
+        console.log("UnifiedModel.getAll()XXXXX, <table>",table,"<req query>", req.query,"<sql>",sql)
         db.all(sql, bindVariables, callback);
     }
 

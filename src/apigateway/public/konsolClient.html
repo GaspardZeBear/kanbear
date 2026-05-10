@@ -7,6 +7,7 @@
         .fieldStyle0 {
             font-style: italic;
             font-weight: bold;
+            background-color: lightgrey;
         }
 
         .fieldStyle1 {
@@ -50,7 +51,7 @@
 
         //---------------------------------------------------------------------------------------
         append = function (text) {
-            //console.log(text)
+            console.log(text)
             try {
                 jEvent = JSON.parse(text)
                 //let jEvent = JSON.parse(text)
@@ -59,24 +60,30 @@
                 let entry = document.createElement('li')
                 entry.innerHTML = `<b>${header}</b>`;
                 let table = document.createElement("table")
+                console.log("fieldDisplayLength",fieldDisplayLength)
                 if (document.getElementById("mergeFields").checked) {
                     let tr = document.createElement("tr")
                     let td = document.createElement("td")
-                    let output = "-> Merged | "
+                    td.appendChild( document.createTextNode("-> Merged |"))
                     for (let i = 1; i < jEvent['fields'].length; i++) {
-                        output += `<span class="fieldStyle${i % 2}">${JSON.stringify(jEvent['fields'][i], '').substr(0, fieldDisplayLength)}</span>|`
-                        console.log(output)
+                        //output += `<span class="fieldStyle${i % 2}">${JSON.stringify(jEvent['fields'][i], '').substr(0, fieldDisplayLength)}</span>|`
+                        const span = document.createElement("span")
+                        span.setAttribute("class",`fieldStyle${i % 2}`)
+                        const txt = document.createTextNode(`${JSON.stringify(jEvent['fields'][i]).substr(0, fieldDisplayLength)}|`)
+                        //txt.setAttribute("class",`fieldStyle${i % 2}`)
+                        span.appendChild(txt)
+                        td.appendChild(span)
                     }
-                    td.innerHTML = output
+                    //td.innerHTML = output
                     tr.appendChild(td)
                     table.appendChild(tr)
                 } else {
+                    //console.log(jEvent['fields'])
                     for (let i = 1; i < jEvent['fields'].length; i++) {
                         let tr = document.createElement("tr")
                         let td = document.createElement("td")
-                        //td.innerHTML = `<pre>${JSON.stringify(f,'')}</pre>`
-                        //console.log("fieldDisplayLength", fieldDisplayLength)
-                        td.innerHTML = `${JSON.stringify(jEvent['fields'][i], '').substr(0, fieldDisplayLength)}`
+                        const txt = document.createTextNode(`${JSON.stringify(jEvent['fields'][i]).substr(0, fieldDisplayLength)}`)
+                        td.appendChild(txt)
                         tr.appendChild(td)
                         table.appendChild(tr)
                     }
@@ -142,15 +149,16 @@
     <div>
         <input type="button" id="connectButton" value="Connect" onclick="connect()" /><span id="connectStatus">Not connected</span><br />
         <form>
-            fieldDisplayLength: <input value="160" id="fieldDisplayLength" /><br />
-            fieldDisplayCount : <input value="3" id="fieldDisplayCount" /></br>
-            mergeFields : <input type="checkbox" id="mergeFields" /></br>
-            <input type="button" value="setParams" onclick="setParms()" /><br />
+            fieldDisplayLength: <input value="160" id="fieldDisplayLength" />
+            fieldDisplayCount : <input value="3" id="fieldDisplayCount" />
+            mergeFields : <input type="checkbox" id="mergeFields" checked/>
+            <br/><input type="button" value="setParms" onclick="setParms()" />
         </form>
-        <input type="button" value="writeMark" onclick="writeMark()" /><br />
+        
         Message: <input value="Hello!" type="text" id="message" />
         <input type="button" value="Send" onclick="sendMessage(event)" /><br />
-        <input type="button" value="Clear" onclick="clearEvents()" /><br />
+        <input type="button" value="Clear" onclick="clearEvents()" />
+        <input type="button" value="writeMark" onclick="writeMark()" /><br />
     </div>
     <div id="container">
         <ul id="konsolEvents"></ul>
