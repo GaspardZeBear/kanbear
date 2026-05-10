@@ -89,8 +89,8 @@ class Task extends KanbearEntity {
     //-----------------------------------------------------------------------------------------------------
     getTaskDisplayColor(col = undefined) {
         console.log("Task.getTaskDisplayColor()", "task", this.task, "color")
-        console.log("Task.getTaskDisplayColor()", "taskColorLen", this.task.color.length)
-        if (this.task.color.length > 0) {
+        //console.log("Task.getTaskDisplayColor()", "taskColorLen", this.task.color.length)
+        if (this.task.color && this.task.color.length > 0) {
             return (this.task.color)
         }
         if (!col) {

@@ -24,16 +24,16 @@ h1 {
 }
 
 .swimlane-header {
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    background-color: #e9e9e9;
+    padding: 5px 5px;
+    margin-bottom: 2px;
+    background-color: lightseagreen;
     border-radius: 5px;
 }
 
 .swimlane-header h2 {
     margin: 0;
     font-size: 1.2rem;
-    color: #444;
+    color: black;
 }
 
 .swimlane-columns {
@@ -74,7 +74,7 @@ h1 {
 }
 
 .kanban-items {
-    background-color: salmon;
+    background-color: lightgray;
     flex-grow: 1;
     min-height: 150px;
     padding: 5px;
@@ -82,7 +82,7 @@ h1 {
 }
 
 .kanban-item {
-    background-color: pink;
+    background-color: lightgray;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     padding: 3px;
