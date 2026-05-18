@@ -93,17 +93,18 @@ class KanbearUserPanel {
   //-----------------------------------------------------------------
   async createTable() {
       const users = await User.getAll('users')
-      console.log(users)
+      console.log("KanbearUserPanel.createTable()","<users>",users)
       this.table = document.createElement('table')
       const thead = document.createElement('thead')
       const hrow = document.createElement('tr')
       hrow.innerHTML = `
         <th>Sel</th>
         <th>Name</th>
-        <th>Tasks</th>
+        <th>Password</th>
         <th>Description</th>
         <th>Tel</th>
         <th>Email</th>
+        <th>isAdmin</th>
         <th>Delete</th>
         `
       thead.appendChild(hrow)
@@ -128,10 +129,11 @@ class KanbearUserPanel {
         const id = "userSel"
         row.appendChild(td('<input class="userCheckbox" userId=' + user.id + ' type="checkbox"/>'))
         row.appendChild(tdHref(buildUserLink(user.id, user.name)))
-        row.appendChild(td("Tasks ..."))
+        row.appendChild(td("**** ..."))
         row.appendChild(td(user.description))
         row.appendChild(td(user.tel))
         row.appendChild(td(user.email))
+        row.appendChild(td(user.is_admin))
         row.appendChild(td("Delete"))
         tbody.appendChild(row);
       }

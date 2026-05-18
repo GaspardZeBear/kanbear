@@ -23,6 +23,9 @@ class KanbearListPanel {
   //----------------------------------------------------------
   static async builder() {
     console.log("KanbearListPanel.builder()")
+    if ( !Kontext.getWorkspaceId()) {
+      throw new Error("No workspace selected")
+    }
     const isOpen = document.getElementById("projectOpen").checked;
     const isClosed = document.getElementById("projectClosed").checked;
     const openClosed = getOpenCloseParmBoolean('project', isOpen, isClosed)

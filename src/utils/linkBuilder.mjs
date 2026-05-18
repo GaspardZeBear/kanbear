@@ -4,6 +4,7 @@ import { SwimlaneDialog } from '../classes/SwimlaneDialog.mjs'
 import { ColumnDialog } from '../classes/ColumnDialog.mjs'
 import { WorkspaceDialog } from '../classes/WorkspaceDialog.mjs'
 import { AssigneeDialog } from '../classes/AssigneeDialog.mjs'
+import { UserDialog } from '../classes/UserDialog.mjs'
 
 class LinkCounter {
   static counter=0
@@ -103,4 +104,24 @@ class LinkCounter {
     return(href)
   }
 
-  export { buildAssigneeLink, buildWorkspaceLink, buildProjectLink, buildSwimlaneLink , buildColumnLink }
+//----------------------------------------------------------------------------------
+  function buildUserLink(userId, userName) {
+    const href = document.createElement("a")
+    //LinkCounter.counter++
+    //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
+    href.setAttribute("href", "javascript:void(0)")
+    href.innerHTML = `${userName}`
+    //let myProject = this.project
+    let uId=userId
+    let editUserFn = function (ev) {
+      console.log("editUserHref event Listener fired ")
+      ev.stopPropagation();
+      const user = new UserDialog()
+      user.modify({userId:uId});
+    }
+    href.addEventListener('click', editUserFn, { once: true });
+    console.log(href)
+    return(href)
+  }
+
+  export { buildAssigneeLink, buildUserLink, buildWorkspaceLink, buildProjectLink, buildSwimlaneLink , buildColumnLink }

@@ -116,9 +116,12 @@ h1 {
 
 
 .kanban-item-topline {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
+    xjustify-content: space-between;
+    margin-bottom: 2px;
+    background-color: white;
+    display : grid;
+    grid-template-columns: 45% 15% 15% 15% 10%;
+    border:1px outset grey;
 }
 
 .kanban-item-name {

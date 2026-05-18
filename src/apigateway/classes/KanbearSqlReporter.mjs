@@ -125,7 +125,10 @@ class KanbearSqlReporter {
   //-----------------------------------------------------
   async selectUsers() {
     Konsol.log("KanbearSqlReporter.selectUsers()")
-    let reqUsers = `select u.id uId,u.name uName from users as u`
+    let reqUsers = `select 
+        u.id uId,
+        u.name uName
+      from users as u`
     //let usersMap = { '0': 'nobody' }
     db.all(reqUsers, [], this.callAfterUsers.bind(this));
   }
@@ -219,6 +222,7 @@ class KanbearSqlReporter {
         column_id: row.cId,
         date_moved: row.tMoved,
         date_due: row.tDue,
+        note: row.tNote,
         color: row.tColor,
         assignee_id: row.tAssigneeId
       }

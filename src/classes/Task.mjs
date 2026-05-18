@@ -121,6 +121,7 @@ class Task extends KanbearEntity {
         const href = document.createElement("a")
         href.setAttribute("id", `taskHref_${this.task.id}`)
         href.setAttribute("href", "javascript:void(0)")
+        
         href.innerHTML = `${this.task.name}`
         let myTask = this.task
         let editTaskFn = function (ev) {
@@ -168,7 +169,11 @@ class Task extends KanbearEntity {
         // let's try 
         const topLineDiv = document.createElement("div")
         topLineDiv.classList.add("kanban-item-topline")
-        topLineDiv.appendChild(href)
+
+        const hrefDiv = document.createElement("div")
+        
+        hrefDiv.appendChild(href)
+        topLineDiv.appendChild(hrefDiv)
 
         const commentDiv = document.createElement("div")
         commentDiv.appendChild(buildAddDummyButton({ inner: "Co", message: "AddComment" }))

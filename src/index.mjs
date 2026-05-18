@@ -4,6 +4,7 @@
 import { KanbanPanel } from './classes/KanbanPanel.mjs';
 import { KanbearEntityFactory } from './classes/KanbearEntityFactory.mjs';
 import { KanbearAssigneePanel } from './classes/KanbearAssigneePanel.mjs';
+import { KanbearUserPanel } from './classes/KanbearUserPanel.mjs';
 import { KanbearListPanel } from './classes/KanbearListPanel.mjs';
 import { KanbearMigrator } from './classes/KanbearMigrator.mjs';
 import { KanbearProjectCleanor } from './classes/KanbearProjectCleanor.mjs';
@@ -46,7 +47,7 @@ document.getElementById("projectOpen").addEventListener("change", async (ev) => 
 })
 
 document.getElementById("projectClosed").addEventListener("change", async (ev) => {
-    console.log(`index.mjs() projectClosed22 listener fired <ev>`, ev)
+    console.log(`index.mjs() projectClosed listener fired <ev>`, ev)
     buildKanbearProjectsSelectBox()
 })
 
@@ -137,6 +138,21 @@ document.addEventListener("assigneeDeleted", async (ev) => {
     new KanbearAssigneePanel().render()
 })
 
+document.addEventListener("userCreated", async (ev) => {
+    console.log("index.mjs() userCreated listener fired <ev>", ev)
+    new KanbearUserPanel().render()
+})
+
+document.addEventListener("userDeleted", async (ev) => {
+    console.log("index.mjs() userDeleted listener fired <ev>", ev)
+    new KanbearUserPanel().render()
+})
+
+document.addEventListener("userModified", async (ev) => {
+    new KanbearUserPanel().render()
+})
+
+
 document.addEventListener("assigneeModified", async (ev) => {
     new KanbearAssigneePanel().render()
 })
@@ -177,10 +193,10 @@ document.addEventListener("error", async (ev) => {
 
 document.getElementById('kanboard').href = Kontext.getKanboardUrl()
 
-document.getElementById('loadJson').addEventListener('click', async () => {
+document.getElementById('loadProject').addEventListener('click', async () => {
     try {
         const response = await Kontext.loadKanbearJsonBulkData()
-        //document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(Kontext.getJsonBulkData(), null, 2) + '</pre>';
+        document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(Kontext.getJsonBulkData(), null, 2) + '</pre>';
         //document.getElementById('message').innerHTML = '<p>Loaded</p>';
     } catch (error) {
         //document.getElementById('message').innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
@@ -326,9 +342,13 @@ document.getElementById('userPanel').addEventListener('click', () => {
 
 
 //------------------- showDetails --------------------------------------
-document.getElementById('showDetails').addEventListener('click', async () => {
+document.getElementById('listWorkspace').addEventListener('click', async () => {
+    try { 
     let kl = await KanbearListPanel.builder()
     kl.render()
+    } catch(error) {
+       alert(error)
+    }
 });
 
 //------------------- kanban --------------------------------------

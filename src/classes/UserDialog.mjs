@@ -31,7 +31,7 @@ class UserDialog extends Dialog {
     //----------------------------------------------------------------------------
     async fillDbFromForm(user) {
         user.setData("name", userForm.userName.value)
-        user.setData("description", userForm.assigneeDescription.value)
+        user.setData("description", userForm.userDescription.value)
         user.setData("tel", userForm.userTel.value)
         user.setData("email", userForm.userEmail.value)
         user.setData("password", userForm.userPassword.value)
