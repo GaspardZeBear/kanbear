@@ -320,6 +320,12 @@ document.getElementById('assigneePanel').addEventListener('click', () => {
 });
 
 //------------------- showDetails --------------------------------------
+document.getElementById('userPanel').addEventListener('click', () => {
+    new KanbearUserPanel().render()
+});
+
+
+//------------------- showDetails --------------------------------------
 document.getElementById('showDetails').addEventListener('click', async () => {
     let kl = await KanbearListPanel.builder()
     kl.render()
