@@ -54,6 +54,8 @@ class KanbearSqlReporter {
     Konsol.log("KanbearSqlReporter.selectPST(projectId) filter",filter)
     let reqPST = `
       select 
+        w.id wId,
+        w.name wName,
         p.id pId,
 	      p.name pName,
         p.description pDescription,
@@ -74,6 +76,8 @@ class KanbearSqlReporter {
 	      t.date_due tDue,
 	      datetime(t.date_moved,'unixepoch') tMovedDatetime
       from projects as p
+      left join workspaces as w
+        on w.id=p.workspace_id
       left join swimlanes as s
         on p.id=s.project_id
       left join tasks as t
@@ -180,6 +184,7 @@ class KanbearSqlReporter {
       //console.log(row)
       if (!projectsMap[row.pId]) {
         projectsMap[row.pId] = {}
+        projectsMap[row.pId].workspace = { name: row.wName, id: row.wId }
         projectsMap[row.pId].name = row.pName
         projectsMap[row.pId].id = row.pId
         projectsMap[row.pId].is_open = row.pIsOpen

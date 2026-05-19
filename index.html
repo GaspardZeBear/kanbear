@@ -27,7 +27,7 @@
                 <ul>
                     <li class="dropdown"><a href="#">People</a>
                         <ul class="under">
-                            <li><a href="#">Users</a></li>
+                            <li><a href="#" id="userPanel">Users</a></li>
                             <li><a href="#" id="assigneePanel">Assignees</a></li>
                         </ul>
                     </li>
@@ -80,7 +80,7 @@
         <div>
             <div class="infos">
                 <b>Project</b>
-                
+
             </div>
             <div class="infos" id="project">
                 <p>No selection</p>
@@ -121,25 +121,25 @@
 
         <div class="filter-group">
             <div style="display:flex;flex-direction:row;">
-            <label for="project">Project</label>
-            &nbsp;&#x01F513;<input type="checkbox" id="projectOpen" checked>
-            &#x01F512;<input type="checkbox" id="projectClosed" checked>
+                <label for="project">Project</label>
+                &nbsp;&#x01F513;<input type="checkbox" id="projectOpen" checked>
+                &#x01F512;<input type="checkbox" id="projectClosed" checked>
             </div>
             <input type="text" id="projectFilter" placeholder=".*">
         </div>
         <div class="filter-group">
             <div style="display:flex;flex-direction:row;">
-            <label for="swimlane">Swimlane</label>
-            &nbsp;&#x01F513;<input type="checkbox" id="swimlaneOpen" checked>
-            &#x01F512;<input type="checkbox" id="swimlaneClosed" checked>
+                <label for="swimlane">Swimlane</label>
+                &nbsp;&#x01F513;<input type="checkbox" id="swimlaneOpen" checked>
+                &#x01F512;<input type="checkbox" id="swimlaneClosed" checked>
             </div>
             <input type="text" id="swimlaneFilter" placeholder=".*">
         </div>
         <div class="filter-group">
             <div style="display:flex;flex-direction:row;">
-            <label for="task">Task</label>
-            &nbsp;&#x01F513;<input type="checkbox" id="taskOpen" checked>
-            &#x01F512;<input type="checkbox" id="taskClosed" checked>
+                <label for="task">Task</label>
+                &nbsp;&#x01F513;<input type="checkbox" id="taskOpen" checked>
+                &#x01F512;<input type="checkbox" id="taskClosed" checked>
             </div>
             <input type="text" id="taskFilter" placeholder=".*">
         </div>
@@ -158,8 +158,8 @@
     <div class="content">
         <div class="actions">
             <!-- <button id="migrate">Migrate From Kanboard</button> -->
-            <button id="loadJson">Load project</button>
-            <button id="showDetails">List Workspace</button>
+            <button id="loadProject">Load project</button>
+            <button id="listWorkspace">List Workspace</button>
             <button id="kanban">Kanban Project</button>
             <button id="showEvents">Events</button>
             <button id="clearProjects">Clear project</button>
@@ -169,7 +169,6 @@
         <!-- Résultats -->
         <div class="resultsClass">
             <div id="resultsHeader">
-                <p>Result Header</p>
             </div>
             <div class="results scroller" id="results">
             </div>
@@ -203,6 +202,40 @@
             </div>
             <button type="button" value="save" name="saveAssigneeBtn" id="saveAssigneeBtn">Save</button>
             <button type="button" value="cancel" name="cancelAssigneeBtn" id="cancelAssigneeBtn">Cancel</button>
+        </form>
+    </dialog>
+
+
+    <dialog id="userDialog">
+        <h2 id="userDialogTitle"></h2>
+        <div id="userDialogMessage"></div>
+        <form id="userForm" method="dialog">
+            <div id="userNameDiv">
+                <label for="name">User Name: </label>
+                <input type="text" id="userName" name="userName" />
+            </div>
+            <div id="userDescriptionDiv">
+                <label for="user">Description: </label>
+                <input type="text" id="userDescription" name="userDescription" />
+            </div>
+            <div id="userTelDiv">
+                <label for="user">Tel: </label>
+                <input type="text" id="userTel" name="userTel" />
+            </div>
+            <div id="userEmailDiv">
+                <label for="user">Email: </label>
+                <input type="text" id="userEmail" name="userEmail" />
+            </div>
+            <div id="userPasswordDiv">
+                <label for="user">Password: </label>
+                <input type="password" id="userPassword" name="userPassword" />
+            </div>
+            <div id="userIsAdminDivDiv">
+                <label for="isAdmin">Admin </label>
+                <input type="checkbox" id="userIsAdmin" checked />
+            </div>
+            <button type="button" value="save" name="saveUserBtn" id="saveUserBtn">Save</button>
+            <button type="button" value="cancel" name="cancelUserBtn" id="cancelUserBtn">Cancel</button>
         </form>
     </dialog>
 
@@ -291,7 +324,16 @@
         </form>
     </dialog>
 
-    <dialog id="taskDialog"  class="modal">
+    <dialog id="tasksCommentsDialog" closedby="any">
+        <h2 id="tasksCommentsTitle">tasksCommentsTitle</h2>
+        <div id="tasksCommentsHeader">
+        </div>
+        <div class="results scroller" id="tasksCommentsResults">
+        </div>
+
+    </dialog>
+
+    <dialog id="taskDialog" class="modal">
         <h2 id="taskDialogTitle"></h2>
         <div id="taskDialogMessage"></div>
         <form id="taskForm" method="dialog">
@@ -323,8 +365,7 @@
                 <label for="due">Due time</label>
                 <input type="time" id="taskTimeDue" name="taskTimeDue"></input>
             </div>
-           <div id="taskComments">
-                <label for="comments">Comments</label>
+            <div id="taskComments">
             </div>
 
             <button type="button" value="save" name="saveTaskBtn" id="saveTaskBtn">Save</button>

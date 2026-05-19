@@ -6,6 +6,8 @@ import { Assignee } from './Assignee.mjs'
 import { sendEvent } from '../utils/sendEvent.mjs'
 import { fromDateTime, toDateTime } from '../utils/dateAndTime.mjs'
 import { selectBoxBuilder, buildColorSelectBox } from '../utils/selectBoxBuilder.mjs'
+import { buildProjectLink } from '../utils/linkBuilder.mjs'
+import { TasksCommentsDialog } from './TasksCommentsDialog.mjs'
 
 class TaskDialog extends Dialog {
 
@@ -13,6 +15,24 @@ class TaskDialog extends Dialog {
         super('task')
         this.dialogName = dialogName
         this.task = null
+    }
+
+    //----------------------------------------------------------------------------
+    buildTaskCommentsLink(id) {
+        const href = document.createElement("a")
+        //LinkCounter.counter++
+        //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
+        href.setAttribute("href", "javascript:void(0)")
+        href.innerHTML = `Comments`
+        //let myProject = this.project
+        let tasksCommentsFn = function (ev) {
+            console.log("tasksComments Href event Listener fired ")
+            ev.stopPropagation();
+            const dialog=new TasksCommentsDialog(id)
+        }
+        href.addEventListener('click', tasksCommentsFn);
+        console.log(href)
+        return (href)
     }
 
     //----------------------------------------------------------------------------
@@ -35,6 +55,10 @@ class TaskDialog extends Dialog {
         if (task.is_open > 0) {
             document.getElementById("taskIsOpen").setAttribute("checked", "")
         }
+
+        let taskCommentsLink = this.buildTaskCommentsLink(task.id)
+        document.getElementById("taskComments").replaceChildren(taskCommentsLink)
+
     }
 
     //----------------------------------------------------------------------------
@@ -42,7 +66,7 @@ class TaskDialog extends Dialog {
         let ass = await Assignee.getAll('assignees')
         //ass.unshift({ id: -1, name: '* Create new assignee' })
         let boxName = "kanbearAssigneeSelectBox"
-        
+
         let boxParams = {
             domId: boxName,
             boxLabel: "taskAssignee",
@@ -81,10 +105,10 @@ class TaskDialog extends Dialog {
         task.setData("color", color)
         //let assignee = taskForm.taskAssignee.value < 0 ? "" : taskForm.taskAssignee.value
         //console.log("TaskDialog.fillDbFromForm() <assignee>",assignee)
-        if ( taskForm.taskAssignee.value > 0 ) {
-           task.setData("assignee_id", taskForm.taskAssignee.value)
+        if (taskForm.taskAssignee.value > 0) {
+            task.setData("assignee_id", taskForm.taskAssignee.value)
         } else {
-           task.setData("assignee_id", null)
+            task.setData("assignee_id", null)
         }
         task.setName(taskForm.taskName.value)
         task.setDescription(taskForm.taskDescription.value)

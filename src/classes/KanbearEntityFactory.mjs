@@ -4,7 +4,7 @@ import { Column} from './Column.mjs'
 import { Project} from './Project.mjs'
 import { Swimlane} from './Swimlane.mjs'
 import { Task} from './Task.mjs'
-import { TaskComment} from './TaskComment.mjs'
+import { TasksComments} from './TasksComments.mjs'
 import { User} from './User.mjs'
 import { Workspace} from './Workspace.mjs'
 
@@ -27,8 +27,8 @@ class KanbearEntityFactory {
             case 'task': 
                 return new Task({})
                 break
-            case 'taskComment': 
-                return new TaskComment({})
+            case 'tasksComments': 
+                return new TasksComments({})
                 break
             case 'user': 
                 return new User({})

@@ -23,9 +23,9 @@ class KanbearListPanel {
   //----------------------------------------------------------
   static async builder() {
     console.log("KanbearListPanel.builder()")
-    if ( !Kontext.getWorkspaceId()) {
-      throw new Error("No workspace selected")
-    }
+    //if ( !Kontext.getWorkspaceId()) {
+    //  throw new Error("No workspace selected")
+    //}
     const isOpen = document.getElementById("projectOpen").checked;
     const isClosed = document.getElementById("projectClosed").checked;
     const openClosed = getOpenCloseParmBoolean('project', isOpen, isClosed)
@@ -135,10 +135,14 @@ class KanbearListPanel {
     hrow.innerHTML = `
         <th>Sel</th>
         <th>Action</th>
+        <th>Workspace</th>
         <th>Project</th>
+        <th></th>
         <th>Swimlane</th>
+        <th></th>
         <th>Column</th>
         <th>Task</th>
+        <th></th>
         <th>Since</th>
         <th>Duration</th>
         <th>Due</th>
@@ -179,10 +183,14 @@ class KanbearListPanel {
           row.innerHTML = `
               <td><input type="checkbox" name="tasks" id="${checkBoxId}" class="taskCheckbox"/></td>
               <td><a href="#" class="taskCommentLink" id="${commentLinkId}">c</a></td>
-              <td>${project.name} ${getOpenCloseSymbol(project.is_open)}</td>
-              <td>${swimlane.name} ${getOpenCloseSymbol(swimlane.is_open)}</td>
+              <td>${project.workspace.name}</td>
+              <td>${project.name}</td>
+              <td>${getOpenCloseSymbol(project.is_open)}</td>
+              <td>${swimlane.name}</td>
+              <td>${getOpenCloseSymbol(swimlane.is_open)}</td>
               <td style="background-color:${project.columns[task.column_id].color}">${project.columns[task.column_id].name}</td>
-              <td style="background-color:${taskEntity.getTaskDisplayColor(project.columns[task.column_id])}">${task.name} ${getOpenCloseSymbol(task.is_open)}</td>
+              <td style="background-color:${taskEntity.getTaskDisplayColor(project.columns[task.column_id])}">${task.name}</td>
+              <td>${getOpenCloseSymbol(task.is_open)}</td>
               <td>${dateToString(task.date_moved)}</td>
               <td>${getDurationFromNow(task.date_moved, true)}</td>
               <td>${dateToString(task.date_due)}</td>
@@ -197,7 +205,7 @@ class KanbearListPanel {
   }
 
   //-----------------------------------------------------------------
-  setPopup() {
+  XsetPopup() {
     const self = this
     document.querySelectorAll('.taskCommentLink').forEach(link => {
       //console.log(link)

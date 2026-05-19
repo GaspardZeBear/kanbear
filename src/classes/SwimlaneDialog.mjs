@@ -43,14 +43,6 @@ class SwimlaneDialog extends Dialog {
 
 
     //----------------------------------------------------------------------------
-    Xcreate(projectId) {
-        console.log("Swimlane.create() dialog, for  <projectId>",projectId)
-        this.projectId = projectId
-        this.createDialog(this.save.bind(this))
-        this.showDialog("Create swimlane")
-    }
-
-    //----------------------------------------------------------------------------
     subCreate(params) {
         console.log("SwimlanDialog.create() dialog, for  <projectId>",params)
         this.projectId = params["projectId"]
@@ -69,55 +61,6 @@ class SwimlaneDialog extends Dialog {
         console.log("SwimlaneDialog.subModify() <params>", params)
         return( params["swimlaneId"])
     }
-
-    //-------------------------------------------------------------------------------------
-    async Xsave() {
-        console.log("Swimlane.save() dialog, <name>", swimlaneForm.swimlaneName.value)
-        const sw = await KanbearEntityFactory.generate('swimlane')
-        sw.setData("project_id", this.projectId)
-        this.fillDbFromForm(sw)
-        try {
-            let resp = await sw.create()
-            this.closeDialog()
-            sendEvent("swimlaneCreated", { swimlaneId: sw.getId() })
-        } catch (error) {
-            this.setMessage(error.cause?.msg)
-            this.create(this.swimlaneId)
-        }
-    }
-
-    //----------------------------------------------------------------------------
-    async Xmodify(swimlaneId) {
-        this.swimlaneId = swimlaneId
-        this.swimlane = new Swimlane({ id: swimlaneId })
-        try {
-            const sw = await this.swimlane.get()
-            console.log("SwimlaneDialog.modify() <sw>", sw)
-            await this.fillFormFromDb(sw)
-            this.createDialog(this.saveModify.bind(this))
-            this.showDialog("Modify swimlane")
-        } catch (error) {
-            console.log(error)
-            this.setMessage(error.cause?.msg)
-            this.modify(this.swimlaneId)
-        }
-    }
-
-    //-------------------------------------------------------------------------------------
-    async XsaveModify() {
-        console.log("SwimlaneDialog.saveModify()")
-        this.fillDbFromForm(this.swimlane)
-        try {
-            let resp = await this.swimlane.patch({})
-            this.closeDialog()
-            sendEvent("swimlaneModified", { swimlane: this.swimlane.getId() })
-        } catch (error) {
-            console.log(error)
-            this.setMessage(error.cause?.msg)
-            this.modify(this.swimlane.id)
-        }
-    }
-
 
 }
 
