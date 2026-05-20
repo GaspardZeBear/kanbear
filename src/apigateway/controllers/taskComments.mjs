@@ -1,4 +1,5 @@
 import {TaskComment } from '../models/taskComment.mjs';
+import { Konsol } from '../classes/Konsol.mjs';
 
 export const   createTaskComment = (req, res) => {
   TaskComment.create(req.body, (err, taskCommentId) => {
@@ -10,6 +11,7 @@ export const   createTaskComment = (req, res) => {
  export const  getAllTaskComments = (req, res) => {
   TaskComment.getAll((err, taskComments) => {
     if (err) return res.status(500).json({ error: err.message });
+    Konsol.log("taskComments.getAllTaskComments()","taskComments=",taskComments)
     res.json(taskComments);
   });
 };
@@ -25,6 +27,7 @@ export const   getTaskCommentById = (req, res) => {
 export const   getTaskCommentsByTaskId = (req, res) => {
   TaskComment.getByTaskId(req.params.taskId, (err, taskComments) => {
     if (err) return res.status(500).json({ error: err.message });
+    Konsol.log("taskComments.getTaskCommentsByTaskId()","taskComments=",taskComments)
     res.json(taskComments);
   });
 };

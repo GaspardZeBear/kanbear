@@ -324,13 +324,27 @@
         </form>
     </dialog>
 
-    <dialog id="tasksCommentsDialog" closedby="any">
-        <h2 id="tasksCommentsTitle">tasksCommentsTitle</h2>
-        <div id="tasksCommentsHeader">
+    <dialog id="tasksCommentsModal" closedby="any">
+        <h2 id="tasksCommentsModalTitle">tasksCommentsTitle</h2>
+        <div id="tasksCommentsModalHeader">
         </div>
-        <div class="results scroller" id="tasksCommentsResults">
+        <div class="results scroller" id="tasksCommentsModalResults">
         </div>
     </dialog>
+
+    <dialog id="tasksCommentsDialog" closedby="any">
+        <h2 id="tasksCommentsDialogTitle"></h2>
+        <div id="tasksCommentsDialogMessage"></div>
+        <form id="tasksCommentsForm" method="dialog">
+            <div id="tasksCommentsCommentDiv">
+                <label for="comment">comment: </label>
+                <input type="text" id="tasksCommentsComment" name="comment" />
+            </div>
+            <button type="button" value="save" name="saveTasksCommentsBtn" id="saveTasksCommentsBtn">Save</button>
+            <button type="button" value="cancel" name="cancelTasksCommentsBtn" id="cancelTasksCommentsBtn">Cancel</button>
+        </form>
+    </dialog>
+
 
     <dialog id="taskDialog" class="modal">
         <h2 id="taskDialogTitle"></h2>
