@@ -15,6 +15,13 @@
             xfont-weight: bolder;
         }
 
+        .connected {
+            background-color: greenyellow;
+        }
+        .disconnected {
+            background-color: red;
+        }
+
         #container {
             width: 1200px;
             height: 600px;
@@ -32,11 +39,16 @@
         let fieldDisplayCount = 3
 
         //---------------------------------------------------------------------------------------
-        function setParms() {
+        function setLocalParms() {
             fieldDisplayLength = parseInt(document.getElementById("fieldDisplayLength").value)
             console.log("setParms() fieldDisplayLength", document.getElementById("fieldDisplayLength").value)
             fieldDisplayCount = parseInt(document.getElementById("fieldDisplayCount").value)
             console.log("setParms() fieldDisplayCount", document.getElementById("fieldDisplayCount").value)
+        }
+
+        //---------------------------------------------------------------------------------------
+        function stackTrace() {
+            sendMessage({type:"cmd",value:"toggleStackTrace"})
         }
 
         //---------------------------------------------------------------------------------------
@@ -138,17 +150,29 @@
                 append(`konsolClient.connect() connected to ${url}`);
                 document.getElementById("connectStatus").innerHTML = " Connected"
                 document.getElementById("connectButton").setAttribute("disabled", "")
+                document.getElementById("disconnectButton").removeAttribute("disabled")
+                document.getElementById("connectStatus").classList.remove("disconnected")
+                document.getElementById("connectStatus").classList.add("connected")
                 console.log("konsolClient.connect() connected to ", url)
             };
             konsol.onclose = function () {
                 document.getElementById("connectStatus").innerHTML = " Not connected"
                 document.getElementById("connectButton").removeAttribute("disabled")
+                document.getElementById("disconnectButton").setAttribute("disabled", "")
+                document.getElementById("connectStatus").classList.add("disconnected")
+                document.getElementById("connectStatus").classList.remove("connected")
                 append("Connection closed");
             };
             konsol.onerror = function () {
                 append("Error happens");
             };
         };
+
+        //---------------------------------------------------------------------
+        function disconnect() {
+            konsol.close()
+            document.getElementById("disconnectButton").setAttribute("disabled", "")
+        }
 
         //--------------------------------------------------------------------
         function sendMessage(event) {
@@ -162,17 +186,20 @@
 <body onload="connect()">
     <h1>Konsol.log Client</h1>
     <div>
-        <input type="button" id="connectButton" value="Connect" onclick="connect()" /><span id="connectStatus">Not
-            connected</span><br />
+        <input type="button" id="connectButton" value="Connect" onclick="connect()" />
+        <input type="button" id="disconnectButton" value="Disconnect" onclick="disconnect()" />
+        <span id="connectStatus">Not connected</span><br />
         <form>
             fieldDisplayLength: <input value="160" id="fieldDisplayLength" />
             fieldDisplayCount : <input value="3" id="fieldDisplayCount" />
             mergeFields : <input type="checkbox" id="mergeFields" checked />
-            <br /><input type="button" value="setParms" onclick="setParms()" />
+            <br /><input type="button" value="setLocalParms" onclick="setLocalParms()" />
         </form>
 
+        <input type="button" value="StackTrace on/off" onclick="stackTrace()" />
         Message: <input value="Hello!" type="text" id="message" />
         <input type="button" value="Send" onclick="sendMessage(event)" /><br />
+
         <input type="button" value="Clear" onclick="clearEvents()" />
         <input type="button" value="writeMark" onclick="writeMark()" /><br />
     </div>
