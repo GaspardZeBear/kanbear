@@ -5,8 +5,8 @@ class TasksComments extends KanbearEntity {
 
     //------------------------------------------------------------------------
     constructor(tasksComments) {
-        super('taskComments',tasksComments)
-        this.TasksComments = tasksComments
+        super('tasksComments',tasksComments)
+        this.tasksComments = tasksComments
     }
 
 }

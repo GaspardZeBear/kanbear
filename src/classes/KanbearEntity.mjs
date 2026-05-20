@@ -1,12 +1,20 @@
 import { ApiCaller } from "./ApiCaller.mjs"
 
 class KanbearEntity {
+
+    // Translate entity kin to api route
+    // !! Beware, an 's' char ist added by POST, PUT etc .... so remove it from translation
+    static apiTablesMap = {"tasksComments":"tasks_comment"}
     //------------------------------------------------------------------------
     constructor(kind, from = {}) {
         console.log("KanbearEntity.constructor() <kind>", kind, "<from>", from)
         this.kind = kind
+        if ( KanbearEntity.apiTablesMap[kind] ) {
+            this.kind=KanbearEntity.apiTablesMap[kind]
+        }
         this.data = {}
         from.id ? this.id = from.id : undefined
+        console.log("KanbearEntity.constructor()","<kind>",kind,"<this.kind>", this.kind)
         console.log("KanbearEntity.constructor() <from>", from)
         console.log("KanbearEntity.constructor() <this>", this)
     }

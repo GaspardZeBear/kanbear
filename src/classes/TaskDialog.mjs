@@ -7,7 +7,7 @@ import { sendEvent } from '../utils/sendEvent.mjs'
 import { fromDateTime, toDateTime } from '../utils/dateAndTime.mjs'
 import { selectBoxBuilder, buildColorSelectBox } from '../utils/selectBoxBuilder.mjs'
 import { buildProjectLink } from '../utils/linkBuilder.mjs'
-import { TasksCommentsDialog } from './TasksCommentsDialog.mjs'
+import { TasksCommentsModal } from './TasksCommentsModal.mjs'
 
 class TaskDialog extends Dialog {
 
@@ -28,7 +28,7 @@ class TaskDialog extends Dialog {
         let tasksCommentsFn = function (ev) {
             console.log("tasksComments Href event Listener fired ")
             ev.stopPropagation();
-            const dialog=new TasksCommentsDialog(id)
+            const dialog=new TasksCommentsModal(id)
         }
         href.addEventListener('click', tasksCommentsFn);
         console.log(href)

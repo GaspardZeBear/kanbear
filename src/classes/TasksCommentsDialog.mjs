@@ -1,140 +1,51 @@
+import { Dialog } from './Dialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
+import { sendEvent } from '../utils/sendEvent.mjs'
 import { TasksComments } from './TasksComments.mjs'
+import { selectBoxBuilder, colorBoxBuilder, buildColorSelectBox } from '../utils/selectBoxBuilder.mjs'
 
-class TasksCommentsDialog {
 
+class TasksCommentsDialog extends Dialog {
 
-  //------------------------------------------------------------------------
-  constructor(taskId) {
-    this.taskId = taskId
-    this.dialog = document.getElementById(`tasksCommentsDialog`)
-    //document.getElementById(`taskCommentsDialogTitle`).innerHTML="www"
-    this.dialog.showModal();
-    this.htmlElement=`tasksCommentsResults`
-    this.render()
-  }
-
-  //-----------------------------------------------------------------
-  async render() {
-    const result = document.getElementById(this.htmlElement);
-    //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
-
-    let resultTitleTasksComments = document.createElement('h3')
-    let addTasksCommentsButton = this.buildAddTasksCommentsButton()
-    //let resultTitleTasksComments = document.createElement('h3')
-    resultTitleTasksComments.appendChild(addTasksCommentsButton)
-    let delTasksCommentsButton = this.buildDelTasksCommentsButton()
-    resultTitleTasksComments.appendChild(delTasksCommentsButton)
-
-    let titleTasksComments = document.createElement('span')
-    titleTasksComments.innerHTML = `TasksComments list filtered by .....`
-    resultTitleTasksComments.appendChild(titleTasksComments)
-
-    let resultTitle = document.createElement("div")
-    //resultTitle.appendChild(resultTitleWorkspace)
-    resultTitle.appendChild(resultTitleTasksComments)
-
-    const elementHeader = `tasksCommentsHeader`
-    document.getElementById(this.htmlElement).replaceChildren()
-    document.getElementById(elementHeader).replaceChildren(resultTitle)
-    await this.createTable()
-    result.appendChild(this.table)
-  }
-
-  //------------------------------------------------------------------------
-  buildDelTasksCommentsButton() {
-    //let projectId = this.project.id
-    const delTasksCommentsButton = document.createElement('button')
-    delTasksCommentsButton.classList.add("add-item-btn")
-    delTasksCommentsButton.setAttribute("id", "delTasksCommentsButton")
-    delTasksCommentsButton.innerHTML = "D"
-    const myThis = this
-    let delTasksCommentsFn = async function (ev) {
-      console.log("delTasksCommentsButton event Listener fired")
-      ev.stopPropagation();
-      const toDelete = Array.from(document.querySelectorAll('input.tasksCommentsCheckbox')).filter(input => input.checked);
-
-      // Never use await in forEach!!!!! 
-      for (let toDel of toDelete) {
-        console.log("KanbearTasksCommentsPanel <toDel>", toDel.getAttribute("tasksCommentsid"))
-        const tasksComments = new TasksComments()
-        tasksComments.setId(toDel.getAttribute("tasksCommentsid"))
-        await tasksComments.delete()
-      }
-      sendEvent('tasksCommentsDeleted', { "ids": [] })
-      console.log("KanbearTasksCommentsPanel <tasksCommentsDeletedEvent>", toDelete)
+    constructor(dialogName,parms) {
+        super('tasksComments')
+        this.dialogName = dialogName
+        this.tasksComments=null
+        this.taskId=parms["taskId"]
     }
-    delTasksCommentsButton.addEventListener('click', delTasksCommentsFn, { once: true });
-    return (delTasksCommentsButton)
-  }
 
-  //------------------------------------------------------------------------
-  buildAddTasksCommentsButton() {
-    //let projectId = this.project.id
-    const addTasksCommentsButton = document.createElement('button')
-    addTasksCommentsButton.classList.add("add-item-btn")
-    addTasksCommentsButton.setAttribute("id", "addTasksCommentsButton")
-    addTasksCommentsButton.innerHTML = "+A"
-    let addTasksCommentsFn = function (ev) {
-      console.log("addTasksCommentsButton event Listener fired")
-      ev.stopPropagation();
-      const tasksComments = new TasksCommentsDialog('tasksComments')
-      tasksComments.create({});
+    //----------------------------------------------------------------------------
+    async fillFormFromDb(tasksComments) {
+        console.log("tasksCommentsDialog.fillFormFromDb() column>", tasksComments)
+        tasksCommentsForm.tasksCommentsComment.value = tasksComments.comment
     }
-    //removeEventListener("click", addSwimlaneFn)
-    addTasksCommentsButton.addEventListener('click', addTasksCommentsFn, { once: true });
-    return (addTasksCommentsButton)
-  }
 
-  //------------------------------------------------------------------------
-  async createTable() {
-    const tasksComments = await TasksComments.getAll('tasks_comments')
-    console.log("TasksCommentsDiaolog.filltable()", "<taskComments>", tasksComments)
-    this.table = document.createElement('table')
-    const thead = document.createElement('thead')
-    const hrow = document.createElement('tr')
-    hrow.innerHTML = `
-        <th>Sel</th>
-        <th>Name</th>
-        <th>Tasks</th>
-        <th>Description</th>
-        <th>Tel</th>
-        <th>Email</th>
-        <th>Delete</th>
-        `
-    thead.appendChild(hrow)
-    this.table.appendChild(thead)
-    const tbody = document.createElement('tbody')
-
-    Object.entries(tasksComments).forEach((tasksCommentsEntity) => {
-      const tasksComments = tasksCommentsEntity[1]
-      //console.log("KanbearTasksCommentsPanel.createTable() <tasksComments>", tasksComments)
-      const row = document.createElement('tr');
-
-      const td = (p) => {
-        const td = document.createElement('td')
-        td.innerHTML = p
-        return (td)
-      }
-      const tdHref = (href) => {
-        const td = document.createElement('td')
-        td.appendChild(href)
-        return (td)
-      }
-      const id = "tasksCommentsSel"
-      row.appendChild(td('<input class="tasksCommentsCheckbox" tasksCommentsId=' + tasksComments.id + ' type="checkbox"/>'))
-      row.appendChild(tdHref(buildTasksCommentsLink(tasksComments.id, tasksComments.name)))
-      row.appendChild(td("Tasks ..."))
-      row.appendChild(td(tasksComments.description))
-      row.appendChild(td(tasksComments.tel))
-      row.appendChild(td(tasksComments.email))
-      row.appendChild(td("Delete"))
-      tbody.appendChild(row);
+    //----------------------------------------------------------------------------
+    async fillDbFromForm(tasksComments) {
+        tasksComments.setData("comment", tasksCommentsForm.tasksCommentsComment.value)
+        tasksComments.setData("task_id",this.taskId)
+        tasksComments.setData("user_id",1)
     }
-    );
-    this.table.appendChild(tbody)
-  }
 
+    //----------------------------------------------------------------------------
+    subCreate(params) {
+        console.log("tasksCommentsDialog.create() dialog, for  <params>",params)
+        //this.projectId = params["projectId"]
+    }
+
+    //-------------------------------------------------------------------------------------
+    async subSave(co) {
+        console.log("tasksCommentsDialog.subSave() <name>", tasksCommentsForm.tasksCommentsComment.value)
+        //const pr = await KanbearEntityFactory.generate('project')
+        //co.setData("project_id", this.projectId)
+        this.fillDbFromForm(co)
+    }
+
+    //----------------------------------------------------------------------------
+    async subModify(params) {
+        console.log("tasksCommentsDialog.subModify() <params>", params)
+        return( params["tasksCommentsId"])
+    }
 }
 
 export { TasksCommentsDialog }

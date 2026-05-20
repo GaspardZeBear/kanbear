@@ -114,6 +114,7 @@ class Dialog {
      //-------------------------------------------------------------------------------------
      // Build event listener on "Save" and "cancel" buttons, accordind to the action (create, modify etc..)
     createDialog(save=()=>{}) {
+        console.log("Dialog.createDialog() ","kind",this.kind+"Dialog")
         this.dialog = document.getElementById(this.kind+"Dialog")
         let dialog = this.dialog
         dialog.setAttribute("closedby","none")
