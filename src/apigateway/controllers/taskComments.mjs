@@ -24,13 +24,29 @@ export const   getTaskCommentById = (req, res) => {
   });
 };
 
-export const   getTaskCommentsByTaskId = (req, res) => {
+export const getTaskCommentsByTaskId = (req, res) => {
+  Konsol.log("taskCommentsController.getTaskCommentsByTaskId()","invokated")
+  TaskComment.getByTaskId(req.params.taskId, (err, httpCode, taskComments) => {
+    Konsol.log("taskCommentsController.getTaskCommentsByTaskId()","callback invokated","httpCode",httpCode)
+    Konsol.log("taskCommentsController.getTaskCommentsByTaskId()","callback invokated","err",err)
+    Konsol.log("taskCommentsController.getTaskCommentsByTaskId()","taskComments=",taskComments)
+    if ( err ) {
+      Konsol.log("taskCommentsController.getTaskCommentsByTaskId()","err=",err.message)
+      return res.status(500).json({ error: err.message });
+    }
+    Konsol.log("taskCommentsController.getTaskCommentsByTaskId()","taskComments=",taskComments)
+    res.json(taskComments);
+  });
+};
+
+export const   XgetTaskCommentsByTaskId = (req, res) => {
   TaskComment.getByTaskId(req.params.taskId, (err, taskComments) => {
     if (err) return res.status(500).json({ error: err.message });
     Konsol.log("taskComments.getTaskCommentsByTaskId()","taskComments=",taskComments)
     res.json(taskComments);
   });
 };
+
 
 export const   updateTaskComment = (req, res) => {
   TaskComment.update(req.params.id, req.body, (err) => {

@@ -1,6 +1,7 @@
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 import { TasksComments } from './TasksComments.mjs'
 import { TasksCommentsDialog } from './TasksCommentsDialog.mjs'
+import { sendEvent } from '../utils/sendEvent.mjs'
 
 class TasksCommentsModal{
 
@@ -124,7 +125,8 @@ class TasksCommentsModal{
       }
       const id = "tasksCommentsSel"
       row.appendChild(td('<input class="tasksCommentsCheckbox" tasksCommentsId=' + tasksComments.id + ' type="checkbox"/>'))
-      row.appendChild(tdHref(buildTasksCommentsLink(tasksComments.id, tasksComments.name)))
+      //row.appendChild(tdHref(buildTasksCommentsLink(tasksComments.id, tasksComments.name)))
+      row.appendChild(td("Link ..."))
       row.appendChild(td("Tasks ..."))
       row.appendChild(td(tasksComments.date_created))
       row.appendChild(td(tasksComments.date_modified))

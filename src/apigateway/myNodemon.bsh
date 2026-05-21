@@ -1,0 +1,9 @@
+#
+# node ../../src/apigateway/node_modules/nodemon/bin/nodemon.js apigateway.mjs
+node='/mnt/c/Program\ Files/nodejs/node.exe'
+kanbear='/mnt/c/Users/gzbze/kanbear'
+cd $kanbear/src/apigateway
+nodemon=../../src/apigateway/node_modules/nodemon/bin/nodemon.js
+echo $nodemon
+apigateway=apigateway.mjs
+/mnt/c/Program\ Files/nodejs/node.exe $nodemon $apigateway
