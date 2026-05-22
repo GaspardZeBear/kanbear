@@ -8,9 +8,10 @@ class TaskComment {
     const { task_id, user_id, comment, reference } = taskComment;
     const date_created = Math.floor(Date.now() / 1000);
     const sql = 'INSERT INTO tasks_comments (task_id, user_id, date_created, comment, reference) VALUES (?, ?, ?, ?, ?)';
-    db.run(sql, [task_id, user_id, date_created, comment, reference], function(err) {
-      callback(err, this.lastID);
-    });
+    //db.run(sql, [task_id, user_id, date_created, comment, reference], function(err) {
+    //  callback(err, this.lastID);
+    //});
+    db.run(sql, [task_id, user_id, date_created, comment, reference],callback)
   }
 
   //------------------------------------------------------------------------------------------------------------

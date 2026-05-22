@@ -54,7 +54,7 @@ class Db {
             const res = stmt.run(...parms)
             Konsol.log("Db.run() res", res)
             Konsol.log("Db.run() calling callback")
-            callAfterRun(res, 200, res.lastInsertRowid)
+            callAfterRun(res, 200, callAfterRun)
         } catch (error) {
             Konsol.log("Db.run() exception ", error)
             //callAfterRun({ message: "Error see log" })

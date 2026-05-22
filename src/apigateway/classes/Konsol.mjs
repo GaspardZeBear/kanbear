@@ -5,7 +5,7 @@ class Konsol {
 
   static wss
   static wsClients = {}
-  static stackTrace = true
+  static stackTrace = false
 
   //----------------------------------------------------------------------------------------------
   static init(server) {

@@ -8,7 +8,8 @@ class TasksCommentsController {
     return (
       (req, res) => {
         TaskComment.create(req.body, (err, taskCommentId) => {
-          if (err) return res.status(500).json({ error: err.message });
+          Konsol.log("TasksComments.create()", "err=", err, "<taskCommentId>", taskCommentId)
+          if (!taskCommentId) return res.status(500).json({ error: err.message });
           res.status(201).json({ id: taskCommentId });
         })
       })
@@ -67,7 +68,7 @@ class TasksCommentsController {
   //----------------------------------------------------------------------------------------
   deleteTaskComment() {
     return ((req, res) => {
-      TaskComment.delete(req.params.id, (err, httpCode, dummy) => {
+      TaskComment.delete(req.params.id, (err, httpCode) => {
         Konsol.log("TasksCommentsController.deleteTaskComment()", "err=", err)
         Konsol.log("TasksCommentsController.deleteTaskComment()", "httpCode=", httpCode)
         //if (err) {

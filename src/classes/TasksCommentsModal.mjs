@@ -2,6 +2,7 @@ import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 import { TasksComments } from './TasksComments.mjs'
 import { TasksCommentsDialog } from './TasksCommentsDialog.mjs'
 import { sendEvent } from '../utils/sendEvent.mjs'
+import { formatDuration, dateToString, getDurationFromNow } from "../utils/dateAndTime.mjs";
 
 class TasksCommentsModal{
 
@@ -98,8 +99,9 @@ class TasksCommentsModal{
     const hrow = document.createElement('tr')
     hrow.innerHTML = `
         <th>Sel</th>
-        <th>DateCreated</th>
-        <th>DateModified</th>
+        <th>Id</th>
+        <th>Created</th>
+        <th>Modified</th>
         <th>User</th>
         <th>Comment</th>
         <th>Reference</th>
@@ -126,10 +128,9 @@ class TasksCommentsModal{
       const id = "tasksCommentsSel"
       row.appendChild(td('<input class="tasksCommentsCheckbox" tasksCommentsId=' + tasksComments.id + ' type="checkbox"/>'))
       //row.appendChild(tdHref(buildTasksCommentsLink(tasksComments.id, tasksComments.name)))
-      row.appendChild(td("Link ..."))
-      row.appendChild(td("Tasks ..."))
-      row.appendChild(td(tasksComments.date_created))
-      row.appendChild(td(tasksComments.date_modified))
+      row.appendChild(td(tasksComments.id))
+      row.appendChild(td(dateToString(tasksComments.date_created)))
+      row.appendChild(td(dateToString(tasksComments.date_modified)))
       row.appendChild(td(tasksComments.user_id))
       row.appendChild(td(tasksComments.comment))
       row.appendChild(td(tasksComments.reference))
