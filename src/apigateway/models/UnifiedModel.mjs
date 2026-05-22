@@ -30,7 +30,7 @@ class UnifiedModel {
     //------------------------------------------------------------------
     static create(table, req, opParms, callback) {
         const { sql, bindVariables } = new SqlBuilder().generateCreateStatement(table, req.body)
-        db.run(sql, bindVariables, (res) => {
+        db.run(sql, bindVariables, (res, httpCode) => {
             Konsol.log("UnifiedModel.create(), will call callback","<res>", res)
             //res.lastInsertRowid ? callback(null, 201,res.lastInsertRowid) : callback(res, null)
             res.lastInsertRowid ? callback(null, 201,res) : callback(res, 500, null)

@@ -4,6 +4,9 @@ import { SwimlaneDialog } from "../classes/SwimlaneDialog.mjs"
 import { WorkspaceDialog } from "../classes/WorkspaceDialog.mjs"
 import { ColumnDialog } from "../classes/ColumnDialog.mjs"
 import { TaskDialog } from "../classes/TaskDialog.mjs"
+import { Task } from "../classes/Task.mjs"
+import { sendEvent } from "./sendEvent.mjs"
+import { Kontext } from "../classes/Kontext.mjs"
   
   //------------------------------------------------------------------------
   function buildAddSwimlaneButton(projectId) {
@@ -114,6 +117,28 @@ import { TaskDialog } from "../classes/TaskDialog.mjs"
   }
 
   //------------------------------------------------------------------------
+  function buildAddNoteButton(taskId,taskEntity) {
+    const addNoteButton = document.createElement('button')
+    addNoteButton.classList.add("add-item-btn")
+    addNoteButton.setAttribute("id", `addNoteButton`)
+    //addTaskButton.innerHTML = "+\u{1F3CB}"
+    addNoteButton.innerHTML = 'No'
+    let addNoteFn = async function (ev) {
+      console.log("addNoteButton event Listener fired")
+      ev.stopPropagation();
+      let note=prompt("Note for task ")
+      if (note===null) {
+        return
+      }
+      taskEntity.setData("note", note)
+      await taskEntity.patch({"note":note})
+      sendEvent("taskModified",{id:taskId,item:{field:'note',value:note}})
+    }
+    addNoteButton.addEventListener('click', addNoteFn, { once: false });
+    return (addNoteButton)
+  }
+
+  //------------------------------------------------------------------------
   function buildAddOpenCloseButton(id,value,callback) {
     const addAddOpenCloseButton = document.createElement('button')
     addAddOpenCloseButton.classList.add("add-item-btn")
@@ -135,5 +160,6 @@ export {
    buildAddProjectButton, 
    buildAddWorkspaceButton, 
    buildAddDummyButton, 
+   buildAddNoteButton,
    buildAddOpenCloseButton
   }

@@ -6,7 +6,7 @@ import { Assignee } from './Assignee.mjs'
 import { sendEvent } from '../utils/sendEvent.mjs'
 import { fromDateTime, toDateTime } from '../utils/dateAndTime.mjs'
 import { selectBoxBuilder, buildColorSelectBox } from '../utils/selectBoxBuilder.mjs'
-import { buildProjectLink } from '../utils/linkBuilder.mjs'
+import { buildProjectLink, buildTasksCommentsLink } from '../utils/linkBuilder.mjs'
 import { TasksCommentsModal } from './TasksCommentsModal.mjs'
 
 class TaskDialog extends Dialog {
@@ -18,7 +18,7 @@ class TaskDialog extends Dialog {
     }
 
     //----------------------------------------------------------------------------
-    buildTaskCommentsLink(id) {
+    XbuildTaskCommentsLink(id) {
         const href = document.createElement("a")
         //LinkCounter.counter++
         //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
@@ -56,8 +56,9 @@ class TaskDialog extends Dialog {
             document.getElementById("taskIsOpen").setAttribute("checked", "")
         }
 
-        let taskCommentsLink = this.buildTaskCommentsLink(task.id)
-        document.getElementById("taskComments").replaceChildren(taskCommentsLink)
+        //let taskCommentsLink = this.buildTaskCommentsLink(task.id)
+        let tasksCommentsLink = buildTasksCommentsLink(task.id,'Comments')
+        document.getElementById("tasksComments").replaceChildren(tasksCommentsLink)
 
     }
 

@@ -5,12 +5,12 @@ class TasksCommentsController {
 
   //----------------------------------------------------------------------------------------
   createTaskComment() {
-    return (
-      (req, res) => {
-        TaskComment.create(req.body, (err, taskCommentId) => {
-          Konsol.log("TasksComments.create()", "err=", err, "<taskCommentId>", taskCommentId)
-          if (!taskCommentId) return res.status(500).json({ error: err.message });
-          res.status(201).json({ id: taskCommentId });
+    return ((req, res) => {
+        TaskComment.create(req.body, (sgbdRes, httpCode) => {
+          Konsol.log("TasksComments.create()", "<sgbdRes>", sgbdRes, "<httpCode>", httpCode)
+          //res.lastInsertRowid ? callback(null, 201,res) : callback(res, 500, null)
+          if (!sgbdRes.lastInsertRowid) return res.status(500).json({ error: sgbdRes.message });
+          res.status(201).json({ id: sgbdRes.lastInsertRowid });
         })
       })
   }

@@ -4,7 +4,7 @@ import { TasksCommentsDialog } from './TasksCommentsDialog.mjs'
 import { sendEvent } from '../utils/sendEvent.mjs'
 import { formatDuration, dateToString, getDurationFromNow } from "../utils/dateAndTime.mjs";
 
-class TasksCommentsModal{
+class TasksCommentsModal {
 
 
   //------------------------------------------------------------------------
@@ -13,7 +13,8 @@ class TasksCommentsModal{
     this.dialog = document.getElementById(`tasksCommentsModal`)
     //document.getElementById(`taskCommentsDialogTitle`).innerHTML="www"
     this.dialog.showModal();
-    this.htmlElement=`tasksCommentsModalResults`
+    this.htmlElement = `tasksCommentsModalResults`
+    this.createListeners(this)
     this.render()
   }
 
@@ -23,8 +24,9 @@ class TasksCommentsModal{
     //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
 
     let resultTitleTasksComments = document.createElement('h3')
+    let exitTasksCommentsButton = this.buildExitTasksCommentsButton()
+    resultTitleTasksComments.appendChild(exitTasksCommentsButton)
     let addTasksCommentsButton = this.buildAddTasksCommentsButton()
-    //let resultTitleTasksComments = document.createElement('h3')
     resultTitleTasksComments.appendChild(addTasksCommentsButton)
     let delTasksCommentsButton = this.buildDelTasksCommentsButton()
     resultTitleTasksComments.appendChild(delTasksCommentsButton)
@@ -41,8 +43,40 @@ class TasksCommentsModal{
     document.getElementById(this.htmlElement).replaceChildren()
     document.getElementById(elementHeader).replaceChildren(resultTitle)
     await this.createTable()
-    result.appendChild(this.table)
+    result.replaceChildren(this.table)
+
   }
+
+  //---------------------------------------------------------------------
+  async createListeners(thisClass) {
+    document.addEventListener("tasksCommentsCreated", async (ev) => {
+      console.log("index.mjs() tasksCommentsCreated listener fired <ev>", ev)
+      thisClass.render()
+    })
+    document.addEventListener("tasksCommentsDeleted", async (ev) => {
+      console.log("index.mjs() tasksCommentsDeleted listener fired <ev>", ev)
+      thisClass.render()
+    })
+  }
+
+//------------------------------------------------------------------------
+  buildExitTasksCommentsButton() {
+    //let projectId = this.project.id
+    const exitTasksCommentsButton = document.createElement('button')
+    exitTasksCommentsButton.classList.add("add-item-btn")
+    exitTasksCommentsButton.setAttribute("id", "exitTasksCommentsButton")
+    exitTasksCommentsButton.innerHTML = "Exit"
+    const myThis = this
+    let exitTasksCommentsFn = async function (ev) {
+      console.log("exitTaskCommentButton event Listener fired")
+      ev.stopPropagation();
+      document.getElementById(`tasksCommentsModal`).close()
+    }
+    //let dialog = document.getElementById(`tasksCommentsModal`)
+    exitTasksCommentsButton.addEventListener('click', exitTasksCommentsFn, { once: false });
+    return (exitTasksCommentsButton)
+  }
+
 
   //------------------------------------------------------------------------
   buildDelTasksCommentsButton() {
@@ -50,8 +84,9 @@ class TasksCommentsModal{
     const delTasksCommentsButton = document.createElement('button')
     delTasksCommentsButton.classList.add("add-item-btn")
     delTasksCommentsButton.setAttribute("id", "delTasksCommentsButton")
-    delTasksCommentsButton.innerHTML = "D"
+    delTasksCommentsButton.innerHTML = "-C"
     const myThis = this
+    const taskId=this.taskId
     let delTasksCommentsFn = async function (ev) {
       console.log("delTaskCommentButton event Listener fired")
       ev.stopPropagation();
@@ -64,10 +99,10 @@ class TasksCommentsModal{
         tasksComments.setId(toDel.getAttribute("tasksCommentsid"))
         await tasksComments.delete()
       }
-      sendEvent('tasksCommentsDeleted', { "ids": [] })
+      sendEvent('tasksCommentsDeleted', { taskId: taskId, "ids": [] })
       console.log("KanbearTasksCommentsPanel <tasksCommentsDeletedEvent>", toDelete)
     }
-    delTasksCommentsButton.addEventListener('click', delTasksCommentsFn, { once: true });
+    delTasksCommentsButton.addEventListener('click', delTasksCommentsFn, { once: false });
     return (delTasksCommentsButton)
   }
 
@@ -77,16 +112,17 @@ class TasksCommentsModal{
     const addTasksCommentsButton = document.createElement('button')
     addTasksCommentsButton.classList.add("add-item-btn")
     addTasksCommentsButton.setAttribute("id", "addTasksCommentsButton")
-    addTasksCommentsButton.innerHTML = "+A"
-    let taskId=this.taskId
+    addTasksCommentsButton.innerHTML = "+C"
+    let taskId = this.taskId
     let addTasksCommentsFn = function (ev) {
       console.log("addTasksCommentsButton event Listener fired")
       ev.stopPropagation();
-      const tasksComments = new TasksCommentsDialog('tasksComments',{taskId:taskId})
+      const tasksComments = new TasksCommentsDialog('tasksComments', { taskId: taskId })
       tasksComments.create();
+      sendEvent('tasksCommentsCreated', { taskId: taskId })
     }
     //removeEventListener("click", addSwimlaneFn)
-    addTasksCommentsButton.addEventListener('click', addTasksCommentsFn, { once: true });
+    addTasksCommentsButton.addEventListener('click', addTasksCommentsFn, { once: false });
     return (addTasksCommentsButton)
   }
 

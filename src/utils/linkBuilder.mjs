@@ -4,6 +4,7 @@ import { SwimlaneDialog } from '../classes/SwimlaneDialog.mjs'
 import { ColumnDialog } from '../classes/ColumnDialog.mjs'
 import { WorkspaceDialog } from '../classes/WorkspaceDialog.mjs'
 import { AssigneeDialog } from '../classes/AssigneeDialog.mjs'
+import { TasksCommentsModal } from '../classes/TasksCommentsModal.mjs'
 import { UserDialog } from '../classes/UserDialog.mjs'
 
 class LinkCounter {
@@ -124,4 +125,23 @@ class LinkCounter {
     return(href)
   }
 
-  export { buildAssigneeLink, buildUserLink, buildWorkspaceLink, buildProjectLink, buildSwimlaneLink , buildColumnLink }
+  //----------------------------------------------------------------------------------
+  function buildTasksCommentsLink(taskId, taskName) {
+    const href = document.createElement("a")
+    //LinkCounter.counter++
+    //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
+    href.setAttribute("href", "javascript:void(0)")
+    href.innerHTML = taskName
+    //let myProject = this.project
+    let editTasksCommentsFn = function (ev) {
+      console.log("editTasksCommentsHref event Listener fired ")
+      ev.stopPropagation();
+      const user = new TasksCommentsModal(taskId)
+      //user.modify({userId:uId});
+    }
+    href.addEventListener('click', editTasksCommentsFn, { once: false });
+    console.log(href)
+    return(href)
+  }
+
+  export { buildAssigneeLink, buildUserLink, buildWorkspaceLink, buildProjectLink, buildSwimlaneLink , buildColumnLink, buildTasksCommentsLink }
