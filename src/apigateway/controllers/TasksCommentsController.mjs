@@ -3,6 +3,7 @@ import { Konsol } from '../classes/Konsol.mjs';
 
 class TasksCommentsController {
 
+  //----------------------------------------------------------------------------------------
   createTaskComment() {
     return (
       (req, res) => {
@@ -13,7 +14,7 @@ class TasksCommentsController {
       })
   }
 
-
+  //----------------------------------------------------------------------------------------
   getAllTaskComments() {
     return ((req, res) => {
       TaskComment.getAll((err, httpCode, taskComments) => {
@@ -24,6 +25,7 @@ class TasksCommentsController {
     })
   }
 
+  //----------------------------------------------------------------------------------------
   getTaskCommentById() {
     return ((req, res) => {
       TaskComment.getById(req.params.id, (err, httpCode, taskComment) => {
@@ -34,6 +36,7 @@ class TasksCommentsController {
     })
   }
 
+  //----------------------------------------------------------------------------------------
   getTaskCommentsByTaskId() {
     return ((req, res) => {
       Konsol.log("taskCommentsController.getTaskCommentsByTaskId()", "invokated")
@@ -51,17 +54,7 @@ class TasksCommentsController {
     })
   }
 
-  XgetTaskCommentsByTaskId() {
-    return ((req, res) => {
-      TaskComment.getByTaskId(req.params.taskId, (err, taskComments) => {
-        if (err) return res.status(500).json({ error: err.message });
-        Konsol.log("taskComments.getTaskCommentsByTaskId()", "taskComments=", taskComments)
-        res.json(taskComments);
-      })
-    })
-  }
-
-
+  //----------------------------------------------------------------------------------------
   updateTaskComment() {
     return ((req, res) => {
       TaskComment.update(req.params.id, req.body, (err) => {
@@ -71,17 +64,17 @@ class TasksCommentsController {
     })
   }
 
+  //----------------------------------------------------------------------------------------
   deleteTaskComment() {
     return ((req, res) => {
       TaskComment.delete(req.params.id, (err, httpCode, dummy) => {
         Konsol.log("TasksCommentsController.deleteTaskComment()", "err=", err)
         Konsol.log("TasksCommentsController.deleteTaskComment()", "httpCode=", httpCode)
-        Konsol.log("TasksCommentsController.deleteTaskComment()", "dummy=", dummy)
-        if (err) {
-           return res.status(httpCode).json(err.message)
-        }
+        //if (err) {
+          return res.status(httpCode).json(err.message)
+        //}
         //if (err) return res.status(500).json({ error: err.message });
-        res.json({ message: 'Task comment deleted successfully' });
+        //res.json({ message: 'Task comment deleted successfully' });
       })
     })
   }

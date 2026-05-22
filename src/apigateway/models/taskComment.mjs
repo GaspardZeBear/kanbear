@@ -33,6 +33,7 @@ class TaskComment {
     const sql = 'SELECT * FROM tasks_comments WHERE task_id = ? ORDER BY date_created';
     db.all(sql, [taskId], callback);
   }
+  
   //------------------------------------------------------------------------------------------------------------
   static update(id, taskComment, callback) {
     Konsol.log("TaskComment.update()","taskComment",taskComment,"callback",callback)
