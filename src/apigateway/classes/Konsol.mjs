@@ -24,10 +24,12 @@ class Konsol {
       const id = `${clientIP}:${clientPort}`
       console.log(`Konsol.onConnection() New client ${id} connected`);
       Konsol.addClient(id, ws)
-      ws.send('Connected to Konsol websocket server');
+      ws.send(JSON.stringify({
+        msg:'Connected to Konsol websocket server',
+        status:{stackTrace:Konsol.stackTrace}
+      }));
 
       ws.on('message', function message(data) {
-
         try {
           const messageText = data.toString();
           console.log('Konsol ws.onMessage() Received:', messageText);

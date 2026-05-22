@@ -18,6 +18,7 @@
         .connected {
             background-color: greenyellow;
         }
+
         .disconnected {
             background-color: red;
         }
@@ -48,7 +49,7 @@
 
         //---------------------------------------------------------------------------------------
         function stackTrace() {
-            sendMessage({type:"cmd",value:"toggleStackTrace"})
+            sendMessage({ type: "cmd", value: "toggleStackTrace" })
         }
 
         //---------------------------------------------------------------------------------------
@@ -59,6 +60,30 @@
         function writeMark() {
             //
             append('------------------- Mark ------------------')
+        }
+
+        //---------------------------------------------------------------------------------------
+        function escapeHtmlByReplacingCharacters(str) {
+            if (typeof str !== 'string') {
+                return '';
+            }
+            return(str)
+
+            const escapeCharacter = (match) => {
+                switch (match) {
+                    case '&': return '&amp;';
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    //case '"': return '&quot;';
+                    case '\'': return '&#039;';
+                    case '`': return '&#096;';
+                    default: return match;
+                }
+            };
+            
+            const escaped=str.replace(/[&<>"'`]/g, escapeCharacter);
+            console.log(str,"-->",escaped)
+            return(escaped)
         }
 
         //---------------------------------------------------------------------------------------
@@ -82,7 +107,7 @@
                         //output += `<span class="fieldStyle${i % 2}">${JSON.stringify(jEvent['fields'][i], '').substr(0, fieldDisplayLength)}</span>|`
                         const span = document.createElement("span")
                         span.setAttribute("class", `fieldStyle${i % 2}`)
-                        const txt = document.createTextNode(`${JSON.stringify(jEvent['fields'][i]).substr(0, fieldDisplayLength)}|`)
+                        const txt = document.createTextNode(escapeHtmlByReplacingCharacters(`${JSON.stringify(jEvent['fields'][i]).substr(0, fieldDisplayLength)}|`))
                         //txt.setAttribute("class",`fieldStyle${i % 2}`)
                         span.appendChild(txt)
                         td.appendChild(span)
@@ -95,7 +120,7 @@
                     for (let i = 1; i < jEvent['fields'].length; i++) {
                         let tr = document.createElement("tr")
                         let td = document.createElement("td")
-                        const txt = document.createTextNode(`${JSON.stringify(jEvent['fields'][i]).substr(0, fieldDisplayLength)}`)
+                        const txt = document.createTextNode(escapeHtmlByReplacingCharacters(`${JSON.stringify(jEvent['fields'][i]).substr(0, fieldDisplayLength)}`))
                         td.appendChild(txt)
                         tr.appendChild(td)
                         table.appendChild(tr)
@@ -106,9 +131,9 @@
                 if (jEvent['stack']) {
                     //document.getElementById("konsolEvents").insertAdjacentElement('beforeend', jEvent['stack'])
                     let lines = jEvent['stack'].split('\n')
-                    console.log("lines",lines)
+                    console.log("lines", lines)
                     let table = document.createElement("table")
-                    for (let i = 2; i < lines.length -1; i++) {
+                    for (let i = 2; i < lines.length - 1; i++) {
                         console.log(lines[i])
                         let tr = document.createElement("tr")
                         let td = document.createElement("td")
@@ -116,14 +141,14 @@
                         tr.appendChild(td)
                         table.appendChild(tr)
                     }
-                                      
+
                     document.getElementById("konsolEvents").insertAdjacentElement('beforeend', table)
                 }
-                
+
             } catch (error) {
-                console.log(error)
+                console.log("Did not receive json data")
                 let entry = document.getElementById("konsolEvents")
-                entry.insertAdjacentHTML("beforeend", `<li>${text}</li>`);
+                entry.insertAdjacentHTML("beforeend", `<li>${escapeHtmlByReplacingCharacters(text)}</li>`);
             }
             const container = document.getElementById('container')
             container.scrollTop = container.scrollHeight;
