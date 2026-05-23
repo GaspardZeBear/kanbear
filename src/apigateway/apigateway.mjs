@@ -29,7 +29,9 @@ import taskCommentRoutes from './routes/taskComments.mjs'
 import { KanbearSqlReporter } from './classes/KanbearSqlReporter.mjs';
 //import { createServer } from 'vite';
 import { createServer } from 'http';
-import { Konsol } from './classes/Konsol.mjs';
+import { KonsolServer} from './classes/KonsolServer.mjs';
+import { Konsol} from './classes/Konsol.mjs';
+
 
 app.use(express.static('public'))
 // Crud api
@@ -72,7 +74,7 @@ const PORT = process.env.PORT || 3002;
 const server = app.listen(PORT, () => {
   console.log(`Serveur http démarré sur le port ${PORT}`);
 });
-Konsol.init(server)
+KonsolServer.init(server)
 
 //const server = createServer(app)
 /*

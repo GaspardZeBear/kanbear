@@ -1,10 +1,8 @@
-//import fs from 'fs';
-//import { WebSocketServer } from 'ws';
-import { KonsolServer } from './KonsolServer.mjs';
+import fs from 'fs';
+import { WebSocketServer } from 'ws';
 
-class Konsol {
+class KonsolServer {
 
-  /*
   static wss
   static wsClients = {}
   static stackTrace = false
@@ -13,43 +11,43 @@ class Konsol {
   static init(server) {
     //const server = createServer(app)
     console.log(`Websocket server creation`);
-    Konsol.wss = new WebSocketServer({
+    KonsolServer.wss = new WebSocketServer({
       //port: 3003,
       noServer: true
     });
     console.log(`Websocket server created`);
 
-    Konsol.wss.on('connection', function connection(ws, request) {
+    KonsolServer.wss.on('connection', function connection(ws, request) {
       //Konsol.addClient(ws)
       const clientIP = request.socket.remoteAddress;
       const clientPort = request.socket.remotePort
       const id = `${clientIP}:${clientPort}`
       console.log(`Konsol.onConnection() New client ${id} connected`);
-      Konsol.addClient(id, ws)
+      KonsolServer.addClient(id, ws)
       ws.send(JSON.stringify({
-        msg:'Connected to Konsol websocket server',
-        status:{stackTrace:Konsol.stackTrace}
+        msg: 'Connected to Konsol websocket server',
+        status: { stackTrace: KonsolServer.stackTrace }
       }));
 
       ws.on('message', function message(data) {
         try {
           const messageText = data.toString();
-          console.log('Konsol ws.onMessage() Received:', messageText);
+          console.log('KonsolServer ws.onMessage() Received:', messageText);
           if (ws.readyState === ws.OPEN) {
-            Konsol.stackTrace = !Konsol.stackTrace
-            ws.send(`Echo: ${messageText} stackTrace=${Konsol.stackTrace}`);
+            KonsolServer.stackTrace = !KonsolServer.stackTrace
+            ws.send(`Echo: ${messageText} stackTrace=${KonsolServer.stackTrace}`);
           }
         } catch (error) {
-          console.error('Konsol ws.onMessage() Error processing message:', error);
+          console.error('KonsolServer ws.onMessage() Error processing message:', error);
         }
       });
 
       ws.on('close', function close(code, reason) {
-        console.log(`Konsol.onClose() Client ${id} disconnected - Code: ${code}, Reason: ${reason}`);
+        console.log(`KonsolServer.onClose() Client ${id} disconnected - Code: ${code}, Reason: ${reason}`);
       });
 
       ws.on('error', function error(err) {
-        console.error('Konsol.onError() WebSocket error:', err);
+        console.error('KonsolServer.onError() WebSocket error:', err);
       });
 
       ws.on('pong', function heartbeat() {
@@ -62,12 +60,12 @@ class Konsol {
 
     // Handle upgrade because http server reused (noServer)
     server.on('upgrade', function upgrade(request, socket, head) {
-      console.log("Konsol.onUpgrade() handler ")
+      console.log("KonsolServer.onUpgrade() handler ")
       const { pathname } = new URL(request.url, 'wss://base.url');
 
-      Konsol.wss.handleUpgrade(request, socket, head, function done(ws) {
-        console.log("Konsol.handleUpgrade request")
-        Konsol.wss.emit('connection', ws, request);
+      KonsolServer.wss.handleUpgrade(request, socket, head, function done(ws) {
+        console.log("KonsolServer.handleUpgrade request")
+        KonsolServer.wss.emit('connection', ws, request);
       })
     });
 
@@ -75,7 +73,7 @@ class Konsol {
 
     const interval = setInterval(function ping() {
       //Konsol.wss.clients.forEach(function each(ws) {
-      Object.entries(Konsol.wsClients).forEach(([id, ws]) => {
+      Object.entries(KonsolServer.wsClients).forEach(([id, ws]) => {
         if (ws.isAlive === false) {
           return ws.terminate();
         }
@@ -84,7 +82,7 @@ class Konsol {
       });
     }, 30000);
 
-    Konsol.wss.on('close', function close() {
+    KonsolServer.wss.on('close', function close() {
       clearInterval(interval);
     });
   }
@@ -92,40 +90,22 @@ class Konsol {
   //----------------------------------------------------------------------------------------------
   static addClient(id, wsClient) {
     //console.log("Konsol.addClient() <wsClient>",wsClient)
-    Konsol.wsClients[id] = wsClient
+    KonsolServer.wsClients[id] = wsClient
   }
 
-  */
-
-  //----------------------------------------------------------------------------------------------
-  static log(...msg) {
-    let stack = ""
-    if (KonsolServer.stackTrace) {
+  static broadcast(evt) {
+    Object.entries(KonsolServer.wsClients).forEach(([id, ws]) => {
+      //Konsol.wsClients.forEach(function each(ws) {
       try {
-        throw new Error("Konsol")
+        ws.send(JSON.stringify(evt))
       } catch (error) {
-        stack = error.stack
+        console.log("KonsolServer.log() error on send to <id>", id, "<error>", error, "<msg>", msg)
       }
-    }
-    try {
-      const ddate = new Date()
-      const now = Date.now()
-      const ddated = ddate.toISOString()
-      let evt = {
-        type: 'log',
-        date: ddated,
-        stack: stack,
-        correlationId: now,
-        fields: []
-      }
-      for (let m of msg) {
-        evt.fields.push(m)
-      }
-      KonsolServer.broadcast(evt)
-    } catch (error) {
-      console.log("Konsol.log() error on log <error>", error, "<msg>", msg)
-    }
+    })
   }
 }
 
-export { Konsol };
+  
+
+
+export { KonsolServer };
