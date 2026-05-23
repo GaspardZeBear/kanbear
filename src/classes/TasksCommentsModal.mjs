@@ -128,7 +128,7 @@ class TasksCommentsModal {
 
   //------------------------------------------------------------------------
   async createTable() {
-    const tasksComments = await TasksComments.getAll('tasks_comments')
+    const tasksComments = await TasksComments.getByTaskId('tasks_comments',{task_id:this.taskId})
     console.log("TasksCommentsDialog.filltable()", "<taskComments>", tasksComments)
     this.table = document.createElement('table')
     const thead = document.createElement('thead')

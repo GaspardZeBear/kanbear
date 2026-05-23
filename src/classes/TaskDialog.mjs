@@ -28,7 +28,7 @@ class TaskDialog extends Dialog {
         let tasksCommentsFn = function (ev) {
             console.log("tasksComments Href event Listener fired ")
             ev.stopPropagation();
-            const dialog=new TasksCommentsModal(id)
+            const modal=new TasksCommentsModal(id)
         }
         href.addEventListener('click', tasksCommentsFn);
         console.log(href)

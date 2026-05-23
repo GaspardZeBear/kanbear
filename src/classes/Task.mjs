@@ -2,7 +2,7 @@ import { KanbearEntity } from "./KanbearEntity.mjs"
 import { TaskDialog } from "./TaskDialog.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { Ref } from "./Ref.mjs"
-import { buildAddDummyButton, buildAddNoteButton, buildAddOpenCloseButton } from "../utils/buttonBuilder.mjs"
+import { buildAddDummyButton, buildAddNoteButton, buildAddOpenCloseButton, buildTasksCommentsButton } from "../utils/buttonBuilder.mjs"
 import { buildTasksCommentsLink } from "../utils/linkBuilder.mjs"
 import { getOpenCloseSymbol } from "../utils/openClose.mjs"
 
@@ -177,8 +177,8 @@ class Task extends KanbearEntity {
         topLineDiv.appendChild(hrefDiv)
 
         const commentDiv = document.createElement("div")
-        commentDiv.appendChild(buildTasksCommentsLink(this.task.id,'Co'))
-        //commentDiv.appendChild(buildAddDummyButton({ inner: "Co", message: "AddComment" }))
+        //commentDiv.appendChild(buildTasksCommentsLink(this.task.id,'Co'))
+        commentDiv.appendChild(buildTasksCommentsButton(this.task.id,'Co'))
         topLineDiv.appendChild(commentDiv)
 
         const tagDiv = document.createElement("div")

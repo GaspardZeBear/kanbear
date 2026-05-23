@@ -140,6 +140,7 @@ class LinkCounter {
       //user.modify({userId:uId});
     }
     href.addEventListener('click', editTasksCommentsFn, { once: false });
+    //href.addEventListener('mouseover', editTasksCommentsFn, { once: false });
     console.log(href)
     return(href)
   }

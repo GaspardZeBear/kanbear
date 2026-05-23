@@ -7,6 +7,7 @@ import { TaskDialog } from "../classes/TaskDialog.mjs"
 import { Task } from "../classes/Task.mjs"
 import { sendEvent } from "./sendEvent.mjs"
 import { Kontext } from "../classes/Kontext.mjs"
+import { TasksCommentsModal } from "../classes/TasksCommentsModal.mjs"
   
   //------------------------------------------------------------------------
   function buildAddSwimlaneButton(projectId) {
@@ -138,6 +139,45 @@ import { Kontext } from "../classes/Kontext.mjs"
     return (addNoteButton)
   }
 
+   //------------------------------------------------------------------------
+  function buildTasksCommentsButton(taskId, name) {
+    const tasksCommentsButton = document.createElement('button')
+    tasksCommentsButton.classList.add("add-item-btn")
+    tasksCommentsButton.setAttribute("id", `tasksCommentsButton`)
+    //addTaskButton.innerHTML = "+\u{1F3CB}"
+    tasksCommentsButton.innerHTML = name
+    let tasksCommentsFn = async function (ev) {
+      console.log("tasksCommentsButton event Listener fired")
+      ev.stopPropagation();
+      let modal=new TasksCommentsModal(taskId)
+    }
+    tasksCommentsButton.addEventListener('click', tasksCommentsFn, { once: false });
+    return (tasksCommentsButton)
+  }
+
+
+  //----------------------------------------------------------------------------------
+  function ZZZZZZZZZZZZZZZZbuildTasksCommentsLink(taskId, taskName) {
+    const href = document.createElement("a")
+    //LinkCounter.counter++
+    //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
+    href.setAttribute("href", "javascript:void(0)")
+    href.innerHTML = taskName
+    //let myProject = this.project
+    let editTasksCommentsFn = function (ev) {
+      console.log("editTasksCommentsHref event Listener fired ")
+      ev.stopPropagation();
+      const user = new TasksCommentsModal(taskId)
+      //user.modify({userId:uId});
+    }
+    href.addEventListener('click', editTasksCommentsFn, { once: false });
+    //href.addEventListener('mouseover', editTasksCommentsFn, { once: false });
+    console.log(href)
+    return(href)
+  }
+
+
+
   //------------------------------------------------------------------------
   function buildAddOpenCloseButton(id,value,callback) {
     const addAddOpenCloseButton = document.createElement('button')
@@ -161,5 +201,6 @@ export {
    buildAddWorkspaceButton, 
    buildAddDummyButton, 
    buildAddNoteButton,
-   buildAddOpenCloseButton
+   buildAddOpenCloseButton,
+   buildTasksCommentsButton
   }
