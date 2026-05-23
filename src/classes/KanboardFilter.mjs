@@ -1,6 +1,7 @@
 class KanboardFilter {
   constructor(filtersMap) {
     console.log("kanboardFilter() ", filtersMap)
+    this.wRx = new RegExp(filtersMap.workspaceFilter)
     this.pRx = new RegExp(filtersMap.projectFilter)
     this.sRx = new RegExp(filtersMap.swimlaneFilter)
     this.tRx = new RegExp(filtersMap.taskFilter)
@@ -8,6 +9,12 @@ class KanboardFilter {
     this.aRx = new RegExp(filtersMap.assigneeFilter)
     // WIP for assignee !!
     this.aRx = new RegExp('.*')
+  }
+
+  //-------------------------------------------------------------------
+  keepWorkspace(wName) {
+    console.log("KanboardFilter.keepWorkspace()","wName",wName,"filter",this.wRx)
+    return ((wName ? this.wRx.test(wName) : true) )
   }
 
   //-------------------------------------------------------------------

@@ -69,6 +69,12 @@ document.addEventListener("workspaceModified", async (ev) => {
     buildWorkspacesSelectBox()
 })
 
+document.addEventListener("workspaceSelected", async (ev) => {
+    console.log("workspaceSelected listener fired","<ev>", ev)
+    Kontext.setWorkspaceId(ev.detail.workspaceId)
+    buildKanbearProjectsSelectBox()
+})
+
 //document.querySelectorAll("projectCreated").addEventListener("projectCreated", (ev) => {
 document.addEventListener("projectCreated", async (ev) => {
     console.log("projectCreated listener fired <ev>", ev)
@@ -301,6 +307,7 @@ async function buildWorkspacesSelectBox() {
         
         let workspaceId = parseInt(e.target.value)
         if (workspaceId < 0) {
+            sendEvent("workspaceSelected",workspaceId)
             return
         }
         Kontext.setWorkspaceId(e.target.value);
@@ -311,7 +318,7 @@ async function buildWorkspacesSelectBox() {
         console.log("wssOrigin in listener", wssOrigin)
         const ws = wssOrigin.find((element) => element.id == workspaceId)
         console.log("ws", ws)
-         Kontext.setWorkspaceName(ws.name);
+        Kontext.setWorkspaceName(ws.name);
         document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
         let workspaceLink = buildWorkspaceLink(ws.id, ws.name)
         document.getElementById("workspace").replaceChildren(workspaceLink)

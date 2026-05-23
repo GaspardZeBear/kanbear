@@ -163,6 +163,7 @@ class KanbearListPanel {
       const project = projectM[p.id]
       console.log("KanbearListPanel.createTable() <project>", project)
       if (!this.kanboardFilter.keepProject(project.name)) { continue }
+      if (!this.kanboardFilter.keepWorkspace(project.workspace.name)) { continue }
       Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
         if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
         Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
