@@ -8,12 +8,12 @@ class KanboardFilter {
     this.cRx = new RegExp(filtersMap.columnFilter)
     this.aRx = new RegExp(filtersMap.assigneeFilter)
     // WIP for assignee !!
-    this.aRx = new RegExp('.*')
+    //this.aRx = new RegExp('.*')
   }
 
   //-------------------------------------------------------------------
   keepWorkspace(wName) {
-    console.log("KanboardFilter.keepWorkspace()","wName",wName,"filter",this.wRx)
+    //console.log("KanboardFilter.keepWorkspace()","wName",wName,"filter",this.wRx)
     return ((wName ? this.wRx.test(wName) : true) )
   }
 
@@ -39,7 +39,14 @@ class KanboardFilter {
 
   //-------------------------------------------------------------------
   keepAssignee(aName) {
-    return ((aName ? this.aRx.test('') : true))
+    console.log("KanboardFilter.keepAssignee()","aName",aName,"filter",this.aRx)
+    if (this.aRx.source === "(?:)" || this.aRx.source === ".*") {
+      return(true)
+    }
+    if (aName == null || aName.length == 0) {
+      return(false)
+    }
+    return ((aName ? this.aRx.test(aName) : true))
   }
 
   //-------------------------------------------------------------------

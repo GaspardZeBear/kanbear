@@ -168,6 +168,12 @@ class KanbearListPanel {
         if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
         Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
           if (!this.kanboardFilter.keepTask(task.name)) { return }
+          console.log("KanbearListPanel.createTable() <task>", task)
+          if ( task.assignee_id ) {
+            if (!this.kanboardFilter.keepAssignee(project.assignees[task.assignee_id].name)) { return }
+          } else {
+            if (!this.kanboardFilter.keepAssignee("")) { return }
+          }
           if (!this.kanboardFilter.keepColumn(project.columns[task.column_id].name)) { return }
           let userName = ""
           if (project.users[task.owner_id] && project.users[task.owner_id].name) {

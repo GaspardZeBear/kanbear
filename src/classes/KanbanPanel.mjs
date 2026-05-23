@@ -285,6 +285,7 @@ class KanbanPanel {
         if (project.swimlanes[kSwimlaneId]) {
           Object.entries(project.swimlanes[kSwimlaneId].tasks).forEach(([tKey, task]) => {
             if (task.column_id == columnId) {
+              if (!this.kanboardFilter.keepTask(task.name)) { return }
               const newTask = new Task(task)
               container.appendChild(newTask.createKanbanTaskElement());
               //document.getElementById(project.id).addEventListener("taskModified", (ev) => {
