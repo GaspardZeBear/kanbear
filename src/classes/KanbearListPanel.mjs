@@ -185,6 +185,9 @@ class KanbearListPanel {
           const checkBoxId = Ref.getRef('checkbox', project.id, swimlane.id, task.id)
           const commentLinkId = Ref.getRef('commentLink', project.id, swimlane.id, task.id)
 
+          const projectKanban=document.createElement('span')
+          
+
           //<td style="background-color:${taskEntity.getTaskDisplayColor()}">${task.name} ${getOpenCloseSymbol(task.is_open)}</td>
           //<td style="background-color:${task.color}">${task.name} ${getOpenCloseSymbol(task.is_open)}</td>
           row.innerHTML = `
