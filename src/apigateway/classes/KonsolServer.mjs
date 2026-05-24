@@ -8,13 +8,14 @@ class KonsolServer {
   static stackTrace = false
 
   //----------------------------------------------------------------------------------------------
-  static init(server) {
+  static init(server,parms={
+      //port: 3003,
+      noServer: true,
+      clientTracking: true
+    }) {
     //const server = createServer(app)
     console.log(`Websocket server creation`);
-    KonsolServer.wss = new WebSocketServer({
-      //port: 3003,
-      noServer: true
-    });
+    KonsolServer.wss = new WebSocketServer(parms);
     console.log(`Websocket server created`);
 
     KonsolServer.wss.on('connection', function connection(ws, request) {
@@ -22,25 +23,49 @@ class KonsolServer {
       const clientIP = request.socket.remoteAddress;
       const clientPort = request.socket.remotePort
       const id = `${clientIP}:${clientPort}`
-      console.log(`Konsol.onConnection() New client ${id} connected`);
-      KonsolServer.addClient(id, ws)
+      console.log("KonsolServer.onConnection() New client connected", "<id>", id, "request.url", request.url);
+      ws.isLogger = true
+      let messageProcessorFn
+      if (request.url != "/logger") {
+        console.log("KonsolServer.onConnection() New client connected", "<id>", id, "request.url", request.url, " is a logbrowser");
+        KonsolServer.addClient(id, ws)
+        ws.isLogger = false
+        messageProcessorFn = messageFromLogBrowser
+      } else {
+        console.log("KonsolServer.onConnection() New client connected", "<id>", id, "request.url", request.url, " is a logger");
+        ws.isLogger = true
+        messageProcessorFn = messageFromLogger
+      }
+
       ws.send(JSON.stringify({
-        msg: 'Connected to Konsol websocket server',
-        status: { stackTrace: KonsolServer.stackTrace }
-      }));
+        date: new Date().toISOString(),
+        fields: [
+          { msg: 'Connected to Konsol websocket server' },
+          { status: { stackTrace: KonsolServer.stackTrace } }]
+      }
+      ));
+
+      //--------------------------------------------
+      function messageFromLogger(data) {
+        KonsolServer.broadcast(JSON.parse(data))
+      }
+
+      //-------------------------------------------
+      function messageFromLogBrowser(data) {
+        KonsolServer.stackTrace = !KonsolServer.stackTrace
+        ws.send(JSON.stringify({
+          date: new Date().toISOString(),
+          fields: [{ stackTrace: KonsolServer.stackTrace }]
+        }))
+      }
+
+      //----------------------------
 
       ws.on('message', function message(data) {
-        try {
-          const messageText = data.toString();
-          console.log('KonsolServer ws.onMessage() Received:', messageText);
-          if (ws.readyState === ws.OPEN) {
-            KonsolServer.stackTrace = !KonsolServer.stackTrace
-            ws.send(`Echo: ${messageText} stackTrace=${KonsolServer.stackTrace}`);
-          }
-        } catch (error) {
-          console.error('KonsolServer ws.onMessage() Error processing message:', error);
+        if (ws.readyState === ws.OPEN) {
+          messageProcessorFn(data)
         }
-      });
+      })
 
       ws.on('close', function close(code, reason) {
         console.log(`KonsolServer.onClose() Client ${id} disconnected - Code: ${code}, Reason: ${reason}`);
@@ -58,7 +83,7 @@ class KonsolServer {
 
     });
 
-    // Handle upgrade because http server reused (noServer)
+    //-------------------   Handle upgrade because http server reused (noServer)
     server.on('upgrade', function upgrade(request, socket, head) {
       console.log("KonsolServer.onUpgrade() handler ")
       const { pathname } = new URL(request.url, 'wss://base.url');
@@ -80,7 +105,7 @@ class KonsolServer {
         ws.isAlive = false;
         ws.ping();
       });
-    }, 30000);
+    }, 15000);
 
     KonsolServer.wss.on('close', function close() {
       clearInterval(interval);
@@ -93,9 +118,11 @@ class KonsolServer {
     KonsolServer.wsClients[id] = wsClient
   }
 
+  //----------------------------------------------------------------------------------------------
   static broadcast(evt) {
+    //console.log("KonsolServer.broadcast()", "evt", JSON.stringify(evt))
     Object.entries(KonsolServer.wsClients).forEach(([id, ws]) => {
-      //Konsol.wsClients.forEach(function each(ws) {
+      console.log("KonsolServer.broadcast() to", "id", id)
       try {
         ws.send(JSON.stringify(evt))
       } catch (error) {
@@ -105,7 +132,7 @@ class KonsolServer {
   }
 }
 
-  
+
 
 
 export { KonsolServer };
