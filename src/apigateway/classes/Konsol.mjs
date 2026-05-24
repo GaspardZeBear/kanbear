@@ -21,6 +21,7 @@ class Konsol {
       const ddated = ddate.toISOString()
       let evt = {
         type: 'log',
+        level: 'log',
         date: new Date().toISOString(),
         stack: stack,
         correlationId: now,

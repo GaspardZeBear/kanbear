@@ -1,15 +1,18 @@
 import fs from 'fs';
 import { WebSocketServer } from 'ws';
+//import { readFileSync } from 'node:fs';
 
 class KonsolClient {
 
-  static wss
+  //static wss
   static stackTrace = false
   static konsol
+  static origin="unkown"
 
   //----------------------------------------------------------------------------------------------
-  static init(url = "ws://localhost:3002/logger") {
-    console.log("KonsolClient.connect() connecting to ", url)
+  static init(origin,url = "ws://localhost:3002/logger") {
+    KonsolClient.origin=origin
+    console.log("KonsolClient.connect()","origin",KonsolClient.origin,"connecting to ", url)
     KonsolClient.konsol = new WebSocket(url);
     KonsolClient.konsol.onmessage = function (event) {
       console.log("KonsolClient.onMessage()) ", event.data);
@@ -30,7 +33,7 @@ class KonsolClient {
   //------------------------------------------------------------------------------------------------
   static broadcast(evt) {
     try {
-      evt.origin = "KonsolClient"
+      evt.origin = KonsolClient.origin
       if (KonsolClient.konsol) {
         KonsolClient.konsol.send(JSON.stringify(evt))
       }

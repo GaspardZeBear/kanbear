@@ -48,8 +48,13 @@
         }
 
         //---------------------------------------------------------------------------------------
-        function stackTrace() {
+        function toggleStackTrace() {
             sendMessage({ type: "cmd", value: "toggleStackTrace" })
+        }
+
+        //---------------------------------------------------------------------------------------
+        function status() {
+            sendMessage({ type: "cmd", value: "status" })
         }
 
         //---------------------------------------------------------------------------------------
@@ -63,7 +68,7 @@
         }
 
         //---------------------------------------------------------------------------------------
-        function escapeHtmlByReplacingCharacters(str) {
+        function escapeHtml(str) {
             if (typeof str !== 'string') {
                 return '';
             }
@@ -82,7 +87,7 @@
             };
 
             const escaped = str.replace(/[&<>"'`]/g, escapeCharacter);
-            console.log(str, "-->", escaped)
+            //console.log(str, "-->", escaped)
             return (escaped)
         }
 
@@ -96,7 +101,7 @@
 
         //----------------------------------------------------------------------------------------
         function localLog(msg) {
-            append(JSON.stringify({ date: getNow(), fields: ["localLog", msg] }))
+            append(JSON.stringify({ date: getNow(), origin: '__this__', fields: ["msg", msg] }))
         }
 
         //---------------------------------------------------------------------------------------
@@ -106,7 +111,8 @@
                 jEvent = JSON.parse(text)
                 //console.log(jEvent)
                 //let jEvent = JSON.parse(text)
-                let header = `${getNow()} event ${jEvent['date']}  ${jEvent['fields'][0]}`
+                let origin= jEvent['origin'] ?? "unknown"
+                let header = `${getNow()} event ${jEvent['date']} |<span style="background-color:yellow;">${origin}</span>| ${jEvent['fields'][0]}`
                 //let  = document.getElementById("konsolEvents")
                 let entry = document.createElement('li')
                 entry.innerHTML = `<b>${header}</b>`;
@@ -120,7 +126,7 @@
                         //output += `<span class="fieldStyle${i % 2}">${JSON.stringify(jEvent['fields'][i], '').substr(0, fieldDisplayLength)}</span>|`
                         const span = document.createElement("span")
                         span.setAttribute("class", `fieldStyle${i % 2}`)
-                        const txt = document.createTextNode(escapeHtmlByReplacingCharacters(`${JSON.stringify(jEvent['fields'][i]).substr(0, fieldDisplayLength)}|`))
+                        const txt = document.createTextNode(escapeHtml(`${JSON.stringify(jEvent['fields'][i]).substr(0, fieldDisplayLength)}|`))
                         //txt.setAttribute("class",`fieldStyle${i % 2}`)
                         span.appendChild(txt)
                         td.appendChild(span)
@@ -133,7 +139,7 @@
                     for (let i = 1; i < jEvent['fields'].length; i++) {
                         let tr = document.createElement("tr")
                         let td = document.createElement("td")
-                        const txt = document.createTextNode(escapeHtmlByReplacingCharacters(`${JSON.stringify(jEvent['fields'][i]).substr(0, fieldDisplayLength)}`))
+                        const txt = document.createTextNode(escapeHtml(`${JSON.stringify(jEvent['fields'][i]).substr(0, fieldDisplayLength)}`))
                         td.appendChild(txt)
                         tr.appendChild(td)
                         table.appendChild(tr)
@@ -198,7 +204,7 @@
                 document.getElementById("connectStatus").classList.remove("disconnected")
                 document.getElementById("connectStatus").classList.add("connected")
                 console.log("konsolClient.connect() connected to ", url)
-                konsol.send("Hello!")
+                sendMessage()
                 const ddate = new Date()
                 const now = Date.now()
                 const ddated = ddate.toISOString()
@@ -224,12 +230,17 @@
             konsol.close()
             document.getElementById("disconnectButton").setAttribute("disabled", "")
         }
+        //--------------------------------------------------------------------
+        function sendInputMessage() {
+            let message = document.getElementById("message").value;
+            konsol.send(JSON.stringify({type:'cmd',value:message}));
+        }
 
         //--------------------------------------------------------------------
         function sendMessage(event) {
             console.log(event);
             let message = document.getElementById("message").value;
-            konsol.send(message);
+            konsol.send(JSON.stringify(event));
         }
     </script>
 </head>
@@ -247,9 +258,10 @@
             <br /><input type="button" value="setLocalParms" onclick="setLocalParms()" />
         </form>
 
-        <input type="button" value="StackTrace on/off" onclick="stackTrace()" />
-        Message: <input value="Hello!" type="text" id="message" />
-        <input type="button" value="Send" onclick="sendMessage(event)" /><br />
+        <input type="button" value="Status" onclick="status()" />
+        <input type="button" value="StackTrace on/off" onclick="toggleStackTrace()" />
+        Message: <input value="status" type="text" id="message" />
+        <input type="button" value="Send" onclick="sendInputMessage()" /><br />
 
         <input type="button" value="Clear" onclick="clearEvents()" />
         <input type="button" value="writeMark" onclick="writeMark()" /><br />
