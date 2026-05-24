@@ -49,7 +49,12 @@ app.use('/api/task_has_tags', taskHasTagRoutes);
 app.use('/api/tasks_comments', taskCommentRoutes);
 
 //------------------------------------------------------------------------------
-app.get('/api/sql/report/:projectId', async (req, res) => {
+app.get('/api/sql/report/:projectId', 
+    (req, res, next) => {
+    console.log("apigateway ",req.headers) 
+    next();
+    // otherwise pass the control to the next middleware function in this stack
+    },async (req, res) => {
   const projectId = parseInt(req.params.projectId)
   //console.log("--------------------------------------------------------------------------------------------")
   Konsol.log("/api/sql/report params", req.params)

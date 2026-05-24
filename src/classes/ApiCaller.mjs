@@ -16,7 +16,9 @@ class ApiCaller {
             this.kanbearUrl = url
         }
         this.apiToken = apiToken;
-        axios.defaults.headers.post['Authorization'] = apiToken;
+        console.log("ApiCaller() constructor()", url)
+        axios.defaults.headers.common['Authorization'] = `Bearer loulou`;
+        axios.defaults.headers.common['Bear'] = "gzb";
         this.headerArray = []
     }
 
@@ -60,7 +62,7 @@ class ApiCaller {
         console.log("ApiCaller.get() url ", await this.url(uri), { params: params })
         try {
             console.log("ApiCaller.get() before");
-            const res = await axios.get(await this.url(uri), { params: params });
+            const res = await axios.get(await this.url(uri), { headers : { Authorization : "gzb"} , params: params });
             console.log("ApiCaller.get() <res.status>", res.status); // Status Code
             return (res)
         } catch (error) {

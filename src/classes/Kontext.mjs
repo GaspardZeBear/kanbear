@@ -3,6 +3,7 @@ import { KanbanPanel } from './KanbanPanel.mjs'
 import { KanbearListPanel } from "./KanbearListPanel.mjs"
 import { sendMessage, sendErrorMessage } from '../utils/sendMessage.mjs'
 import { getOpenCloseSymbol, getOpenCloseQueryParms } from '../utils/openClose.mjs'
+import axios from 'axios';
 
 class Kontext {
 
@@ -139,8 +140,7 @@ class Kontext {
     //--------------------------------------------------------------
     static async loadKanbearJsonBulkData(parms = { useKontext: true, projectId: null }) {
         try {
-
-                       
+  
             // Do not take in account project open or closed !!!!
             let query = getOpenCloseQueryParms(['swimlane', 'task'])
             let projectId = parms.useKontext ? Kontext.currentProjectId : parms.projectId
@@ -151,13 +151,16 @@ class Kontext {
 
             const url = `${Kontext.getKanbearUrl()}/api/sql/report/${projectId}${query}`
             console.log("Kontext.loadKanbearJsonBulkData() from kanbear", url)
-            const response = await fetch(url);
+            //const response = await fetch(url);
+            const response = await axios.get(url);
             console.log(response)
-            if (!response.ok) {
 
+            //if (!response.ok) {
+            if (response.statusText != "OK") {
                 throw new Error(`Kontext.loadKanbearJsonBulkData() error ${response.message}`)
             }
-            const resp = await response.json();
+            //const resp = await response.json();
+            const resp = await response.data;
             console.log("Kontext.loadKanbearJsonBulkData() from updated loaded", resp)
             if (parms.useKontext) {
                 Kontext.jsonBulkData = resp
@@ -167,7 +170,7 @@ class Kontext {
             return (resp)
         } catch (error) {
             sendErrorMessage(`Could not  load project ${Kontext.currentProjectId}`)
-            console.log(`Kontext.loadKanbearJsonBulkData() error ${error.message}`)
+            console.log(`Kontext.loadKanbearJsonBulkData() error ",error`)
             throw new Error(`Kontext.loadKanbearJsonBulkData() error ${error.message}`)
         }
     }
@@ -215,8 +218,10 @@ class Kontext {
         try {
             const url = `${Kontext.getGatewayUrl()}/api/sql/loadProjects`
             console.log(url)
-            const response = await fetch(url);
-            Kontext.kanboardProjects = await response.json();
+            //const response = await fetch(url);
+            const response = await axios.get(url);
+            //Kontext.kanboardProjects = await response.json();
+            Kontext.kanboardProjects = response.data;
         } catch (error) {
             throw new Error(`Kontext.loadProjects() error ${error.message}`)
         }
