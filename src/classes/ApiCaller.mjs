@@ -18,7 +18,7 @@ class ApiCaller {
         this.apiToken = apiToken;
         console.log("ApiCaller() constructor()", url)
         axios.defaults.headers.common['Authorization'] = `Bearer loulou`;
-        axios.defaults.headers.common['Bear'] = "gzb";
+        axios.defaults.headers.common['ZeBear'] = "gzb";
         this.headerArray = []
     }
 

@@ -25,6 +25,8 @@ class TasksCommentsDialog extends Dialog {
         tasksComments.setData("comment", tasksCommentsForm.tasksCommentsComment.value)
         tasksComments.setData("task_id",this.taskId)
         tasksComments.setData("user_id",1)
+        tasksComments.setData("date_created", Math.floor(Date.now() / 1000));
+        tasksComments.setData("date_modified", Math.floor(Date.now() / 1000));
     }
 
     //----------------------------------------------------------------------------
