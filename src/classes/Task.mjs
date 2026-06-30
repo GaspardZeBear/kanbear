@@ -89,7 +89,7 @@ class Task extends KanbearEntity {
 
     //-----------------------------------------------------------------------------------------------------
     getTaskDisplayColor(col = undefined) {
-        console.log("Task.getTaskDisplayColor()", "task", this.task, "color")
+        //console.log("Task.getTaskDisplayColor()", "task", this.task, "color")
         //console.log("Task.getTaskDisplayColor()", "taskColorLen", this.task.color.length)
         if (this.task.color && this.task.color.length > 0) {
             return (this.task.color)
@@ -97,7 +97,7 @@ class Task extends KanbearEntity {
         if (!col) {
             col = Kontext.getCurrentProject().columns[this.task.column_id]
         }
-        console.log("Task.getTaskDisplayColor()", "col", col)
+        //console.log("Task.getTaskDisplayColor()", "col", col)
         return (col.color)
     }
     //-----------------------------------------------------------------------------------------------------
@@ -214,16 +214,16 @@ class Task extends KanbearEntity {
         taskElement.appendChild(tNote)
 
         taskElement.addEventListener('dragstart', (ev) => {
-            console.log("dragstart")
+            //console.log("dragstart")
             ev.dataTransfer.setData('dragId', dragId);
-            console.log(ev.dataTransfer)
+            //console.log(ev.dataTransfer)
             ev.target.classList.add("dragging")
             //ev.stopPropagation()
             ev.dataTransfer.effectAllowed = 'move';
         })
 
         taskElement.addEventListener('dragend', (ev) => {
-            console.log("dragend")
+            //console.log("dragend")
             //ev.dataTransfer.setData('dragId', dragId);
             //console.log(ev.dataTransfer)
             ev.target.classList.remove("dragging")

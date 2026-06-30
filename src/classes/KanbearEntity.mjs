@@ -14,9 +14,9 @@ class KanbearEntity {
         }
         this.data = {}
         from.id ? this.id = from.id : undefined
-        console.log("KanbearEntity.constructor()","<kind>",kind,"<this.kind>", this.kind)
-        console.log("KanbearEntity.constructor() <from>", from)
-        console.log("KanbearEntity.constructor() <this>", this)
+        //console.log("KanbearEntity.constructor()","<kind>",kind,"<this.kind>", this.kind)
+        //console.log("KanbearEntity.constructor() <from>", from)
+        //console.log("KanbearEntity.constructor() <this>", this)
     }
 
     //----------------------------------------------------------------------------

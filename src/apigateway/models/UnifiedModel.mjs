@@ -56,34 +56,17 @@ class UnifiedModel {
     }
 
     //------------------------------------------------------------------
-    static XgetByForeignKey(table, req, opParms, callback) {
-        Konsol.log("UnifiedModel.getByForeignKey()","<params>", req.params, "<opParms>",opParms,"<body>", req.body)
-        //const sql = `SELECT * FROM ${table} WHERE id = ?`;
-        //db.get(sql, params["id"], callback);
-        // By convention, foreign key name on table xxx is xxx_id !
-        const id=`${opParms['foreignKey'].slice(0,-3)}Id`
-        //console.log("id",id)
-        //console.log("params[id]",req.params[id])
-        const sql = `SELECT * FROM ${table} WHERE ${opParms['foreignKey']} = ? ORDER BY ${opParms['sortColumn']}`;
-        db.all(sql, req.params[id], callback);
-    }
-
-        //------------------------------------------------------------------
     static getByForeignKey(table, req, opParms, callback) {
         Konsol.log("UnifiedModel.getByForeignKey()","<params>", req.params, "<opParms>",opParms,"<body>", req.body)
-        //const sql = `SELECT * FROM ${table} WHERE id = ?`;
-        //db.get(sql, params["id"], callback);
-        // By convention, foreign key name on table xxx is xxx_id !
+
+        // Let's asssume for now that req.params contains the foreign keys
+        // Maybe  in req. body one day!
         let wheres=[]
-        let id
-        Object.entries(req.params).forEach(([key, val]) => {
+          Object.entries(req.params).forEach(([key, val]) => {
             wheres.push(`${key}=${val}`)
-            id=val
+  
         })
-        //const id=`${opParms['foreignKey'].slice(0,-3)}Id`
         const where=wheres.join(' AND ')
-        //console.log("id",id)
-        //console.log("params[id]",req.params[id])
         const sql = `SELECT * FROM ${table} WHERE ${where}`;
         db.all(sql, [] , callback);
     }

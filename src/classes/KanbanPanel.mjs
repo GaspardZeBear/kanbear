@@ -19,11 +19,11 @@ class KanbanPanel {
   constructor() {
     //this.projects = Kontext.getJsonBulkData()
     console.log("KanbanPanel.constructor() projectId", Kontext.getCurrentProjectId())
-    this.project=undefined
+    this.project = undefined
     if (Kontext.getCurrentProjectId()) {
-      console.log("KanbanPanel.constructor() ",Kontext.getJsonBulkData())
-       this.project = Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()]
-    } 
+      console.log("KanbanPanel.constructor() ", Kontext.getJsonBulkData())
+      this.project = Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()]
+    }
     this.htmlElement = 'results'
     this.kanboardFilter = new KanboardFilter(getFiltersMap())
     this.buttons = {}
@@ -41,8 +41,8 @@ class KanbanPanel {
     Kontext.setPanelClass(KanbanPanel)
     return new KanbanPanel()
   }
-  
-    //------------------------------------------------------------------------
+
+  //------------------------------------------------------------------------
   async render() {
     console.log("KanbanPanel.render() <project>", this.project)
     let [displayable, cause] = new ProjectManager(this.project).isDisplayable()
@@ -82,7 +82,8 @@ class KanbanPanel {
 
     this.buildKanbanDivsForProject(this.project)
     //this.buildkColumnsQuerySelectors(this.projects[0])
-    this.setDropZones(this.project.id)
+    this.setDropZonesForTasks(this.project.id)
+    this.setDropZonesForColumnsHeaders(this.project.id)
     this.loadTasksForProject(this.project)
   }
 
@@ -110,7 +111,7 @@ class KanbanPanel {
       const swimlaneLink = buildSwimlaneLink(swimlane.id, swimlane.name)
       //kSwimlaneDivH2.innerHTML = `${project.name}::`
       const status = document.createElement('span')
-      status.innerHTML =  ` ${getOpenCloseSymbol(swimlane.is_open)}`
+      status.innerHTML = ` ${getOpenCloseSymbol(swimlane.is_open)}`
       const separator1 = document.createElement('span')
       separator1.innerHTML = `Swimlane `
       //console.log(this.projectLink)
@@ -137,10 +138,30 @@ class KanbanPanel {
         kColumnDiv.setAttribute("data-swimlane-id", swimlane.id)
         kColumnDiv.setAttribute("style", `background-color:${col.color}`)
 
+
         // create kanban-column-header
         const kColumnHeaderDiv = document.createElement('div')
         kColumnHeaderDiv.setAttribute("data-swimlane-id", swimlane.id)
+        kColumnHeaderDiv.setAttribute("draggable", true)
+        const dragId = Ref.getRef('drag',project.id,swimlane.id, "_",col.id)
+        kColumnHeaderDiv.setAttribute("data-column-id", col.id)
         kColumnHeaderDiv.classList.add("kanban-column-header")
+        kColumnHeaderDiv.addEventListener('dragstart', (ev) => {
+          console.log("kColumnHeaderDiv dragstart")
+          ev.dataTransfer.setData('dragId', dragId);
+          console.log(ev.dataTransfer)
+          ev.target.classList.add("dragging")
+          //ev.stopPropagation()
+          ev.dataTransfer.effectAllowed = 'move';
+        })
+
+        kColumnHeaderDiv.addEventListener('dragend', (ev) => {
+          console.log("kColumnHeaderDiv dragend")
+          //ev.dataTransfer.setData('dragId', dragId);
+          //console.log(ev.dataTransfer)
+          ev.target.classList.remove("dragging")
+        })
+
 
         // fillin column header
         const columnLink = buildColumnLink(col.id, col.name)
@@ -182,7 +203,7 @@ class KanbanPanel {
   };
 
   //----------------------------------------------------------------------------------------
-  setDropZones(project) {
+  setDropZonesForTasks(project) {
     //console.log("setDropZones")
     this.kColumns[project.id] = {}
     const qs = `.kanban-items`
@@ -205,6 +226,7 @@ class KanbanPanel {
         ev.preventDefault()
         zone.classList.remove("drag-over")
         const data = ev.dataTransfer.getData("dragId");
+        console.log("Drop zone ", zone, " data ", data)
         let taskElement = document.getElementById(data)
 
         //remove old taskElment
@@ -264,6 +286,52 @@ class KanbanPanel {
         return false;
       });
     });
+  };
+
+
+  //----------------------------------------------------------------------------------------
+  setDropZonesForColumnsHeaders(project) {
+    //console.log("setDropZones")
+    this.kColumns[project.id] = {}
+    const ch = `.kanban-column-header`
+    //console.log("ch", ch)
+    const zones = document.querySelectorAll(ch)
+    //console.log(zones)
+    zones.forEach((zone) => {
+      //console.log("listener", zone)
+      project = this.project
+      zone.addEventListener('dragover', (ev) => {
+        console.log("dragover starting for column ", zone)
+        //console.log("dragover", zone)
+        ev.preventDefault()
+        zone.classList.add("drag-over")
+      })
+      zone.addEventListener('dragleave', (ev) => {
+        zone.classList.remove("drag-over")
+      })
+      zone.addEventListener('drop', (ev) => {
+        console.log("Drop starting for column ", zone)
+        ev.preventDefault()
+        zone.classList.remove("drag-over")
+        const data = ev.dataTransfer.getData("dragId");
+        const target = ev.target
+        console.log("Drop data", data)
+        let columnId = Ref.getColumnIdFromRef(data)
+
+
+        //let columnId = target.getAttribute("data-column-id")
+        let dropColumnDiv = ev.target.closest(".kanban-column")
+        let dropColumnId = dropColumnDiv.getAttribute("data-column-id")
+        console.log("Drop", "project", project)
+        //console.log("Drop", "zone", zone)
+        console.log("Drop", "target", target)
+        console.log("Drop", "dropColumnDiv", dropColumnDiv)
+        console.log("Drop", "column", project.columns[columnId])
+        console.log("Drop", "dropColumnId", project.columns[dropColumnId])
+        //let taskElement = document.getElementById(data)
+      })
+    })
+
   };
 
   //------------------------------------------------------------------------

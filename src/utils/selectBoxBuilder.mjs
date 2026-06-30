@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------------
 async function selectBoxBuilder(params) {
 
-  console.log("selectBoxBuilder() <params>", params)
+  //console.log("selectBoxBuilder() <params>", params)
   let domId = params.domId
   let boxLabel = params.boxLabel
   let items = params.items
@@ -12,7 +12,7 @@ async function selectBoxBuilder(params) {
   let selectedOption = params.selectedOption
   ////"filter-group") {
 
-  console.log("selectBoxBuilder", items)
+  //console.log("selectBoxBuilder", items)
   const itemDiv = document.createElement("div")
   itemDiv.classList.add(klass)
   //const label = document.createElement(boxLabel)
@@ -39,7 +39,7 @@ async function selectBoxBuilder(params) {
   select.appendChild(fakeOption)
 
   items.forEach((item, idx) => {
-    console.log(item)
+    //console.log(item)
     const option = document.createElement('option')
     option.setAttribute("value", item.id)
     if (item.id == selectedOption) {
@@ -58,7 +58,7 @@ async function selectBoxBuilder(params) {
   })
   itemDiv.appendChild(label)
   itemDiv.appendChild(select)
-    console.log("selectBoxBuilder() <itemDiv>",itemDiv)
+  //console.log("selectBoxBuilder() <itemDiv>",itemDiv)
   return (itemDiv)
 }
 

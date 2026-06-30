@@ -19,6 +19,8 @@ import {db } from './config/database.mjs'
       project_id INTEGER NOT NULL DEFAULT 0,
       color TEXT DEFAULT 'white',
       description TEXT,
+      prev_column_id INTEGER,
+      next_column_id INTEGER,
       FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE SET DEFAULT,
       UNIQUE (name, project_id)
     )
