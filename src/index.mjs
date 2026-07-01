@@ -11,6 +11,7 @@ import { KanbearProjectCleanor } from './classes/KanbearProjectCleanor.mjs';
 import { Kontext } from './classes/Kontext.mjs';
 import { Workspace } from './classes/Workspace.mjs';
 import { Project } from './classes/Project.mjs';
+import { Columns } from './classes/Columns.mjs';
 import { selectBoxBuilder } from './utils/selectBoxBuilder.mjs'
 import { ProjectDialog } from './classes/ProjectDialog.mjs'
 import { WorkspaceDialog } from './classes/WorkspaceDialog.mjs'
@@ -165,6 +166,8 @@ document.addEventListener("assigneeModified", async (ev) => {
 
 document.addEventListener("columnCreated", async (ev) => {
     console.log("index.mjs() column listener fired <ev>", ev)
+    //await Kontext.loadKanbearJsonBulkData()
+    //new Columns().chain(ev.detail.columnId)
     const kb = await KanbanPanel.builder()
     kb.render()
 })
@@ -174,6 +177,13 @@ document.addEventListener("columnModified", async (ev) => {
     const kb = await KanbanPanel.builder()
     kb.render()
 })
+
+document.addEventListener("columnDragged", async (ev) => {
+    console.log("index.mjs() columnDragged listener fired <ev>", ev)
+    const kb = await KanbanPanel.builder()
+    kb.render()
+})
+
 
 document.addEventListener("taskCreated", async (ev) => {
     console.log("index.mjs() task listener fired <ev>", ev)

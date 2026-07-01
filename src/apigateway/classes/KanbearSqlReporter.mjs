@@ -100,6 +100,8 @@ class KanbearSqlReporter {
         c.id cId,
 	      c.name cName,
         c.position cPosition,
+        c.prev_column_id as cPrevColumnId,
+        c.next_column_id as cNextColumnId,
         c.color cColor,
         c.description cDescription
       from projects as p
@@ -241,6 +243,8 @@ class KanbearSqlReporter {
         id: c.cId,
         color: c.cColor,
         position: c.cPosition,
+        prevColumnId: c.cPrevColumnId,
+        nextColumnId: c.cNextColumnId,
         description: c.cDescription
       }
     }

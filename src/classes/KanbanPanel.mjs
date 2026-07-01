@@ -6,12 +6,15 @@ import { ProjectDialog } from "./ProjectDialog.mjs"
 import { SwimlaneDialog } from "./SwimlaneDialog.mjs"
 import { WorkspaceDialog } from "./WorkspaceDialog.mjs"
 import { ColumnDialog } from "./ColumnDialog.mjs"
+import { Columns } from "./Columns.mjs"
 import { TaskDialog } from "./TaskDialog.mjs"
 import { buildProjectLink, buildSwimlaneLink, buildColumnLink } from "../utils/linkBuilder.mjs"
 import { getFiltersMap } from "../utils/filters.mjs"
 import { Ref } from "./Ref.mjs"
 import { buildAddColumnButton, buildAddTaskButton, buildAddSwimlaneButton } from "../utils/buttonBuilder.mjs"
 import { getOpenCloseSymbol } from "../utils/openClose.mjs"
+import { KanbearEntityFactory } from "./KanbearEntityFactory.mjs"
+import { sendEvent } from "../utils/sendEvent.mjs"
 
 class KanbanPanel {
   //------------------------------------------------------------------------
@@ -96,6 +99,8 @@ class KanbanPanel {
     kanbanDiv.setAttribute("data-projectid", project.id)
     //const projectLink = buildProjectLink(project.id, project.name)
 
+    let orderedColumnsList = new Columns().getOrderedList()
+    console.log("KanbanPanel.buildKanbanDivsForProject() ",orderedColumnsList)
     Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
       if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
       // create kanban-swimlane
@@ -129,7 +134,8 @@ class KanbanPanel {
       const kSwimlaneColumnsDiv = document.createElement('div')
       kSwimlaneColumnsDiv.classList.add("swimlane-columns")
 
-      Object.entries(project.columns).forEach(([tKey, col]) => {
+      //Object.entries(project.columns).forEach(([tKey, col]) => {
+      orderedColumnsList.forEach( col => {
         // create a kanban-column
         //console.log("buildkColumnsDivsForProject(project) col=", col)
         const kColumnDiv = document.createElement('div')
@@ -309,7 +315,7 @@ class KanbanPanel {
       zone.addEventListener('dragleave', (ev) => {
         zone.classList.remove("drag-over")
       })
-      zone.addEventListener('drop', (ev) => {
+      zone.addEventListener('drop', async (ev) => {
         console.log("Drop starting for column ", zone)
         ev.preventDefault()
         zone.classList.remove("drag-over")
@@ -318,16 +324,33 @@ class KanbanPanel {
         console.log("Drop data", data)
         let columnId = Ref.getColumnIdFromRef(data)
 
-
         //let columnId = target.getAttribute("data-column-id")
         let dropColumnDiv = ev.target.closest(".kanban-column")
         let dropColumnId = dropColumnDiv.getAttribute("data-column-id")
-        console.log("Drop", "project", project)
+        //console.log("Drop", "project", project)
         //console.log("Drop", "zone", zone)
-        console.log("Drop", "target", target)
-        console.log("Drop", "dropColumnDiv", dropColumnDiv)
-        console.log("Drop", "column", project.columns[columnId])
-        console.log("Drop", "dropColumnId", project.columns[dropColumnId])
+        //console.log("Drop", "target", target)
+        //console.log("Drop", "dropColumnDiv", dropColumnDiv)
+        //console.log("Drop", "column", project.columns[columnId])
+        //console.log("Drop", "dropColumnId", project.columns[dropColumnId])
+
+        let colEntity=await KanbearEntityFactory.generate('column')
+        colEntity.setId(columnId)
+        let col=await colEntity.get('column',{})
+        let dropColEntity=await KanbearEntityFactory.generate('column')
+        dropColEntity.setId(dropColumnId)
+        let dropCol = await dropColEntity.get('column',{})
+
+        console.log("Drop", "col", col)
+        console.log("Drop", "dropCol", dropCol)
+        colEntity.setData("next_column_id",dropCol.next_column_id)
+        await colEntity.patch("columns",{})
+        dropColEntity.setData("next_column_id",columnId)
+        await dropColEntity.patch("columns",{})
+        sendEvent(`columnDragged`, { })
+        //let dropCol=new Column(dropColumnId)
+
+
         //let taskElement = document.getElementById(data)
       })
     })
