@@ -2,7 +2,7 @@ import { Dialog } from './Dialog.mjs'
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 import { sendEvent } from '../utils/sendEvent.mjs'
 import { Column } from './Column.mjs'
-import { Columns } from './Columns.mjs'
+
 import { selectBoxBuilder, colorBoxBuilder, buildColorSelectBox } from '../utils/selectBoxBuilder.mjs'
 
 
@@ -48,12 +48,11 @@ class ColumnDialog extends Dialog {
         //const pr = await KanbearEntityFactory.generate('project')
         co.setData("project_id", this.projectId)
         this.fillDbFromForm(co)
-        let firstColumn=new Columns().getColumn(0)
-        if ( firstColumn ) {
-          co.setData("next_column_id", firstColumn.id)
-        }
-        co.setData("prev_column_id", null)
+        co.setData("next_column_id", -1) 
+        co.setData("prev_column_id", -1)
     }
+
+    
 
     //----------------------------------------------------------------------------
     async subModify(params) {

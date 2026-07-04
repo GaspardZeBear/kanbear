@@ -6,27 +6,27 @@ function getOpenCloseSymbol(val) {
 
 //--------------------------------------------------------------------------------------------
 function getOpenCloseParmBoolean(kind, openSelected, closeSelected) {
-    console.log("getOpenCloseParmBoolean() <kind>", kind, openSelected, closeSelected)
+    //console.log("getOpenCloseParmBoolean() <kind>", kind, openSelected, closeSelected)
     if (openSelected && closeSelected) {
-        console.log("getOpenCloseParmBoolean() openSelected && closeSelected")
+        //console.log("getOpenCloseParmBoolean() openSelected && closeSelected")
         return(undefined)
     }
     if (openSelected) {
-        console.log("getOpenCloseParmBoolean() openSelected")
+        //console.log("getOpenCloseParmBoolean() openSelected")
         return (true)
     }
     if (closeSelected) {
-        console.log("getOpenCloseParmBoolean() closeSelected")
+        //console.log("getOpenCloseParmBoolean() closeSelected")
         return (false)
     }
-    console.log("getOpenCloseParmBoolean() default")
+    //console.log("getOpenCloseParmBoolean() default")
     return(undefined)
 }
 
 
 //--------------------------------------------------------------------------------------------
 function getOpenCloseParm(kind, openSelected, closeSelected) {
-    console.log("getOpenCloseParm() <kind>", kind, openSelected, closeSelected)
+    //console.log("getOpenCloseParm() <kind>", kind, openSelected, closeSelected)
     if (openSelected && closeSelected) return("")
     if (openSelected) return (`${kind}.open=true`)
     if (closeSelected) return (`${kind}.closed=true`)
@@ -44,12 +44,12 @@ function getOpenCloseQueryParms(kinds=['project', 'swimlane', 'task']) {
         if (parm.length > 0) queries.push(parm)
     }
 
-    console.log("getOpenCloseQueryParms() queries", queries)
+    //console.log("getOpenCloseQueryParms() queries", queries)
     let query = ""
     if (queries.length > 0) {
         query = "?" + queries.join("&")
     }
-    console.log("getOpenCloseQueryParms() query", query)
+    //console.log("getOpenCloseQueryParms() query", query)
     return (query)
 }
 

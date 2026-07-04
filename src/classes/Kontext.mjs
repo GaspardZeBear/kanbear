@@ -24,7 +24,7 @@ class Kontext {
     static async loadConfig() {
         const config = await fetch('/kanbearConfig.json')
         Kontext.kanbearConfig = await config.json();
-        console.log(Kontext.kanbearConfig)
+        console.log("Kontext.loadConfig() ","/kanbearConfig.json", Kontext.kanbearConfig)
     }
     //--------------------------------------------------------------
     static async setProject(projectId) {
@@ -35,7 +35,7 @@ class Kontext {
         }
         //Kontext.currentProjectName=projectName[]
         //Kontext.currentProjectName=projectName
-        console.log("Kontext setProject() bulk ", Kontext.currentProjectId)
+        console.log("Kontext setProject()"," Kontext.currentProjectId ", Kontext.currentProjectId)
         await Kontext.loadKanbearJsonBulkData()
         console.log("Kontext setProject() after bulk ", Kontext.jsonBulkData)
         Kontext.currentProjectName = Kontext.jsonBulkData[projectId].name

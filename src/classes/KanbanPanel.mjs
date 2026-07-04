@@ -100,7 +100,7 @@ class KanbanPanel {
     //const projectLink = buildProjectLink(project.id, project.name)
 
     let orderedColumnsList = new Columns().getOrderedList()
-    console.log("KanbanPanel.buildKanbanDivsForProject() ",orderedColumnsList)
+    console.log("KanbanPanel.buildKanbanDivsForProject() ", orderedColumnsList)
     Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
       if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
       // create kanban-swimlane
@@ -135,7 +135,7 @@ class KanbanPanel {
       kSwimlaneColumnsDiv.classList.add("swimlane-columns")
 
       //Object.entries(project.columns).forEach(([tKey, col]) => {
-      orderedColumnsList.forEach( col => {
+      orderedColumnsList.forEach(col => {
         // create a kanban-column
         //console.log("buildkColumnsDivsForProject(project) col=", col)
         const kColumnDiv = document.createElement('div')
@@ -149,7 +149,7 @@ class KanbanPanel {
         const kColumnHeaderDiv = document.createElement('div')
         kColumnHeaderDiv.setAttribute("data-swimlane-id", swimlane.id)
         kColumnHeaderDiv.setAttribute("draggable", true)
-        const dragId = Ref.getRef('drag',project.id,swimlane.id, "_",col.id)
+        const dragId = Ref.getRef('drag', project.id, swimlane.id, "_", col.id)
         kColumnHeaderDiv.setAttribute("data-column-id", col.id)
         kColumnHeaderDiv.classList.add("kanban-column-header")
         kColumnHeaderDiv.addEventListener('dragstart', (ev) => {
@@ -171,8 +171,11 @@ class KanbanPanel {
 
         // fillin column header
         const columnLink = buildColumnLink(col.id, col.name)
+        const kColumnId = document.createElement('span')
+        kColumnId.innerHTML = `#${col.id}->#${col.nextColumnId} | `
         const kColumnHeaderDivH3 = document.createElement('h3')
         //kColumnHeaderDivH3.innerHTML = col.name
+        kColumnHeaderDivH3.appendChild(kColumnId)
         kColumnHeaderDivH3.appendChild(columnLink)
         const kCounterDiv = document.createElement('span')
         kCounterDiv.classList.add("kanban-count")
@@ -307,7 +310,7 @@ class KanbanPanel {
       //console.log("listener", zone)
       project = this.project
       zone.addEventListener('dragover', (ev) => {
-        console.log("dragover starting for column ", zone)
+        //console.log("dragover starting for column ", zone)
         //console.log("dragover", zone)
         ev.preventDefault()
         zone.classList.add("drag-over")
@@ -334,21 +337,7 @@ class KanbanPanel {
         //console.log("Drop", "column", project.columns[columnId])
         //console.log("Drop", "dropColumnId", project.columns[dropColumnId])
 
-        let colEntity=await KanbearEntityFactory.generate('column')
-        colEntity.setId(columnId)
-        let col=await colEntity.get('column',{})
-        let dropColEntity=await KanbearEntityFactory.generate('column')
-        dropColEntity.setId(dropColumnId)
-        let dropCol = await dropColEntity.get('column',{})
-
-        console.log("Drop", "col", col)
-        console.log("Drop", "dropCol", dropCol)
-        colEntity.setData("next_column_id",dropCol.next_column_id)
-        await colEntity.patch("columns",{})
-        dropColEntity.setData("next_column_id",columnId)
-        await dropColEntity.patch("columns",{})
-        sendEvent(`columnDragged`, { })
-        //let dropCol=new Column(dropColumnId)
+        await new Columns().drag(columnId,dropColumnId)
 
 
         //let taskElement = document.getElementById(data)
