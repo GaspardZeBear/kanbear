@@ -56,6 +56,7 @@ class Columns {
 
         let key = firstColumnId
         let prevColumnId = 0
+        
         for (let i = 0; columnsList.length; i++) {
             console.log("xxx", "columns[key]", columns[key])
             columns[key].prevColumnId = prevColumnId
@@ -110,40 +111,31 @@ class Columns {
             console.log("Drop", "col and dropCol identical")
             return
         }
-        //let colEntity = await KanbearEntityFactory.generate('column')
-        //colEntity.setId(columnId)
-        //let col = await colEntity.get('column', {})
-        //console.log("Columns.drag()", "col", col)
+
+  
+        // - - - - - - -
+        // Chain is currently  ...| col | colnext | ... | dropCol | dropColNext | ...
+        // dropColNext may not exist
+        // col must be inserted just after dropCol
+        // Chain will become   ...| colnext | ... | dropCol | col | dropColNext | ...
+        // - - - - - - - 
         let col = await this._getColumn("col", columnId)
-
-
-        //let colNextEntity = await KanbearEntityFactory.generate('column')
-        //colNextEntity.setId(col.next_column_id)
-        //let colNext = await colNextEntity.get('column', {})
-        //console.log("Columns.drag()", "colNext", colNext)
         let colNext = await this._getColumn("colNext", col.values.next_column_id)
-
-
-        //let dropColEntity = await KanbearEntityFactory.generate('column')
-        //dropColEntity.setId(dropColumnId)
-        //let dropCol = await dropColEntity.get('column', {})
-        //console.log("Columns.drag()", "dropCol", dropCol)
         let dropCol = await this._getColumn("colNext", dropColumnId)
-
-
-        //let dropColNextEntity = await KanbearEntityFactory.generate('column')
-        //dropColNextEntity.setId(dropColumnId.next_column_id)
-        //let dropColNext = await dropColNextEntity.get('column', {})
-        //console.log("Columns.drag()", "dropColNext", dropColNext)
-        let dropColNext = await this._getColumn("dropColNext", dropColumnId.next_column_id, true)
-
-        colNext.entity.setData("prev_column_id", col.values.prev_column_id)
+        let dropColNext = await this._getColumn("dropColNext", dropCol.values.next_column_id, true)
+        // Insert col between dropCol and dropColNext : ppint backward to dropCol, and forward to what dropCol pointed forward to
+        col.entity.setData("prev_column_id", dropColumnId)
         col.entity.setData("next_column_id", dropCol.values.next_column_id)
-        dropCol.entity.setData("next_column_id", col.values.id)
-        dropColNext.values ? dropColNext.entity.setData("prev_column_id", col.values.id) : 0
-        col.entity.setData("prev_column_id", dropCol.values.prev_column_id)
+        // colNext must point backward to what col was pointing backward to
+        // colNext forward pointer has not to be changed
+        colNext.entity.setData("prev_column_id", col.values.prev_column_id)
+        // dropCol must point forward to col
+        // dropCol backward pointer has not to be changed
+        dropCol.entity.setData("next_column_id", columnId)
+        // if there was a dropColNext, it must point backward to col
 
-
+        dropColNext.values ? dropColNext.entity.setData("prev_column_id", columnId) : 0
+        
         await col.entity.patch("columns", {})
         await colNext.entity.patch("columns", {})
         await dropCol.entity.patch("columns", {})

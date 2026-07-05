@@ -330,17 +330,7 @@ class KanbanPanel {
         //let columnId = target.getAttribute("data-column-id")
         let dropColumnDiv = ev.target.closest(".kanban-column")
         let dropColumnId = dropColumnDiv.getAttribute("data-column-id")
-        //console.log("Drop", "project", project)
-        //console.log("Drop", "zone", zone)
-        //console.log("Drop", "target", target)
-        //console.log("Drop", "dropColumnDiv", dropColumnDiv)
-        //console.log("Drop", "column", project.columns[columnId])
-        //console.log("Drop", "dropColumnId", project.columns[dropColumnId])
-
         await new Columns().drag(columnId,dropColumnId)
-
-
-        //let taskElement = document.getElementById(data)
       })
     })
 
