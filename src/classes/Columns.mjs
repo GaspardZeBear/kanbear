@@ -8,9 +8,19 @@ import { KanbearEntityFactory } from "./KanbearEntityFactory.mjs"
 class Columns {
 
     //------------------------------------------------------------------------
-    constructor() {
-        console.log("Columns constructor ")
-        this.buildOrderedList()
+    constructor(parms = {}) {
+        console.log("Columns constructor ", "columnsHash", parms)
+        this.columnsHash = parms.columnsHash
+        this.sortedColumnsList = parms.columnsList
+        if (parms.columnsHash) {
+            this.columnsHash = parms.columnsHash
+            this.columns = []
+            Object.entries(this.columnsHash).forEach(([key, col]) => {
+                this.columns.push(col)
+            })
+            console.log("Columns.buildOrderedList()", "Non-ordered columnList", this.columns)
+            this.buildOrderedList()
+        }
     }
 
     //------------------------------------------------------------------------
@@ -19,59 +29,63 @@ class Columns {
     }
 
     //------------------------------------------------------------------------
-    buildOrderedList() {
-        console.log("Columns. buildOrderedList()")
+    XXbuildOrderedList() {
         const projectId = Object.keys(Kontext.getJsonBulkData())[0]
-        let columnsList = []
-
-        let columnsHash = {}
-        Object.entries(Kontext.getJsonBulkData()[projectId].columns).forEach(([key, col]) => {
-            columnsList.push(col)
-            columnsHash[col.id] = true
-        })
-        console.log("Columns.buildOrdredList()", "Non-ordered", columnsList)
         this.sortedColumnsList = []
+        Object.entries(Kontext.getJsonBulkData()[projectId].columns).forEach(([key, col]) => {
+            this.sortedColumnsList.push(col)
+        })
+        //this.buildOrderedListN()
+    }
 
-        // columnist is a chain of columns
-        // columnHash keys are columnIds 
-        // nobody point to the first of chain
-        // So, if a pointer exists, remove the pointed col from columnHash
-        for (let col of columnsList) {
-            console.log("xxx", "columnsHash", Object.keys(columnsHash).length, columnsHash)
-            if (Object.keys(columnsHash).length == 1) {
-                break
-            }
-            if (col.nextColumnId in columnsHash && col.nextColumnId > 0) {
-                delete (columnsHash[col.nextColumnId])
-            }
-        };
-        console.log("xxx", "columnsHash final", columnsHash)
-        let firstColumnId = Object.keys(columnsHash)[0]
-
-
-        let columns = Kontext.getJsonBulkData()[projectId].columns
-
-        // let's establish a forward chain starting from first column
-        // and backward chain
-
-        let key = firstColumnId
-        let prevColumnId = 0
-        
-        for (let i = 0; columnsList.length; i++) {
-            console.log("xxx", "columns[key]", columns[key])
-            columns[key].prevColumnId = prevColumnId
-            this.sortedColumnsList.push(columns[key])
-            if (columns[key].nextColumnId > 0) {
-                key = columns[key].nextColumnId
-                prevColumnId = columns[key].id
-            } else {
-                break
+    //------------------------------------------------------------------------
+    buildOrderedList() {
+        try {
+            const firstColumn = this.columns.find(col => col.prevColumnId === 0);
+            if (!firstColumn) {
+                throw new Error("Not starting col found");
             }
 
+            const sortedColumnsList = [];
+            let currentCol = firstColumn;
+            let maxLoop = this.columns.length
+            let loops = 0
+            while (currentCol) {
+                sortedColumnsList.push(currentCol);
+                // Trouver le nœud suivant
+                console.log("Columns.buildOrderedList()", "currentCol", currentCol)
+                currentCol = this.columns.find(col => col.id === currentCol.nextColumnId);
+                loops++
+                if (loops > maxLoop) {
+                    console.log("Columns.buildOrderedList()", "excessive loop count")
+                    throw "excessive loop count"
+                }
+            }
+            this.sortedColumnsList = sortedColumnsList
+            console.log("Columns.buildOrderedList()", "over normally ", this.sortedColumnsList)
+        } catch (error) {
+            this.columns = []
+            console.log("Columns.buildOrderedList()", "error", error, "no ordered list")
+            Object.entries(this.columnsHash).forEach(([key, col]) => {
+                this.columns.push(col)
+            })
+            this.sortedColumnsList = this.columns
         }
-        console.log("xxx", "first", firstColumnId)
-        console.log("Columns.buildOrdredList()", "ordered", this.sortedColumnsList)
-        //this.columns = await Column.getAll('columns', {projectId:projectId})
+    }
+
+    //------------------------------------------------------------------------
+    chainFromScratch(index) {
+        let columns = Kontext.getJsonBulkData()[projectId].columns
+        console.log("Columns.chainFromScratch()", "ordered", columns)
+        let prevIndex = 0
+        columns[0].prevColumnId = 0
+        for (let i = 1; i < columns.length; i++) {
+            columns[prevIndex].nextColumnId = columns[i].id
+            columns[i].prevColumnId = columns[prevIndex].id
+            prevIndex++
+        }
+        columns[columns.length].nextColumnId = 0
+        this.sortedColumnsList = []
     }
 
     //------------------------------------------------------------------------
@@ -96,9 +110,9 @@ class Columns {
             return (result)
         } catch (error) {
             if (mayFail) {
-                return(result)
+                return (result)
             } else {
-                throw(error)
+                throw (error)
             }
         };
 
@@ -112,7 +126,7 @@ class Columns {
             return
         }
 
-  
+
         // - - - - - - -
         // Chain is currently  ...| col | colnext | ... | dropCol | dropColNext | ...
         // dropColNext may not exist
@@ -121,7 +135,7 @@ class Columns {
         // - - - - - - - 
         let col = await this._getColumn("col", columnId)
         let colNext = await this._getColumn("colNext", col.values.next_column_id)
-        let dropCol = await this._getColumn("colNext", dropColumnId)
+        let dropCol = await this._getColumn("dropCol", dropColumnId)
         let dropColNext = await this._getColumn("dropColNext", dropCol.values.next_column_id, true)
         // Insert col between dropCol and dropColNext : ppint backward to dropCol, and forward to what dropCol pointed forward to
         col.entity.setData("prev_column_id", dropColumnId)
@@ -135,7 +149,7 @@ class Columns {
         // if there was a dropColNext, it must point backward to col
 
         dropColNext.values ? dropColNext.entity.setData("prev_column_id", columnId) : 0
-        
+
         await col.entity.patch("columns", {})
         await colNext.entity.patch("columns", {})
         await dropCol.entity.patch("columns", {})

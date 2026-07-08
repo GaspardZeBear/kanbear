@@ -3,6 +3,7 @@ import { KanbanPanel } from './KanbanPanel.mjs'
 import { KanbearListPanel } from "./KanbearListPanel.mjs"
 import { sendMessage, sendErrorMessage } from '../utils/sendMessage.mjs'
 import { getOpenCloseSymbol, getOpenCloseQueryParms } from '../utils/openClose.mjs'
+import { Columns } from './Columns.mjs'
 import axios from 'axios';
 
 class Kontext {
@@ -18,6 +19,7 @@ class Kontext {
     static workspaceId
     static workspaceName
     static panelClass
+    static orderedColumnsList
 
 
     //--------------------------------------------------------------
@@ -39,6 +41,7 @@ class Kontext {
         await Kontext.loadKanbearJsonBulkData()
         console.log("Kontext setProject() after bulk ", Kontext.jsonBulkData)
         Kontext.currentProjectName = Kontext.jsonBulkData[projectId].name
+        //Kontext.orderedColumnsIds = Kontext.jsonBulkData[projectId].columnsOrdered
         //await Kontext.loadKanboardJsonBulkData()
     }
 
@@ -77,6 +80,12 @@ class Kontext {
     static getCurrentProjectId() {
         console.log("Kontext getCurrentProjectId() ", Kontext.currentProjectId)
         return (Kontext.currentProjectId)
+    }
+
+    //--------------------------------------------------------------
+    static getOrderedColumnsList() {
+        console.log("Kontext getOrderedColumnsList()")
+        return (Kontext.orderedColumnsList)
     }
 
     //--------------------------------------------------------------
@@ -161,7 +170,11 @@ class Kontext {
             }
             //const resp = await response.json();
             const resp = await response.data;
-            console.log("Kontext.loadKanbearJsonBulkData() from updated loaded", resp)
+            console.log("Kontext.loadKanbearJsonBulkData() from updated loaded", "resp.keys()", Object.keys(resp))
+            const key=Object.keys(resp)[0]
+            const bulk=resp[key]
+            console.log("Kontext.loadKanbearJsonBulkData() from updated loaded", "", bulk)
+            bulk.jsonColumnsOrder=JSON.parse(bulk.columnsOrder)
             if (parms.useKontext) {
                 Kontext.jsonBulkData = resp
             }

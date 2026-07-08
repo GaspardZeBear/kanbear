@@ -27,6 +27,12 @@ class KanbanPanel {
       console.log("KanbanPanel.constructor() ", Kontext.getJsonBulkData())
       this.project = Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()]
     }
+    this.orderedColumnsList = []
+    console.log("KanbanPanel.constructor", "columnsOrder", this.project.jsonColumnsOrder)
+    for (let colId of this.project.jsonColumnsOrder) {
+      this.orderedColumnsList.push(this.project.columns[colId])
+    }
+    //console.log("KanbanPanel.constructor() orderedColumnsList", this.orderedColumnsList)
     this.htmlElement = 'results'
     this.kanboardFilter = new KanboardFilter(getFiltersMap())
     this.buttons = {}
@@ -92,15 +98,15 @@ class KanbanPanel {
 
   //----------------------------------------------------------------------------------------
   buildKanbanDivsForProject(project) {
-    console.log("buildKanbanDivsForProject", project)
+    console.log("buildKanbanDivsForProject", "this", this, "project", project)
     const kanbanDiv = document.createElement('div')
     kanbanDiv.classList.add("kanban-board")
     kanbanDiv.setAttribute("id", project.id)
     kanbanDiv.setAttribute("data-projectid", project.id)
     //const projectLink = buildProjectLink(project.id, project.name)
 
-    let orderedColumnsList = new Columns().getOrderedList()
-    console.log("KanbanPanel.buildKanbanDivsForProject() ", orderedColumnsList)
+
+    //console.log("KanbanPanel.buildKanbanDivsForProject() ", orderedColumnsList)
     Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
       if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
       // create kanban-swimlane
@@ -135,7 +141,8 @@ class KanbanPanel {
       kSwimlaneColumnsDiv.classList.add("swimlane-columns")
 
       //Object.entries(project.columns).forEach(([tKey, col]) => {
-      orderedColumnsList.forEach(col => {
+      this.orderedColumnsList.forEach(col => {
+        console.log("KanbanPanelbuildKanbanDivsForProject() ", "col", col)
         // create a kanban-column
         //console.log("buildkColumnsDivsForProject(project) col=", col)
         const kColumnDiv = document.createElement('div')
@@ -172,7 +179,7 @@ class KanbanPanel {
         // fillin column header
         const columnLink = buildColumnLink(col.id, col.name)
         const kColumnId = document.createElement('span')
-        kColumnId.innerHTML = `#${col.id}->#${col.nextColumnId} | `
+        kColumnId.innerHTML = `#${col.id}| #${col.prevColumnId}<->#${col.nextColumnId} | `
         const kColumnHeaderDivH3 = document.createElement('h3')
         //kColumnHeaderDivH3.innerHTML = col.name
         kColumnHeaderDivH3.appendChild(kColumnId)
@@ -330,7 +337,14 @@ class KanbanPanel {
         //let columnId = target.getAttribute("data-column-id")
         let dropColumnDiv = ev.target.closest(".kanban-column")
         let dropColumnId = dropColumnDiv.getAttribute("data-column-id")
-        await new Columns().drag(columnId,dropColumnId)
+
+        let projectEntity = await KanbearEntityFactory.generate('project')
+        projectEntity.setId(project.id)
+        const project0 = await projectEntity.get('project', {})
+        console.log("KanbanPanel.drag", project0, projectEntity)
+        await projectEntity.dragColumn(project0.columns_order, parseInt(columnId), parseInt(dropColumnId))
+        sendEvent(`columnDragged`, { columnId: columnId })
+        //await new Columns({columnsList:this.orderedColumnsList}).drag(columnId,dropColumnId)
       })
     })
 

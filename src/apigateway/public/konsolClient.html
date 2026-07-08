@@ -58,6 +58,11 @@
         }
 
         //---------------------------------------------------------------------------------------
+        function dump() {
+            sendMessage({ type: "cmd", value: "toggleDump" })
+        }
+
+        //---------------------------------------------------------------------------------------
         function getFieldDisplayLength() {
             return (fieldDisplayLength)
         }
@@ -257,6 +262,8 @@
             mergeFields : <input type="checkbox" id="mergeFields" checked />
             <br /><input type="button" value="setLocalParms" onclick="setLocalParms()" />
         </form>
+
+        <input type="button" value="Dump" onclick="dump()" />
 
         <input type="button" value="Status" onclick="status()" />
         <input type="button" value="StackTrace on/off" onclick="toggleStackTrace()" />

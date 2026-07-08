@@ -60,6 +60,7 @@ class KanbearSqlReporter {
 	      p.name pName,
         p.description pDescription,
         p.is_open pIsOpen,
+        p.columns_order pColumnsOrder,
         s.id sId,
 	      s.name sName,
         s.description sDescription,
@@ -191,6 +192,7 @@ class KanbearSqlReporter {
         projectsMap[row.pId].id = row.pId
         projectsMap[row.pId].is_open = row.pIsOpen
         projectsMap[row.pId].description = row.pDescription
+        projectsMap[row.pId].columnsOrder = row.pColumnsOrder
         projectsMap[row.pId].swimlanes = {}
         projectsMap[row.pId].columns = {}
         projectsMap[row.pId].tags = {}

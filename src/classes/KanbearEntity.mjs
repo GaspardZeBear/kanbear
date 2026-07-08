@@ -97,7 +97,7 @@ class KanbearEntity {
     //-------------------------------------------------------------------------------
     async patch(kind, params) {
         const data = {}
-        console.log("KanbearEntity.patch()","<this.data>",this.data)
+        console.log("KanbearEntity.patch()","<kind>",this.kind,"<id>",this.id,"<this.data>",this.data)
         Object.entries(this.data).forEach(([key, val]) => {
             val ? data[key] = val : 1
         })

@@ -15,9 +15,9 @@ import {db } from './config/database.mjs'
     CREATE TABLE IF NOT EXISTS columns (
       id INTEGER PRIMARY KEY,
       name TEXT NOT NULL,
-      position INTEGER,
       project_id INTEGER NOT NULL DEFAULT 0,
       color TEXT DEFAULT 'white',
+      position INTEGER default 0,
       description TEXT,
       prev_column_id INTEGER DEFAULT 0,
       next_column_id INTEGER DEFAULT 0,
@@ -32,6 +32,7 @@ import {db } from './config/database.mjs'
       name TEXT NOCASE NOT NULL,
       description TEXT,
       workspace_id INTEGER NOT NULL DEFAULT 0,
+      columns_order TEXT DEFAULT '[]',
       is_open INTEGER DEFAULT 1,
       FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE SET DEFAULT,
       UNIQUE (name, id)
