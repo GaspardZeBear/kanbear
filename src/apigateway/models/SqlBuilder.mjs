@@ -1,4 +1,6 @@
-import { Konsol } from "../classes/Konsol.mjs"
+//import { Konsol } from "../classes/Konsol.mjs"
+
+import { Konsol } from "konsol"
 class SqlBuilder {
 
     //----------------------------------------------------------------------------------

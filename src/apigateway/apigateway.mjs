@@ -28,10 +28,16 @@ import taskHasTagRoutes from './routes/taskHasTags.mjs'
 import taskCommentRoutes from './routes/taskComments.mjs'
 import { KanbearSqlReporter } from './classes/KanbearSqlReporter.mjs';
 //import { createServer } from 'vite';
+/*
 import { createServer } from 'http';
 import { KonsolServer} from './classes/KonsolServer.mjs';
 import { KonsolClient} from './classes/KonsolClient.mjs';
 import { Konsol} from './classes/Konsol.mjs';
+*/
+import { Konsol} from 'konsol';
+import { Logger} from 'konsol';
+import { Server} from 'konsol';
+
 
 
 app.use(express.static('public'))
@@ -80,12 +86,21 @@ const PORT = process.env.PORT || 3002;
 const server = app.listen(PORT, () => {
   console.log(`Serveur http démarré sur le port ${PORT}`);
 });
+
+/*
 KonsolServer.init(server,{
       //port: 3003,
       noServer: true,
       clientTracking: true
     })
 KonsolClient.init('apigateway',`ws://localhost:${PORT}/logger`)
+*/
+Server.init(server,{
+      //port: 3003,
+      noServer: true,
+      clientTracking: true
+    })
+Logger.init('apigateway',`ws://localhost:${PORT}/logger`)
 
 
 

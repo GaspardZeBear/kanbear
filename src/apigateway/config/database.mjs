@@ -3,7 +3,8 @@ import Database from 'better-sqlite3';
 import path from 'path'
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { Konsol } from '../classes/Konsol.mjs'
+//import { Konsol } from '../classes/Konsol.mjs'
+import { Konsol } from 'konsol'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

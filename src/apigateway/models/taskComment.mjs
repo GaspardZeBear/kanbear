@@ -1,4 +1,4 @@
-import { Konsol } from '../classes/Konsol.mjs';
+import { Konsol } from 'konsol';
 import { db } from '../config/database.mjs'
 
 class TaskComment {

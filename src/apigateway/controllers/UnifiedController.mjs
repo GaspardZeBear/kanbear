@@ -1,5 +1,6 @@
 import { UnifiedModel } from '../models/UnifiedModel.mjs'
-import { Konsol } from '../classes/Konsol.mjs'
+//import { Konsol } from '../classes/Konsol.mjs'
+import { Konsol } from 'konsol'
 
 //------------------------------------------------------------------------
 // Class to avoid having lots of individual controllers that have the same look
