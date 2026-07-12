@@ -1,7 +1,8 @@
 // kanboardReporter.js
 //const axios = require('axios');
 //import { KanboardRPC } from '../classes/KanboardRPC.mjs';
-import { Konsol } from './Konsol.mjs'
+//import { Konsol } from './Konsol.mjs'
+import { Konsol } from 'konsol'
 import { db } from '../config/database.mjs';
 
 class KanbearSqlReporter {
