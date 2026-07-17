@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Kontext } from './Kontext.mjs';
 import { sendEvent } from '../utils/sendEvent.mjs';
+import { AxiosInstance } from './AxiosInstance.mjs';
 
 axios.defaults.timeout = 3000;
 const apiUrl = 'http://A6.mshome.net:3002'
@@ -20,6 +21,8 @@ class ApiCaller {
         axios.defaults.headers.common['Authorization'] = `Bearer loulou`;
         axios.defaults.headers.common['ZeBear'] = "gzb";
         this.headerArray = []
+        let ax=new AxiosInstance(this.kanbearUrl)
+        this.axiosInstance=ax.getInstance()
     }
 
     //-----------------------------------------------------------------
@@ -62,7 +65,8 @@ class ApiCaller {
         console.log("ApiCaller.get() url ", await this.url(uri), { params: params })
         try {
             console.log("ApiCaller.get() before");
-            const res = await axios.get(await this.url(uri), { headers : { Authorization : "gzb"} , params: params });
+            //const res = await axios.get(await this.url(uri), { headers : { Authorization : "gzb"} , params: params });
+            const res = await this.axiosInstance.get(await this.url(uri), { headers : { Authorization : "gzb"} , params: params });
             console.log("ApiCaller.get() <res.status>", res.status); // Status Code
             return (res)
         } catch (error) {

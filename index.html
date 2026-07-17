@@ -43,16 +43,24 @@
                             <li><span id="migrateFromKanboard">Migrate</span></li>
                         </ul>
                     </li>
+                    <li class="dropdown"><a href="#">Login</a>
+                        <ul class="under">
+                            <li><a href="#" id="loginPanel">login</a></li>
+                            <li><a href="#" id="logoutPanel">logout</a></li>
+                        </ul>
+                    </li>
                     <li class="dropdown"><a href="#">Contact</a>
                         <ul class="under">
                             <li><a href="#">gaspardzebear@hotmail.fr</a></li>
                         </ul>
                     </li>
+                    <!--
                     <li class="dropdown"><a href="#">About</a>
                         <ul class="under">
                             <li><a href="#">Kanbear, powered by Gzb Ltd.</a></li>
                         </ul>
                     </li>
+                -->
                 </ul>
             </nav>
         </div>
@@ -210,6 +218,23 @@
             </div>
             <button type="button" value="save" name="saveAssigneeBtn" id="saveAssigneeBtn">Save</button>
             <button type="button" value="cancel" name="cancelAssigneeBtn" id="cancelAssigneeBtn">Cancel</button>
+        </form>
+    </dialog>
+
+    <dialog id="loginDialog">
+        <h2 id="loginDialogTitle"></h2>
+        <div id="loginDialogMessage"></div>
+        <form id="loginForm" method="dialog">
+            <div id="loginNameDiv">
+                <label for="name">User</label>
+                <input type="text" id="loginName" name="loginName" />
+            </div>
+            <div id="loginPasswordDiv">
+                <label for="password">Password: </label>
+                <input type="text" id="loginPassword" name="loginPassword" />
+            </div>
+            <button type="button" value="submit" name="submitLoginBtn" id="submitLoginBtn">Submite</button>
+            <button type="button" value="cancel" name="cancelLoginBtn" id="cancelLoginBtn">Cancel</button>
         </form>
     </dialog>
 

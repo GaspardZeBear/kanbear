@@ -4,13 +4,13 @@ class KanbearEntity {
 
     // Translate entity kin to api route
     // !! Beware, an 's' char ist added by POST, PUT etc .... so remove it from translation
-    static apiTablesMap = {"tasksComments":"tasks_comment"}
+    static apiTablesMap = { "tasksComments": "tasks_comment" }
     //------------------------------------------------------------------------
     constructor(kind, from = {}) {
         console.log("KanbearEntity.constructor() <kind>", kind, "<from>", from)
         this.kind = kind
-        if ( KanbearEntity.apiTablesMap[kind] ) {
-            this.kind=KanbearEntity.apiTablesMap[kind]
+        if (KanbearEntity.apiTablesMap[kind]) {
+            this.kind = KanbearEntity.apiTablesMap[kind]
         }
         this.data = {} // will contain attributes to create or patch 
         this.fromDb = {} // conatains raw retried from db 
@@ -81,30 +81,35 @@ class KanbearEntity {
 
     //-------------------------------------------------------------------------------
     static async getAll(kind, params) {
-        const resp = await new ApiCaller().get(`/api/${kind}`, params)
-        console.log("KanbearEntity.getAll()", "<kind>", kind, "<data>", resp.data)
-        return(resp.data)
+        try {
+            const resp = await new ApiCaller().get(`/api/${kind}`, params)
+            console.log("KanbearEntity.getAll()", "<kind>", kind, "<data>", resp.data)
+            return (resp.data)
+        } catch (error) {
+            console.log("KanbearEntity.getAll() <error>", error)
+            throw error
+        }
     }
 
     //-------------------------------------------------------------------------------
     async get(kind, params) {
         const resp = await new ApiCaller().get(`/api/${this.kind}s/${this.id}`, params)
-        console.log("KanbearEntity.get()","<resp.data>", resp.data)
-        this.fromDb=resp.data
-        return(resp.data)
+        console.log("KanbearEntity.get()", "<resp.data>", resp.data)
+        this.fromDb = resp.data
+        return (resp.data)
     }
 
     //-------------------------------------------------------------------------------
     async patch(kind, params) {
         const data = {}
-        console.log("KanbearEntity.patch()","<kind>",this.kind,"<id>",this.id,"<this.data>",this.data)
+        console.log("KanbearEntity.patch()", "<kind>", this.kind, "<id>", this.id, "<this.data>", this.data)
         Object.entries(this.data).forEach(([key, val]) => {
             val ? data[key] = val : 1
         })
-        console.log("KanbearEntity.patch() effective <data>",data)
+        console.log("KanbearEntity.patch() effective <data>", data)
         // !!!! send this.data and noot data (not useful) ??????????
         const resp = await new ApiCaller().patch(`/api/${this.kind}s/${this.id}`, this.data)
-        console.log("KanbearEntity.patch()", "<resp.data>",resp.data)
+        console.log("KanbearEntity.patch()", "<resp.data>", resp.data)
         await this.postPatch(this.data)
         return (resp.data)
     }
@@ -120,8 +125,8 @@ class KanbearEntity {
         Object.entries(this.data).forEach(([key, val]) => {
             val ? data[key] = val : 1
         })
-        console.log("KanbearEntity.delete()","<kind>", this.kind, "<id>", this.id, "<data>", data)
-        const resp=await new ApiCaller().erase(`/api/${this.kind}s/${this.id}`, data)
+        console.log("KanbearEntity.delete()", "<kind>", this.kind, "<id>", this.id, "<data>", data)
+        const resp = await new ApiCaller().erase(`/api/${this.kind}s/${this.id}`, data)
         console.log("KanbearEntity.delete() <resp>", resp)
         return (resp.data)
     }

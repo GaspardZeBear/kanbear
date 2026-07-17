@@ -3,7 +3,6 @@ import { assigneeController } from '../controllers/assignees.mjs';
 import { UnifiedController } from '../controllers/UnifiedController.mjs';
 const router = express.Router();
 
-
 //router.post('/', assigneeController.createAssignee);
 router.post('/', UnifiedController.getFunction('assignees','create'))
 //router.get('/', assigneeController.getAllAssignees);

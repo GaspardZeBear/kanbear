@@ -37,11 +37,15 @@ import { Konsol} from './classes/Konsol.mjs';
 import { Konsol} from 'konsol';
 import { Logger} from 'konsol';
 import { Server} from 'konsol';
+import { controlAccessRights } from './middlewares/AccessRights.mjs';
 
 
 
 app.use(express.static('public'))
 // Crud api
+
+app.use ((req,res,next) => controlAccessRights(req,res,next))
+
 app.use('/api/assignees', assigneeRoutes);
 app.use('/api/columns', columnRoutes);
 app.use('/api/swimlanes', swimlaneRoutes);
@@ -56,16 +60,12 @@ app.use('/api/tasks_comments', taskCommentRoutes);
 
 //------------------------------------------------------------------------------
 app.get('/api/sql/report/:projectId', 
-    (req, res, next) => {
-    console.log("apigateway ",req.headers) 
-    next();
-    // otherwise pass the control to the next middleware function in this stack
-    },async (req, res) => {
+  async (req, res) => {
   const projectId = parseInt(req.params.projectId)
   //console.log("--------------------------------------------------------------------------------------------")
-  Konsol.log("/api/sql/report params", req.params)
-  Konsol.log("/api/sql/report body", req.body)
-  Konsol.log("/api/sql/report query", req.query)
+  //Konsol.log("/api/sql/report params", req.params)
+  //Konsol.log("/api/sql/report body", req.body)
+  //Konsol.log("/api/sql/report query", req.query)
   //console.log("--------------------------------------------------------------------------------------------")
 
   console.log("/api/sql/report invokated pId", projectId)
