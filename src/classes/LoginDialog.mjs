@@ -1,17 +1,15 @@
 import { sendEvent } from '../utils/sendEvent.mjs'
+import { ApiCaller } from './ApiCaller.mjs'
 
 class LoginDialog {
 
     constructor(dialogName) {
-        //super('login')
         this.dialogName = dialogName
          this.dialog = document.getElementById("loginDialog")
-        //this.user = null
     }
 
     //----------------------------------------------------------------------------
     async create(params={}) {
-        //this.workspaceId = workspaceId
         this.params=params
         this.createDialog()
         this.dialog.showModal();
@@ -23,10 +21,21 @@ class LoginDialog {
         try {
             //this.closeDialog()
             //let eventId=`LoId`
+            // Here call /login !!!!!!!!!!!!!!!!!!!!!!!!!
+            // if success, save JWT token
             //sendEvent(`LoginDone`, { [eventId] : entity.getId() })
-            console.log("LoginDialog.save() <sendEvent>")
+            //let userName=loginForm.userName.value
+            //let userPassword=loginForm.userPassword.value
+            let params = {
+                userName:loginForm.loginName.value,
+                userPassword:loginForm.loginPassword.value
+            }
+            const resp = await new ApiCaller().post(`/api/login`, params)
+            console.log("LoginDialog submit()","resp token",resp.data.token)
         } catch (error) {
-            console.log("LoginDialog.save() <error>",error)
+            console.log("LoginDialog.submit() <error>",error)
+        } finally {
+
         }
     }
 
@@ -34,13 +43,8 @@ class LoginDialog {
     //----------------------------------------------------------------------------
     createDialog() {
         console.log("LoginDialog.createDialog() ")
-       
-        let dialog = this.dialog
-        dialog.setAttribute("closedby","none")
+        this.dialog.setAttribute("closedby","none")
         let close = this.closeDialog.bind(this)
-        //let save = this.save.bind(this)
-
-        //document.getElementById("projectNameDiv").setAttribute("hidden","")
         let submitBtnId="submitLoginBtn"
         let submit=this.submit
         let submitFn=async function (event) {
@@ -49,8 +53,6 @@ class LoginDialog {
         }
         console.log("Dialog.createDialog <saveBtn>",document.getElementById(submitBtnId))
         document.getElementById(submitBtnId).addEventListener("click", submitFn, {once: true});
-        //document.getElementById(saveBtnId).addEventListener("mouseover", () => {console.log("Mouseover")});
-
         let cancelBtnId="cancelLoginBtn"
         let cancel = this.cancelDialog.bind(this)
         let cancelFn=function (event) {

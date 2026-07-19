@@ -2,6 +2,7 @@ import { db } from '../config/database.mjs'
 import { SqlBuilder } from './SqlBuilder.mjs'
 //import { Konsol } from '../classes/Konsol.mjs'
 import { Konsol } from 'konsol'
+import bcrypt from 'bcrypt'
 
 class UnifiedModel {
 
@@ -20,6 +21,7 @@ class UnifiedModel {
     static UnifiedModelOp = {}
     static {
         UnifiedModel.UnifiedModelOp['create'] = UnifiedModel.create
+        UnifiedModel.UnifiedModelOp['hashAndCreateUser'] = UnifiedModel.hashAndCreateUser
         UnifiedModel.UnifiedModelOp['getAll'] = UnifiedModel.getAll
         UnifiedModel.UnifiedModelOp['getById'] = UnifiedModel.getById
         UnifiedModel.UnifiedModelOp['getByForeignKey'] = UnifiedModel.getByForeignKey
@@ -33,6 +35,19 @@ class UnifiedModel {
         const { sql, bindVariables } = new SqlBuilder().generateCreateStatement(table, req.body)
         db.run(sql, bindVariables, (res, httpCode) => {
             Konsol.log("UnifiedModel.create(), will call callback","<res>", res)
+            //res.lastInsertRowid ? callback(null, 201,res.lastInsertRowid) : callback(res, null)
+            res.lastInsertRowid ? callback(null, 201,res) : callback(res, 500, null)
+        });
+    }
+
+    //------------------------------------------------------------------
+    static hashAndCreateUser(table, req, opParms, callback) {
+         Konsol.log("UnifiedModel.hashAndCreateUser()","<passwd>", req.body.password)
+        const hashedPassword=bcrypt.hashSync(req.body.password,10)
+        req.body.password=hashedPassword
+        const { sql, bindVariables } = new SqlBuilder().generateCreateStatement(table, req.body)
+        db.run(sql, bindVariables, (res, httpCode) => {
+            Konsol.log("UnifiedModel.hashAndCreateUser(), will call callback","<res>", res)
             //res.lastInsertRowid ? callback(null, 201,res.lastInsertRowid) : callback(res, null)
             res.lastInsertRowid ? callback(null, 201,res) : callback(res, 500, null)
         });

@@ -5,7 +5,8 @@ import { UnifiedController } from '../controllers/UnifiedController.mjs';
 
 
 //router.post('/', userController.createUser);
-router.post('/', UnifiedController.getFunction('users','create'))
+//router.post('/', UnifiedController.getFunction('users','create'))
+router.post('/', UnifiedController.getFunction('users','hashAndCreateUser'))
 //router.get('/', userController.getAllUsers);
 router.get('/', UnifiedController.getFunction('users','getAll'))
 //router.get('/:id', userController.getUserById);

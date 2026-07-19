@@ -5,6 +5,7 @@ import cors from 'cors';
 import { db } from './config/database.mjs';
 import { WebSocketServer } from 'ws';
 
+
 // Initialiser l'application Express
 const app = express();
 
@@ -27,6 +28,7 @@ import projectUserRoutes from './routes/projectUsers.mjs'
 import taskHasTagRoutes from './routes/taskHasTags.mjs'
 import taskCommentRoutes from './routes/taskComments.mjs'
 import { KanbearSqlReporter } from './classes/KanbearSqlReporter.mjs';
+import { KanbearLogin } from './classes/KanbearLogin.mjs';
 //import { createServer } from 'vite';
 /*
 import { createServer } from 'http';
@@ -34,9 +36,9 @@ import { KonsolServer} from './classes/KonsolServer.mjs';
 import { KonsolClient} from './classes/KonsolClient.mjs';
 import { Konsol} from './classes/Konsol.mjs';
 */
-import { Konsol} from 'konsol';
-import { Logger} from 'konsol';
-import { Server} from 'konsol';
+import { Konsol } from 'konsol';
+import { Logger } from 'konsol';
+import { Server } from 'konsol';
 import { controlAccessRights } from './middlewares/AccessRights.mjs';
 
 
@@ -44,7 +46,7 @@ import { controlAccessRights } from './middlewares/AccessRights.mjs';
 app.use(express.static('public'))
 // Crud api
 
-app.use ((req,res,next) => controlAccessRights(req,res,next))
+//app.use ((req,res,next) => controlAccessRights(req,res,next))
 
 app.use('/api/assignees', assigneeRoutes);
 app.use('/api/columns', columnRoutes);
@@ -59,27 +61,41 @@ app.use('/api/task_has_tags', taskHasTagRoutes);
 app.use('/api/tasks_comments', taskCommentRoutes);
 
 //------------------------------------------------------------------------------
-app.get('/api/sql/report/:projectId', 
+app.get('/api/sql/report/:projectId',
   async (req, res) => {
-  const projectId = parseInt(req.params.projectId)
-  //console.log("--------------------------------------------------------------------------------------------")
-  //Konsol.log("/api/sql/report params", req.params)
-  //Konsol.log("/api/sql/report body", req.body)
-  //Konsol.log("/api/sql/report query", req.query)
-  //console.log("--------------------------------------------------------------------------------------------")
+    const projectId = parseInt(req.params.projectId)
+    //console.log("--------------------------------------------------------------------------------------------")
+    //Konsol.log("/api/sql/report params", req.params)
+    //Konsol.log("/api/sql/report body", req.body)
+    //Konsol.log("/api/sql/report query", req.query)
+    //console.log("--------------------------------------------------------------------------------------------")
 
-  console.log("/api/sql/report invokated pId", projectId)
-  try {
-    const sqlReporter = new KanbearSqlReporter(false)
-    const report = await sqlReporter.getJsonReport(projectId, req.query);
-    Konsol.log("api.get() ", report)
-    res.json(report);
-  } catch (error) {
-    console.log("/api/sql/report error ", error.message)
-    res.status(500).json({ error: error.message });
-  }
-  //console.log("/api/sql/report done")
-});
+    console.log("/api/sql/report invokated pId", projectId)
+    try {
+      const sqlReporter = new KanbearSqlReporter(false)
+      const report = await sqlReporter.getJsonReport(projectId, req.query);
+      Konsol.log("api.get() ", report)
+      res.json(report);
+    } catch (error) {
+      console.log("/api/sql/report error ", error.message)
+      res.status(500).json({ error: error.message });
+    }
+    //console.log("/api/sql/report done")
+  });
+
+//------------------------------------------------------------------------------
+app.post('/api/login',
+  async (req, res) => {
+    Konsol.log("apigateway login", req.body)
+    try {
+      let login = new KanbearLogin({ userName: req.body.userName, userPassword: req.body.userPassword })
+      const token = await login.check()
+      res.status(200).json({ message: 'Logged in', token });
+    } catch (error) {
+      console.log("/api/login error ", error.message)
+      res.status(500).json({ error: error.message });
+    }
+  })
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 3002;
@@ -95,12 +111,12 @@ KonsolServer.init(server,{
     })
 KonsolClient.init('apigateway',`ws://localhost:${PORT}/logger`)
 */
-Server.init(server,{
-      //port: 3003,
-      noServer: true,
-      clientTracking: true
-    })
-Logger.init('apigateway',`ws://localhost:${PORT}/logger`)
+Server.init(server, {
+  //port: 3003,
+  noServer: true,
+  clientTracking: true
+})
+Logger.init('apigateway', `ws://localhost:${PORT}/logger`)
 
 
 

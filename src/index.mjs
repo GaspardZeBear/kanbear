@@ -273,7 +273,7 @@ async function buildKanbearProjectsSelectBox() {
 
 //---------------------------------------------------------------------------------
 async function buildWorkspacesSelectBox() {
-    let wss0 = []
+    let wss0 
     let wss = []
 
     let retries = 10
@@ -296,9 +296,9 @@ async function buildWorkspacesSelectBox() {
     }
     document.getElementById("message").innerHTML = "Ready"
 
-    if (wss.length == 0) {
-        alert("Could not initialize, are you logged in ?")
-    }
+    //if (wss.length == 0) {
+    //    alert("Could not initialize, are you logged in ?")
+    //}
 
     wss = wss0
 
