@@ -46,7 +46,7 @@ import { controlAccessRights } from './middlewares/AccessRights.mjs';
 app.use(express.static('public'))
 // Crud api
 
-//app.use ((req,res,next) => controlAccessRights(req,res,next))
+app.use ((req,res,next) => controlAccessRights(req,res,next))
 
 app.use('/api/assignees', assigneeRoutes);
 app.use('/api/columns', columnRoutes);
@@ -89,11 +89,12 @@ app.post('/api/login',
     Konsol.log("apigateway login", req.body)
     try {
       let login = new KanbearLogin({ userName: req.body.userName, userPassword: req.body.userPassword })
-      const token = await login.check()
-      res.status(200).json({ message: 'Logged in', token });
+      const check = await login.check()
+
+      res.status(200).json({ message: 'Logged in', token:check.token, userId:check.userId });
     } catch (error) {
       console.log("/api/login error ", error.message)
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.cause });
     }
   })
 

@@ -1,8 +1,13 @@
 import express from 'express'
+import { Konsol } from 'konsol'
 const router = express.Router();
-import { workspaceController } from '../controllers/workspaces.mjs'
+//import { workspaceController } from '../controllers/workspaces.mjs'
 import { UnifiedController } from '../controllers/UnifiedController.mjs';
-
+console.log("workspaces route")
+router.all('*',(req,res,next)=>{
+    console.log("workspace router.All()")
+    next()
+})
 //router.post('/', workspaceController.createWorkspace);
 router.post('/', UnifiedController.getFunction('workspaces','create'))
 //router.get('/', workspaceController.getAllWorkspaces);

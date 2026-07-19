@@ -9,7 +9,6 @@ import bcrypt from 'bcrypt'
 
 class KanbearLogin {
 
-  // PCST mean Projet, Swimlane, Column, Task !!!!!
   constructor(params) {
     Konsol.log("KanbearLogin.constructor()", "params", params)
     //this.db = new DatabaseSync('db.sqlite', { readonly: true });
@@ -22,7 +21,8 @@ class KanbearLogin {
   async selectUser() {
     Konsol.log("KanbearLogin.selectUser()")
     let req = `
-      select  
+      select
+        id uId,  
         name uName,
         password uPassword
       from 
@@ -36,28 +36,36 @@ class KanbearLogin {
 
   //--------------------------------------------------------
   callAfterUser(err, httpCode, params) {
-    Konsol.log("KanbearLogin.callAfterUser() <PSTResp>", params)
-    this.UserResp = params
+    Konsol.log("KanbearLogin.callAfterUser() ", params)
+    this.userResp = params
     //return (params)
   }
 
   //-----------------------------------------------------
   async check() {
     await this.selectUser()
-    Konsol.log("KanbearLogin.check() ", "resp", this.UserResp)
-    Konsol.log("KanbearLogin.check()"," this.userPassword",this.userPassword, bcrypt.hashSync(this.userPassword,10))
-    Konsol.log("KanbearLogin.check()"," this.userPassword async",this.userPassword, await bcrypt.hash(this.userPassword,10))
-    const valid = bcrypt.compareSync(this.userPassword,this.UserResp.uPassword);
-    if (valid) {
-      const token = jwt.sign(
-        { user: this.userName },
-        'process.env.JWT_SECRET',
-        { expiresIn: '1h' }
-      );
-      return (token)
-    } else {
-      throw Error("Beurk")
-    }
+    //Konsol.log("KanbearLogin.check() ", "this.UserResp", this.UserResp)
+    //Konsol.log("KanbearLogin.check() ", "resp", this.userResp[0].uPassword)
+    //Konsol.log("KanbearLogin.check()", " this.userPassword", this.userPassword)
+    //try {
+      if ( this.userResp.length != 1 ) {
+        throw Error("Login check failed", { cause : "user"})
+      }
+      const valid = bcrypt.compareSync(this.userPassword, this.userResp[0].uPassword);
+      if (valid) {
+        const token = jwt.sign(
+          { userName: this.userName, userId: this.userResp[0].uId },
+          'kanbear',
+          { expiresIn: '1h' }
+        );
+        //Konsol.log("KanbearLogin.check()", "token", token)
+        return ({userId: this.userResp[0].uId, token:token})
+      } else {
+        throw Error("Login check failed", { cause : "password"})
+      }
+    //} catch (err) {
+    //  console.log(err)
+    //}
   }
 
 }
