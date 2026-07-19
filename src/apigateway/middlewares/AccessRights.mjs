@@ -45,7 +45,7 @@ class AccessRights {
         Konsol.log("AccessRights control() params", this.req.params)
         Konsol.log("AccessRights control() body", this.req.body)
         Konsol.log("AccessRights control() query", this.req.query)
-        await sleep(2500)
+        //await sleep(2500)
         const token = this.req.headers['authorization'];
         Konsol.log("AccessRights control() token", token)
         return(true)

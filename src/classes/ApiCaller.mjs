@@ -18,8 +18,9 @@ class ApiCaller {
         }
         this.apiToken = apiToken;
         console.log("ApiCaller() constructor()", url)
-        axios.defaults.headers.common['Authorization'] = `Bearer loulou`;
-        axios.defaults.headers.common['ZeBear'] = "gzb";
+        //axios.defaults.headers.common['Authorization'] = `Bearer loulou`;
+        axios.defaults.headers.common['Authorization'] = Kontext.getJwtoken()
+        //axios.defaults.headers.common['ZeBear'] = "gzb";
         this.headerArray = []
         let ax=new AxiosInstance(this.kanbearUrl)
         this.axiosInstance=ax.getInstance()
@@ -64,9 +65,9 @@ class ApiCaller {
         this.header(["GET", uri, { params }])
         console.log("ApiCaller.get() url ", await this.url(uri), { params: params })
         try {
-            console.log("ApiCaller.get() before");
+            console.log("ApiCaller.get() before"," token ",Kontext.getJwtoken());
             //const res = await axios.get(await this.url(uri), { headers : { Authorization : "gzb"} , params: params });
-            const res = await this.axiosInstance.get(await this.url(uri), { headers : { Authorization : "gzb"} , params: params });
+            const res = await this.axiosInstance.get(await this.url(uri), { headers : { Authorization : Kontext.getJwtoken()} , params: params });
             console.log("ApiCaller.get() <res.status>", res.status); // Status Code
             return (res)
         } catch (error) {

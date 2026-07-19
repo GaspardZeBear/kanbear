@@ -23,378 +23,392 @@ import { UserDialog } from './classes/UserDialog.mjs';
 import { LoginDialog } from './classes/LoginDialog.mjs'
 
 await Kontext.loadConfig()
-buildWorkspacesSelectBox()
-buildKanbearProjectsSelectBox()
 
-for (let item of ['project', 'swimlane', 'task']) {
-    for (let status of ['Open', 'Closed']) {
-        const id = `${item}${status}`
-        console.log(`index.mjs() ${id} listener creation`)
-        document.getElementById(id).addEventListener("change", async (ev) => {
-            console.log(`index.mjs() ${id} listener fired <ev>`, ev)
-            //if (ev.currentTarget.checked) {
-            //    console.log('checked');
-            //} else {
-            //   console.log('not checked');
-            //}
-            //
-            Kontext.loadKanbearJsonBulkData()
-            Kontext.renderPanel()
-        })
-    }
-}
+let login = new LoginDialog('login')
+login.create({})
 
-document.getElementById("projectOpen").addEventListener("change", async (ev) => {
-    console.log(`index.mjs() projectOpen2 listener fired <ev>`, ev)
-    buildKanbearProjectsSelectBox()
+document.addEventListener("loginKo", async (ev) => {
+    location.reload();
 })
 
-document.getElementById("projectClosed").addEventListener("change", async (ev) => {
-    console.log(`index.mjs() projectClosed listener fired <ev>`, ev)
-    buildKanbearProjectsSelectBox()
+document.addEventListener("loginCancelled", async (ev) => {
+    location.reload();
 })
 
-document.addEventListener("workspaceCreated", (ev) => {
-    console.log("workspaceCreated listener fired <ev>", ev)
+document.addEventListener("loginOk", async (ev) => {
+    console.log("loginOk listener fired <ev>", ev)
     buildWorkspacesSelectBox()
-})
-
-document.addEventListener("workspaceModified", async (ev) => {
-    console.log("workspaceModified listener fired <ev>", ev)
-    const wsEntity = await KanbearEntityFactory.generate('workspace')
-    wsEntity.setId(ev.detail.workspaceId)
-    let ws = await wsEntity.get()
-    console.log("workspaceModified ws", ws)
-    //document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
-    wsEntity.setName(ws.name)
-    let workspaceLink = buildWorkspaceLink(ws.id, ws.name)
-    document.getElementById("workspace").replaceChildren(workspaceLink)
-    buildWorkspacesSelectBox()
-})
-
-document.addEventListener("workspaceSelected", async (ev) => {
-    console.log("workspaceSelected listener fired", "<ev>", ev)
-    Kontext.setWorkspaceId(ev.detail.workspaceId)
     buildKanbearProjectsSelectBox()
-})
-
-//document.querySelectorAll("projectCreated").addEventListener("projectCreated", (ev) => {
-document.addEventListener("projectCreated", async (ev) => {
-    console.log("projectCreated listener fired <ev>", ev)
-    //buildKanbearProjectsSelectBox()
-    await Kontext.setProject(ev.detail.projectId);
-    sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
-    new KanbanPanel().render()
-})
-
-document.addEventListener("projectSelected", async (ev) => {
-    console.log("projectSelected listener fired <ev>", ev)
-    //buildKanbearProjectsSelectBox()
-    await Kontext.setProject(ev.detail.projectId);
-    sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
-    //let projectLink=buildProjectLink(Kontext.getCurrentProjectId(),Kontext.getCurrentProjectName())
-    //document.getElementById("project").replaceChildren(projectLink)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-document.addEventListener("projectModified", async (ev) => {
-    console.log("index.mjs() project modified listener fired <ev>", ev)
-    //buildKanbearProjectsSelectBox()
-    await Kontext.setProject(ev.detail.projectId);
-    sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
-    //let projectLink=buildProjectLink(Kontext.getCurrentProjectId(),Kontext.getCurrentProjectName())
-    //document.getElementById("project").replaceChildren(projectLink)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-// Event _projectReloaded : "subevent" to update various things
-document.addEventListener("_projectReloaded", async (ev) => {
-    console.log("index.mjs() _projectReloaded listener fired <ev>", ev)
-    buildKanbearProjectsSelectBox()
-    let projectLink = buildProjectLink(Kontext.getCurrentProjectId(), Kontext.getCurrentProjectName())
-    document.getElementById("project").replaceChildren(projectLink)
-    //const kb = await KanbanPanel.builder()
-    //kb.render()
-})
-
-document.addEventListener("projectDeleted", (ev) => {
-    console.log("projectDeleted listener fired <ev>", ev)
-    sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
-    //buildKanbearProjectsSelectBox()
-})
-
-document.addEventListener("swimlaneCreated", async (ev) => {
-    console.log("index.mjs() swimlane listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-document.addEventListener("swimlaneModified", async (ev) => {
-    console.log("index.mjs() swimlane listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-document.addEventListener("assigneeCreated", async (ev) => {
-    console.log("index.mjs() assigneeCreated listener fired <ev>", ev)
-    new KanbearAssigneePanel().render()
-})
-
-document.addEventListener("assigneeDeleted", async (ev) => {
-    console.log("index.mjs() assigneeDeleted listener fired <ev>", ev)
-    new KanbearAssigneePanel().render()
-})
-
-document.addEventListener("userCreated", async (ev) => {
-    console.log("index.mjs() userCreated listener fired <ev>", ev)
-    new KanbearUserPanel().render()
-})
-
-document.addEventListener("userDeleted", async (ev) => {
-    console.log("index.mjs() userDeleted listener fired <ev>", ev)
-    new KanbearUserPanel().render()
-})
-
-document.addEventListener("userModified", async (ev) => {
-    new KanbearUserPanel().render()
-})
-
-
-document.addEventListener("assigneeModified", async (ev) => {
-    new KanbearAssigneePanel().render()
-})
-
-document.addEventListener("columnCreated", async (ev) => {
-    console.log("index.mjs() column listener fired <ev>", ev)
-    //await Kontext.loadKanbearJsonBulkData()
-    //new Columns().chain(ev.detail.columnId)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-document.addEventListener("columnModified", async (ev) => {
-    console.log("index.mjs() column listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-document.addEventListener("columnDragged", async (ev) => {
-    console.log("index.mjs() columnDragged listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-
-document.addEventListener("taskCreated", async (ev) => {
-    console.log("index.mjs() task listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-document.addEventListener("taskModified", async (ev) => {
-    console.log("index.mjs() task modified listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-document.addEventListener("dialogCanceled", async (ev) => {
-    console.log("index.mjs() dialogCanceled listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-document.addEventListener("error", async (ev) => {
-    console.log("index.mjs() error listener fired <ev>", ev)
-    document.getElementById("message").innerHTML = "Error : " + ev.detail.error
-})
-//document.getElementById(project.id).addEventListener("taskModified", (ev) => {
-
-
-document.getElementById('kanboard').href = Kontext.getKanboardUrl()
-
-document.getElementById('loadProject').addEventListener('click', async () => {
-    try {
-        const response = await Kontext.loadKanbearJsonBulkData()
-        document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(Kontext.getJsonBulkData(), null, 2) + '</pre>';
-        //document.getElementById('message').innerHTML = '<p>Loaded</p>';
-    } catch (error) {
-        //document.getElementById('message').innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
-    }
-})
-
-//---------------------------------------------------------------------------------
-async function buildKanbearProjectsSelectBox() {
-    let workspaceId = Kontext.getWorkspaceId()
-    let projects = []
-    console.log("buildKanbearProjectsSelectBox() <workspaceId>", workspaceId)
-    if (workspaceId) {
-        const isOpen = document.getElementById("projectOpen").checked;
-        const isClosed = document.getElementById("projectClosed").checked;
-        const openClosed = getOpenCloseParmBoolean('project', isOpen, isClosed)
-        const parms = { workspace_id: workspaceId }
-        if (!(openClosed === undefined)) {
-            parms["is_open"] = openClosed
-        }
-        projects = await Project.getAll('projects', parms)
-        //projects.unshift({ id: -1, name: '* Create new project' })
-    }
-    console.log("buildKanbearProjectsSelectBox <Kontext.getCurrentProjectId>", Kontext.getCurrentProjectId())
-    let boxName = "kanbearProjectSelectBox"
-    let buttons = []
-
-    if (workspaceId > 0) {
-        buttons.push(buildAddProjectButton(workspaceId))
-    } else {
-        buttons.push(buildAddDummyButton())
-    }
-    let checkboxes = []
-
-    let boxParams = {
-        domId: boxName,
-        boxLabel: "Project",
-        buttons: buttons,
-        checkboxes: checkboxes,
-        items: projects,
-        labelText: "Project",
-        klass: "filter-group",
-        selectedOption: Kontext.getCurrentProjectId()
-    }
-    let wsDiv = await selectBoxBuilder(boxParams)
-    wsDiv.classList.add("projectCreated")
-    document.getElementById("kanbearProjectsDiv").replaceChildren(wsDiv)
-    document.getElementById(boxName).addEventListener('change', async (e) => {
-        console.log({ boxName }, e.target)
-        let projectId = e.target.value;
-        //Kontext.setProject(e.target.value);
-        //let projectLink=buildProjectLink(projectId,"xxx")
-        //document.getElementById("project").replaceChildren(projectLink)
-        sendEvent("projectSelected", { projectId: projectId })
-    });
-}
-
-//---------------------------------------------------------------------------------
-async function buildWorkspacesSelectBox() {
-    let wss0 
-    let wss = []
-
-    let retries = 10
-    while (!Array.isArray(wss0)) {
-        try {
-            wss0 = await Workspace.getAll('workspaces')
-            console.log("buildWorkspacesSelectBox() ", "retries", retries, "wss0", wss0)
-            retries--
-            if (retries == 0) {
-                // throw("Workspaces list not avalailable")
-                wss0 = []
-            }
-        } catch (err) {
-            console.log("buildWorkspacesSelectBox() error", err.cause)
-            document.getElementById("message").innerHTML = "Cannot get workspace list (is back launched ?)"
-            setTimeout(function () {
-                location.reload();
-            }, 30000);
+    for (let item of ['project', 'swimlane', 'task']) {
+        for (let status of ['Open', 'Closed']) {
+            const id = `${item}${status}`
+            console.log(`index.mjs() ${id} listener creation`)
+            document.getElementById(id).addEventListener("change", async (ev) => {
+                console.log(`index.mjs() ${id} listener fired <ev>`, ev)
+                //if (ev.currentTarget.checked) {
+                //    console.log('checked');
+                //} else {
+                //   console.log('not checked');
+                //}
+                //
+                Kontext.loadKanbearJsonBulkData()
+                Kontext.renderPanel()
+            })
         }
     }
-    document.getElementById("message").innerHTML = "Ready"
+    //})
 
-    //if (wss.length == 0) {
-    //    alert("Could not initialize, are you logged in ?")
-    //}
+    document.getElementById("projectOpen").addEventListener("change", async (ev) => {
+        console.log(`index.mjs() projectOpen2 listener fired <ev>`, ev)
+        buildKanbearProjectsSelectBox()
+    })
 
-    wss = wss0
+    document.getElementById("projectClosed").addEventListener("change", async (ev) => {
+        console.log(`index.mjs() projectClosed listener fired <ev>`, ev)
+        buildKanbearProjectsSelectBox()
+    })
 
-    // as wss will be modified, let's keep a copy
-    let wssOrigin = []
-    for (let i = 0; i < wss.length; i++) {
-        wssOrigin[i] = wss[i]
-    }
-    console.log("wssOrigin init", wssOrigin)
+    document.addEventListener("workspaceCreated", (ev) => {
+        console.log("workspaceCreated listener fired <ev>", ev)
+        buildWorkspacesSelectBox()
+    })
 
-    //wss.unshift({ id: -1, name: '* Create new workspace' })
-    let addWorkspaceButton = buildAddWorkspaceButton()
-    let boxName = "kanbearWorkspaceSelectBox"
-    let boxParams = {
-        domId: boxName,
-        boxLabel: "workspace",
-        buttons: [addWorkspaceButton],
-        items: wss,
-        labelText: "Workspace",
-        klass: "filter-group",
-        selectedOption: Kontext.getWorkspaceId()
-        //headItems:[['* Create new workspace',-1]]
-    }
-    let wsDiv = await selectBoxBuilder(boxParams)
-    document.getElementById("kanbearWorkspacesDiv").replaceChildren(wsDiv)
-    document.getElementById(boxName).addEventListener('change', async (e) => {
-
-        let workspaceId = parseInt(e.target.value)
-        if (workspaceId < 0) {
-            sendEvent("workspaceSelected", workspaceId)
-            return
-        }
-        Kontext.setWorkspaceId(e.target.value);
-        //console.log("wss",e.wss)
-        let box = document.getElementById("kanbearWorkspaceSelectBox")
-
-        //let addedElementsCount=box.length-wssOrigin.length
-        console.log("wssOrigin in listener", wssOrigin)
-        const ws = wssOrigin.find((element) => element.id == workspaceId)
-        console.log("ws", ws)
-        Kontext.setWorkspaceName(ws.name);
-        document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
+    document.addEventListener("workspaceModified", async (ev) => {
+        console.log("workspaceModified listener fired <ev>", ev)
+        const wsEntity = await KanbearEntityFactory.generate('workspace')
+        wsEntity.setId(ev.detail.workspaceId)
+        let ws = await wsEntity.get()
+        console.log("workspaceModified ws", ws)
+        //document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
+        wsEntity.setName(ws.name)
         let workspaceLink = buildWorkspaceLink(ws.id, ws.name)
         document.getElementById("workspace").replaceChildren(workspaceLink)
+        buildWorkspacesSelectBox()
+    })
+
+    document.addEventListener("workspaceSelected", async (ev) => {
+        console.log("workspaceSelected listener fired", "<ev>", ev)
+        Kontext.setWorkspaceId(ev.detail.workspaceId)
         buildKanbearProjectsSelectBox()
-        console.log({ boxName }, e.target.value)
-    });
-}
+    })
 
-//------------------- migrate from kanboard to kanbear --------------------------------------
-function migrateFromKanboard() {
-    new KanbearMigrator().migrate()
-}
+    //document.querySelectorAll("projectCreated").addEventListener("projectCreated", (ev) => {
+    document.addEventListener("projectCreated", async (ev) => {
+        console.log("projectCreated listener fired <ev>", ev)
+        //buildKanbearProjectsSelectBox()
+        await Kontext.setProject(ev.detail.projectId);
+        sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
+        new KanbanPanel().render()
+    })
 
-//------------------- migrate from kanboard to kanbear --------------------------------------
-document.getElementById('migrateFromKanboard').addEventListener('click', () => {
-    new KanbearMigrator().migrate()
-});
+    document.addEventListener("projectSelected", async (ev) => {
+        console.log("projectSelected listener fired <ev>", ev)
+        //buildKanbearProjectsSelectBox()
+        await Kontext.setProject(ev.detail.projectId);
+        sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
+        //let projectLink=buildProjectLink(Kontext.getCurrentProjectId(),Kontext.getCurrentProjectName())
+        //document.getElementById("project").replaceChildren(projectLink)
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
 
-//------------------- Assignee --------------------------------------
-document.getElementById('assigneePanel').addEventListener('click', () => {
-    new KanbearAssigneePanel().render()
-});
+    document.addEventListener("projectModified", async (ev) => {
+        console.log("index.mjs() project modified listener fired <ev>", ev)
+        //buildKanbearProjectsSelectBox()
+        await Kontext.setProject(ev.detail.projectId);
+        sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
+        //let projectLink=buildProjectLink(Kontext.getCurrentProjectId(),Kontext.getCurrentProjectName())
+        //document.getElementById("project").replaceChildren(projectLink)
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
 
-//------------------- User --------------------------------------
-document.getElementById('userPanel').addEventListener('click', () => {
-    new KanbearUserPanel().render()
-});
+    // Event _projectReloaded : "subevent" to update various things
+    document.addEventListener("_projectReloaded", async (ev) => {
+        console.log("index.mjs() _projectReloaded listener fired <ev>", ev)
+        buildKanbearProjectsSelectBox()
+        let projectLink = buildProjectLink(Kontext.getCurrentProjectId(), Kontext.getCurrentProjectName())
+        document.getElementById("project").replaceChildren(projectLink)
+        //const kb = await KanbanPanel.builder()
+        //kb.render()
+    })
 
-//------------------- Login --------------------------------------
-document.getElementById('loginPanel').addEventListener('click', () => {
-    let login=new LoginDialog('login')
-    login.create({})
-});
+    document.addEventListener("projectDeleted", (ev) => {
+        console.log("projectDeleted listener fired <ev>", ev)
+        sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
+        //buildKanbearProjectsSelectBox()
+    })
+
+    document.addEventListener("swimlaneCreated", async (ev) => {
+        console.log("index.mjs() swimlane listener fired <ev>", ev)
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
+
+    document.addEventListener("swimlaneModified", async (ev) => {
+        console.log("index.mjs() swimlane listener fired <ev>", ev)
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
+
+    document.addEventListener("assigneeCreated", async (ev) => {
+        console.log("index.mjs() assigneeCreated listener fired <ev>", ev)
+        new KanbearAssigneePanel().render()
+    })
+
+    document.addEventListener("assigneeDeleted", async (ev) => {
+        console.log("index.mjs() assigneeDeleted listener fired <ev>", ev)
+        new KanbearAssigneePanel().render()
+    })
+
+    document.addEventListener("userCreated", async (ev) => {
+        console.log("index.mjs() userCreated listener fired <ev>", ev)
+        new KanbearUserPanel().render()
+    })
+
+    document.addEventListener("userDeleted", async (ev) => {
+        console.log("index.mjs() userDeleted listener fired <ev>", ev)
+        new KanbearUserPanel().render()
+    })
+
+    document.addEventListener("userModified", async (ev) => {
+        new KanbearUserPanel().render()
+    })
 
 
-//------------------- list --------------------------------------
-document.getElementById('listWorkspace').addEventListener('click', async () => {
-    try {
-        let kl = await KanbearListPanel.builder()
-        kl.render()
-    } catch (error) {
-        alert(error)
+    document.addEventListener("assigneeModified", async (ev) => {
+        new KanbearAssigneePanel().render()
+    })
+
+    document.addEventListener("columnCreated", async (ev) => {
+        console.log("index.mjs() column listener fired <ev>", ev)
+        //await Kontext.loadKanbearJsonBulkData()
+        //new Columns().chain(ev.detail.columnId)
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
+
+    document.addEventListener("columnModified", async (ev) => {
+        console.log("index.mjs() column listener fired <ev>", ev)
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
+
+    document.addEventListener("columnDragged", async (ev) => {
+        console.log("index.mjs() columnDragged listener fired <ev>", ev)
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
+
+
+    document.addEventListener("taskCreated", async (ev) => {
+        console.log("index.mjs() task listener fired <ev>", ev)
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
+    document.addEventListener("taskModified", async (ev) => {
+        console.log("index.mjs() task modified listener fired <ev>", ev)
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
+    document.addEventListener("dialogCanceled", async (ev) => {
+        console.log("index.mjs() dialogCanceled listener fired <ev>", ev)
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
+    document.addEventListener("error", async (ev) => {
+        console.log("index.mjs() error listener fired <ev>", ev)
+        document.getElementById("message").innerHTML = "Error : " + ev.detail.error
+    })
+    //document.getElementById(project.id).addEventListener("taskModified", (ev) => {
+
+
+    document.getElementById('kanboard').href = Kontext.getKanboardUrl()
+
+    document.getElementById('loadProject').addEventListener('click', async () => {
+        try {
+            const response = await Kontext.loadKanbearJsonBulkData()
+            document.getElementById('results').innerHTML = '<pre>' + JSON.stringify(Kontext.getJsonBulkData(), null, 2) + '</pre>';
+            //document.getElementById('message').innerHTML = '<p>Loaded</p>';
+        } catch (error) {
+            //document.getElementById('message').innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
+        }
+    })
+
+    //---------------------------------------------------------------------------------
+    async function buildKanbearProjectsSelectBox() {
+        let workspaceId = Kontext.getWorkspaceId()
+        let projects = []
+        console.log("buildKanbearProjectsSelectBox() <workspaceId>", workspaceId)
+        if (workspaceId) {
+            const isOpen = document.getElementById("projectOpen").checked;
+            const isClosed = document.getElementById("projectClosed").checked;
+            const openClosed = getOpenCloseParmBoolean('project', isOpen, isClosed)
+            const parms = { workspace_id: workspaceId }
+            if (!(openClosed === undefined)) {
+                parms["is_open"] = openClosed
+            }
+            projects = await Project.getAll('projects', parms)
+            //projects.unshift({ id: -1, name: '* Create new project' })
+        }
+        console.log("buildKanbearProjectsSelectBox <Kontext.getCurrentProjectId>", Kontext.getCurrentProjectId())
+        let boxName = "kanbearProjectSelectBox"
+        let buttons = []
+
+        if (workspaceId > 0) {
+            buttons.push(buildAddProjectButton(workspaceId))
+        } else {
+            buttons.push(buildAddDummyButton())
+        }
+        let checkboxes = []
+
+        let boxParams = {
+            domId: boxName,
+            boxLabel: "Project",
+            buttons: buttons,
+            checkboxes: checkboxes,
+            items: projects,
+            labelText: "Project",
+            klass: "filter-group",
+            selectedOption: Kontext.getCurrentProjectId()
+        }
+        let wsDiv = await selectBoxBuilder(boxParams)
+        wsDiv.classList.add("projectCreated")
+        document.getElementById("kanbearProjectsDiv").replaceChildren(wsDiv)
+        document.getElementById(boxName).addEventListener('change', async (e) => {
+            console.log({ boxName }, e.target)
+            let projectId = e.target.value;
+            //Kontext.setProject(e.target.value);
+            //let projectLink=buildProjectLink(projectId,"xxx")
+            //document.getElementById("project").replaceChildren(projectLink)
+            sendEvent("projectSelected", { projectId: projectId })
+        });
     }
-});
 
-//------------------- kanban --------------------------------------
-document.getElementById('kanban').addEventListener('click', () => {
-    new KanbanPanel().render()
-});
+    //---------------------------------------------------------------------------------
+    async function buildWorkspacesSelectBox() {
+        let wss0
+        let wss = []
+
+        let retries = 10
+        while (!Array.isArray(wss0)) {
+            try {
+                wss0 = await Workspace.getAll('workspaces')
+                console.log("buildWorkspacesSelectBox() ", "retries", retries, "wss0", wss0)
+                retries--
+                if (retries == 0) {
+                    // throw("Workspaces list not avalailable")
+                    wss0 = []
+                }
+            } catch (err) {
+                console.log("buildWorkspacesSelectBox() error", err.cause)
+                document.getElementById("message").innerHTML = "Cannot get workspace list (is back launched ?)"
+                setTimeout(function () {
+                    location.reload();
+                }, 30000);
+            }
+        }
+        document.getElementById("message").innerHTML = "Ready"
+
+        //if (wss.length == 0) {
+        //    alert("Could not initialize, are you logged in ?")
+        //}
+
+        wss = wss0
+
+        // as wss will be modified, let's keep a copy
+        let wssOrigin = []
+        for (let i = 0; i < wss.length; i++) {
+            wssOrigin[i] = wss[i]
+        }
+        console.log("wssOrigin init", wssOrigin)
+
+        //wss.unshift({ id: -1, name: '* Create new workspace' })
+        let addWorkspaceButton = buildAddWorkspaceButton()
+        let boxName = "kanbearWorkspaceSelectBox"
+        let boxParams = {
+            domId: boxName,
+            boxLabel: "workspace",
+            buttons: [addWorkspaceButton],
+            items: wss,
+            labelText: "Workspace",
+            klass: "filter-group",
+            selectedOption: Kontext.getWorkspaceId()
+            //headItems:[['* Create new workspace',-1]]
+        }
+        let wsDiv = await selectBoxBuilder(boxParams)
+        document.getElementById("kanbearWorkspacesDiv").replaceChildren(wsDiv)
+        document.getElementById(boxName).addEventListener('change', async (e) => {
+
+            let workspaceId = parseInt(e.target.value)
+            if (workspaceId < 0) {
+                sendEvent("workspaceSelected", workspaceId)
+                return
+            }
+            Kontext.setWorkspaceId(e.target.value);
+            //console.log("wss",e.wss)
+            let box = document.getElementById("kanbearWorkspaceSelectBox")
+
+            //let addedElementsCount=box.length-wssOrigin.length
+            console.log("wssOrigin in listener", wssOrigin)
+            const ws = wssOrigin.find((element) => element.id == workspaceId)
+            console.log("ws", ws)
+            Kontext.setWorkspaceName(ws.name);
+            document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
+            let workspaceLink = buildWorkspaceLink(ws.id, ws.name)
+            document.getElementById("workspace").replaceChildren(workspaceLink)
+            buildKanbearProjectsSelectBox()
+            console.log({ boxName }, e.target.value)
+        });
+    }
+
+    //------------------- migrate from kanboard to kanbear --------------------------------------
+    function migrateFromKanboard() {
+        new KanbearMigrator().migrate()
+    }
+
+    //------------------- migrate from kanboard to kanbear --------------------------------------
+    document.getElementById('migrateFromKanboard').addEventListener('click', () => {
+        new KanbearMigrator().migrate()
+    });
+
+    //------------------- Assignee --------------------------------------
+    document.getElementById('assigneePanel').addEventListener('click', () => {
+        new KanbearAssigneePanel().render()
+    });
+
+    //------------------- User --------------------------------------
+    document.getElementById('userPanel').addEventListener('click', () => {
+        new KanbearUserPanel().render()
+    });
+
+    //------------------- Login --------------------------------------
+    document.getElementById('loginPanel').addEventListener('click', () => {
+        let login = new LoginDialog('login')
+        login.create({})
+    });
 
 
-// Effacer les données
-document.getElementById('clearProjects').addEventListener('click', () => {
-    new KanbearProjectCleanor().cleanup()
-});
+    //------------------- list --------------------------------------
+    document.getElementById('listWorkspace').addEventListener('click', async () => {
+        try {
+            let kl = await KanbearListPanel.builder()
+            kl.render()
+        } catch (error) {
+            alert(error)
+        }
+    });
+
+    //------------------- kanban --------------------------------------
+    document.getElementById('kanban').addEventListener('click', () => {
+        new KanbanPanel().render()
+    });
 
 
+    // Effacer les données
+    document.getElementById('clearProjects').addEventListener('click', () => {
+        new KanbearProjectCleanor().cleanup()
+    });
 
+
+})

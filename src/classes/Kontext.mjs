@@ -20,6 +20,9 @@ class Kontext {
     static workspaceName
     static panelClass
     static orderedColumnsList
+    static jwtoken
+    static currentUserId
+    static currentUserName
 
 
     //--------------------------------------------------------------
@@ -59,6 +62,26 @@ class Kontext {
     //--------------------------------------------------------------
     static setPanelClass(panelClass) {
         Kontext.panelClass = panelClass
+    }
+
+     //--------------------------------------------------------------
+    static setUserName(userName) {
+        Kontext.currentUserName = userName
+    }
+
+         //--------------------------------------------------------------
+    static setUserId(userId) {
+        Kontext.currentUserId = userId
+    }
+
+    //--------------------------------------------------------------
+    static setJwtoken(jwtoken) {
+        Kontext.jwtoken = jwtoken
+    }
+
+    //--------------------------------------------------------------
+    static getJwtoken() {
+        return(Kontext.jwtoken)
     }
 
     //--------------------------------------------------------------
