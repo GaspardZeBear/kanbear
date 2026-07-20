@@ -1,4 +1,5 @@
 import {db } from './config/database.mjs'
+import bcrypt from 'bcrypt'
 
 
   db.exec(`
@@ -157,7 +158,9 @@ import {db } from './config/database.mjs'
   db.exec('CREATE INDEX IF NOT EXISTS columns_project_idx ON columns(project_id)');
   db.exec('CREATE INDEX IF NOT EXISTS swimlanes_project_idx ON swimlanes(project_id)');
 
+  // create admin
   db.exec("INSERT INTO workspaces (name,is_open) VALUES('default_workspace',1)")
+  db.exec(`INSERT INTO users (name,password,is_admin) VALUES('admin','${bcrypt.hashSync("admin",10)}',1)`)
   console.log('Base de données initialisée avec succès.');
 
 

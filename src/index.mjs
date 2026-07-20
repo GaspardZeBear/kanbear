@@ -38,6 +38,24 @@ document.addEventListener("loginCancelled", async (ev) => {
 
 document.addEventListener("loginOk", async (ev) => {
     console.log("loginOk listener fired <ev>", ev)
+    const isAdmin=await Kontext.isUserAdmin()
+    
+    console.log("loginOk listener isAdmin", isAdmin)
+    document.getElementById('Tags').style.visibility = "hidden"
+    if (!isAdmin ) {
+        document.getElementById('Actors').style.visibility = "hidden"
+        document.getElementById('Kanboard').style.visibility = "hidden"
+        document.getElementById('showEvents').style.visibility = "hidden"
+        document.getElementById('clearProject').style.visibility = "hidden"
+        
+        document.getElementById('isAdmin').innerHTML = `N`;
+    } else {
+        document.getElementById('Actors').style.visibility = "visible"
+        document.getElementById('Kanboard').style.visibility = "visible"
+        document.getElementById('showEvents').style.visibility = "visible"
+        document.getElementById('clearProject').style.visibility = "visible"
+        document.getElementById('isAdmin').innerHTML = `Y`;
+    }
     document.getElementById('user').innerHTML = `${ev.detail.userName}`;
     buildWorkspacesSelectBox()
     buildKanbearProjectsSelectBox()
@@ -421,7 +439,7 @@ document.addEventListener("loginOk", async (ev) => {
 
 
     // Effacer les données
-    document.getElementById('clearProjects').addEventListener('click', () => {
+    document.getElementById('clearProject').addEventListener('click', () => {
         new KanbearProjectCleanor().cleanup()
     });
 

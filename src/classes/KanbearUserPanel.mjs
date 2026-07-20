@@ -19,6 +19,10 @@ class KanbearUserPanel {
 
   //-----------------------------------------------------------------
   async render() {
+    if ( !await Kontext.isUserAdmin()) {
+      alert("You must be admin to see users")
+      return
+    }
     const result = document.getElementById(this.htmlElement);
     //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
 

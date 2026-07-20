@@ -25,30 +25,31 @@
         <div id="dropdown">
             <nav>
                 <ul>
-                    <li class="dropdown"><a href="#">People</a>
-                        <ul class="under">
-                            <li><a href="#" id="userPanel">Users</a></li>
-                            <li><a href="#" id="assigneePanel">Assignees</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown"><a href="#">Tags</a>
-                        <ul class="under">
-                            <li><a href="#">Tags management</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown"><a href="#">Kanboard</a>
-                        <ul class="under">
-                            <li><a id="kanboard" target="kanboard">Open kanboard</a></li>
-                            <!-- <li><a href="#">Migrate</a></li> -->
-                            <li><span id="migrateFromKanboard">Migrate</span></li>
-                        </ul>
-                    </li>
                     <li class="dropdown"><a href="#">Login</a>
                         <ul class="under">
                             <li><a href="#" id="loginPanel">login</a></li>
                             <li><a href="#" id="logoutPanel">logout</a></li>
                         </ul>
                     </li>
+                    <li class="dropdown" id="Actors"><a href="#">Actors</a>
+                        <ul class="under">
+                            <li><a href="#" id="userPanel">Users</a></li>
+                            <li><a href="#" id="assigneePanel">Assignees</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="Tags"><a href="#">Tags</a>
+                        <ul class="under">
+                            <li><a href="#">Tags management</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="Kanboard"><a href="#">Kanboard</a>
+                        <ul class="under">
+                            <li><a id="kanboard" target="kanboard">Open kanboard</a></li>
+                            <!-- <li><a href="#">Migrate</a></li> -->
+                            <li><span id="migrateFromKanboard">Migrate</span></li>
+                        </ul>
+                    </li>
+
                     <li class="dropdown"><a href="#">Contact</a>
                         <ul class="under">
                             <li><a href="#">gaspardzebear@hotmail.fr</a></li>
@@ -100,8 +101,19 @@
                 <b>User</b>
             </div>
             <div class="infos" id="user">
+                <p>No User</p>
             </div>
         </div>
+
+        <div>
+            <div class="infos">
+                <b>isAdmin</b>
+            </div>
+            <div class="infos" id="isAdmin">
+                <p>?</p>
+            </div>
+        </div>
+
 
         <div>
             <div class="infos">
@@ -186,7 +198,7 @@
             <button id="listWorkspace">List Workspace</button>
             <button id="kanban">Kanban Project</button>
             <button id="showEvents">Events</button>
-            <button id="clearProjects">Clear project</button>
+            <button id="clearProject">Clear project</button>
         </div>
 
 
@@ -382,7 +394,8 @@
                 <input type="text" id="tasksCommentsComment" name="comment" />
             </div>
             <button type="button" value="save" name="saveTasksCommentsBtn" id="saveTasksCommentsBtn">Save</button>
-            <button type="button" value="cancel" name="cancelTasksCommentsBtn" id="cancelTasksCommentsBtn">Cancel</button>
+            <button type="button" value="cancel" name="cancelTasksCommentsBtn"
+                id="cancelTasksCommentsBtn">Cancel</button>
         </form>
     </dialog>
 

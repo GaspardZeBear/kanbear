@@ -1,9 +1,11 @@
 import { Project } from './Project.mjs'
+import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 import { KanbanPanel } from './KanbanPanel.mjs'
 import { KanbearListPanel } from "./KanbearListPanel.mjs"
 import { sendMessage, sendErrorMessage } from '../utils/sendMessage.mjs'
 import { getOpenCloseSymbol, getOpenCloseQueryParms } from '../utils/openClose.mjs'
 import { Columns } from './Columns.mjs'
+import { ApiCaller } from './ApiCaller.mjs'
 import axios from 'axios';
 
 class Kontext {
@@ -69,18 +71,35 @@ class Kontext {
         Kontext.currentUserName = userName
     }
 
-      static getUserName() {
+    //--------------------------------------------------------------
+    static getUserName() {
         return(Kontext.currentUserName)
     }
 
-         //--------------------------------------------------------------
+    //--------------------------------------------------------------
     static setUserId(userId) {
         Kontext.currentUserId = userId
     }
 
+    //--------------------------------------------------------------
     static getUserId() {
         return(Kontext.currentUserId)
     }
+
+    //--------------------------------------------------------------
+    static async isUserAdmin() {
+        //let user = await new ApiCaller().get(`/api/users/${Kontext.currentUserId}`, {})
+        //console.log("Kontext isUserAdmin()",user)
+        let userEntity = await KanbearEntityFactory.generate('user')
+        userEntity.setId(Kontext.currentUserId)
+        const user = await userEntity.get('user', {})
+        console.log("Kontext isUserAdmin()",user)
+        if ( user.is_admin == 1 ) { 
+            return(true)
+        }
+        return(false)
+    }
+
     //--------------------------------------------------------------
     static setJwtoken(jwtoken) {
         Kontext.jwtoken = jwtoken
