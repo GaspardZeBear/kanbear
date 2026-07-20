@@ -42,7 +42,8 @@ class UnifiedModel {
 
     //------------------------------------------------------------------
     static hashAndCreateUser(table, req, opParms, callback) {
-         Konsol.log("UnifiedModel.hashAndCreateUser()","<passwd>", req.body.password)
+        Konsol.log("UnifiedModel.hashAndCreateUser()","<kanbearKontext>", req.kanbearKontext)
+        Konsol.log("UnifiedModel.hashAndCreateUser()","<passwd>", req.body.password)
         const hashedPassword=bcrypt.hashSync(req.body.password,10)
         req.body.password=hashedPassword
         const { sql, bindVariables } = new SqlBuilder().generateCreateStatement(table, req.body)
