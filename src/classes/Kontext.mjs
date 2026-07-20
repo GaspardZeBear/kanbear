@@ -69,11 +69,18 @@ class Kontext {
         Kontext.currentUserName = userName
     }
 
+      static getUserName() {
+        return(Kontext.currentUserName)
+    }
+
          //--------------------------------------------------------------
     static setUserId(userId) {
         Kontext.currentUserId = userId
     }
 
+    static getUserId() {
+        return(Kontext.currentUserId)
+    }
     //--------------------------------------------------------------
     static setJwtoken(jwtoken) {
         Kontext.jwtoken = jwtoken

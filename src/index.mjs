@@ -28,6 +28,7 @@ let login = new LoginDialog('login')
 login.create({})
 
 document.addEventListener("loginKo", async (ev) => {
+    alert("Login infos are wrong")
     location.reload();
 })
 
@@ -37,6 +38,7 @@ document.addEventListener("loginCancelled", async (ev) => {
 
 document.addEventListener("loginOk", async (ev) => {
     console.log("loginOk listener fired <ev>", ev)
+    document.getElementById('user').innerHTML = `${ev.detail.userName}`;
     buildWorkspacesSelectBox()
     buildKanbearProjectsSelectBox()
     for (let item of ['project', 'swimlane', 'task']) {
@@ -287,9 +289,12 @@ document.addEventListener("loginOk", async (ev) => {
 
     //---------------------------------------------------------------------------------
     async function buildWorkspacesSelectBox() {
+
+        /*
         let wss0
         let wss = []
 
+        
         let retries = 10
         while (!Array.isArray(wss0)) {
             try {
@@ -308,14 +313,24 @@ document.addEventListener("loginOk", async (ev) => {
                 }, 30000);
             }
         }
-        document.getElementById("message").innerHTML = "Ready"
+            */
 
-        //if (wss.length == 0) {
-        //    alert("Could not initialize, are you logged in ?")
-        //}
+        let wss0 = []
+        try {
+            wss0 = await Workspace.getAll('workspaces')
+        } catch (err) {
 
-        wss = wss0
+        }
+        let wss = wss0
 
+        //document.getElementById("message").innerHTML = "Ready"
+
+        if (wss.length == 0) {
+            document.getElementById("message").innerHTML = "No workspace found"
+            alert("Could not initialize workspaces, are you logged in with a right user  ?")
+        } else {
+            document.getElementById("message").innerHTML = "Ready"
+        }
         // as wss will be modified, let's keep a copy
         let wssOrigin = []
         for (let i = 0; i < wss.length; i++) {

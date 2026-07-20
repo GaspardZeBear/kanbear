@@ -36,7 +36,7 @@ class LoginDialog {
             Kontext.setUserName(loginForm.loginName.value)
             Kontext.setUserId(resp.data.userId)
             Kontext.setJwtoken(resp.data.token)
-            sendEvent('loginOk')
+            sendEvent('loginOk',{ userName : Kontext.getUserName(), userId : Kontext.getUserId()})
         } catch (error) {
             console.log("LoginDialog.submit() <error>", error)
             sendEvent('loginKo')
