@@ -46,11 +46,13 @@ class UnifiedModel {
         Konsol.log("UnifiedModel.hashAndCreateUser()", "<passwd>", req.body.password)
 
         // only user is_admin true can create user
-        let bogusReq = { params: { id: req.kanbearKontext.userId } }
-        let admin
-        UnifiedModel.getById('users', bogusReq, {}, (err, httpCode, params) => { admin = params })
-        Konsol.log("UnifiedModel.hashAndCreateUser()", "admin", admin)
-        if (admin.is_admin) {
+        //let bogusReq = { params: { id: req.kanbearKontext.token.userId } }
+        //let admin
+        //UnifiedModel.getById('users', bogusReq, {}, (err, httpCode, params) => { admin = params })
+        //Konsol.log("UnifiedModel.hashAndCreateUser()", "admin", admin)
+        //if (admin.is_admin) {
+        //if ( req.kanbearKontext.token.isAdmin ) {
+            if ( true ) {
             const hashedPassword = bcrypt.hashSync(req.body.password, 10)
             req.body.password = hashedPassword
             UnifiedModel.create(table, req, opParms, callback)

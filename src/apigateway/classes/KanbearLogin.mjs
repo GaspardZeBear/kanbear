@@ -24,7 +24,8 @@ class KanbearLogin {
       select
         id uId,  
         name uName,
-        password uPassword
+        password uPassword,
+        is_admin uIsAdmin
       from 
         users
       where
@@ -54,7 +55,7 @@ class KanbearLogin {
       const valid = bcrypt.compareSync(this.userPassword, this.userResp[0].uPassword);
       if (valid) {
         const token = jwt.sign(
-          { userName: this.userName, userId: this.userResp[0].uId },
+          { userName: this.userName, userId: this.userResp[0].uId, isAdmin: this.userResp[0].uIsAdmin },
           'kanbear',
           { expiresIn: '1h' }
         );

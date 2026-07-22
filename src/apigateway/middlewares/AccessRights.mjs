@@ -1,5 +1,6 @@
 import { Konsol } from 'konsol'
 import jwt from 'jsonwebtoken'
+import { KanbearRights } from '../classes/KanbearRights.mjs'
 
 async function controlAccessRights(req, res, next) {
     try {
@@ -39,12 +40,12 @@ class AccessRights {
 
     async check() {
         Konsol.log("AccessRights control()", this.req.headers)
-        //Konsol.log("AccessRights control() url baseUrl", this.req.baseUrl)
-        //Konsol.log("AccessRights control() url originalreq", this.req.originalUrl)
-        //Konsol.log("AccessRights control() url method", this.req.method)
-        //Konsol.log("AccessRights control() params", this.req.params)
-        //Konsol.log("AccessRights control() body", this.req.body)
-        /Konsol.log("AccessRights control() query", this.req.query)
+            //Konsol.log("AccessRights control() url baseUrl", this.req.baseUrl)
+            //Konsol.log("AccessRights control() url originalreq", this.req.originalUrl)
+            //Konsol.log("AccessRights control() url method", this.req.method)
+            //Konsol.log("AccessRights control() params", this.req.params)
+            //Konsol.log("AccessRights control() body", this.req.body)
+            / Konsol.log("AccessRights control() query", this.req.query)
         //await sleep(2500)
         const token = this.req.headers['authorization'];
         if (!token) {
@@ -52,17 +53,30 @@ class AccessRights {
             return (false)
         }
         const decoded = jwt.verify(token, 'kanbear')
-        Konsol.log("AccessRights control() token", JSON.stringify(decoded))
+        Konsol.log("AccessRights check() token", JSON.stringify(decoded))
         //return (false)
+        //
         try {
-            this.req.kanbearKontext=decoded
-            return(true)
-            //next();
+            Konsol.log("AccessRights check() token.userId", decoded.userId)
+            let rights = {}
+            //let rights=await new KanbearRights(decoded.userId).load()
+            if (decoded.isAdmin == 0) {
+              rights = await new KanbearRights(decoded.userId).load()
+            }
+            this.req.kanbearKontext = {
+                token: decoded,
+                rights: {}
+            }
+            return (true)
         } catch (e) {
+            console.log(e)
+            Konsol.log("AccessRights check()", "error", e)
             //this.res.status(401).json({ message: 'Token invalide.' });
-            return(false)
+            return (false)
         }
-        //return (true)
+    }
+
+    async loadRights(userId) {
     }
 
 }

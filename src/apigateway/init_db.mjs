@@ -41,12 +41,25 @@ import bcrypt from 'bcrypt'
   `);
 
   db.exec(`
-    CREATE TABLE IF NOT EXISTS workspaces_users (
-      workspace_id INTEGER NOT NULL DEFAULT 0,
+    CREATE TABLE IF NOT EXISTS projects_rights (
+      id INTEGER NOT NULL DEFAULT 0,
       user_id INTEGER NOT NULL DEFAULT 0,
-      right INTEGER NOT NULL DEFAULT 0,
+      project_id INTEGER NOT NULL DEFAULT 0,
+      rights INTEGER NOT NULL DEFAULT 0,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET DEFAULT
+      FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE SET DEFAULT,
+      UNIQUE(project_id, user_id)
+    )
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS workspaces_rights (
+      id INTEGER NOT NULL DEFAULT 0,
+      user_id INTEGER NOT NULL DEFAULT 0,
+      workspace_id INTEGER NOT NULL DEFAULT 0,
+      rights INTEGER NOT NULL DEFAULT 0,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET DEFAULT
       FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE SET DEFAULT,
-      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET DEFAULT,
       UNIQUE(workspace_id, user_id)
     )
   `);
