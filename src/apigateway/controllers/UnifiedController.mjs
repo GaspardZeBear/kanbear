@@ -1,3 +1,5 @@
+import { KanbearRights } from '../classes/KanbearRights.mjs'
+import { KanbearRightsChecker } from '../classes/KanbearRightsChecker.mjs'
 import { UnifiedModel } from '../models/UnifiedModel.mjs'
 //import { Konsol } from '../classes/Konsol.mjs'
 import { Konsol } from 'konsol'
@@ -22,10 +24,17 @@ class UnifiedController {
                     "op=", op, 
                     "req.body=", req.body,
                     "req.params=", req.params,
-                    "req.query=", req.query
+                    "req.query=", req.query,
+                    "kanbearKontext=",req.kanbearKontext
                 )
                 //Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.params=", req.params)
                 //Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.query=", req.query)
+                let entityId=req.params.id ?? 0
+                //let isAllowed=new KanbearRightsChecker().isAllowed(table,op,entityId,req.kanbearKontext.rights)
+                let isAllowed=new KanbearRightsChecker().isAllowed(table,op,entityId,req)
+                if ( !isAllowed ) {
+                    res.status(403).json({error:"Access denied"});
+                }
                 UnifiedModel[op](table, req, opParms, (err, httpCode, sqlRes) => {
                     Konsol.log(`UnifiedModel ${op}_${table}() callback function,'<err>`, err, '<sqlRes>', sqlRes)
                     if (err) {

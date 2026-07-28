@@ -10,7 +10,7 @@ import { db } from '../config/database.mjs';
 class KanbearRights {
 
     constructor(userId) {
-        Konsol.log("KanbearRights.constructor()", "userId", userId)
+        //Konsol.log("KanbearRights.constructor()", "userId", userId)
         //this.db = new DatabaseSync('db.sqlite', { readonly: true });
         this.db = db
         this.userId = userId
@@ -46,23 +46,28 @@ class KanbearRights {
 
     //--------------------------------------------------------
     callAfterRights(err, httpCode, params) {
-        Konsol.log("KanbearRights.callAfterUser() ", params)
+        //Konsol.log("KanbearRights.callAfterUser() ", params)
         this.rightsResp = params
         //return (params)
     }
 
     //-----------------------------------------------------
     async load() {
-        Konsol.log("KanbearRights.load() ")
+        //Konsol.log("KanbearRights.load() ")
         await this.loadRights()
         //try {
         if (this.rightsResp.length != 1) {
-            throw Error("no rights", { cause: "user" })
+            //throw Error("no rights", { cause: "user" })
+            return ({})
         }
         return ({})
         //} catch (err) {
         //  console.log(err)
         //}
+    }
+
+    //-----------------------------------------------------
+    async isAllowed(kind,name) {
     }
 
 }
