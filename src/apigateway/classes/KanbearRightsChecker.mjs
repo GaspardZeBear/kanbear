@@ -13,7 +13,7 @@ import { db } from '../config/database.mjs';
 */
 
 //-----------------------------------------------------
-function getTaskProjectId(id, req) {
+function extractProjectIdFromTask(id, req) {
     Konsol.log("KanbearRightChecker.getTaskProjectId()")
     let subselect
     if (id > 0) {
@@ -37,19 +37,46 @@ function getTaskProjectId(id, req) {
     return(project_id)
 }
 
-function getProjectIdFromTask(target, id, req) {
-    let project_id = getTaskProjectId(id, req)
+//----------------------------------------------------------------------------------------
+function getProjectIdFromTask(target, kind, id, req) {
+    let project_id = extractProjectIdFromTask(id, req)
     Konsol.log("KanbearRightChecker.getProjectIdFromTask()","project_id",project_id)
     return(project_id)
 }
 
-function getProjectIdFromBody(target, id, req) {
+//----------------------------------------------------------------------------------------
+function getTargetIdFromBody(target, kind, id, req) {
+    let idName=`${target}_id`
+    Konsol.log("KanbearRightChecker.getProjectIdFromBody()","id",id,"project_id",req.body[idName])
+    return(req.body[idName])
 }
 
-function getProjectIdFromParams(target, id, req) {
+//----------------------------------------------------------------------------------------
+function getId(target, kind, id, req) {
+    Konsol.log("KanbearRightChecker.getId()","id",id)
+    return(id)
 }
 
 
+//---------------------------------------------------------------------------------------
+function getTargetIdFromParams(target, kind, id, req) {
+     let sqlReq = `
+      select
+        ${target.slice(0,-1)}_id 
+      from 
+        ${kind}
+      where
+       id=${id}
+      `
+      let target_id
+      db.all(sqlReq, [], (err, httpCode, params) => {
+        Konsol.log("KanbearRightChecker.getTargetIdFromParams()","params",params)
+        target_id = params[0][`${target}_id`]
+    } );
+    return(target_id)
+}
+
+//-----------------------------------------------------------------------------------------
 class KanbearRightsChecker {
 
     static READ = 1      // can READ this oject (modify attritbute)
@@ -66,12 +93,12 @@ class KanbearRightsChecker {
         return (false)
     }
 
-    static hasRightOn(target, kind, requiredRight, idFn) {
+    static hasRightOn(target, kind, requiredRight, getIdFn) {
         // target is the final object to have rights on
         // kind is the current object
         // Read it as : to make action on kind, must have right xxx on target
         // The kind objects contains somewhere the id of target.
-        // idFn is a function that will return targetId : workspace or projectId  
+        // getIdFn is a function that will return targetId : workspace or projectId  
         // Example : to create a task :
         // - kind is task
         // - must be allowed to reference project
@@ -90,30 +117,76 @@ class KanbearRightsChecker {
         //   the project_id is used
 
 
-        Konsol.log("KanbearRightsChecker hasRightOnProject()", "target", target, "kind", kind, "requiredRight", requiredRight, "idFn", idFn)
-        console.log("KanbearRightsChecker hasRightOnProject()", "idFn", idFn)
+        Konsol.log("KanbearRightsChecker hasRightOnProject()", "target", target, "kind", kind, "requiredRight", requiredRight, "idFn", getIdFn)
+        console.log("KanbearRightsChecker hasRightOnProject()", "idFn", getIdFn)
         return ((id, req) => {
             // id is :
             //   the id of the object (ex task)
             // or 0 if create
-            console.log("KanbearRightsChecker hasRightOnProject()", "invoke idFn", idFn)
-            idFn(target, id, req)
-            Konsol.log("hasRightOnProject()", "kind", kind, "requiredRight", requiredRight)
+            console.log("KanbearRightsChecker hasRightOnProject()", "invoke idFn", getIdFn)
+            
+            //Konsol.log("hasRightOnProject()", "kind", kind, "requiredRight", requiredRight)
             Konsol.log("hasRightOnProject()", "fired params", req.params)
             Konsol.log("hasRightOnProject()", "fired body", req.body)
+            Konsol.log("hasRightOnProject()", "kanbearKontext", req.kanbearKontext)
+            let targetId=getIdFn(target, kind, id, req)
+            Konsol.log("hasRightOnProject()", "targetId", targetId)
+            let kanbearKontext={
+                rights : {
+                    isAdmin:0,
+                    data : {
+                        workspaces :
+                           { 1 : 1},
+                        projects :
+                           { 
+                           1 : 3,
+                           2 : 3,
+                           3 : 3,
+                           4 : 3,
+                           5 : 3,
+                           6 : 3,
+                           7 : 3,
+                           8 : 3,
+                           9 : 3
+                        }
+                    }
+                }
+            }
+            console.log("hasRightOnProject()", "auth kontext",kanbearKontext)
+            console.log("hasRightOnProject()", "auth target",target)
+            console.log("hasRightOnProject()", "auth full", kanbearKontext.rights.data[target])
+            let auth=requiredRight & kanbearKontext.rights.data[target][targetId]
+            console.log("hasRightOnProject()", "auth ", auth)
             return (true)
         })
     }
 
     static checkerFunctions = {
-        'workspace': {
-            'create': KanbearRightsChecker.fnFalse,
+        'workspaces': {
+            'create': KanbearRightsChecker.fnTrue,
             'getAll': KanbearRightsChecker.fnTrue,
             'getById': KanbearRightsChecker.fnTrue,
             'getByForeignKey': KanbearRightsChecker.fnTrue,
             'update': KanbearRightsChecker.fnFalse,
-            'patch': KanbearRightsChecker.hasRightOn('workspaces', 'workspaces', KanbearRightsChecker.WRITE, []),
+            'patch': KanbearRightsChecker.fnTrue,
             'delete': KanbearRightsChecker.fnFalse
+        },
+        'assignees': {
+            'create': KanbearRightsChecker.fnTrue,
+            'getAll': KanbearRightsChecker.fnTrue,
+            'getById': KanbearRightsChecker.fnTrue,
+            'getByForeignKey': KanbearRightsChecker.fnTrue,
+            'update': KanbearRightsChecker.fnTrue,
+            'patch': KanbearRightsChecker.fnTrue,
+            'delete': KanbearRightsChecker.fnFalse
+        },
+        'projects': {
+            'create': KanbearRightsChecker.hasRightOn('workspaces', 'projects', KanbearRightsChecker.REFERENCE, getTargetIdFromBody),
+            'getAll': KanbearRightsChecker.hasRightOn('projects', 'projects', KanbearRightsChecker.READ, getTargetIdFromParams),
+            'getById': KanbearRightsChecker.hasRightOn('projects', 'projects', KanbearRightsChecker.READ, getId),
+            'patch': KanbearRightsChecker.hasRightOn('projects', 'projects', KanbearRightsChecker.WRITE, getId),
+            'update': KanbearRightsChecker.hasRightOn('projects', 'projects', KanbearRightsChecker.WRITE, getId),
+            'delete': KanbearRightsChecker.hasRightOn('projects', 'projects', KanbearRightsChecker.REFERENCE, getId),
         },
         'tasks': {
             'create': KanbearRightsChecker.hasRightOn('projects', 'tasks', KanbearRightsChecker.REFERENCE, getProjectIdFromTask),
@@ -124,34 +197,35 @@ class KanbearRightsChecker {
             'delete': KanbearRightsChecker.hasRightOn('projects', 'tasks', KanbearRightsChecker.REFERENCE, getProjectIdFromTask),
         },
         'swimlanes': {
-            'create': KanbearRightsChecker.hasRightOn('projects', 'swimlanes', KanbearRightsChecker.REFERENCE, getProjectIdFromBody),
-            'getAll': KanbearRightsChecker.hasRightOn('projects', 'swimlanes', KanbearRightsChecker.READ, getProjectIdFromParams),
-            'getById': KanbearRightsChecker.hasRightOn('projects', 'swimlanes', KanbearRightsChecker.READ, getProjectIdFromParams),
-            'patch': KanbearRightsChecker.hasRightOn('projects', 'swimlanes', KanbearRightsChecker.WRITE, getProjectIdFromParams),
-            'update': KanbearRightsChecker.hasRightOn('projects', 'swimlanes', KanbearRightsChecker.WRITE, getProjectIdFromParams),
-            'delete': KanbearRightsChecker.hasRightOn('projects', 'swimlanes', KanbearRightsChecker.REFERENCE, getProjectIdFromParams),
+            'create': KanbearRightsChecker.hasRightOn('projects', 'swimlanes', KanbearRightsChecker.REFERENCE, getTargetIdFromBody),
+            'getAll': KanbearRightsChecker.hasRightOn('projects', 'swimlanes', KanbearRightsChecker.READ, getTargetIdFromParams),
+            'getById': KanbearRightsChecker.hasRightOn('projects', 'swimlanes', KanbearRightsChecker.READ, getTargetIdFromParams),
+            'patch': KanbearRightsChecker.hasRightOn('projects', 'swimlanes', KanbearRightsChecker.WRITE, getTargetIdFromParams),
+            'update': KanbearRightsChecker.hasRightOn('projects', 'swimlanes', KanbearRightsChecker.WRITE, getTargetIdFromParams),
+            'delete': KanbearRightsChecker.hasRightOn('projects', 'swimlanes', KanbearRightsChecker.REFERENCE, getTargetIdFromParams),
         },
         'columns': {
-            'create': KanbearRightsChecker.hasRightOn('projects', 'columns', KanbearRightsChecker.REFERENCE, getProjectIdFromBody),
-            'getAll': KanbearRightsChecker.hasRightOn('projects', 'columns', KanbearRightsChecker.READ, getProjectIdFromParams),
-            'getById': KanbearRightsChecker.hasRightOn('projects', 'columns', KanbearRightsChecker.READ, getProjectIdFromParams),
-            'patch': KanbearRightsChecker.hasRightOn('projects', 'columns', KanbearRightsChecker.WRITE, getProjectIdFromParams),
-            'update': KanbearRightsChecker.hasRightOn('projects', 'columns', KanbearRightsChecker.WRITE, getProjectIdFromParams),
-            'delete': KanbearRightsChecker.hasRightOn('projects', 'columns', KanbearRightsChecker.REFERENCE, getProjectIdFromParams),
+            'create': KanbearRightsChecker.hasRightOn('projects', 'columns', KanbearRightsChecker.REFERENCE, getTargetIdFromBody),
+            'getAll': KanbearRightsChecker.hasRightOn('projects', 'columns', KanbearRightsChecker.READ, getTargetIdFromParams),
+            'getById': KanbearRightsChecker.hasRightOn('projects', 'columns', KanbearRightsChecker.READ, getTargetIdFromParams),
+            'patch': KanbearRightsChecker.hasRightOn('projects', 'columns', KanbearRightsChecker.WRITE, getTargetIdFromParams),
+            'update': KanbearRightsChecker.hasRightOn('projects', 'columns', KanbearRightsChecker.WRITE, getTargetIdFromParams),
+            'delete': KanbearRightsChecker.hasRightOn('projects', 'columns', KanbearRightsChecker.REFERENCE, getTargetIdFromParams),
         }
     }
 
     //---------------------------------------------------------------------------------
     isAllowed(kind, op, id, req) {
         Konsol.log("KanbearRightsChecker", "isAllowed()", kind, op, id)
-        if (req.kanbearKontext.rights.isAdmin) {
+        if (req.kanbearKontext.rights.isAdmin > 0) {
             return (true)
         }
         try {
+            console.log("KanbearRightsChecker", "isAllowed()", kind, op, id)
             return (KanbearRightsChecker.checkerFunctions[kind][op](id, req))
         } catch (err) {
             console.log("KanbearRightsChecker err", err)
-            Konsol.log("KanbearRightsChecker", "no checkerFunction found !", err)
+            Konsol.log("KanbearRightsChecker", "Error on checkerFunction found !", err)
             return (true)
         }
     }

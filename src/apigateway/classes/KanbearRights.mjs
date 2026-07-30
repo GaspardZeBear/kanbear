@@ -9,22 +9,46 @@ import { db } from '../config/database.mjs';
 
 class KanbearRights {
 
-    constructor(userId) {
-        //Konsol.log("KanbearRights.constructor()", "userId", userId)
-        //this.db = new DatabaseSync('db.sqlite', { readonly: true });
-        this.db = db
-        this.userId = userId
-    }
+  constructor(userId) {
+    //Konsol.log("KanbearRights.constructor()", "userId", userId)
+    //this.db = new DatabaseSync('db.sqlite', { readonly: true });
+    this.db = db
+    this.userId = userId
+  }
 
-    //-----------------------------------------------------
-    async loadRights() {
-        Konsol.log("KanbearRights.loadRights()")
-        let req = `
+//-----------------------------------------------------
+  async isAdmin() {
+    Konsol.log("KanbearRights.isAdmin()")
+    let req = `
+      select
+        id id,  
+        name name,
+        is_admin isAdmin
+      from 
+        users
+      where
+       id='${this.userId}'
+      `
+    //    db.all(req, [], this.callAfterRights.bind(this));
+    let user
+    db.all(req, [], (err, httpCode, params) => {
+      //Konsol.log("KanbearRights.callAfterUser() params", params)
+      user = params
+      //return (params)
+    });
+    //Konsol.log("KanbearRights.callAfterUser() user[0]", user[0].isAdmin)
+    return(user[0].isAdmin)
+  }
+
+  //-----------------------------------------------------
+  async loadRights() {
+    Konsol.log("KanbearRights.loadRights()")
+    let req = `
       select
         id id,  
         'workspaces',
         workspace_id tId,
-        rights
+        rights rights
       from 
         workspaces_rights
       where
@@ -40,35 +64,41 @@ class KanbearRights {
       where
        user_id='${this.userId}'
       `
-        db.all(req, [], this.callAfterRights.bind(this));
-    }
+    //    db.all(req, [], this.callAfterRights.bind(this));
+    db.all(req, [], (err, httpCode, params) => {
+      //Konsol.log("KanbearRights.callAfterUser() ", params)
+      this.rightsResp = params
+      //return (params)
+    });
+  }
 
 
-    //--------------------------------------------------------
-    callAfterRights(err, httpCode, params) {
-        //Konsol.log("KanbearRights.callAfterUser() ", params)
-        this.rightsResp = params
-        //return (params)
-    }
+  //--------------------------------------------------------
+  //callAfterRights(err, httpCode, params) {
+    //Konsol.log("KanbearRights.callAfterUser() ", params)
+  //  this.rightsResp = params
+  //  //return (params)
+  //}
 
-    //-----------------------------------------------------
-    async load() {
-        //Konsol.log("KanbearRights.load() ")
-        await this.loadRights()
-        //try {
-        if (this.rightsResp.length != 1) {
-            //throw Error("no rights", { cause: "user" })
-            return ({})
-        }
-        return ({})
-        //} catch (err) {
-        //  console.log(err)
-        //}
+  //-----------------------------------------------------
+  async load() {
+    //Konsol.log("KanbearRights.load() ")
+    await this.loadRights()
+    //try {
+    if (this.rightsResp.length != 1) {
+      //throw Error("no rights", { cause: "user" })
+      return ({})
     }
+    //return ({})
+    return(this.rightsResp[0])
+    //} catch (err) {
+    //  console.log(err)
+    //}
+  }
 
-    //-----------------------------------------------------
-    async isAllowed(kind,name) {
-    }
+  //-----------------------------------------------------
+  async isAllowed(kind, name) {
+  }
 
 }
 

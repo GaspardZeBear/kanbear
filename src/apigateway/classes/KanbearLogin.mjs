@@ -55,8 +55,9 @@ class KanbearLogin {
       const valid = bcrypt.compareSync(this.userPassword, this.userResp[0].uPassword);
       if (valid) {
         const token = jwt.sign(
-          { userName: this.userName, userId: this.userResp[0].uId, isAdmin: this.userResp[0].uIsAdmin },
-          'kanbear',
+          //{ userName: this.userName, userId: this.userResp[0].uId, isAdmin: this.userResp[0].uIsAdmin },
+          { userName: this.userName, userId: this.userResp[0].uId },
+           'kanbear',
           { expiresIn: '1h' }
         );
         //Konsol.log("KanbearLogin.check()", "token", token)

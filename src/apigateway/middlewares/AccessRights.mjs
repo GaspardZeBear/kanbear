@@ -58,12 +58,16 @@ class AccessRights {
         //
         try {
             //Konsol.log("AccessRights check() token.userId", decoded.userId)
-            let rights = {isAdmin:1}
-            //let rights=await new KanbearRights(decoded.userId).load()
-            if (decoded.isAdmin == 0) {
-                rights = await new KanbearRights(decoded.userId).load()
+            let kanbearRights=new KanbearRights(decoded.userId)
+            let isAdmin = await kanbearRights.isAdmin()
+            console.log("isAdmin",isAdmin)
+            let rights={}
+            if (isAdmin == 0) {
+                rights = await kanbearRights.load()
                 rights.isAdmin = 0
-            } 
+            }  else {
+                rights.isAdmin = 1
+            }
             
             this.req.kanbearKontext = {
                 token: decoded,
