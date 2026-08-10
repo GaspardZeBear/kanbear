@@ -21,6 +21,7 @@ import columnRoutes from './routes/columns.mjs'
 import swimlaneRoutes from './routes/swimlanes.mjs'
 import tagRoutes from './routes/tags.mjs'
 import projectRoutes from './routes/projects.mjs'
+import projectRightsRoutes from './routes/projectRights.mjs'
 import userRoutes from './routes/users.mjs'
 import taskRoutes from './routes/tasks.mjs'
 import workspaceRoutes from './routes/workspaces.mjs'
@@ -72,6 +73,7 @@ app.use('/api/workspaces', workspaceRoutes);
 app.use('/api/projects_users', projectUserRoutes);
 app.use('/api/task_has_tags', taskHasTagRoutes);
 app.use('/api/tasks_comments', taskCommentRoutes);
+app.use('/api/projects_rights', projectRightsRoutes);
 
 //------------------------------------------------------------------------------
 app.get('/api/sql/report/:projectId',

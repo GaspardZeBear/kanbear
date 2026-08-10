@@ -399,6 +399,28 @@
         </form>
     </dialog>
 
+    <dialog id="rightsModal" closedby="any">
+        <h2 id="rightsModalTitle">RightsTitle</h2>
+        <div id="rightsModalHeader">
+        </div>
+        <div class="results scroller" id="rightsModalResults">
+        </div>
+    </dialog>
+
+    <dialog id="rightsDialog" closedby="any">
+        <h2 id="rightsDialogTitle"></h2>
+        <div id="rightsDialogMessage"></div>
+        <form id="rightsForm" method="dialog">
+            <div id="rightsCommentDiv">
+                <label for="comment">comment: </label>
+                <input type="text" id="rightsComment" name="rightsComment" />
+            </div>
+            <button type="button" value="save" name="saverRightsBtn" id="saverRightsBtn">Save</button>
+            <button type="button" value="cancel" name="cancelRightsBtn"
+                id="cancelRightsBtn">Cancel</button>
+        </form>
+    </dialog>
+
 
     <dialog id="taskDialog" class="modal">
         <h2 id="taskDialogTitle"></h2>

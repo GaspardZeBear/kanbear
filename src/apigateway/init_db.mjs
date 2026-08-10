@@ -40,6 +40,7 @@ import bcrypt from 'bcrypt'
     )
   `);
 
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS projects_rights (
       id INTEGER NOT NULL DEFAULT 0,

@@ -2,6 +2,7 @@ import { ApiCaller } from "./ApiCaller.mjs"
 import { Assignee} from './Assignee.mjs'
 import { Column} from './Column.mjs'
 import { Project} from './Project.mjs'
+import { ProjectsRights } from "./ProjectsRights.mjs"
 import { Swimlane} from './Swimlane.mjs'
 import { Task} from './Task.mjs'
 import { TasksComments} from './TasksComments.mjs'
@@ -20,6 +21,9 @@ class KanbearEntityFactory {
                 break
             case 'project': 
                 return new Project({})
+                break
+            case 'projectsRights': 
+                return new ProjectsRights({})
                 break
             case 'swimlane': 
                 return new Swimlane({})

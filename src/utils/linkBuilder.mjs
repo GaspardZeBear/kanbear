@@ -5,6 +5,7 @@ import { ColumnDialog } from '../classes/ColumnDialog.mjs'
 import { WorkspaceDialog } from '../classes/WorkspaceDialog.mjs'
 import { AssigneeDialog } from '../classes/AssigneeDialog.mjs'
 import { TasksCommentsModal } from '../classes/TasksCommentsModal.mjs'
+import { UserRightsModal } from '../classes/UserRightsModal.mjs'
 import { UserDialog } from '../classes/UserDialog.mjs'
 
 class LinkCounter {
@@ -126,6 +127,27 @@ class LinkCounter {
   }
 
   //----------------------------------------------------------------------------------
+  function buildUserRightsLink(userId, userName) {
+    const href = document.createElement("a")
+    //LinkCounter.counter++
+    //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
+    href.setAttribute("href", "javascript:void(0)")
+    href.innerHTML = `${userName}`
+    //let myProject = this.project
+    let uId=userId
+    let editUserRightsFn = function (ev) {
+      console.log("editUserHref event Listener fired ")
+      ev.stopPropagation();
+      //const userRights = new UserDialog()
+      let modal=new UserRightsModal(userId)
+      //userRights.modify({userId:uId});
+    }
+    href.addEventListener('click', editUserRightsFn, { once: true });
+    console.log(href)
+    return(href)
+  }
+
+  //----------------------------------------------------------------------------------
   function buildTasksCommentsLink(taskId, taskName) {
     const href = document.createElement("a")
     //LinkCounter.counter++
@@ -145,4 +167,11 @@ class LinkCounter {
     return(href)
   }
 
-  export { buildAssigneeLink, buildUserLink, buildWorkspaceLink, buildProjectLink, buildSwimlaneLink , buildColumnLink, buildTasksCommentsLink }
+  export { buildAssigneeLink, 
+    buildUserLink,
+    buildUserRightsLink,
+    buildWorkspaceLink,
+    buildProjectLink,
+    buildSwimlaneLink,
+    buildColumnLink,
+     buildTasksCommentsLink }

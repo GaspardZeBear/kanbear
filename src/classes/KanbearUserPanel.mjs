@@ -3,7 +3,7 @@ import { formatDuration, dateToString, getDurationFromNow } from "../utils/dateA
 import { Kontext } from "./Kontext.mjs";
 import { User } from "./User.mjs"
 import { UserDialog } from "./UserDialog.mjs"
-import { buildUserLink } from "../utils/linkBuilder.mjs";
+import { buildUserLink, buildUserRightsLink } from "../utils/linkBuilder.mjs";
 import { sendEvent } from "../utils/sendEvent.mjs";
 import { getFiltersMap } from "../utils/filters.mjs";
 
@@ -23,6 +23,7 @@ class KanbearUserPanel {
       alert("You must be admin to see users")
       return
     }
+    console.log("KanbearUserPanel render()")
     const result = document.getElementById(this.htmlElement);
     //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
 
@@ -108,6 +109,7 @@ class KanbearUserPanel {
         <th>Description</th>
         <th>Tel</th>
         <th>Email</th>
+        <th>Rights</th>
         <th>isAdmin</th>
         <th>Delete</th>
         `
@@ -137,6 +139,7 @@ class KanbearUserPanel {
         row.appendChild(td(user.description))
         row.appendChild(td(user.tel))
         row.appendChild(td(user.email))
+        row.appendChild(tdHref(buildUserRightsLink(user.id, user.name)))
         row.appendChild(td(user.is_admin))
         row.appendChild(td("Delete"))
         tbody.appendChild(row);
