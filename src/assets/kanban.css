@@ -18,15 +18,20 @@ h1 {
 
 .kanban-swimlane {
     background-color: #f9f9f9;
+    display:flex;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     padding: 10px;
 }
 
 .swimlane-header {
-    padding: 5px 5px;
-    margin-bottom: 2px;
-    background-color: lightseagreen;
+    xpadding: 5px 5px;
+    xmargin: 10px;
+    width:150px;
+    flex-direction: column;
+    border-top-color: red;
+    border-width: 10px;
+    background-color: rgb(215, 117, 200);
     border-radius: 5px;
 }
 
