@@ -124,7 +124,7 @@ class KanbanPanel {
       const status = document.createElement('span')
       status.innerHTML = ` ${getOpenCloseSymbol(swimlane.is_open)}`
       const separator1 = document.createElement('span')
-      separator1.innerHTML = `Swimlane #${swimlane.id}|`
+      separator1.innerHTML = `Swimlane<br/>#${swimlane.id}|`
       //console.log(this.projectLink)
       //kSwimlaneDivH2.appendChild(separator0)
       //kSwimlaneDivH2.appendChild(projectLink)

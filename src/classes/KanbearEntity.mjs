@@ -4,7 +4,10 @@ class KanbearEntity {
 
     // Translate entity kin to api route
     // !! Beware, an 's' char ist added by POST, PUT etc .... so remove it from translation
-    static apiTablesMap = { "tasksComments": "tasks_comment" }
+    static apiTablesMap = { 
+        "tasksComments": "tasks_comment",
+        "projectsRights": "projects_right"
+     }
     //------------------------------------------------------------------------
     constructor(kind, from = {}) {
         console.log("KanbearEntity.constructor() <kind>", kind, "<from>", from)

@@ -27,11 +27,15 @@ h1 {
 .swimlane-header {
     xpadding: 5px 5px;
     xmargin: 10px;
-    width:150px;
-    flex-direction: column;
-    border-top-color: red;
-    border-width: 10px;
-    background-color: rgb(215, 117, 200);
+    width:350px;
+    xmargin : 10px;
+    xpadding: 10px;
+    vertical-align:middle; 
+    xflex-direction: column;
+    border-style: solid;
+    border-color: rgb(217, 21, 194);
+    border-width: 3px;
+    background-color: rgb(80, 201, 231);
     border-radius: 5px;
 }
 
