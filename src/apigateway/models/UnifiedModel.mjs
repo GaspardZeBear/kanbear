@@ -25,6 +25,7 @@ class UnifiedModel {
         UnifiedModel.UnifiedModelOp['getAll'] = UnifiedModel.getAll
         UnifiedModel.UnifiedModelOp['getById'] = UnifiedModel.getById
         UnifiedModel.UnifiedModelOp['getByForeignKey'] = UnifiedModel.getByForeignKey
+        UnifiedModel.UnifiedModelOp['getProjectsRightsByUserid'] = UnifiedModel.getProjectsRightsByUserid
         UnifiedModel.UnifiedModelOp['update'] = UnifiedModel.update
         UnifiedModel.UnifiedModelOp['patch'] = UnifiedModel.patch
         UnifiedModel.UnifiedModelOp['delete'] = UnifiedModel.delete
@@ -38,6 +39,35 @@ class UnifiedModel {
             //res.lastInsertRowid ? callback(null, 201,res.lastInsertRowid) : callback(res, null)
             res.lastInsertRowid ? callback(null, 201, res) : callback(res, 500, null)
         });
+    }
+
+//------------------------------------------------------------------
+    static getProjectsRightsByUserid(table, req, opParms, callback) {
+        Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<params>", req.params)
+        Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<body>", req.body)
+        const sql = `SELECT r.id id,
+                            r.user_id user_id,
+                            r.project_id project_id,
+                            r.rights rights,
+                            p.name project_name
+                        FROM projects_rights as r
+                        LEFT JOIN projects as p
+                            on p.id=r.project_id
+                        WHERE r.user_id = ${req.params["user_id"]}
+                        `
+                   
+        Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<sql>", sql)
+        
+        db.all(sql, [], (err, httpCode, res) => {
+             Konsol.log("UnifiedModel.getProjectsRightsByUserid()(), will call callback","<res>", err)
+            Konsol.log("UnifiedModel.getProjectsRightsByUserid()(), will call callback","<res>", res)
+             Konsol.log("UnifiedModel.getProjectsRightsByUserid()(), will call callback","<httpCode>", httpCode)
+            //res.lastInsertRowid ? callback(null, 201,res.lastInsertRowid) : callback(res, null)
+            callback(null, 200,res)
+        });
+        
+        
+       //db.run(sql, [], callback)
     }
 
     //------------------------------------------------------------------

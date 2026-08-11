@@ -32,7 +32,7 @@ class Db {
         const stmt = this.db.prepare(sql, [])
         //console.log("Db.run() <expandeSql>", stmt.expandedSQL)
         const res = stmt.all(parms)
-        //Konsol.log("Db.all() over <res>",res)
+        Konsol.log("Db.all() over <res>",res)
         callAfterAll(null, 200, res)
     }
 
@@ -53,7 +53,7 @@ class Db {
         try {
             const stmt = this.db.prepare(sql, [])
             const res = stmt.run(...parms)
-            //Konsol.log("Db.run() res", res)
+            Konsol.log("Db.run() res", res)
             //Konsol.log("Db.run() calling callback")
             callAfterRun(res, 200, callAfterRun)
         } catch (error) {

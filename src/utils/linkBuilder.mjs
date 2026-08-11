@@ -139,10 +139,10 @@ class LinkCounter {
       console.log("editUserHref event Listener fired ")
       ev.stopPropagation();
       //const userRights = new UserDialog()
-      let modal=new UserRightsModal(userId)
+      let modal=new UserRightsModal(userId,userName)
       //userRights.modify({userId:uId});
     }
-    href.addEventListener('click', editUserRightsFn, { once: true });
+    href.addEventListener('click', editUserRightsFn, { once: false });
     console.log(href)
     return(href)
   }
