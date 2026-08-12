@@ -3,12 +3,12 @@
   position: fixed; /* Stay in place */
   z-index: 100; /* Sit on top */
   /* padding-top: 100px; Location of the box */
-  left: 50%;
-  top: 50%;
-  width: 33%; /* Full width */
+  left: 33%;
+  top: 33%;
+  width: 66%; /* Full width */
   height: 50%; /* Full height */
   overflow: auto; /* Enable scroll if needed */
-  background-color: lightcyan; /* Fallback color */
+  background-color: rgb(227, 255, 124); /* Fallback color */
 }
 
 /* Modal Content */

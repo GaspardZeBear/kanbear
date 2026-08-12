@@ -43,7 +43,7 @@ import bcrypt from 'bcrypt'
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS projects_rights (
-      id INTEGER NOT NULL DEFAULT 0,
+      id INTEGER PRIMARY KEY,
       user_id INTEGER NOT NULL DEFAULT 0,
       project_id INTEGER NOT NULL DEFAULT 0,
       rights INTEGER NOT NULL DEFAULT 0,
@@ -55,7 +55,7 @@ import bcrypt from 'bcrypt'
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS workspaces_rights (
-      id INTEGER NOT NULL DEFAULT 0,
+      id INTEGER PRIMARY KEY,
       user_id INTEGER NOT NULL DEFAULT 0,
       workspace_id INTEGER NOT NULL DEFAULT 0,
       rights INTEGER NOT NULL DEFAULT 0,
