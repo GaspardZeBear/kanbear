@@ -20,7 +20,8 @@ class UnifiedController {
         return (
             (req, res) => {
                 //console.log("---------------------------------------------------------------------")
-                Konsol.log("UnifiedController callback fired table=", table, 
+                Konsol.log("UnifiedController decorated function fired",
+                    "table=", table, 
                     "op=", op, 
                     "req.body=", req.body,
                     "req.params=", req.params,
@@ -29,12 +30,15 @@ class UnifiedController {
                 )
                 //Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.params=", req.params)
                 //Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.query=", req.query)
-                let entityId=req.params.id ?? 0
+                
                 //let isAllowed=new KanbearRightsChecker().isAllowed(table,op,entityId,req.kanbearKontext.rights)
-                let isAllowed=new KanbearRightsChecker().isAllowed(table,op,entityId,req)
+                let krc=new KanbearRightsChecker()
+                let isAllowed=krc.isAllowed(table,op,req)
                 if ( !isAllowed ) {
                     res.status(403).json({error:"Access denied"});
                 }
+
+
                 UnifiedModel[op](table, req, opParms, (err, httpCode, sqlRes) => {
                     Konsol.log(`UnifiedModel ${op}_${table}() callback function,'<err>`, err, '<sqlRes>', sqlRes)
                     if (err) {
