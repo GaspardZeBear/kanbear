@@ -40,7 +40,7 @@ import { Konsol} from './classes/Konsol.mjs';
 import { Konsol } from 'konsol';
 import { Logger } from 'konsol';
 import { Server } from 'konsol';
-import { controlAccessRights } from './middlewares/AccessRights.mjs';
+import { controlToken } from './middlewares/tokenControl.mjs';
 
 
 
@@ -60,7 +60,7 @@ app.post('/api/login',
       res.status(500).json({ error: error.cause });
     }
   })
-app.use ((req,res,next) => controlAccessRights(req,res,next))
+app.use ((req,res,next) => controlToken(req,res,next))
 
 app.use('/api/assignees', assigneeRoutes);
 app.use('/api/columns', columnRoutes);

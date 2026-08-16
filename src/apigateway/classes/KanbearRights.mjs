@@ -12,12 +12,12 @@ class KanbearRights {
   constructor(userId) {
     //Konsol.log("KanbearRights.constructor()", "userId", userId)
     //this.db = new DatabaseSync('db.sqlite', { readonly: true });
-    this.db = db
+    //this.db = db
     this.userId = userId
   }
 
-//-----------------------------------------------------
-  async isAdmin() {
+  //-----------------------------------------------------
+  isAdmin() {
     Konsol.log("KanbearRights.isAdmin()")
     let req = `
       select
@@ -37,17 +37,21 @@ class KanbearRights {
       //return (params)
     });
     //Konsol.log("KanbearRights.callAfterUser() user[0]", user[0].isAdmin)
-    return(user[0].isAdmin)
+    if (user[0].isAdmin == 0) {
+      return (false)
+    } else {
+      return (true)
+    }
+
   }
 
   //-----------------------------------------------------
-  async loadRights() {
+  loadRights() {
     Konsol.log("KanbearRights.loadRights()")
     let req = `
       select
         id id,  
-        'workspaces',
-        workspace_id tId,
+        workspace_id as workspace_id,
         rights rights
       from 
         workspaces_rights
@@ -56,8 +60,7 @@ class KanbearRights {
       union
       select
         id id,  
-        'projects',
-        project_id tId,
+        project_id as project_id,
         rights
       from 
         projects_rights
@@ -66,7 +69,7 @@ class KanbearRights {
       `
     //    db.all(req, [], this.callAfterRights.bind(this));
     db.all(req, [], (err, httpCode, params) => {
-      //Konsol.log("KanbearRights.callAfterUser() ", params)
+      Konsol.log("KanbearRights loadRights() callback() params", params)
       this.rightsResp = params
       //return (params)
     });
@@ -75,22 +78,22 @@ class KanbearRights {
 
   //--------------------------------------------------------
   //callAfterRights(err, httpCode, params) {
-    //Konsol.log("KanbearRights.callAfterUser() ", params)
+  //Konsol.log("KanbearRights.callAfterUser() ", params)
   //  this.rightsResp = params
   //  //return (params)
   //}
 
   //-----------------------------------------------------
-  async load() {
+  load() {
     //Konsol.log("KanbearRights.load() ")
-    await this.loadRights()
+    this.loadRights()
     //try {
     if (this.rightsResp.length != 1) {
       //throw Error("no rights", { cause: "user" })
       return ({})
     }
     //return ({})
-    return(this.rightsResp[0])
+    return (this.rightsResp[0])
     //} catch (err) {
     //  console.log(err)
     //}
