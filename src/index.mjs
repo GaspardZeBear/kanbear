@@ -37,6 +37,9 @@ document.addEventListener("loginCancelled", async (ev) => {
 })
 
 document.addEventListener("loginOk", async (ev) => {
+    await Kontext.init()
+    document.getElementById("resultsHeader").innerHTML=""
+    document.getElementById("results").innerHTML=""
     console.log("loginOk listener fired <ev>", ev)
     const isAdmin=await Kontext.isUserAdmin()
     

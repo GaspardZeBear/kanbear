@@ -26,13 +26,32 @@ class Kontext {
     static currentUserId
     static currentUserName
 
+    //--------------------------------------------------------------
+    static async init() {
+        Kontext.jsonBulkData = null
+        Kontext.kanboardJsonBulkData = null
+        //Kontext.kanbearConfig = null
+        Kontext.projects = null
+        Kontext.kanboardProjects = null
+        Kontext.currentProject = null
+        Kontext.currentProjectId = null
+        Kontext.currentProjectName = null
+        Kontext.workspaceId = null
+        Kontext.workspaceName = null
+        Kontext.panelClass = null
+        Kontext.orderedColumnsList = null
+        //Kontext.jwtoken = null
+        //Kontext.currentUserId = null
+        //Kontext.currentUserName = null
+    }
 
     //--------------------------------------------------------------
     static async loadConfig() {
         const config = await fetch('/kanbearConfig.json')
         Kontext.kanbearConfig = await config.json();
-        console.log("Kontext.loadConfig() ","/kanbearConfig.json", Kontext.kanbearConfig)
+        console.log("Kontext.loadConfig() ", "/kanbearConfig.json", Kontext.kanbearConfig)
     }
+
     //--------------------------------------------------------------
     static async setProject(projectId) {
         Kontext.currentProjectId = projectId
@@ -42,7 +61,7 @@ class Kontext {
         }
         //Kontext.currentProjectName=projectName[]
         //Kontext.currentProjectName=projectName
-        console.log("Kontext setProject()"," Kontext.currentProjectId ", Kontext.currentProjectId)
+        console.log("Kontext setProject()", " Kontext.currentProjectId ", Kontext.currentProjectId)
         await Kontext.loadKanbearJsonBulkData()
         console.log("Kontext setProject() after bulk ", Kontext.jsonBulkData)
         Kontext.currentProjectName = Kontext.jsonBulkData[projectId].name
@@ -66,14 +85,14 @@ class Kontext {
         Kontext.panelClass = panelClass
     }
 
-     //--------------------------------------------------------------
+    //--------------------------------------------------------------
     static setUserName(userName) {
         Kontext.currentUserName = userName
     }
 
     //--------------------------------------------------------------
     static getUserName() {
-        return(Kontext.currentUserName)
+        return (Kontext.currentUserName)
     }
 
     //--------------------------------------------------------------
@@ -83,7 +102,7 @@ class Kontext {
 
     //--------------------------------------------------------------
     static getUserId() {
-        return(Kontext.currentUserId)
+        return (Kontext.currentUserId)
     }
 
     //--------------------------------------------------------------
@@ -93,11 +112,11 @@ class Kontext {
         let userEntity = await KanbearEntityFactory.generate('user')
         userEntity.setId(Kontext.currentUserId)
         const user = await userEntity.get('user', {})
-        console.log("Kontext isUserAdmin()",user)
-        if ( user.is_admin == 1 ) { 
-            return(true)
+        console.log("Kontext isUserAdmin()", user)
+        if (user.is_admin == 1) {
+            return (true)
         }
-        return(false)
+        return (false)
     }
 
     //--------------------------------------------------------------
@@ -107,7 +126,7 @@ class Kontext {
 
     //--------------------------------------------------------------
     static getJwtoken() {
-        return(Kontext.jwtoken)
+        return (Kontext.jwtoken)
     }
 
     //--------------------------------------------------------------
@@ -198,13 +217,13 @@ class Kontext {
     //--------------------------------------------------------------
     static async loadKanbearJsonBulkData(parms = { useKontext: true, projectId: null }) {
         try {
-  
+
             // Do not take in account project open or closed !!!!
             let query = getOpenCloseQueryParms(['swimlane', 'task'])
             let projectId = parms.useKontext ? Kontext.currentProjectId : parms.projectId
-            if ( projectId === undefined ) {
+            if (projectId === undefined) {
                 console.log("Kontext.loadKanbearJsonBulkData() from kanbear projectId is undefined")
-                return({})
+                return ({})
             }
 
             const url = `${Kontext.getKanbearUrl()}/api/sql/report/${projectId}${query}`
@@ -220,10 +239,10 @@ class Kontext {
             //const resp = await response.json();
             const resp = await response.data;
             console.log("Kontext.loadKanbearJsonBulkData() from updated loaded", "resp.keys()", Object.keys(resp))
-            const key=Object.keys(resp)[0]
-            const bulk=resp[key]
+            const key = Object.keys(resp)[0]
+            const bulk = resp[key]
             console.log("Kontext.loadKanbearJsonBulkData() from updated loaded", "", bulk)
-            bulk.jsonColumnsOrder=JSON.parse(bulk.columnsOrder)
+            bulk.jsonColumnsOrder = JSON.parse(bulk.columnsOrder)
             if (parms.useKontext) {
                 Kontext.jsonBulkData = resp
             }
