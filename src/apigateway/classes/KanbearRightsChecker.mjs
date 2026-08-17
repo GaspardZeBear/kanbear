@@ -4,8 +4,7 @@
 //import { Konsol } from './Konsol.mjs'
 import { Konsol } from 'konsol'
 import { db } from '../config/database.mjs';
-//import jwt from 'jsonwebtoken'
-//import bcrypt from 'bcrypt'
+import { KanbearRights } from './KanbearRights.mjs';
 
 /*
  RightChecker :
@@ -51,8 +50,20 @@ function getProjectIdFromTask(target, kind, id, req) {
 //----------------------------------------------------------------------------------------
 function getTargetIdFromBody(target, kind, id, req) {
     let idName = `${target}_id`
-    Konsol.log("KanbearRightChecker.getProjectIdFromBody()", "id", id, "project_id", req.body[idName])
+    Konsol.log("KanbearRightChecker.getProjectIdFromBody()", "id", id, "req.body", req.body[idName])
     return (req.body[idName])
+}
+//----------------------------------------------------------------------------------------
+function getTargetIdFromParams(target, kind, id, req) {
+    let idName = `${target}_id`
+    Konsol.log("KanbearRightChecker.getProjectIdFromParams()", "id", id, "req.params", req.params[idName])
+    return (req.params[idName])
+}
+//----------------------------------------------------------------------------------------
+function getTargetIdFromQuery(target, kind, id, req) {
+    let idName = `${target}_id`
+    Konsol.log("KanbearRightChecker.getProjectIdFromQuery()", "id", id, "req.query", req.query[idName])
+    return (req.params[idName])
 }
 
 //----------------------------------------------------------------------------------------
@@ -63,7 +74,7 @@ function getId(target, kind, id, req) {
 
 
 //---------------------------------------------------------------------------------------
-function getTargetIdFromParams(target, kind, id, req) {
+function XgetTargetIdFromParams(target, kind, id, req) {
     let sqlReq = `
       select
         ${target.slice(0, -1)}_id 
@@ -102,8 +113,8 @@ class KanbearRightsChecker {
         // The kind objects contains somewhere the id of target.
         // getIdFn is a function that will return targetId : workspace or projectId  
         // Example : to create a task :
+        // - target is project
         // - kind is task
-        // - must be allowed to reference project
         // - task creation request contains column_id 
         // - must get project_id from columns where id=column_id
 
@@ -121,7 +132,7 @@ class KanbearRightsChecker {
 
         Konsol.log("KanbearRightsChecker hasRightOnProject()", "target", target, "kind", kind, "requiredRight", requiredRight, "idFn", getIdFn)
         console.log("KanbearRightsChecker hasRightOnProject()", "idFn", getIdFn)
-        return ((id, req) => {
+        return ((id, req, userRights) => {
             // id is :
             //   the id of the object (ex task)
             // or 0 if create
@@ -158,8 +169,8 @@ class KanbearRightsChecker {
                 */
             Konsol.log("hasRightOnProject()", "auth kontext", kanbearKontext)
             Konsol.log("hasRightOnProject()", "auth target", target)
-            Konsol.log("hasRightOnProject()", "auth full", kanbearKontext.rights.data[target])
-            let auth = requiredRight & kanbearKontext.rights.data[target][targetId]
+            Konsol.log("hasRightOnProject()", "auth full", userRights.data[target])
+            let auth = requiredRight & userRights.data[target][targetId]
             console.log("hasRightOnProject()", "auth ", auth)
             return (true)
         })
@@ -186,7 +197,7 @@ class KanbearRightsChecker {
         },
         'projects': {
             'create': KanbearRightsChecker.hasRightOn('workspaces', 'projects', REFERENCE, getTargetIdFromBody),
-            'getAll': KanbearRightsChecker.hasRightOn('projects', 'projects', READ, getId),
+            'getAll': KanbearRightsChecker.hasRightOn('workspaces', 'projects', READ, getTargetIdFromQuery),
             'getById': KanbearRightsChecker.hasRightOn('projects', 'projects', READ, getId),
             'patch': KanbearRightsChecker.hasRightOn('projects', 'projects', WRITE, getId),
             'update': KanbearRightsChecker.hasRightOn('projects', 'projects', WRITE, getId),
@@ -223,18 +234,18 @@ class KanbearRightsChecker {
         Konsol.log("KanbearRightsChecker", "isAllowed()", "<kind>", kind, "<op>", op)
 
         let kanbearRights = new KanbearRights(req.kanbearKontext.decodedToken.userId)
+        
         // admin users have all rights
         if (kanbearRights.isAdmin()) {
             return (true)
         }
-
         // Non-admin users require advanced access control
         // 
-        let rights = kanbearRights.load()
+        let userRights = kanbearRights.load()
         let entityId = req.params.id ?? 0
         try {
             //console.log("KanbearRightsChecker", "isAllowed()", "<kind>",kind, "<op>",op,"<id>",id)
-            return (KanbearRightsChecker.checkerFunctions[kind][op](entityId, req))
+            return (KanbearRightsChecker.checkerFunctions[kind][op](entityId, req, userRights))
         } catch (err) {
             Konsol.log("KanbearRightsChecker err", err)
             Konsol.log("KanbearRightsChecker", "Error on checkerFunction found !", err)
