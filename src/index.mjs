@@ -38,19 +38,19 @@ document.addEventListener("loginCancelled", async (ev) => {
 
 document.addEventListener("loginOk", async (ev) => {
     await Kontext.init()
-    document.getElementById("resultsHeader").innerHTML=""
-    document.getElementById("results").innerHTML=""
+    document.getElementById("resultsHeader").innerHTML = ""
+    document.getElementById("results").innerHTML = ""
     console.log("loginOk listener fired <ev>", ev)
-    const isAdmin=await Kontext.isUserAdmin()
-    
+    const isAdmin = await Kontext.isUserAdmin()
+
     console.log("loginOk listener isAdmin", isAdmin)
     document.getElementById('Tags').style.visibility = "hidden"
-    if (!isAdmin ) {
+    if (!isAdmin) {
         document.getElementById('Actors').style.visibility = "hidden"
         document.getElementById('Kanboard').style.visibility = "hidden"
         document.getElementById('showEvents').style.visibility = "hidden"
         document.getElementById('clearProject').style.visibility = "hidden"
-        
+
         document.getElementById('isAdmin').innerHTML = `N`;
     } else {
         document.getElementById('Actors').style.visibility = "visible"
@@ -79,7 +79,7 @@ document.addEventListener("loginOk", async (ev) => {
             })
         }
     }
-    //})
+    })
 
     document.getElementById("projectOpen").addEventListener("change", async (ev) => {
         console.log(`index.mjs() projectOpen2 listener fired <ev>`, ev)
@@ -447,4 +447,4 @@ document.addEventListener("loginOk", async (ev) => {
     });
 
 
-})
+
