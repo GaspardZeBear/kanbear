@@ -6,6 +6,7 @@ import { UserDialog } from "./UserDialog.mjs"
 import { buildUserLink, buildUserRightsLink } from "../utils/linkBuilder.mjs";
 import { sendEvent } from "../utils/sendEvent.mjs";
 import { getFiltersMap } from "../utils/filters.mjs";
+import { SmartTable } from "./SmartTable.mjs";
 
 
 class KanbearUserPanel {
@@ -46,7 +47,9 @@ class KanbearUserPanel {
     document.getElementById(this.htmlElement).replaceChildren()
     document.getElementById(elementHeader).replaceChildren(resultTitle)
     await this.createTable()
+    //console.log(this.table)
     result.appendChild(this.table)
+    let table=new SmartTable(this.table)
   }
 
 
@@ -100,6 +103,7 @@ class KanbearUserPanel {
       const users = await User.getAll('users')
       console.log("KanbearUserPanel.createTable()","<users>",users)
       this.table = document.createElement('table')
+      this.table.id="UsersTable"
       const thead = document.createElement('thead')
       const hrow = document.createElement('tr')
       hrow.innerHTML = `
@@ -146,6 +150,8 @@ class KanbearUserPanel {
       }
       );
       this.table.appendChild(tbody)
+      //this.table=new SmartTable(this.table)
+      
     }
 
   }
