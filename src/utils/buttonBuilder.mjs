@@ -6,6 +6,7 @@ import { ColumnDialog } from "../classes/ColumnDialog.mjs"
 import { TaskDialog } from "../classes/TaskDialog.mjs"
 import { Task } from "../classes/Task.mjs"
 import { ProjectsRights } from "../classes/ProjectsRights.mjs"
+import { WorkspacesRights } from "../classes/WorkspacesRights.mjs"
 import { sendEvent } from "./sendEvent.mjs"
 import { Kontext } from "../classes/Kontext.mjs"
 import { TasksCommentsModal } from "../classes/TasksCommentsModal.mjs"
@@ -117,6 +118,36 @@ function buildAddProjectsRightsButton(boxId,userId) {
 }
 
 
+//------------------------------------------------------------------------
+function buildAddWorkspacesRightsButton(boxId,userId) {
+  console.log("buildAddWorkspacesRightsButton event Listener fired", "userId", userId)
+  const addWorkspacesRightsButton = document.createElement('button')
+  addWorkspacesRightsButton.classList.add("add-item-btn")
+  addWorkspacesRightsButton.setAttribute("id", "addWorkspacesRightsButton")
+  addWorkspacesRightsButton.innerHTML = "+R"
+  let addWorkspacesRightsFn = function (ev) {
+    console.log("addWorkspacesRightsButton event Listener fired", ev.target)
+    let el = document.getElementById("kanbearWorkspacesRightsSelectBox")
+    console.log("addWorkspacesRightsButton event Listener fired, selected", el.value)
+    ev.stopPropagation();
+    let workspaceId = parseInt(document.getElementById(boxId).value)
+    if (workspaceId > 0) {
+      const workspacesRights = new WorkspacesRights('workspacesRights',{})
+      workspacesRights.setData("workspace_id",workspaceId)
+      workspacesRights.setData("user_id",userId)
+      workspacesRights.create()
+      //projectsRights.create();
+      sendEvent('workspacessRightsCreated', {})
+    } else {
+      alert("Select a workspaces to add user to")
+    }
+  }
+  //removeEventListener("click", addSwimlaneFn)
+  addWorkspacesRightsButton.addEventListener('click', addWorkspacesRightsFn, { once: false });
+  return (addWorkspacesRightsButton)
+}
+
+
 
 //------------------------------------------------------------------------
 function buildAddWorkspaceButton() {
@@ -188,29 +219,6 @@ function buildTasksCommentsButton(taskId, name) {
   return (tasksCommentsButton)
 }
 
-
-//----------------------------------------------------------------------------------
-function ZZZZZZZZZZZZZZZZbuildTasksCommentsLink(taskId, taskName) {
-  const href = document.createElement("a")
-  //LinkCounter.counter++
-  //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
-  href.setAttribute("href", "javascript:void(0)")
-  href.innerHTML = taskName
-  //let myProject = this.project
-  let editTasksCommentsFn = function (ev) {
-    console.log("editTasksCommentsHref event Listener fired ")
-    ev.stopPropagation();
-    const user = new TasksCommentsModal(taskId)
-    //user.modify({userId:uId});
-  }
-  href.addEventListener('click', editTasksCommentsFn, { once: false });
-  //href.addEventListener('mouseover', editTasksCommentsFn, { once: false });
-  console.log(href)
-  return (href)
-}
-
-
-
 //------------------------------------------------------------------------
 function buildAddOpenCloseButton(id, value, callback) {
   const addAddOpenCloseButton = document.createElement('button')
@@ -232,6 +240,7 @@ export {
   buildAddTaskButton,
   buildAddProjectButton,
   buildAddProjectsRightsButton,
+  buildAddWorkspacesRightsButton,
   buildAddWorkspaceButton,
   buildAddDummyButton,
   buildAddNoteButton,

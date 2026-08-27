@@ -1,3 +1,5 @@
+import { sendEvent } from "../utils/sendEvent.mjs"
+import { sendErrorMessage } from "../utils/sendMessage.mjs"
 import { ApiCaller } from "./ApiCaller.mjs"
 
 class KanbearEntity {
@@ -6,7 +8,9 @@ class KanbearEntity {
     // !! Beware, an 's' char ist added by POST, PUT etc .... so remove it from translation
     static apiTablesMap = { 
         "tasksComments": "tasks_comment",
-        "projectsRights": "projects_right"
+        "projectsRights": "projects_right",
+        "workspacesRights": "workspaces_right",
+        
      }
     //------------------------------------------------------------------------
     constructor(kind, from = {}) {
@@ -90,7 +94,9 @@ class KanbearEntity {
             return (resp.data)
         } catch (error) {
             console.log("KanbearEntity.getAll() <error>", error)
-            throw error
+            //throw error
+            sendErrorMessage(`Error ${error} when calling getAll on /api/${kind}`)
+            return([])
         }
     }
 

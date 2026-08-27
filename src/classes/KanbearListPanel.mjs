@@ -6,6 +6,7 @@ import { getFiltersMap } from "../utils/filters.mjs";
 import { Task } from "./Task.mjs"
 import { Project } from "./Project.mjs"
 import { getOpenCloseSymbol, getOpenCloseParmBoolean } from "../utils/openClose.mjs";
+import { SmartTable } from "./SmartTable.mjs";
 //import { buildWorkspaceLink } from "../utils/linkBuilder.mjs";
 
 class KanbearListPanel {
@@ -94,9 +95,11 @@ class KanbearListPanel {
   }
 
   //-----------------------------------------------------------------
-  render() {
+  async render() {
     this.createButtons()
-    this.createTable()
+    await this.createTable()
+    //console.log(this.table)
+    let t=new SmartTable(this.table)
     const result = document.getElementById(this.htmlElement);
     //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
     let resultTitle = document.createElement('h2')
@@ -111,6 +114,7 @@ class KanbearListPanel {
     result.appendChild(this.buttons['move'])
     result.appendChild(this.buttons['close'])
     result.appendChild(this.table)
+    
     //this.setPopup()
   }
 
@@ -213,40 +217,6 @@ class KanbearListPanel {
       this.table.appendChild(tbody)
     };
   }
-
-  //-----------------------------------------------------------------
-  XsetPopup() {
-    const self = this
-    document.querySelectorAll('.taskCommentLink').forEach(link => {
-      //console.log(link)
-      link.addEventListener('click', function (e) {
-        e.preventDefault();
-        const [name, project, swimlane, task, column] = self.getObjectsFromRef(this.getAttribute('id'))
-        document.getElementById('popupTaskId').textContent = task.name;
-        popup.style.display = 'flex';
-        // Charger les notes existantes si disponibles (exemple)
-        // taskNotes.value = getNotesForTask(currentTaskId);
-      });
-    });
-    document.querySelector('.close').addEventListener('click', function () {
-      popup.style.display = 'none';
-    });
-    const popup = document.getElementById('editPopup');
-    document.getElementById('editPopup').addEventListener('click', function (e) {
-      if (e.target === popup) {
-        popup.style.display = 'none';
-      }
-    });
-    document.getElementById('saveNotes').addEventListener('click', function () {
-      const notes = document.getElementById('taskNotes').value;
-      alert(`Comment registered : ${notes}`);
-      // Ici, vous pouvez envoyer les données au serveur via fetch()
-      // saveNotes(currentTaskId, notes);
-      popup.style.display = 'none';
-    });
-
-  }
-
 
 }
 export { KanbearListPanel }

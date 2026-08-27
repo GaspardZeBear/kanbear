@@ -1,15 +1,18 @@
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 import { ProjectsRights } from './ProjectsRights.mjs'
 import { Project } from './Project.mjs'
+import { WorkspacesRights } from './WorkspacesRights.mjs'
+import { Workspace } from './Workspace.mjs'
 //import { UserRightsDialog } from './UserRightsDialog.mjs'
 import { sendEvent } from '../utils/sendEvent.mjs'
 import { formatDuration, dateToString, getDurationFromNow } from "../utils/dateAndTime.mjs";
 import { selectBoxBuilder } from '../utils/selectBoxBuilder.mjs';
-import { buildAddProjectsRightsButton } from '../utils/buttonBuilder.mjs'
+import { buildAddProjectsRightsButton, buildAddWorkspacesRightsButton } from '../utils/buttonBuilder.mjs'
 
 // Rights flags
-const READFLAG=2
-const WRITEFLAG=1
+const REFERENCEFLAG = 4
+const READFLAG = 2
+const WRITEFLAG = 1
 
 class UserRightsModal {
 
@@ -38,6 +41,7 @@ class UserRightsModal {
     resultTitleRights.appendChild(saveRightsButton)
     result.replaceChildren(resultTitleRights)
     result.appendChild(await this.renderProjects())
+    result.appendChild(await this.renderWorkspaces())
   }
 
   //-----------------------------------------------------------------
@@ -47,18 +51,32 @@ class UserRightsModal {
     titleprojectsRights.innerHTML = `Projects rights list for user <b>${this.userName}</b> filtered by .....`
     projectsDiv.replaceChildren(titleprojectsRights)
 
-
     let projectsSelectBox = await this.buildProjectsSelectBox()
     projectsDiv.appendChild(projectsSelectBox)
 
-
-    //projectsDiv.appendChild(addprojectsRightsButton)
-
-    let projectsTable = await this.createProjectsTable()
+    const projectsRightsEntity = new ProjectsRights({ userId: this.userId })
+    let rightsList = await projectsRightsEntity.getByUserId()
+    let projectsTable = await this.createTable('Projects', rightsList)
     projectsDiv.appendChild(projectsTable)
     return (projectsDiv)
   }
 
+  //-----------------------------------------------------------------
+  async renderWorkspaces() {
+    let workspacesDiv = document.createElement("div")
+    let titleWorkspacesRights = document.createElement('span')
+    titleWorkspacesRights.innerHTML = `Workspaces rights list for user <b>${this.userName}</b> filtered by .....`
+    workspacesDiv.replaceChildren(titleWorkspacesRights)
+
+    let workspacesSelectBox = await this.buildWorkspacesSelectBox()
+    workspacesDiv.appendChild(workspacesSelectBox)
+
+    const workspacesRightsEntity = new WorkspacesRights({ userId: this.userId })
+    let rightsList = await workspacesRightsEntity.getByUserId()
+    let workspacesTable = await this.createTable('Workspaces', rightsList)
+    workspacesDiv.appendChild(workspacesTable)
+    return (workspacesDiv)
+  }
 
   //---------------------------------------------------------------------
   async createListeners(thisClass) {
@@ -88,27 +106,27 @@ class UserRightsModal {
   //------------------------------------------------------------------------
   saveRights() {
     let rights = document.querySelectorAll(".hiddenProjectsRights")
-    rights.forEach( (r) => {
+    rights.forEach((r) => {
       console.log("UserRightsModal saveRights", r.id, r.value)
-      let readId = this.getItemId('projects','read',r.id)
-      console.log("UserRightsModal saveRights readId",readId)
-      console.log("UserRightsModal saveRights checked",document.getElementById(readId).checked)
-      let cRights=0
-      if ( document.getElementById(readId).checked ) {
-          cRights += READFLAG
+      let readId = this.getItemId('projects', 'read', r.id)
+      console.log("UserRightsModal saveRights readId", readId)
+      console.log("UserRightsModal saveRights checked", document.getElementById(readId).checked)
+      let cRights = 0
+      if (document.getElementById(readId).checked) {
+        cRights += READFLAG
       }
-      let writeId = this.getItemId('projects','write',r.id)
-      console.log("UserRightsModal saveRights writeId",writeId)
-      console.log("UserRightsModal saveRights checked",document.getElementById(writeId).checked)
-      if ( document.getElementById(writeId).checked ) {
-          cRights += WRITEFLAG
+      let writeId = this.getItemId('projects', 'write', r.id)
+      console.log("UserRightsModal saveRights writeId", writeId)
+      console.log("UserRightsModal saveRights checked", document.getElementById(writeId).checked)
+      if (document.getElementById(writeId).checked) {
+        cRights += WRITEFLAG
       }
-      if ( r.value != cRights) {
+      if (r.value != cRights) {
         console.log("UserRightsModal saveRights must patch")
-        let rightsEntity=new ProjectsRights({})
-        let prId=r.id.split(":")[0]
+        let rightsEntity = new ProjectsRights({})
+        let prId = r.id.split(":")[0]
         rightsEntity.setId(prId)
-        rightsEntity.setData("rights",cRights)
+        rightsEntity.setData("rights", cRights)
         rightsEntity.patch()
       } else {
         console.log("UserRightsModal saveRights unchanged")
@@ -150,56 +168,50 @@ class UserRightsModal {
       klass: "filter-group",
     }
     let prDiv = await selectBoxBuilder(boxParams)
-
-    //document.getElementById(boxName).addEventListener('change', async (e) => {
-    /*
-  prDiv.addEventListener('change', async (e) => {
-          console.log("UserRightsModal buildProjectsSelectBox()", e.detail)
-          let projectId = e.target.value;
-          //Kontext.setProject(e.target.value);
-          //let projectLink=buildProjectLink(projectId,"xxx")
-          //document.getElementById("project").replaceChildren(projectLink)
-          sendEvent("projectsRightsCreated", { projectId: projectId })
-      });
-      */
-
-
     console.log("UserRightsModal <buildProjectsSelectBox()>", prDiv)
     return (prDiv)
   }
 
-  //------------------------------------------------------------------------
-  getItemId(kind,action,id) {
-    return(`${kind}Rights_${action}_${id}`)
+  //--------------------------------------------------------------
+  async buildWorkspacesSelectBox() {
+    let workspaces = await Workspace.getAll('workspaces', {})
+    let boxName = "kanbearWorkspacesRightsSelectBox"
+    let buttons = [buildAddWorkspacesRightsButton(boxName, this.userId)]
+    let checkboxes = []
+    let boxParams = {
+      domId: boxName,
+      boxLabel: "WorkspacesRights",
+      buttons: buttons,
+      checkboxes: checkboxes,
+      items: workspaces,
+      labelText: "WorkspacesRights",
+      klass: "filter-group",
+    }
+    let wsDiv = await selectBoxBuilder(boxParams)
+    console.log("UserRightsModal <buildProjectsSelectBox()>", wsDiv)
+    return (wsDiv)
   }
 
   //------------------------------------------------------------------------
-  async createProjectsTable() {
-    const projectsRightsEntity = new ProjectsRights({ userId: this.userId })
-    let projectsRights = await projectsRightsEntity.getByUserId()
-    console.log("projectsRightsDialog.filltable()", "<projectsRights>", projectsRights)
+  getItemId(kind, action, id) {
+    return (`${kind}:rights:${action}:${id}`)
+  }
+
+  //------------------------------------------------------------------------
+  async createTable(kind, rightsList) {
+    const lkinds = kind[0].toLowerCase() + kind.slice(1)
+    const lkind = lkinds.slice(0, -1)
+
+    console.log("projectsRightsDialog.filltable()", "<rightsList>", rightsList)
     let table = document.createElement('table')
     const thead = document.createElement('thead')
     const hrow = document.createElement('tr')
     hrow.innerHTML = `
         <th>RightsId</th>
         <th>Kind</th>
-        <th>Projectid</th>
-        <th>Name</th>
-        <th>Rights</th>
-        <th>Read_checked</th>
-        <th>Write_checked</th>
-        <th>Read_AND</th>
-        <th>Write_AND</th>
-        <th>Read</th>
-        <th>Write</th>
-      `
-
-      hrow.innerHTML = `
-        <th>RightsId</th>
-        <th>Kind</th>
-        <th>ProjectId</th>
-        <th>ProjectName</th>
+        <th>${kind}Id</th>
+        <th>${kind}Name</th>
+        <th>Reference</th>
         <th>Read</th>
         <th>Write</th>
       `
@@ -207,52 +219,49 @@ class UserRightsModal {
     table.appendChild(thead)
     const tbody = document.createElement('tbody')
 
-    Object.entries(projectsRights).forEach((projectsRightsEntity) => {
-      const projectsRights = projectsRightsEntity[1]
-      console.log("KanbearprojectsRightsPanel.createTable() <projectsRights>", projectsRights)
+
+    const td = (p) => {
+      const td = document.createElement('td')
+      td.innerHTML = p
+      return (td)
+    }
+    const tdHref = (href) => {
+      const td = document.createElement('td')
+      td.appendChild(href)
+      return (td)
+    }
+
+    //Object.entries(projectsRightsList).forEach((projectsRightsEntity) => {
+    Object.entries(rightsList).forEach((rightsItem) => {
+      const rights = rightsItem[1]
+      console.log("KanbearprojectsRightsPanel.createTable() <Rights>", rights)
       const row = document.createElement('tr');
 
-      const td = (p) => {
-        const td = document.createElement('td')
-        td.innerHTML = p
-        return (td)
-      }
-      const tdHref = (href) => {
-        const td = document.createElement('td')
-        td.appendChild(href)
-        return (td)
-      }
-
-      let rightId = `${projectsRights.id}:${projectsRights.project_id}_${projectsRights.user_id}`
-      let hiddenRights = `<input type="hidden" class="hiddenProjectsRights" id="${rightId}" value="${projectsRights.rights}">`
-      row.appendChild(td(`${projectsRights.id} ${hiddenRights}`))
-      row.appendChild(td("Project"))
-      
-      //row.appendChild(td('<input class="userRightsCheckbox" userRightsId=' + projectsRights.id + ' type="checkbox"/>'))
-      //row.appendChild(tdHref(buildUserRightsLink(userRights.id, userRights.name)))
-      row.appendChild(td(projectsRights.project_id))
-      row.appendChild(td(projectsRights.project_name))
-      
-      console.log("UserRightsModal hiddenRights", hiddenRights)
-      //row.appendChild(td(`${projectsRights.rights} ${hiddenRights}`))
-      //row.appendChild(td(`${hiddenRights}`))
-      //row.appendChild(td(projectsRights.user_id))
-      let readChecked = ( (projectsRights.rights & READFLAG) > 0) ? "checked" : ""
-      let writeChecked = ( (projectsRights.rights & WRITEFLAG) > 0) ? "checked" : ""
-      //row.appendChild(td(readChecked))
-      //row.appendChild(td(writeChecked))
-      //row.appendChild(td(projectsRights.rights & READFLAG))
-      //row.appendChild(td(projectsRights.rights & WRITEFLAG))
-
+      let kId = rights[`${lkind}_id`]
+      let rightId = `${rights.id}:${kId}:${rights.user_id}`
+      let hiddenRights = `<input type="hidden" class="hiddenProjectsRights" id="${rightId}" value="${rights.rights}">`
+      row.appendChild(td(`${rights.id} ${hiddenRights}`))
+      row.appendChild(td(kind))
+      row.appendChild(td(rights[`${lkind}_id`]))
+      row.appendChild(td(rights[`${lkind}_name`]))
+      let referenceChecked = ((rights.rights & REFERENCEFLAG) > 0) ? "checked" : ""
+      let readChecked = ((rights.rights & READFLAG) > 0) ? "checked" : ""
+      let writeChecked = ((rights.rights & WRITEFLAG) > 0) ? "checked" : ""
       //let readId = `projectsRights_read_${rightId}`
-      let readId = this.getItemId('projects','read',rightId)
+      let referenceId = this.getItemId(lkinds, 'reference', rightId)
       row.appendChild(td(`<input class="userRightsCheckbox"
          type="checkbox"
-         name="${projectsRights.rights}"
+         name="${rights.rights}"
+         id="${referenceId}"
+         ${readChecked}/>`))
+      let readId = this.getItemId(lkinds, 'read', rightId)
+      row.appendChild(td(`<input class="userRightsCheckbox"
+         type="checkbox"
+         name="${rights.rights}"
          id="${readId}"
          ${readChecked}/>`))
       //let writeId = `projectsRights_write_${rightId}`
-      let writeId = this.getItemId('projects','write',rightId)
+      let writeId = this.getItemId(lkinds, 'write', rightId)
       row.appendChild(td(`<input class="userRightsCheckbox" 
          type="checkbox"
          id="${writeId}"

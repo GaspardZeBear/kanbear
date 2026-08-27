@@ -5,7 +5,7 @@
 import { Konsol } from 'konsol'
 import { db } from '../config/database.mjs';
 import { KanbearRights } from './KanbearRights.mjs';
-import e from 'cors';
+//import e from 'cors';
 
 /*
  RightChecker :
@@ -74,10 +74,11 @@ class RightsChecker {
     getWorkspaceIdAndRights(projectId, rights) {
         if (projectId > 0) {
             let sqlReq = `select workspace_id from projects where id=${projectId}`
-            let workspaceId = this.sqlGetId(sqlReq)
+            let workspaceId = this.sqlGetId('workspace_id',sqlReq)
             return ({id: workspaceId, rights: rights })
         } else {
-            return ({id:0, rights: 0 })
+            //return ({id:0, rights: 0 })
+            return ({})
         }
     }
 
@@ -102,8 +103,8 @@ class WorkspacesRightsChecker extends RightsChecker {
     computeRights(req) {
         Konsol.log("WorkspacesRightsChecker computeRights")
         return ({
-            "workspaces": { id: 0, rights: 0 },
-            "projects": { id: 0, rights: 0 }
+        //    "workspaces": { id: 0, rights: 0 },
+        //    "projects": { id: 0, rights: 0 }
         })
     }
 
@@ -117,6 +118,7 @@ class ProjectsRightsChecker extends RightsChecker {
         Konsol.log("ProjectsRightsChecker computeRights")
         let workspaceId, wrights
         let projectId = 0, prights = 0
+        let sqlReq
         switch (this.op) {
             case 'create':
                 wrights = REFERENCE
@@ -130,18 +132,26 @@ class ProjectsRightsChecker extends RightsChecker {
                 wrights = REFERENCE
                 prights = READ
                 projectId = req.params["id"]
-                let sqlReq = `select workspace_id from projects where id=${id}`
+                sqlReq = `select workspace_id from projects where id=${projectId}`
                 workspaceId = this.sqlGetId('workspace_id',sqlReq)
-            // !! No break  
+                break  
             case 'patch':
                 wrights = REFERENCE
                 prights = WRITE
+                projectId = req.params["id"]
+                sqlReq = `select workspace_id from projects where id=${projectId}`
+                workspaceId = this.sqlGetId('workspace_id',sqlReq)
                 break
         }
+        if ( projectId > 0) {
         return ({
             "workspaces": { id : workspaceId, rights: wrights},
             "projects": { id: projectId, rights: prights }
+        })} else {
+            return ({
+            "workspaces": { id : workspaceId, rights: wrights}
         })
+        }
     }
 }
 
@@ -153,6 +163,8 @@ class SwimlanesRightsChecker extends RightsChecker {
         Konsol.log("SwimlanesRightsChecker computeRights")
         let projectId, prights
         let workspaceId, wrights
+        let sqlReq
+        let swimlaneId
         switch (this.op) {
             case 'create':
                 projectId = req.body["project_id"]
@@ -165,12 +177,15 @@ class SwimlanesRightsChecker extends RightsChecker {
 
             case 'getById':
                 prights = READ
-                this.id = req.params["id"]
-                let sqlReq = `select project_id from swimlanes where id=${id}`
-                this.sqlGetId('project_id',sqlReq)
-            // !! No break here
+                swimlaneId = req.params["id"]
+                sqlReq = `select project_id from swimlanes where id=${swimlaneId}`
+                projectId=this.sqlGetId('project_id',sqlReq)
+                break
             case 'patch':
                 prights = WRITE
+                swimlaneId = req.params["id"]
+                sqlReq = `select project_id from swimlanes where id=${swimlaneId}`
+                projectId=this.sqlGetId('project_id',sqlReq)
                 break
         }
         return ({
@@ -189,6 +204,9 @@ class ColumnsRightsChecker extends RightsChecker {
         Konsol.log("ColumnsRightsChecker computeRights")
         let projectId, prights
         let workspaceId, wrights
+        let sqlReq
+        let columnId
+
         switch (this.op) {
             case 'create':
                 projectId = req.body["project_id"]
@@ -200,15 +218,15 @@ class ColumnsRightsChecker extends RightsChecker {
                 break
             case 'patch':
                 prights = WRITE
-                let id = req.params["id"]
-                let sqlReq = `select project_id from columns where id=${id}`
-                this.sqlGetId('project_id',sqlReq)
+                columnId = req.params["id"]
+                sqlReq = `select project_id from columns where id=${columnId}`
+                projectId=this.sqlGetId('project_id',sqlReq)
                 break
             case 'getById':
                 prights = READ
-                this.id = req.params["id"]
-                sqlReq = `select project_id from columns where id=${id}`
-                this.sqlGetId(sqlReq)
+                columnId = req.params["id"]
+                sqlReq = `select project_id from columns where id=${columnId}`
+                projectId=this.sqlGetId('project_id',sqlReq)
                 break
         }
         return ({
@@ -226,24 +244,11 @@ class TasksRightsChecker extends RightsChecker {
         Konsol.log("TasksRightsChecker computeRights")
         let projectId, prights
         let workspaceId, wrights
+        let sqlReq,subselect
         switch (this.op) {
             case 'create':
                 prights = WRITE
-                let subselect = `select column_id from tasks  where id=${req.body["column_id"]}`
-                let sqlReq = `
-                    select
-                      project_id 
-                    from 
-                      columns
-                    where
-                      id=(${subselect})
-                `
-                projectId = this.sqlGetId('project_id',sqlResp)
-            case 'getAll':
-                break
-            case 'getById':
-                prights = READ
-                subselect = `select column_id from tasks  where id=${req.param["column_id"]}`
+                subselect = `select column_id from tasks  where id=${req.body["column_id"]}`
                 sqlReq = `
                     select
                       project_id 
@@ -252,10 +257,35 @@ class TasksRightsChecker extends RightsChecker {
                     where
                       id=(${subselect})
                 `
-                projectId = this.sqlGetId('project_id',sqlResp)
-            //!!!!! No break here
+                projectId = this.sqlGetId('project_id',sqlReq)
+            case 'getAll':
+                break
+            case 'getById':
+                prights = READ
+                subselect = `select column_id from tasks  where id=${req.params["id"]}`
+                sqlReq = `
+                    select
+                      project_id 
+                    from 
+                      columns
+                    where
+                      id=(${subselect})
+                `
+                projectId = this.sqlGetId('project_id',sqlReq)
+                break
             case 'patch':
                 prights = WRITE
+                Konsol.log("TaskRightsChecker computeRights patch",req.params)
+                subselect = `select column_id from tasks  where id=${req.params["id"]}`
+                sqlReq = `
+                    select
+                      project_id 
+                    from 
+                      columns
+                    where
+                      id=(${subselect})
+                `
+                projectId = this.sqlGetId('project_id',sqlReq)
                 break
         }
         return ({
