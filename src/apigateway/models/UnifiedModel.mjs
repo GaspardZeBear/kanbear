@@ -26,6 +26,7 @@ class UnifiedModel {
         UnifiedModel.UnifiedModelOp['getById'] = UnifiedModel.getById
         UnifiedModel.UnifiedModelOp['getByForeignKey'] = UnifiedModel.getByForeignKey
         UnifiedModel.UnifiedModelOp['getProjectsRightsByUserid'] = UnifiedModel.getProjectsRightsByUserid
+        UnifiedModel.UnifiedModelOp['getWorkspacesRightsByUserid'] = UnifiedModel.getWorkspacesRightsByUserid
         UnifiedModel.UnifiedModelOp['update'] = UnifiedModel.update
         UnifiedModel.UnifiedModelOp['patch'] = UnifiedModel.patch
         UnifiedModel.UnifiedModelOp['delete'] = UnifiedModel.delete
@@ -62,6 +63,35 @@ class UnifiedModel {
              Konsol.log("UnifiedModel.getProjectsRightsByUserid()(), will call callback","<res>", err)
             Konsol.log("UnifiedModel.getProjectsRightsByUserid()(), will call callback","<res>", res)
              Konsol.log("UnifiedModel.getProjectsRightsByUserid()(), will call callback","<httpCode>", httpCode)
+            //res.lastInsertRowid ? callback(null, 201,res.lastInsertRowid) : callback(res, null)
+            callback(null, 200,res)
+        });
+        
+        
+       //db.run(sql, [], callback)
+    }
+
+    //------------------------------------------------------------------
+    static getWorkspacesRightsByUserid(table, req, opParms, callback) {
+        Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()", "<params>", req.params)
+        Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()", "<body>", req.body)
+        const sql = `SELECT r.id id,
+                            r.user_id user_id,
+                            r.workspace_id workspace_id,
+                            r.rights rights,
+                            w.name workspace_name
+                        FROM workspaces_rights as r
+                        LEFT JOIN workspaces as w
+                            on w.id=r.workspace_id
+                        WHERE r.user_id = ${req.params["user_id"]}
+                        `
+                   
+        Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()", "<sql>", sql)
+        
+        db.all(sql, [], (err, httpCode, res) => {
+             Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()(), will call callback","<res>", err)
+            Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()(), will call callback","<res>", res)
+             Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()(), will call callback","<httpCode>", httpCode)
             //res.lastInsertRowid ? callback(null, 201,res.lastInsertRowid) : callback(res, null)
             callback(null, 200,res)
         });

@@ -105,34 +105,40 @@ class UserRightsModal {
 
   //------------------------------------------------------------------------
   saveRights() {
-    let rights = document.querySelectorAll(".hiddenProjectsRights")
-    rights.forEach((r) => {
+    let hiddenRights = document.querySelectorAll(".hiddenRights")
+    for (let r of hiddenRights) {
+    //hiddenRights.forEach((r) => {
       console.log("UserRightsModal saveRights", r.id, r.value)
-      let readId = this.getItemId('projects', 'read', r.id)
-      console.log("UserRightsModal saveRights readId", readId)
-      console.log("UserRightsModal saveRights checked", document.getElementById(readId).checked)
       let cRights = 0
-      if (document.getElementById(readId).checked) {
+      if (document.getElementById(`${r.id}:reference`).checked) {
+        cRights += REFERENCEFLAG
+      }
+      if (document.getElementById(`${r.id}:read`).checked) {
         cRights += READFLAG
       }
-      let writeId = this.getItemId('projects', 'write', r.id)
-      console.log("UserRightsModal saveRights writeId", writeId)
-      console.log("UserRightsModal saveRights checked", document.getElementById(writeId).checked)
-      if (document.getElementById(writeId).checked) {
+      if (document.getElementById(`${r.id}:write`).checked) {
         cRights += WRITEFLAG
       }
-      if (r.value != cRights) {
-        console.log("UserRightsModal saveRights must patch")
-        let rightsEntity = new ProjectsRights({})
-        let prId = r.id.split(":")[0]
-        rightsEntity.setId(prId)
+      console.log("UserRightsModal saveRights", r.id, r.value, "cRights", cRights)
+      if (cRights != r.value) {
+        console.log("UserRightsModal saveRights", r.id, " update")
+        let [kind, rightsId, kindId, userId, dum0, dum1] = r.id.split(":")
+        let rightsEntity
+        switch (kind) {
+          case 'projects':
+            rightsEntity = new ProjectsRights({})
+            break
+          case 'workspaces':
+            rightsEntity = new WorkspacesRights({})
+            break
+        }
+        rightsEntity.setId(rightsId)
         rightsEntity.setData("rights", cRights)
         rightsEntity.patch()
-      } else {
-        console.log("UserRightsModal saveRights unchanged")
       }
-    })
+    }
   }
+
 
   //------------------------------------------------------------------------
   buildSaveRightsButton() {
@@ -145,7 +151,8 @@ class UserRightsModal {
       console.log("saveRightsButton event Listener fired")
       ev.stopPropagation();
       myThis.saveRights()
-      document.getElementById(`rightsModal`).close()
+      myThis.render()
+      //document.getElementById(`rightsModal`).close()
     }
     //let dialog = document.getElementById(`projectsRightsModal`)
     saveRightsButton.addEventListener('click', saveRightsFn, { once: false });
@@ -194,7 +201,7 @@ class UserRightsModal {
 
   //------------------------------------------------------------------------
   getItemId(kind, action, id) {
-    return (`${kind}:rights:${action}:${id}`)
+    return (`${kind}:${id}:rights:${action}`)
   }
 
   //------------------------------------------------------------------------
@@ -202,7 +209,7 @@ class UserRightsModal {
     const lkinds = kind[0].toLowerCase() + kind.slice(1)
     const lkind = lkinds.slice(0, -1)
 
-    console.log("projectsRightsDialog.filltable()", "<rightsList>", rightsList)
+    console.log("UserRightsModal.createTable()", "kind", kind, "<rightsList>", rightsList)
     let table = document.createElement('table')
     const thead = document.createElement('thead')
     const hrow = document.createElement('tr')
@@ -239,7 +246,7 @@ class UserRightsModal {
 
       let kId = rights[`${lkind}_id`]
       let rightId = `${rights.id}:${kId}:${rights.user_id}`
-      let hiddenRights = `<input type="hidden" class="hiddenProjectsRights" id="${rightId}" value="${rights.rights}">`
+      let hiddenRights = `<input type="hidden" class="hiddenRights" id="${lkinds}:${rightId}:rights" value="${rights.rights}">`
       row.appendChild(td(`${rights.id} ${hiddenRights}`))
       row.appendChild(td(kind))
       row.appendChild(td(rights[`${lkind}_id`]))
@@ -253,7 +260,7 @@ class UserRightsModal {
          type="checkbox"
          name="${rights.rights}"
          id="${referenceId}"
-         ${readChecked}/>`))
+         ${referenceChecked}/>`))
       let readId = this.getItemId(lkinds, 'read', rightId)
       row.appendChild(td(`<input class="userRightsCheckbox"
          type="checkbox"
