@@ -31,6 +31,7 @@ class UserRightsModal {
 
   //-----------------------------------------------------------------
   async render() {
+    console.log("UserRightsModal render() fired")
     const result = document.getElementById(this.htmlElement);
     //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
 
@@ -155,7 +156,7 @@ class UserRightsModal {
       //document.getElementById(`rightsModal`).close()
     }
     //let dialog = document.getElementById(`projectsRightsModal`)
-    saveRightsButton.addEventListener('click', saveRightsFn, { once: false });
+    saveRightsButton.addEventListener('click', saveRightsFn, { once: true });
     return (saveRightsButton)
   }
 

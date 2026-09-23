@@ -106,7 +106,7 @@ class KanbearRights {
   load() {
     
     this.loadRights()
-    Konsol.log("KanbearRights.load() this.rightsResp",this.rightsResp)
+    //Konsol.log("KanbearRights.load() this.rightsResp",this.rightsResp)
     //try {
     /*
     if (this.rightsResp.length != 1) {
@@ -115,7 +115,7 @@ class KanbearRights {
     }
       */
     //return ({})
-    return (this.rightsResp)
+    return (this.rightsResp.data)
     //} catch (err) {
     //  console.log(err)
     //}

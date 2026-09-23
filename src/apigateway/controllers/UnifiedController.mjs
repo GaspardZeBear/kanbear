@@ -41,12 +41,13 @@ class UnifiedController {
                 let kanbearRights = new KanbearRights(req.kanbearKontext.decodedToken.userId)
                 // admin users have all rights
                 if (!kanbearRights.isAdmin()) {
-                    let krc = KanbearRightsCheckerFactory.create(table, op)
-                    if (krc !== null) {
-                        let requiredRights = krc.getRequiredRights(req)
-                        Konsol.log(`UnifiedModel ${op}_${table}() callback function,'requiredRights=`, requiredRights)
-                        let isAllowed = true
-                        if (!isAllowed) {
+                    let kanbearRightsChecker = KanbearRightsCheckerFactory.create(table, op)
+                    if (kanbearRightsChecker !== null) {
+                        //let requiredRights = kanbearRightsChecker.getRequiredRights(req)
+                        //Konsol.log(`UnifiedModel ${op}_${table}() callback function,'requiredRights=`, requiredRights)
+                        //Konsol.log(`UnifiedModel ${op}_${table}() callback function,'kanbearRights=`, kanbearRights.load())
+                        //let isAllowed = true
+                        if (!kanbearRightsChecker.isAllowed(req,kanbearRights.load())) {
                             res.status(403).json({ error: "Access denied" });
                         }
                     }

@@ -108,6 +108,7 @@ class KanbearUserPanel {
       const hrow = document.createElement('tr')
       hrow.innerHTML = `
         <th>Sel</th>
+        <th>Id</th>
         <th>Name</th>
         <th>Password</th>
         <th>Description</th>
@@ -138,6 +139,7 @@ class KanbearUserPanel {
         }
         const id = "userSel"
         row.appendChild(td('<input class="userCheckbox" userId=' + user.id + ' type="checkbox"/>'))
+        row.appendChild(td(user.id))
         row.appendChild(tdHref(buildUserLink(user.id, user.name)))
         row.appendChild(td("**** ..."))
         row.appendChild(td(user.description))

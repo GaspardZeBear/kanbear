@@ -56,18 +56,47 @@ class RightsChecker {
     constructor(op) {
         Konsol.log("RightsCheckerFactory constructor", "op", op)
         this.op = op
+        this.requiredRights=null
     }
 
     //-----------------------------------------------------------------------------------
-    getRequiredRights(req) {
-        let requiredRights=this.computeRights(req)
+    XgetRequiredRights(req) {
+        this.requiredRights=this.computeRights(req)
         Konsol.log("RightsCheckerFactory getRequiredRights(req)", this.computeRights(req))
         return (requiredRights)
     }
 
     //-----------------------------------------------------------------------------------
-    isAllowed() {
-        return (false)
+    isAllowed(req,userRights) {
+        this.requiredRights=this.computeRights(req)
+        Konsol.log("RightsCheckerFactory requiredRights",this.requiredRights,"userRights=",userRights)
+        // "requiredRights"={"workspaces":{"id":1,"rights":2},"projects":{"id":1,"rights":2}}
+        // "userRights"={"workspaces":{"0":0},"projects":{"1":4,"2":6,"3":7,"4":0,"11":0,"12":0}}
+        if ( this.requiredRights.workspaces && this.requiredRights.workspaces.id > 0 ) {
+            Konsol.log("RightsCheckerFactory getRequiredRights(req) will check workspace")
+            let wsId=this.requiredRights.workspaces.id 
+            //wsId=0
+            let uRights=userRights?.workspaces?.[wsId]
+            Konsol.log("RightsCheckerFactory getRequiredRights(req) will check workspace",uRights)
+            if ( uRights & this.requiredRights.workspaces.rights ) {
+               Konsol.log("RightsCheckerFactory getRequiredRights(req)  check workspace OK")
+            } else {
+               Konsol.log("RightsCheckerFactory getRequiredRights(req)  check workspace KO")
+            }
+        }
+        if ( this.requiredRights.projects && this.requiredRights.projects.id > 0 ) {
+            Konsol.log("RightsCheckerFactory getRequiredRights(req) will check project")
+            let prId=this.requiredRights.projects.id 
+            //wsId=0
+            let uRights=userRights?.projects?.[prId]
+            Konsol.log("RightsCheckerFactory getRequiredRights(req) will check project",uRights)
+            if ( uRights & this.requiredRights.projects.rights ) {
+               Konsol.log("RightsCheckerFactory getRequiredRights(req)  check project OK")
+            } else {
+               Konsol.log("RightsCheckerFactory getRequiredRights(req)  check project KO")
+            }
+        }
+        return (true)
     }
 
     //----------------------------------------------------------------------------------
