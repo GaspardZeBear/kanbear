@@ -89,7 +89,7 @@ function buildAddProjectButton(workspaceId) {
 
 
 //------------------------------------------------------------------------
-function buildAddProjectsRightsButton(boxId,userId) {
+function buildAddProjectsRightsButton(boxId,userId, once=false) {
   console.log("buildAddProjectsRightsButton event Listener fired", "userId", userId)
   const addProjectsRightsButton = document.createElement('button')
   addProjectsRightsButton.classList.add("add-item-btn")
@@ -113,13 +113,13 @@ function buildAddProjectsRightsButton(boxId,userId) {
     }
   }
   //removeEventListener("click", addSwimlaneFn)
-  addProjectsRightsButton.addEventListener('click', addProjectsRightsFn, { once: false });
+  addProjectsRightsButton.addEventListener('click', addProjectsRightsFn, { once: once });
   return (addProjectsRightsButton)
 }
 
 
 //------------------------------------------------------------------------
-function buildAddWorkspacesRightsButton(boxId,userId) {
+function buildAddWorkspacesRightsButton(boxId,userId,once=false) {
   console.log("buildAddWorkspacesRightsButton event Listener fired", "userId", userId)
   const addWorkspacesRightsButton = document.createElement('button')
   addWorkspacesRightsButton.classList.add("add-item-btn")
@@ -137,13 +137,13 @@ function buildAddWorkspacesRightsButton(boxId,userId) {
       workspacesRights.setData("user_id",userId)
       workspacesRights.create()
       //projectsRights.create();
-      sendEvent('workspacessRightsCreated', {})
+      sendEvent('workspacesRightsCreated', {})
     } else {
       alert("Select a workspaces to add user to")
     }
   }
   //removeEventListener("click", addSwimlaneFn)
-  addWorkspacesRightsButton.addEventListener('click', addWorkspacesRightsFn, { once: false });
+  addWorkspacesRightsButton.addEventListener('click', addWorkspacesRightsFn, { once: once });
   return (addWorkspacesRightsButton)
 }
 

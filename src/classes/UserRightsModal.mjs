@@ -85,6 +85,10 @@ class UserRightsModal {
       console.log("UserRightsModal() projectsRightsCreated listener fired <ev>", ev)
       thisClass.render()
     })
+    document.addEventListener("workspacesRightsCreated", async (ev) => {
+      console.log("UserRightsModal() workspacesRightsCreated listener fired <ev>", ev)
+      thisClass.render()
+    })
   }
 
   //------------------------------------------------------------------------
@@ -100,7 +104,7 @@ class UserRightsModal {
       document.getElementById(`rightsModal`).close()
     }
     //let dialog = document.getElementById(`projectsRightsModal`)
-    exitRightsButton.addEventListener('click', exitRightsFn, { once: false });
+    exitRightsButton.addEventListener('click', exitRightsFn, { once: true });
     return (exitRightsButton)
   }
 
@@ -164,7 +168,7 @@ class UserRightsModal {
   async buildProjectsSelectBox() {
     let projects = await Project.getAll('projects', {})
     let boxName = "kanbearProjectsRightsSelectBox"
-    let buttons = [buildAddProjectsRightsButton(boxName, this.userId)]
+    let buttons = [buildAddProjectsRightsButton(boxName, this.userId, true)]
     let checkboxes = []
     let boxParams = {
       domId: boxName,
@@ -184,7 +188,7 @@ class UserRightsModal {
   async buildWorkspacesSelectBox() {
     let workspaces = await Workspace.getAll('workspaces', {})
     let boxName = "kanbearWorkspacesRightsSelectBox"
-    let buttons = [buildAddWorkspacesRightsButton(boxName, this.userId)]
+    let buttons = [buildAddWorkspacesRightsButton(boxName, this.userId, true)]
     let checkboxes = []
     let boxParams = {
       domId: boxName,
