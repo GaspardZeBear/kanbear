@@ -49,22 +49,29 @@ class SqlBuilder {
         const bindVariables = []
         const qmarks = []
         const filter = req.query ?? {}
-        Konsol.log("SqlBuilder.generateGetStatement() <req.query>", req.query, "<req.params>",req.params,"<filter>", filter)
+        Konsol.log("SqlBuilder.generateGetStatement() <req.query>", req.query, "<req.params>", req.params, "<filter>", filter)
         // quick and darty, does not work for strings !
         let filters = []
         Object.entries(filter).forEach(([key, val]) => {
             filters.push(`${key}=${val}`)
         })
-        /*
-        let whereStr = ''
-        if (req.query && filter) {
-            if (Array.isArray(filter)) {
-                whereStr = filter.join(' AND ')
-            } else {
-                whereStr = filter
-            }
-        }
-        */
+
+        //let tableIdFilter=''
+        let kanbearRights = req.kanbearKontext.kanbearRights
+        if (!kanbearRights.isAdmin) {
+            Konsol.log("SqlBuilder.generateGetStatement() will add filter", kanbearRights, "table", tableName, kanbearRights.load()[tableName])
+            const ht = kanbearRights.load()[tableName]
+            let ids = []
+            const READ = 2
+            Object.entries(ht).forEach(([id, rights]) => {
+                Konsol.log("SqlBuilder.generateGetStatement() id", id, "rights",rights)
+                if (parseInt(rights) & READ) {
+                    Konsol.log("SqlBuilder.generateGetStatement() will add id", id)
+                    ids.push(id)
+                }
+            })
+            filters.push(`id in ( ${ids.join(',')})`)
+        } 
         let whereStr = filters.join(' AND ')
         whereStr ? whereStr = 'WHERE ' + whereStr : ''
 

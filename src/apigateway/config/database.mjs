@@ -23,6 +23,7 @@ class Db {
         //this.db = new DatabaseSync(dbFile);
         //this.db = new Database(dbFile, { verbose: console.log });
         this.db = new Database(dbFile)
+        this.db.pragma('foreign_keys = OFF')
     }
 
     //------------------------------------------------------------------------------

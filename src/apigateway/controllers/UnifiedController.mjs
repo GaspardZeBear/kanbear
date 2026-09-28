@@ -39,8 +39,9 @@ class UnifiedController {
 
                 
                 let kanbearRights = new KanbearRights(req.kanbearKontext.decodedToken.userId)
+                req.kanbearKontext.kanbearRights=kanbearRights
                 // admin users have all rights
-                if (!kanbearRights.isAdmin()) {
+                if (!kanbearRights.isAdmin) {
                     let kanbearRightsChecker = KanbearRightsCheckerFactory.create(table, op)
                     if (kanbearRightsChecker !== null) {
                         //let requiredRights = kanbearRightsChecker.getRequiredRights(req)
@@ -53,13 +54,10 @@ class UnifiedController {
                     }
                 }
 
-
                 UnifiedModel[op](table, req, opParms, (err, httpCode, sqlRes) => {
                     Konsol.log(`UnifiedModel ${op}_${table}() callback function,'<err>`, err, '<sqlRes>', sqlRes)
                     if (err) {
                         Konsol.log(`UnifiedModel ${op}_${table}() callback function,'<err>`, JSON.stringify(err.message))
-                        //return res.status(httpCode).json({ error: JSON.stringify(err.message) });
-                        //return res.status(httpCode).json(JSON.stringify(err.message));
                         return res.status(httpCode).json(err.message)
                     }
                     res.status(httpCode).json(sqlRes);

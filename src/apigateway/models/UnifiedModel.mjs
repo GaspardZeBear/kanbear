@@ -132,7 +132,7 @@ class UnifiedModel {
 
     //------------------------------------------------------------------
     static getAll(table, req, opParms, callback) {
-
+        
         const { sql, bindVariables } = new SqlBuilder().generateGetStatement(table, req)
         //const sql = `SELECT * FROM ${table}`;
         Konsol.log("UnifiedModel.getAll()", "<table>", table, "<req.query>", req.query, "<sql>", sql)

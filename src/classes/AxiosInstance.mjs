@@ -19,14 +19,14 @@ class AxiosInstance {
                 return response;
             },
             (error) => {
-                console.log("AxiosInstance error")
+                console.log("AxiosInstance error ",error)
                 if (error.response) {
                     // Cas d'une erreur 401 (Unauthorized)
-                    if (error.response.status === 401) {
+                    if (error.response.status === 401 || error.response.status === 403) {
                         // Gère l'erreur 401 ici
                         this.handleUnauthorizedError(error);
                     }
-                    // Pour les autres erreurs (404, 500, etc.), retourne l'erreur
+                    console.log('AxiosInstance on error status', error.response.status);
                     return Promise.reject(error);
                 } else if (error.request) {
                     // La requête a été faite mais aucune réponse n'a été reçue
@@ -42,12 +42,12 @@ class AxiosInstance {
 
     // Fonction pour gérer les erreurs 401
     handleUnauthorizedError(error) {
-        console.log("AxiosInstance handleUnauthorizedError", error)
+        console.log("AxiosInstance handleUnauthorizedError()", error)
         // Exemple 1 : Rediriger vers la page de login
         //window.location.href = '/login?from=' + encodeURIComponent(window.location.pathname);
 
         // Exemple 2 : Afficher un message d'erreur (avec un toast, par exemple)
-        //alert('Votre session a expiré. Veuillez vous reconnecter.');
+        alert(`No authorized ${error}`);
 
         // Exemple 3 : Rafraîchir le token (si tu utilises JWT)
         // return refreshTokenAndRetry(error);

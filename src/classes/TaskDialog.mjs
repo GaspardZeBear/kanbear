@@ -18,24 +18,6 @@ class TaskDialog extends Dialog {
     }
 
     //----------------------------------------------------------------------------
-    XbuildTaskCommentsLink(id) {
-        const href = document.createElement("a")
-        //LinkCounter.counter++
-        //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
-        href.setAttribute("href", "javascript:void(0)")
-        href.innerHTML = `Comments`
-        //let myProject = this.project
-        let tasksCommentsFn = function (ev) {
-            console.log("tasksComments Href event Listener fired ")
-            ev.stopPropagation();
-            const modal=new TasksCommentsModal(id)
-        }
-        href.addEventListener('click', tasksCommentsFn);
-        console.log(href)
-        return (href)
-    }
-
-    //----------------------------------------------------------------------------
     async fillFormFromDb(task) {
         console.log("TaskDialog.fillFormFromDb() <task>", task)
         //let taskColor = await this.buildColorSelectBox(task.color)
@@ -82,14 +64,6 @@ class TaskDialog extends Dialog {
         document.getElementById("taskAssigneeDiv").replaceChildren(asDiv)
         document.getElementById(boxName).addEventListener('change', async (e) => {
             let assigneeId = parseInt(e.target.value)
-            /*
-            if (assigneeId == -1) {
-                //let newProject =new ProjectDialog("create",workspaceId)
-                let newAssignee = new AssigneeDialog()
-                newAssignee.create()
-                return
-            }
-                */
             if (assigneeId < 0) {
                 return
             }

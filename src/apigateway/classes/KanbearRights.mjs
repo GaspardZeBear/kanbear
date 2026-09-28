@@ -14,10 +14,11 @@ class KanbearRights {
     //this.db = new DatabaseSync('db.sqlite', { readonly: true });
     //this.db = db
     this.userId = userId
+    this.isAdmin=this.isAdminSql()
   }
 
   //-----------------------------------------------------
-  isAdmin() {
+  isAdminSql() {
     Konsol.log("KanbearRights.isAdmin()")
     let req = `
       select
@@ -86,10 +87,10 @@ class KanbearRights {
     });
     let rights={data:{workspaces:{},projects:{}}}
     wResp.forEach(element => {
-      rights.data["workspaces"][element.id]=element.rights
+      rights.data["workspaces"][element.workspace_id]=element.rights
     });
     pResp.forEach(element => {
-      rights.data["projects"][element.id]=element.rights
+      rights.data["projects"][element.project_id]=element.rights
     });
     this.rightsResp=rights
   }
