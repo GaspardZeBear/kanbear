@@ -55,7 +55,7 @@ app.post('/api/login',
       let login = new KanbearLogin({ userName: req.body.userName, userPassword: req.body.userPassword })
       const check = await login.check()
 
-      res.status(200).json({ message: 'Logged in', token:check.token, userId:check.userId });
+      res.status(200).json({ message: 'Logged in', token:check.token, userId:check.userId, rights:check.rights });
     } catch (error) {
       console.log("/api/login error ", error.message)
       res.status(500).json({ error: error.cause });
@@ -101,20 +101,6 @@ app.get('/api/sql/report/:projectId',
     //console.log("/api/sql/report done")
   });
 
-//------------------------------------------------------------------------------
-app.post('/Xapi/login',
-  async (req, res) => {
-    Konsol.log("apigateway login", req.body)
-    try {
-      let login = new KanbearLogin({ userName: req.body.userName, userPassword: req.body.userPassword })
-      const check = await login.check()
-
-      res.status(200).json({ message: 'Logged in', token:check.token, userId:check.userId });
-    } catch (error) {
-      console.log("/api/login error ", error.message)
-      res.status(500).json({ error: error.cause });
-    }
-  })
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 3002;

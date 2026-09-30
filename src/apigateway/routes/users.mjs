@@ -11,6 +11,7 @@ router.post('/', UnifiedController.getFunction('users','hashAndCreateUser'))
 router.get('/', UnifiedController.getFunction('users','getAll'))
 //router.get('/:id', userController.getUserById);
 router.get('/:id', UnifiedController.getFunction('users','getById'))
+router.get('/rights/:id', UnifiedController.getFunction('users','getRightsForUser'))
 
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!
 //router.get('/username/:username', userController.getUserByUsername);

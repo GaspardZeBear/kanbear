@@ -32,7 +32,7 @@ class LoginDialog {
                 userPassword: loginForm.loginPassword.value
             }
             const resp = await new ApiCaller().post(`/api/login`, params)
-            console.log("LoginDialog submit()", "userId", resp.data.userId, "resp token", resp.data.token)
+            console.log("LoginDialog submit()", "userId", resp.data.userId, "rights", resp.data.rights, "resp token", resp.data.token)
             Kontext.setUserName(loginForm.loginName.value)
             Kontext.setUserId(resp.data.userId)
             Kontext.setJwtoken(resp.data.token)

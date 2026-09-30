@@ -4,6 +4,7 @@
 //import { Konsol } from './Konsol.mjs'
 import { Konsol } from 'konsol'
 import { db } from '../config/database.mjs';
+import { KanbearRights } from './KanbearRights.mjs';
 
 class KanbearSqlReporter {
 
@@ -251,9 +252,11 @@ class KanbearSqlReporter {
         description: c.cDescription
       }
     }
+
     for (let p in projectsMap) {
       report.push(projectsMap[p])
     }
+    
     //console.log(report)
     //console.log(usersMap)
     //return (report)

@@ -60,13 +60,6 @@ class RightsChecker {
     }
 
     //-----------------------------------------------------------------------------------
-    XgetRequiredRights(req) {
-        this.requiredRights=this.computeRights(req)
-        Konsol.log("RightsCheckerFactory getRequiredRights(req)", this.computeRights(req))
-        return (requiredRights)
-    }
-
-    //-----------------------------------------------------------------------------------
     isAllowed(req,userRights) {
         this.requiredRights=this.computeRights(req)
         Konsol.log("RightsCheckerFactory requiredRights",this.requiredRights,"userRights=",userRights)
@@ -82,6 +75,7 @@ class RightsChecker {
                Konsol.log("RightsCheckerFactory getRequiredRights(req)  check workspace OK")
             } else {
                Konsol.log("RightsCheckerFactory getRequiredRights(req)  check workspace KO")
+               return(false)
             }
         }
         if ( this.requiredRights.projects && this.requiredRights.projects.id > 0 ) {
@@ -94,6 +88,7 @@ class RightsChecker {
                Konsol.log("RightsCheckerFactory getRequiredRights(req)  check project OK")
             } else {
                Konsol.log("RightsCheckerFactory getRequiredRights(req)  check project KO")
+               return(false)
             }
         }
         return (true)

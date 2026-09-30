@@ -50,6 +50,7 @@ class UnifiedController {
                         //let isAllowed = true
                         if (!kanbearRightsChecker.isAllowed(req,kanbearRights.load())) {
                             res.status(403).json({ error: "Access denied" });
+                            return
                         }
                     }
                 }

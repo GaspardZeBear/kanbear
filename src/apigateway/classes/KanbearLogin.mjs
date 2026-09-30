@@ -4,6 +4,7 @@
 //import { Konsol } from './Konsol.mjs'
 import { Konsol } from 'konsol'
 import { db } from '../config/database.mjs';
+import { KanbearRights } from './KanbearRights.mjs';
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 
@@ -61,7 +62,8 @@ class KanbearLogin {
           { expiresIn: '1h' }
         );
         //Konsol.log("KanbearLogin.check()", "token", token)
-        return ({userId: this.userResp[0].uId, token:token})
+        let kanbearRights = new KanbearRights(this.userResp[0].uId).load()
+        return ({userId: this.userResp[0].uId, rights: kanbearRights, token:token})
       } else {
         throw Error("Login check failed", { cause : "password"})
       }
