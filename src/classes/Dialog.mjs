@@ -1,6 +1,7 @@
 import { KanbearEntity } from "./KanbearEntity.mjs"
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 import { sendEvent } from "../utils/sendEvent.mjs"
+import { mustDisable,REFERENCE,READ,WRITE } from "../utils/rights.mjs"
 
 class Dialog {
 
@@ -135,6 +136,7 @@ class Dialog {
         //console.log("createDialog() saveListeners after push",Dialog.clickListeners)
         //removeEventListener("click",saveFn)
         console.log("Dialog.createDialog <saveBtn>",document.getElementById(saveBtnId))
+        //document.getElementById(saveBtnId).disabled=isDisabled(1)
         document.getElementById(saveBtnId).addEventListener("click", saveFn, {once: true});
         //document.getElementById(saveBtnId).addEventListener("mouseover", () => {console.log("Mouseover")});
 

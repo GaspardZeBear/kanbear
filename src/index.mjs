@@ -96,7 +96,7 @@ document.addEventListener("loginOk", async (ev) => {
 })
 
 function startRightsTimer() {
-    rightsTimer = setInterval(Kontext.getUserRights, 10_000);
+    rightsTimer = setInterval(Kontext.getUserRights, 60_000);
 }
 function stopRightsTimer() {
     clearInterval(rightsTimer)

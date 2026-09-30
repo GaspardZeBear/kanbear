@@ -66,15 +66,15 @@ class RightsChecker {
         // "requiredRights"={"workspaces":{"id":1,"rights":2},"projects":{"id":1,"rights":2}}
         // "userRights"={"workspaces":{"0":0},"projects":{"1":4,"2":6,"3":7,"4":0,"11":0,"12":0}}
         if ( this.requiredRights.workspaces && this.requiredRights.workspaces.id > 0 ) {
-            Konsol.log("RightsCheckerFactory getRequiredRights(req) will check workspace")
+            Konsol.log("RightsCheckerFactory getRequiredRights(req) will check workspace require",this.requiredRights)
             let wsId=this.requiredRights.workspaces.id 
             //wsId=0
             let uRights=userRights?.workspaces?.[wsId]
-            Konsol.log("RightsCheckerFactory getRequiredRights(req) will check workspace",uRights)
+            //Konsol.log("RightsCheckerFactory getRequiredRights(req) will check workspace",uRights)
             if ( uRights & this.requiredRights.workspaces.rights ) {
                Konsol.log("RightsCheckerFactory getRequiredRights(req)  check workspace OK")
             } else {
-               Konsol.log("RightsCheckerFactory getRequiredRights(req)  check workspace KO")
+               Konsol.log("RightsCheckerFactory getRequiredRights(req)  check workspace KO","uRights",uRights,"required",this.requiredRights.workspaces.rights)
                return(false)
             }
         }
@@ -140,7 +140,7 @@ class ProjectsRightsChecker extends RightsChecker {
     //-----------------------------------------------------------------------------------
     computeRights(req) {
         Konsol.log("ProjectsRightsChecker computeRights")
-        let workspaceId, wrights
+        let workspaceId = 0, wrights=0
         let projectId = 0, prights = 0
         let sqlReq
         switch (this.op) {
@@ -153,18 +153,18 @@ class ProjectsRightsChecker extends RightsChecker {
                 workspaceId = req.query["workspace_id"]
                 break
             case 'getById':
-                wrights = REFERENCE
+                //wrights = REFERENCE
                 prights = READ
                 projectId = req.params["id"]
-                sqlReq = `select workspace_id from projects where id=${projectId}`
-                workspaceId = this.sqlGetId('workspace_id',sqlReq)
+                //sqlReq = `select workspace_id from projects where id=${projectId}`
+                //workspaceId = this.sqlGetId('workspace_id',sqlReq)
                 break  
             case 'patch':
-                wrights = REFERENCE
+                //wrights = REFERENCE
                 prights = WRITE
                 projectId = req.params["id"]
-                sqlReq = `select workspace_id from projects where id=${projectId}`
-                workspaceId = this.sqlGetId('workspace_id',sqlReq)
+                //sqlReq = `select workspace_id from projects where id=${projectId}`
+                //workspaceId = this.sqlGetId('workspace_id',sqlReq)
                 break
         }
         if ( projectId > 0) {

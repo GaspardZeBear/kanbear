@@ -29,26 +29,16 @@ class UnifiedController {
                     "req.query=", req.query,
                     "kanbearKontext=", req.kanbearKontext
                 )
-                //Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.params=", req.params)
-                //Konsol.log("UnifiedController callback fired table=", table, "op=", op, "req.query=", req.query)
-
-                //let isAllowed=new KanbearRightsChecker().isAllowed(table,op,entityId,req.kanbearKontext.rights)
-                //let krc=new KanbearRightsChecker()
-                //let isAllowed=krc.isAllowed(table,op,req)
-
-
-                
+                          
                 let kanbearRights = new KanbearRights(req.kanbearKontext.decodedToken.userId)
                 req.kanbearKontext.kanbearRights=kanbearRights
                 // admin users have all rights
                 if (!kanbearRights.isAdmin) {
                     let kanbearRightsChecker = KanbearRightsCheckerFactory.create(table, op)
                     if (kanbearRightsChecker !== null) {
-                        //let requiredRights = kanbearRightsChecker.getRequiredRights(req)
-                        //Konsol.log(`UnifiedModel ${op}_${table}() callback function,'requiredRights=`, requiredRights)
-                        //Konsol.log(`UnifiedModel ${op}_${table}() callback function,'kanbearRights=`, kanbearRights.load())
                         //let isAllowed = true
                         if (!kanbearRightsChecker.isAllowed(req,kanbearRights.load())) {
+                            Konsol.log(`UnifiedController ${op}_${table} error 403 kanbearRights=`, kanbearRights.load())
                             res.status(403).json({ error: "Access denied" });
                             return
                         }

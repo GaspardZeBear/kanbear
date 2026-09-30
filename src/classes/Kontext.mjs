@@ -128,7 +128,7 @@ class Kontext {
 
     //--------------------------------------------------------------
     static getCurrentWorkspaceRights() {
-        return (Kontext.workspacesRights[Kontext.currentWorkspaceId])
+        return (Kontext.workspacesRights[Kontext.workspaceId])
     }
 
 

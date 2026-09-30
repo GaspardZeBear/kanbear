@@ -10,32 +10,7 @@ import { WorkspacesRights } from "../classes/WorkspacesRights.mjs"
 import { sendEvent } from "./sendEvent.mjs"
 import { Kontext } from "../classes/Kontext.mjs"
 import { TasksCommentsModal } from "../classes/TasksCommentsModal.mjs"
-
-const REFERENCE=4
-const READ=2
-const  WRITE=1
-
-//---------------------------------------------------------------------------
-function isAdmin() {
-  let disabled=Kontext.getAdmin() 
-  if (disabled ) {
-    console.log("button isAdmin() isAdmin", disabled )
-    return(false)
-  }
-  return(true)
-}
-
-//---------------------------------------------------------------------------
-function isDisabled(perm) {
-  let disabled=Kontext.getAdmin() 
-  if (disabled ) {
-    console.log("button isDisabled() isAdmin", disabled )
-    return(false)
-  }
-  disabled = (Kontext.getCurrentProjectRights() & perm) !== perm
-  console.log("button isDisabled() ","perm",perm, Kontext.getCurrentProjectRights(),"disabled", disabled )
-  return(disabled)
-}
+import { isAdmin,mustDisable,REFERENCE,READ,WRITE } from "../utils/rights.mjs"
 
 //------------------------------------------------------------------------
 function buildAddSwimlaneButton(projectId) {
@@ -43,7 +18,7 @@ function buildAddSwimlaneButton(projectId) {
   const addSwimlaneButton = document.createElement('button')
   addSwimlaneButton.classList.add("add-item-btn")
   addSwimlaneButton.setAttribute("id", "addSwimlaneButton")
-  addSwimlaneButton.disabled=isDisabled(WRITE)
+  addSwimlaneButton.disabled = mustDisable(WRITE)
   addSwimlaneButton.setAttribute("data-project-id", projectId)
   addSwimlaneButton.innerHTML = "+\u25A4"
   let addSwimlaneFn = function (ev) {
@@ -64,7 +39,7 @@ function buildAddColumnButton(projectId) {
   const addColumnButton = document.createElement('button')
   addColumnButton.classList.add("add-item-btn")
   addColumnButton.setAttribute("id", "addColumnButton")
-  addColumnButton.disabled=isDisabled(WRITE)
+  addColumnButton.disabled = mustDisable(WRITE)
   addColumnButton.setAttribute("data-project-id", projectId)
   addColumnButton.innerHTML = "+\u25A5"
   let addColumnFn = function (ev) {
@@ -83,7 +58,7 @@ function buildAddTaskButton(swimlaneId, columnId) {
   const addTaskButton = document.createElement('button')
   addTaskButton.classList.add("add-item-btn")
   addTaskButton.setAttribute("id", `addTaskButton_${swimlaneId}_${columnId}`)
-  addTaskButton.disabled=isDisabled(WRITE)
+  addTaskButton.disabled = mustDisable(WRITE)
   addTaskButton.setAttribute("data-swimlane-id", swimlaneId)
   addTaskButton.setAttribute("data-column-id", columnId)
   //addTaskButton.innerHTML = "+\u{1F3CB}"
@@ -103,6 +78,7 @@ function buildAddProjectButton(workspaceId) {
   const addProjectButton = document.createElement('button')
   addProjectButton.classList.add("add-item-btn")
   addProjectButton.setAttribute("id", `addProjectButton_${workspaceId}`)
+  addProjectButton.disabled = mustDisable(REFERENCE,"workspace")
   addProjectButton.setAttribute("data-workspace-id", workspaceId)
   //addTaskButton.innerHTML = "+\u{1F3CB}"
   addProjectButton.innerHTML = "+P"
@@ -118,7 +94,7 @@ function buildAddProjectButton(workspaceId) {
 
 
 //------------------------------------------------------------------------
-function buildAddProjectsRightsButton(boxId,userId, once=false) {
+function buildAddProjectsRightsButton(boxId, userId, once = false) {
   console.log("buildAddProjectsRightsButton event Listener fired", "userId", userId)
   const addProjectsRightsButton = document.createElement('button')
   addProjectsRightsButton.classList.add("add-item-btn")
@@ -131,9 +107,9 @@ function buildAddProjectsRightsButton(boxId,userId, once=false) {
     ev.stopPropagation();
     let projectId = parseInt(document.getElementById(boxId).value)
     if (projectId > 0) {
-      const projectsRights = new ProjectsRights('projectsRights',{})
-      projectsRights.setData("project_id",projectId)
-      projectsRights.setData("user_id",userId)
+      const projectsRights = new ProjectsRights('projectsRights', {})
+      projectsRights.setData("project_id", projectId)
+      projectsRights.setData("user_id", userId)
       projectsRights.create()
       //projectsRights.create();
       sendEvent('projectsRightsCreated', {})
@@ -148,7 +124,7 @@ function buildAddProjectsRightsButton(boxId,userId, once=false) {
 
 
 //------------------------------------------------------------------------
-function buildAddWorkspacesRightsButton(boxId,userId,once=false) {
+function buildAddWorkspacesRightsButton(boxId, userId, once = false) {
   console.log("buildAddWorkspacesRightsButton event Listener fired", "userId", userId)
   const addWorkspacesRightsButton = document.createElement('button')
   addWorkspacesRightsButton.classList.add("add-item-btn")
@@ -161,9 +137,9 @@ function buildAddWorkspacesRightsButton(boxId,userId,once=false) {
     ev.stopPropagation();
     let workspaceId = parseInt(document.getElementById(boxId).value)
     if (workspaceId > 0) {
-      const workspacesRights = new WorkspacesRights('workspacesRights',{})
-      workspacesRights.setData("workspace_id",workspaceId)
-      workspacesRights.setData("user_id",userId)
+      const workspacesRights = new WorkspacesRights('workspacesRights', {})
+      workspacesRights.setData("workspace_id", workspaceId)
+      workspacesRights.setData("user_id", userId)
       workspacesRights.create()
       //projectsRights.create();
       sendEvent('workspacesRightsCreated', {})
@@ -183,7 +159,7 @@ function buildAddWorkspaceButton() {
   const addWorkspaceButton = document.createElement('button')
   addWorkspaceButton.classList.add("add-item-btn")
   addWorkspaceButton.setAttribute("id", `addWorkspaceButton`)
-  addWorkspaceButton.disabled=isAdmin()
+  addWorkspaceButton.disabled = !isAdmin()
   //console.log("addWorkspaceButton isAdmin",isAdmin())
   //addTaskButton.innerHTML = "+\u{1F3CB}"
   addWorkspaceButton.innerHTML = "+W"
@@ -217,7 +193,7 @@ function buildAddNoteButton(taskId, taskEntity) {
   const addNoteButton = document.createElement('button')
   addNoteButton.classList.add("add-item-btn")
   addNoteButton.setAttribute("id", `addNoteButton`)
-  addNoteButton.disabled=isDisabled(WRITE)
+  addNoteButton.disabled = mustDisable(WRITE)
   //addTaskButton.innerHTML = "+\u{1F3CB}"
   addNoteButton.innerHTML = 'No'
   let addNoteFn = async function (ev) {
@@ -240,7 +216,7 @@ function buildTasksCommentsButton(taskId, name) {
   const tasksCommentsButton = document.createElement('button')
   tasksCommentsButton.classList.add("add-item-btn")
   tasksCommentsButton.setAttribute("id", `tasksCommentsButton`)
-  tasksCommentsButton.disabled=isDisabled(WRITE)
+  tasksCommentsButton.disabled = mustDisable(WRITE)
   //addTaskButton.innerHTML = "+\u{1F3CB}"
   tasksCommentsButton.innerHTML = name
   let tasksCommentsFn = async function (ev) {
@@ -257,7 +233,7 @@ function buildAddOpenCloseButton(id, value, callback) {
   const addOpenCloseButton = document.createElement('button')
   addOpenCloseButton.classList.add("add-item-btn")
   addOpenCloseButton.setAttribute("id", `addAddOpenCloseButton_${id}`)
-  addOpenCloseButton.disabled=isDisabled(WRITE)
+  addOpenCloseButton.disabled = mustDisable(WRITE)
   value ? addOpenCloseButton.innerHTML = 'O/c' : addAddOpenCloseButton.innerHTML = 'o/C'
   let addOpenCloseFn = function (ev) {
     console.log("addOpenCloseButton event Listener fired")
@@ -279,5 +255,5 @@ export {
   buildAddDummyButton,
   buildAddNoteButton,
   buildAddOpenCloseButton,
-  buildTasksCommentsButton
+  buildTasksCommentsButton,
 }
