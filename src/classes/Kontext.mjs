@@ -22,6 +22,8 @@ class Kontext {
     static workspaceName
     static panelClass
     static orderedColumnsList
+    static projectsRights
+    static workspacesRights
     static jwtoken
     static currentUserId
     static currentUserName
@@ -107,7 +109,28 @@ class Kontext {
         return (Kontext.currentUserId)
     }
 
+    //--------------------------------------------------------------
+    static getProjectsRights() {
+        return (Kontext.projectsRights)
+    }
+
 //--------------------------------------------------------------
+    static getCurrentProjectRights() {
+        return (Kontext.projectsRights[Kontext.currentProjectId])
+    }
+
+    //--------------------------------------------------------------
+    static getWorkspacesRights() {
+        return (Kontext.workspacesRights)
+    }
+
+    //--------------------------------------------------------------
+    static getCurrentWorkspaceRights() {
+        return (Kontext.workspacesRights[Kontext.currentWorkspaceId])
+    }
+
+
+    //--------------------------------------------------------------
     static async getUserRights() {
         let rights = await new ApiCaller().get(`/api/users/rights/${Kontext.currentUserId}`, {})
         console.log("Kontext getUserRights()",rights.data)

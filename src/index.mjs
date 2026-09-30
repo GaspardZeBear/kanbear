@@ -90,6 +90,7 @@ document.addEventListener("loginOk", async (ev) => {
             startRightsTimer()
         }
     });
+    Kontext.getUserRights()
     startRightsTimer();
 
 })

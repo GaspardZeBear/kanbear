@@ -11,12 +11,29 @@ import { sendEvent } from "./sendEvent.mjs"
 import { Kontext } from "../classes/Kontext.mjs"
 import { TasksCommentsModal } from "../classes/TasksCommentsModal.mjs"
 
+const REFERENCE=4
+const READ=2
+const  WRITE=1
+
+//---------------------------------------------------------------------------
+async function isDisabled(perm) {
+  let disabled=await Kontext.isUserAdmin() 
+  if (disabled ) {
+    console.log("button isDisabled() isAdmin", disabled )
+    return(false)
+  }
+  disabled = (Kontext.getCurrentProjectRights() & perm) !== perm
+  console.log("button isDisabled() ","perm",perm, Kontext.getCurrentProjectRights(),"disabled", disabled )
+  return(disabled)
+}
+
 //------------------------------------------------------------------------
 function buildAddSwimlaneButton(projectId) {
   //let projectId = this.project.id
   const addSwimlaneButton = document.createElement('button')
   addSwimlaneButton.classList.add("add-item-btn")
   addSwimlaneButton.setAttribute("id", "addSwimlaneButton")
+  addSwimlaneButton.disabled=isDisabled(REFERENCE)
   addSwimlaneButton.setAttribute("data-project-id", projectId)
   addSwimlaneButton.innerHTML = "+\u25A4"
   let addSwimlaneFn = function (ev) {
@@ -37,6 +54,7 @@ function buildAddColumnButton(projectId) {
   const addColumnButton = document.createElement('button')
   addColumnButton.classList.add("add-item-btn")
   addColumnButton.setAttribute("id", "addColumnButton")
+  addColumnButton.disabled=isDisabled(REFERENCE)
   addColumnButton.setAttribute("data-project-id", projectId)
   addColumnButton.innerHTML = "+\u25A5"
   let addColumnFn = function (ev) {
@@ -55,6 +73,7 @@ function buildAddTaskButton(swimlaneId, columnId) {
   const addTaskButton = document.createElement('button')
   addTaskButton.classList.add("add-item-btn")
   addTaskButton.setAttribute("id", `addTaskButton_${swimlaneId}_${columnId}`)
+  addTaskButton.disabled=isDisabled(REFERENCE)
   addTaskButton.setAttribute("data-swimlane-id", swimlaneId)
   addTaskButton.setAttribute("data-column-id", columnId)
   //addTaskButton.innerHTML = "+\u{1F3CB}"
@@ -186,6 +205,7 @@ function buildAddNoteButton(taskId, taskEntity) {
   const addNoteButton = document.createElement('button')
   addNoteButton.classList.add("add-item-btn")
   addNoteButton.setAttribute("id", `addNoteButton`)
+  addNoteButton.disabled=isDisabled(REFERENCE)
   //addTaskButton.innerHTML = "+\u{1F3CB}"
   addNoteButton.innerHTML = 'No'
   let addNoteFn = async function (ev) {
@@ -208,6 +228,7 @@ function buildTasksCommentsButton(taskId, name) {
   const tasksCommentsButton = document.createElement('button')
   tasksCommentsButton.classList.add("add-item-btn")
   tasksCommentsButton.setAttribute("id", `tasksCommentsButton`)
+  tasksCommentsButton.disabled=isDisabled(REFERENCE)
   //addTaskButton.innerHTML = "+\u{1F3CB}"
   tasksCommentsButton.innerHTML = name
   let tasksCommentsFn = async function (ev) {
@@ -221,17 +242,18 @@ function buildTasksCommentsButton(taskId, name) {
 
 //------------------------------------------------------------------------
 function buildAddOpenCloseButton(id, value, callback) {
-  const addAddOpenCloseButton = document.createElement('button')
-  addAddOpenCloseButton.classList.add("add-item-btn")
-  addAddOpenCloseButton.setAttribute("id", `addAddOpenCloseButton_${id}`)
-  value ? addAddOpenCloseButton.innerHTML = 'O/c' : addAddOpenCloseButton.innerHTML = 'o/C'
-  let addAddOpenCloseFn = function (ev) {
-    console.log("addAddOpenCloseButton event Listener fired")
+  const addOpenCloseButton = document.createElement('button')
+  addOpenCloseButton.classList.add("add-item-btn")
+  addOpenCloseButton.setAttribute("id", `addAddOpenCloseButton_${id}`)
+  addOpenCloseButton.disabled=isDisabled(WRITE)
+  value ? addOpenCloseButton.innerHTML = 'O/c' : addAddOpenCloseButton.innerHTML = 'o/C'
+  let addOpenCloseFn = function (ev) {
+    console.log("addOpenCloseButton event Listener fired")
     ev.stopPropagation();
     callback(!value)
   }
-  addAddOpenCloseButton.addEventListener('click', addAddOpenCloseFn, { once: false });
-  return (addAddOpenCloseButton)
+  addOpenCloseButton.addEventListener('click', addOpenCloseFn, { once: false });
+  return (addOpenCloseButton)
 }
 
 export {
