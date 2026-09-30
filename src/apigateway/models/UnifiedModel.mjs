@@ -3,6 +3,7 @@ import { SqlBuilder } from './SqlBuilder.mjs'
 //import { Konsol } from '../classes/Konsol.mjs'
 import { Konsol } from 'konsol'
 import bcrypt from 'bcrypt'
+import { KanbearRights } from '../classes/KanbearRights.mjs'
 
 class UnifiedModel {
 
@@ -27,6 +28,7 @@ class UnifiedModel {
         UnifiedModel.UnifiedModelOp['getByForeignKey'] = UnifiedModel.getByForeignKey
         UnifiedModel.UnifiedModelOp['getProjectsRightsByUserid'] = UnifiedModel.getProjectsRightsByUserid
         UnifiedModel.UnifiedModelOp['getWorkspacesRightsByUserid'] = UnifiedModel.getWorkspacesRightsByUserid
+        UnifiedModel.UnifiedModelOp['getRightsForUser'] = UnifiedModel.getRightsForUser
         UnifiedModel.UnifiedModelOp['update'] = UnifiedModel.update
         UnifiedModel.UnifiedModelOp['patch'] = UnifiedModel.patch
         UnifiedModel.UnifiedModelOp['delete'] = UnifiedModel.delete
@@ -128,6 +130,13 @@ class UnifiedModel {
         });
         */
 
+    }
+
+    //------------------------------------------------------------------
+    static getRightsForUser(table, req, opParms, callback) {
+        Konsol.log("UnifiedModel.getRightsForUser()", "<id>", req.params["id"])
+        let rights=new KanbearRights(req.params["id"]).load()
+        callback(null,200,rights)
     }
 
     //------------------------------------------------------------------

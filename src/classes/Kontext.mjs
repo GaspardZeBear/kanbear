@@ -40,6 +40,8 @@ class Kontext {
         Kontext.workspaceName = null
         Kontext.panelClass = null
         Kontext.orderedColumnsList = null
+        Kontext.projectsRights = null
+        Kontext.workspacesRights = null
         //Kontext.jwtoken = null
         //Kontext.currentUserId = null
         //Kontext.currentUserName = null
@@ -103,6 +105,14 @@ class Kontext {
     //--------------------------------------------------------------
     static getUserId() {
         return (Kontext.currentUserId)
+    }
+
+//--------------------------------------------------------------
+    static async getUserRights() {
+        let rights = await new ApiCaller().get(`/api/users/rights/${Kontext.currentUserId}`, {})
+        console.log("Kontext getUserRights()",rights.data)
+        Kontext.projectsRights=rights.data["projects"]
+        Kontext.workspacesRights=rights.data["workspaces"]
     }
 
     //--------------------------------------------------------------
