@@ -16,8 +16,18 @@ const READ=2
 const  WRITE=1
 
 //---------------------------------------------------------------------------
-async function isDisabled(perm) {
-  let disabled=await Kontext.isUserAdmin() 
+function isAdmin() {
+  let disabled=Kontext.getAdmin() 
+  if (disabled ) {
+    console.log("button isAdmin() isAdmin", disabled )
+    return(false)
+  }
+  return(true)
+}
+
+//---------------------------------------------------------------------------
+function isDisabled(perm) {
+  let disabled=Kontext.getAdmin() 
   if (disabled ) {
     console.log("button isDisabled() isAdmin", disabled )
     return(false)
@@ -33,7 +43,7 @@ function buildAddSwimlaneButton(projectId) {
   const addSwimlaneButton = document.createElement('button')
   addSwimlaneButton.classList.add("add-item-btn")
   addSwimlaneButton.setAttribute("id", "addSwimlaneButton")
-  addSwimlaneButton.disabled=isDisabled(REFERENCE)
+  addSwimlaneButton.disabled=isDisabled(WRITE)
   addSwimlaneButton.setAttribute("data-project-id", projectId)
   addSwimlaneButton.innerHTML = "+\u25A4"
   let addSwimlaneFn = function (ev) {
@@ -54,7 +64,7 @@ function buildAddColumnButton(projectId) {
   const addColumnButton = document.createElement('button')
   addColumnButton.classList.add("add-item-btn")
   addColumnButton.setAttribute("id", "addColumnButton")
-  addColumnButton.disabled=isDisabled(REFERENCE)
+  addColumnButton.disabled=isDisabled(WRITE)
   addColumnButton.setAttribute("data-project-id", projectId)
   addColumnButton.innerHTML = "+\u25A5"
   let addColumnFn = function (ev) {
@@ -73,7 +83,7 @@ function buildAddTaskButton(swimlaneId, columnId) {
   const addTaskButton = document.createElement('button')
   addTaskButton.classList.add("add-item-btn")
   addTaskButton.setAttribute("id", `addTaskButton_${swimlaneId}_${columnId}`)
-  addTaskButton.disabled=isDisabled(REFERENCE)
+  addTaskButton.disabled=isDisabled(WRITE)
   addTaskButton.setAttribute("data-swimlane-id", swimlaneId)
   addTaskButton.setAttribute("data-column-id", columnId)
   //addTaskButton.innerHTML = "+\u{1F3CB}"
@@ -173,6 +183,8 @@ function buildAddWorkspaceButton() {
   const addWorkspaceButton = document.createElement('button')
   addWorkspaceButton.classList.add("add-item-btn")
   addWorkspaceButton.setAttribute("id", `addWorkspaceButton`)
+  addWorkspaceButton.disabled=isAdmin()
+  //console.log("addWorkspaceButton isAdmin",isAdmin())
   //addTaskButton.innerHTML = "+\u{1F3CB}"
   addWorkspaceButton.innerHTML = "+W"
   let addWorkspaceFn = function (ev) {
@@ -205,7 +217,7 @@ function buildAddNoteButton(taskId, taskEntity) {
   const addNoteButton = document.createElement('button')
   addNoteButton.classList.add("add-item-btn")
   addNoteButton.setAttribute("id", `addNoteButton`)
-  addNoteButton.disabled=isDisabled(REFERENCE)
+  addNoteButton.disabled=isDisabled(WRITE)
   //addTaskButton.innerHTML = "+\u{1F3CB}"
   addNoteButton.innerHTML = 'No'
   let addNoteFn = async function (ev) {
@@ -228,7 +240,7 @@ function buildTasksCommentsButton(taskId, name) {
   const tasksCommentsButton = document.createElement('button')
   tasksCommentsButton.classList.add("add-item-btn")
   tasksCommentsButton.setAttribute("id", `tasksCommentsButton`)
-  tasksCommentsButton.disabled=isDisabled(REFERENCE)
+  tasksCommentsButton.disabled=isDisabled(WRITE)
   //addTaskButton.innerHTML = "+\u{1F3CB}"
   tasksCommentsButton.innerHTML = name
   let tasksCommentsFn = async function (ev) {

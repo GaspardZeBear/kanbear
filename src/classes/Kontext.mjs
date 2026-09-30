@@ -14,6 +14,7 @@ class Kontext {
     static kanboardJsonBulkData
     static kanbearConfig
     static projects
+    static isAdmin
     static kanboardProjects
     static currentProject
     static currentProjectId
@@ -33,6 +34,7 @@ class Kontext {
         Kontext.jsonBulkData = null
         Kontext.kanboardJsonBulkData = null
         //Kontext.kanbearConfig = null
+        Kontext.isAdmin = null
         Kontext.projects = null
         Kontext.kanboardProjects = null
         Kontext.currentProject = null
@@ -147,9 +149,16 @@ class Kontext {
         const user = await userEntity.get('user', {})
         console.log("Kontext isUserAdmin()", user)
         if (user.is_admin == 1) {
+            Kontext.isAdmin = true
             return (true)
         }
+        Kontext.isAdmin = false
         return (false)
+    }
+
+//--------------------------------------------------------------
+    static getAdmin() {
+        return(Kontext.isAdmin)
     }
 
     //--------------------------------------------------------------
