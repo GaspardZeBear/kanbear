@@ -5,6 +5,7 @@ import { Ref } from "./Ref.mjs"
 import { buildAddDummyButton, buildAddNoteButton, buildAddOpenCloseButton, buildTasksCommentsButton } from "../utils/buttonBuilder.mjs"
 import { buildTasksCommentsLink } from "../utils/linkBuilder.mjs"
 import { getOpenCloseSymbol } from "../utils/openClose.mjs"
+import { mustDisable,REFERENCE,READ,WRITE } from "../utils/rights.mjs"
 
 class Task extends KanbearEntity {
 
@@ -108,7 +109,9 @@ class Task extends KanbearEntity {
         this.elementId = dragId
         taskElement.setAttribute("id", dragId)
         taskElement.classList.add('kanban-item');
-        taskElement.setAttribute("draggable", true)
+        if (!mustDisable(WRITE)) {
+            taskElement.setAttribute("draggable", true)
+        }
         //let style=`background-color:${this.task.color}`
         let style = `background-color:${this.getTaskDisplayColor()}`
         taskElement.setAttribute("style", style)
@@ -122,7 +125,7 @@ class Task extends KanbearEntity {
         const href = document.createElement("a")
         href.setAttribute("id", `taskHref_${this.task.id}`)
         href.setAttribute("href", "javascript:void(0)")
-        
+
         href.innerHTML = `${this.task.name}`
         let myTask = this.task
         let editTaskFn = function (ev) {
@@ -172,13 +175,13 @@ class Task extends KanbearEntity {
         topLineDiv.classList.add("kanban-item-topline")
 
         const hrefDiv = document.createElement("div")
-        
+
         hrefDiv.appendChild(href)
         topLineDiv.appendChild(hrefDiv)
 
         const commentDiv = document.createElement("div")
         //commentDiv.appendChild(buildTasksCommentsLink(this.task.id,'Co'))
-        commentDiv.appendChild(buildTasksCommentsButton(this.task.id,'Co'))
+        commentDiv.appendChild(buildTasksCommentsButton(this.task.id, 'Co'))
         topLineDiv.appendChild(commentDiv)
 
         const tagDiv = document.createElement("div")
@@ -186,7 +189,7 @@ class Task extends KanbearEntity {
         topLineDiv.appendChild(tagDiv)
 
         const noteDiv = document.createElement("div")
-        noteDiv.appendChild(buildAddNoteButton(this.task.id,this))
+        noteDiv.appendChild(buildAddNoteButton(this.task.id, this))
         topLineDiv.appendChild(noteDiv)
 
 

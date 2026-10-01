@@ -157,7 +157,7 @@ h1 {
 }
 
 .add-item-btn {
-    background-color: #4CAF50;
+    background-color: #168154;
     color: white;
     border: none;
     padding: 5px;
@@ -252,24 +252,6 @@ h1 {
     border-radius: 6px;
 }
 
-/* Style de base pour les zones droppables */
-.Xkanban-items {
-    /* Fond blanc */
-    background-color: #fff;
-    /* Bordure subtile */
-    border: 1px solid #e0e0e0;
-    /* Arrondi des coins */
-    border-radius: 6px;
-    /* Espacement interne */
-    padding: 10px;
-    /* Taille minimale */
-    min-height: 100px;
-    /* Défilement si nécessaire */
-    overflow-y: auto;
-    /* Transition pour les effets de survol */
-    transition: all 0.2s ease;
-}
-
 
 #taskTitle, #taskDescription {
     width: 100%;
@@ -280,17 +262,4 @@ h1 {
     box-sizing: border-box;
 }
 
-#saveTaskBtn {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    float: right;
-}
 
-#saveTaskBtn:hover {
-    background-color: #45a049;
-}
