@@ -146,6 +146,9 @@ class Dialog {
         let cancel = this.cancelDialog.bind(this)
         let cancelFn=function (event) {
             console.log("eventListener",cancelBtnId,"dialog")
+            let event1=`${cancelBtnId}`
+            sendEvent(event1, { })
+            console.log("Dialog.save() <sendEvent>",event1)
             cancel();
         }
         //Dialog.clickListeners.push(cancelFn)

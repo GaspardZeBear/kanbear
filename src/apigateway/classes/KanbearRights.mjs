@@ -14,7 +14,8 @@ class KanbearRights {
     //this.db = new DatabaseSync('db.sqlite', { readonly: true });
     //this.db = db
     this.userId = userId
-    this.isAdmin=this.isAdminSql()
+    this.isAdmin = this.isAdminSql()
+    this.rights = null
   }
 
   //-----------------------------------------------------
@@ -59,7 +60,7 @@ class KanbearRights {
       where
        user_id='${this.userId}'
        `
-    let preq=`
+    let preq = `
       select
         id id,
         project_id as project_id,
@@ -72,27 +73,28 @@ class KanbearRights {
     //    db.all(req, [], this.callAfterRights.bind(this));
     let wResp
     db.all(wreq, [], (err, httpCode, sqlResp) => {
-      Konsol.log("KanbearRights loadRights() callback()","wreq", wreq)
-      Konsol.log("KanbearRights loadRights() callback()","sqlResp", sqlResp)
+      //Konsol.log("KanbearRights loadRights() callback()", "wreq", wreq)
+      //Konsol.log("KanbearRights loadRights() callback()", "sqlResp", sqlResp)
       wResp = sqlResp
       //return (params)
     });
     let pResp
     db.all(preq, [], (err, httpCode, sqlResp) => {
-      Konsol.log("KanbearRights loadRights() callback()","preq", preq)
-      Konsol.log("KanbearRights loadRights() callback()","sqlResp", sqlResp)
+      //Konsol.log("KanbearRights loadRights() callback()", "preq", preq)
+      //Konsol.log("KanbearRights loadRights() callback()", "sqlResp", sqlResp)
       //this.rightsResp = sqlResp
       pResp = sqlResp
       //return (params)
     });
-    let rights={data:{workspaces:{},projects:{}}}
+    let rights = { data: { workspaces: {}, projects: {} } }
     wResp.forEach(element => {
-      rights.data["workspaces"][element.workspace_id]=element.rights
+      rights.data["workspaces"][element.workspace_id] = element.rights
     });
     pResp.forEach(element => {
-      rights.data["projects"][element.project_id]=element.rights
+      rights.data["projects"][element.project_id] = element.rights
     });
-    this.rightsResp=rights
+    Konsol.log("KanbearRights.loadRights() over","<rights>",rights)
+    this.resp = rights["data"]??null
   }
 
 
@@ -105,8 +107,9 @@ class KanbearRights {
 
   //-----------------------------------------------------
   load() {
-    
-    this.loadRights()
+    if (!this.resp) {
+      this.loadRights()
+    }
     //Konsol.log("KanbearRights.load() this.rightsResp",this.rightsResp)
     //try {
     /*
@@ -116,7 +119,7 @@ class KanbearRights {
     }
       */
     //return ({})
-    return (this.rightsResp.data)
+    return (this.resp)
     //} catch (err) {
     //  console.log(err)
     //}

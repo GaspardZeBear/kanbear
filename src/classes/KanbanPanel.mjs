@@ -44,9 +44,9 @@ class KanbanPanel {
   // hint to have a kind of async construtor
   //----------------------------------------------------------
   static async builder() {
-    console.log("KanbanPanel.reload()")
+    console.log("KanbanPanel.builder() reload")
     await Kontext.loadKanbearJsonBulkData()
-    console.log("KanbanPanel.reload() done")
+    console.log("KanbanPanel.builder() reloaddone")
     Kontext.setPanelClass(KanbanPanel)
     return new KanbanPanel()
   }

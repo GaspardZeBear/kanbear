@@ -30,7 +30,7 @@ function mustDisable(perm, kind = "project") {
       disabled = true
       break
   }
-  console.log("button mustDisable() ", "perm", perm, "kind", kind, "disabled", disabled)
+  console.log("button mustDisable() ", "<perm>", perm, "<kind>", kind, "<disabled>", disabled)
   return (disabled)
 }
 

@@ -77,7 +77,8 @@ function buildAddTaskButton(swimlaneId, columnId) {
 function buildAddProjectButton(workspaceId) {
   const addProjectButton = document.createElement('button')
   addProjectButton.classList.add("add-item-btn")
-  addProjectButton.setAttribute("id", `addProjectButton_${workspaceId}`)
+  //addProjectButton.setAttribute("id", `addProjectButton_${workspaceId}`)
+  addProjectButton.setAttribute("id", `addProjectButton`)
   addProjectButton.disabled = mustDisable(REFERENCE,"workspace")
   addProjectButton.setAttribute("data-workspace-id", workspaceId)
   //addTaskButton.innerHTML = "+\u{1F3CB}"

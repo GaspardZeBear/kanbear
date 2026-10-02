@@ -150,6 +150,24 @@ document.addEventListener("projectCreated", async (ev) => {
     new KanbanPanel().render()
 })
 
+document.addEventListener("cancelProjectBtn", async (ev) => {
+    console.log("projectCreationCancelled listener fired <ev>", ev)
+    //buildKanbearProjectsSelectBox()
+    //await Kontext.setProject(ev.detail.projectId);
+    //sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
+    //new KanbanPanel().render()
+    document.getElementById('addProjectButton').replaceWith(buildAddProjectButton(Kontext.getWorkspaceId()))
+})
+
+document.addEventListener("cancelWorkspaceBtn", async (ev) => {
+    console.log("workspaceCreationCancelled listener fired <ev>", ev)
+    //buildKanbearProjectsSelectBox()
+    //await Kontext.setProject(ev.detail.projectId);
+    //sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
+    //new KanbanPanel().render()
+    document.getElementById('addWorkspaceButton').replaceWith(buildAddWorkspaceButton())
+})
+
 document.addEventListener("projectSelected", async (ev) => {
     console.log("projectSelected listener fired <ev>", ev)
     //buildKanbearProjectsSelectBox()
