@@ -79,10 +79,11 @@ class SqlBuilder {
         whereStr ? whereStr = 'WHERE ' + whereStr : ''
 
         const qmarksStr = qmarks.join(', ');
-        Konsol.log("SqlBuilder.generateGetStatement() <whereStr>", whereStr)
+        //Konsol.log("SqlBuilder.generateGetStatement() <whereStr>", whereStr)
 
         const sql = `SELECT * FROM ${tableName} ${whereStr}`;
         //const sql = `INSERT INTO  ${tableName} (${setClausesStr}) VALUES (${qmarksStr})`;
+        Konsol.log("SqlBuilder.generateGetStatement() <sql>", sql)
         return { sql, bindVariables };
     }
 }

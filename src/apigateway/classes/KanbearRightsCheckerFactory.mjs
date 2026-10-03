@@ -109,8 +109,8 @@ class RightsChecker {
     //-----------------------------------------------------------------------------------
     sqlGetId(key,sqlReq) {
         let resp
+        Konsol.log("RightsChecker sqlGetId() callback()", "key", key,"sqlReq", sqlReq)
         db.all(sqlReq, [], (err, httpCode, sqlResp) => {
-            Konsol.log("RightsChecker sqlGetId() callback()", "preq", sqlReq)
             Konsol.log("RightsChecker sqlGetId() callback()", "sqlResp", sqlResp)
             //this.rightsResp = sqlResp
             resp = sqlResp[0][key]
