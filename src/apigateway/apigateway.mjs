@@ -42,11 +42,18 @@ import { Konsol } from 'konsol';
 import { Logger } from 'konsol';
 import { Server } from 'konsol';
 import { controlToken } from './middlewares/tokenControl.mjs';
+import { KanbearTokens } from './classes/KanbearTokens.mjs';
+import { KanbearUser } from './classes/KanbearUser.mjs';
+import { KanbearRights } from './classes/KanbearRights.mjs';
+
 
 
 
 app.use(express.static('public'))
 // Crud api
+
+let refreshTokens = [];
+
 //------------------------------------------------------------------------------
 app.post('/api/login',
   async (req, res) => {
@@ -54,28 +61,50 @@ app.post('/api/login',
     try {
       let login = new KanbearLogin({ userName: req.body.userName, userPassword: req.body.userPassword })
       const check = await login.check()
-      res.status(200).json({ message: 'Logged in', token:check.token, userId:check.userId, rights:check.rights, refreshToken:check.refreshToken });
+      Konsol.log("apigateway login check", check)
+      let token = new KanbearTokens().generateToken(check)
+      let refreshToken = new KanbearTokens().generateRefreshToken(check)
+      refreshTokens.push(refreshToken);
+      res.status(200).json({ message: 'Logged in', token: token, userId: check.userId, rights: check.rights, refreshToken: refreshToken });
     } catch (error) {
       console.log("/api/login error ", error.message)
       res.status(500).json({ error: error.cause });
     }
   })
 
+//-------------------------------------------------------------------------------
 app.post('/api/token',
   async (req, res) => {
     Konsol.log("apigateway login", req.body)
-    try {
-      let login = new KanbearLogin({ userName: req.body.userName, userPassword: req.body.userPassword })
-      const check = await login.check()
+    const refreshToken = req.body.token;
+    if (!refreshToken) return res.sendStatus(401);
+    
+    // Do not check for dev !!!
+    //if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403); // Si le token n'existe pas en BDD
 
-      res.status(200).json({ message: 'Logged in', token:check.token, userId:check.userId, rights:check.rights, refreshToken:check.refreshToken });
-    } catch (error) {
-      console.log("/api/login error ", error.message)
-      res.status(500).json({ error: error.cause });
+    // Vérification du Refresh Token
+    try {
+      let decodedToken = new KanbearTokens().checkToken(refreshToken)
+      // Le refresh token est valide, on génère un nouvel access token
+      //let user0=new KanbearUser()
+      //await user0.selectUserById(decodedToken.userId)
+      //let user=user0.getUser()
+      let user = (await (new KanbearUser()).selectUserById(decodedToken.userId)).getUser()
+      let kanbearRights = new KanbearRights(decodedToken.userId).load()
+      const accessToken = new KanbearTokens().generateToken({
+        userId : user.userId,
+        userName : user.userName,
+        isAdmin : user.isAdmin,
+        rights: kanbearRights
+        });
+      res.json({ accessToken: accessToken });
+    } catch (err) {
+      return res.sendStatus(403); // Token invalide ou expiré
     }
   })
 
-app.use ((req,res,next) => controlToken(req,res,next))
+ //------------------------------------------------------------------------------- 
+app.use((req, res, next) => controlToken(req, res, next))
 
 app.use('/api/assignees', assigneeRoutes);
 app.use('/api/columns', columnRoutes);

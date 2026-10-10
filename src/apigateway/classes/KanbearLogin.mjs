@@ -1,93 +1,41 @@
-// kanboardReporter.js
-//const axios = require('axios');
-//import { KanboardRPC } from '../classes/KanboardRPC.mjs';
-//import { Konsol } from './Konsol.mjs'
 import { Konsol } from 'konsol'
 import { db } from '../config/database.mjs';
 import { KanbearRights } from './KanbearRights.mjs';
-import jwt from 'jsonwebtoken'
+import { KanbearUser } from './KanbearUser.mjs';
+
 import bcrypt from 'bcrypt'
 
 class KanbearLogin {
 
   constructor(params) {
     Konsol.log("KanbearLogin.constructor()", "params", params)
-    //this.db = new DatabaseSync('db.sqlite', { readonly: true });
-    this.db = db
     this.userName = params.userName
     this.userPassword = params.userPassword
   }
 
   //-----------------------------------------------------
-  async selectUser() {
-    Konsol.log("KanbearLogin.selectUser()")
-    let req = `
-      select
-        id uId,  
-        name uName,
-        password uPassword,
-        is_admin uIsAdmin
-      from 
-        users
-      where
-       name='${this.userName}'
-      `
-    db.all(req, [], this.callAfterUser.bind(this));
-  }
-
-
-  //--------------------------------------------------------
-  callAfterUser(err, httpCode, params) {
-    Konsol.log("KanbearLogin.callAfterUser() ", params)
-    this.userResp = params
-    //return (params)
-  }
-
-  //--------------------------------------------------------------------------------------
-  generateToken(kanbearRights) {
-    const token = jwt.sign(
-          //{ userName: this.userName, userId: this.userResp[0].uId, isAdmin: this.userResp[0].uIsAdmin },
-          { isAdmin: this.userResp[0].uIsAdmin , userName: this.userName, userId: this.userResp[0].uId, rights: kanbearRights },
-           'kanbear',
-          { expiresIn: '15m' }
-        );
-    return(token)
-  }
-
-  //--------------------------------------------------------------------------------------
-  generateRefreshToken(kanbearRights) {
-    const refreshToken = jwt.sign(
-          //{ userName: this.userName, userId: this.userResp[0].uId, isAdmin: this.userResp[0].uIsAdmin },
-          { userName: this.userName, userId: this.userResp[0].uId, rights: kanbearRights },
-           'kanbear',
-          { expiresIn: '1h' }
-        );
-    return(refreshToken)
-  }
-  //-----------------------------------------------------
   async check() {
-    await this.selectUser()
-    //Konsol.log("KanbearLogin.check() ", "this.UserResp", this.UserResp)
-    //Konsol.log("KanbearLogin.check() ", "resp", this.userResp[0].uPassword)
-    //Konsol.log("KanbearLogin.check()", " this.userPassword", this.userPassword)
-    //try {
-      if ( this.userResp.length != 1 ) {
-        throw Error("Login check failed", { cause : "user"})
-      }
-      const valid = bcrypt.compareSync(this.userPassword, this.userResp[0].uPassword);
-      if (valid) {
-        let kanbearRights = new KanbearRights(this.userResp[0].uId).load()
-        const token = this.generateToken(kanbearRights)
-        const refreshToken = this.generateRefreshToken(kanbearRights)
-        Konsol.log("KanbearLogin.check()", "token", token)
-        Konsol.log("KanbearLogin.check()", "refreshToken", refreshToken)
-        return ({userId: this.userResp[0].uId, rights: kanbearRights, token:token, refreshToken:refreshToken})
-      } else {
-        throw Error("Login check failed", { cause : "password"})
-      }
-    //} catch (err) {
-    //  console.log(err)
-    //}
+    //let user0 = new KanbearUser()
+    //await user0.selectUserByName(this.userName)
+    //let user = user0.getUser()
+    let user = (await (new KanbearUser()).selectUserByName(this.userName)).getUser()
+    if (user == null) {
+      throw Error("Login check failed", { cause: "no user" })
+    }
+    const valid = bcrypt.compareSync(this.userPassword, user.password);
+    Konsol.log("KanbearLogin.check() ", "user/password valid", valid)
+    if (valid) {
+      let kanbearRights = new KanbearRights(user.userId).load()
+      Konsol.log("KanbearLogin.check() ", kanbearRights)
+      return ({
+        isAdmin: user.isAdmin,
+        userName: user.userName,
+        userId: user.userId,
+        rights: kanbearRights
+      })
+    } else {
+      throw Error("Login check failed", { cause: "user or password wrong" })
+    }
   }
 
 }

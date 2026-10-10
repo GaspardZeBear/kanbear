@@ -1,23 +1,15 @@
 import { Konsol } from 'konsol'
-import jwt from 'jsonwebtoken'
-//import { KanbearRights } from '../classes/KanbearRights.mjs'
-import { AccessRights } from '../classes/AccessRights.mjs'
-
+import { KanbearTokens } from '../classes/KanbearTokens.mjs'
 
 //------------------------------------------------------------------------------------------------
 async function controlToken(req, res, next) {
+    Konsol.log("controlToken() begin")
     try {
-        Konsol.log("controlToken() begin")
-        let accessRights = new AccessRights(req, res)
-        Konsol.log("controlToken() accesssRight init done")
-        if (!accessRights.checkToken()) {
-            // Si non autorisé, renvoie une erreur 401
-            return res.status(401).json({
-                error: 'Unauthorized',
-                message: 'Access denied'
-            });
+        const token = req.headers['authorization'].split(' ')[1];
+        let decodedToken = new KanbearTokens().checkToken(token)
+        req.kanbearKontext = {
+            decodedToken: decodedToken,
         }
-        accessRights.setKanbearKontext()
         next()
     } catch (err) {
         console.log(err)

@@ -97,33 +97,13 @@ class KanbearRights {
     this.resp = rights["data"]??null
   }
 
-
-  //--------------------------------------------------------
-  //callAfterRights(err, httpCode, params) {
-  //Konsol.log("KanbearRights.callAfterUser() ", params)
-  //  this.rightsResp = params
-  //  //return (params)
-  //}
-
   //-----------------------------------------------------
   load() {
     if (!this.resp) {
       this.loadRights()
     }
-    //Konsol.log("KanbearRights.load() this.rightsResp",this.rightsResp)
-    //try {
-    /*
-    if (this.rightsResp.length != 1) {
-      //throw Error("no rights", { cause: "user" })
-      return ({})
-    }
-      */
-    //return ({})
     return (this.resp)
-    //} catch (err) {
-    //  console.log(err)
-    //}
-  }
+  } 
 
   //-----------------------------------------------------
   async isAllowed(kind, name) {
