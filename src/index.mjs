@@ -39,6 +39,7 @@ document.addEventListener("loginCancelled", async (ev) => {
 
 let rightsTimer = null;
 document.addEventListener("loginOk", async (ev) => {
+    console.log("loginOk listener fired <ev>", ev)
     await Kontext.init()
     console.log("LoginOk listener decodedToken", ev.detail.decodedToken)
     Kontext.setUserName(ev.detail.decodedToken.userName)
@@ -50,17 +51,15 @@ document.addEventListener("loginOk", async (ev) => {
 
     document.getElementById("resultsHeader").innerHTML = ""
     document.getElementById("results").innerHTML = ""
-    console.log("loginOk listener fired <ev>", ev)
+    
     //const isAdmin = await Kontext.isUserAdmin()
-
-    console.log("loginOk listener isAdmin", isAdmin)
+    //console.log("loginOk listener isAdmin", isAdmin)
     document.getElementById('Tags').style.visibility = "hidden"
-    if (!isAdmin) {
+    if (!Kontext.isAdmin) {
         document.getElementById('Actors').style.visibility = "hidden"
         document.getElementById('Kanboard').style.visibility = "hidden"
         document.getElementById('showEvents').style.visibility = "hidden"
         document.getElementById('clearProject').style.visibility = "hidden"
-
         document.getElementById('isAdmin').innerHTML = `N`;
     } else {
         document.getElementById('Actors').style.visibility = "visible"
@@ -69,7 +68,7 @@ document.addEventListener("loginOk", async (ev) => {
         document.getElementById('clearProject').style.visibility = "visible"
         document.getElementById('isAdmin').innerHTML = `Y`;
     }
-    document.getElementById('user').innerHTML = `${ev.detail.userName}`;
+    document.getElementById('user').innerHTML = `${Kontext.getUserName()}`;
     buildWorkspacesSelectBox()
     buildKanbearProjectsSelectBox()
     for (let item of ['project', 'swimlane', 'task']) {
@@ -90,6 +89,7 @@ document.addEventListener("loginOk", async (ev) => {
         }
     }
 
+    /*
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             stopRightsTimer()
@@ -100,6 +100,7 @@ document.addEventListener("loginOk", async (ev) => {
     });
     Kontext.getUserRights()
     startRightsTimer();
+    */
 
 })
 

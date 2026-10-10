@@ -29,7 +29,10 @@ class UnifiedController {
                     "req.query=", req.query,
                     "kanbearKontext=", req.kanbearKontext
                 )
-                          
+
+                console.log(req.kanbearKontext.decodedToken)
+                     
+                /*
                 let kanbearRights = new KanbearRights(req.kanbearKontext.decodedToken.userId)
                 req.kanbearKontext.kanbearRights=kanbearRights
                 // admin users have all rights
@@ -43,7 +46,22 @@ class UnifiedController {
                             return
                         }
                     }
-                }
+                } 
+                    */
+                   let token=req.kanbearKontext.decodedToken
+                   if (token.isAdmin === 0) {
+                    let kanbearRightsChecker = KanbearRightsCheckerFactory.create(table, op)
+                    if (kanbearRightsChecker !== null) {
+                        //let isAllowed = true
+                        if (!kanbearRightsChecker.isAllowed(req,token.rights)) {
+                            Konsol.log(`UnifiedController ${op}_${table} error 403 kanbearRights=`, token.rights)
+                            res.status(403).json({ error: "Access denied" });
+                            return
+                        }
+                    }
+                } 
+
+
 
                 UnifiedModel[op](table, req, opParms, (err, httpCode, sqlRes) => {
                     Konsol.log(`UnifiedModel ${op}_${table}() callback function,'<err>`, err, '<sqlRes>', sqlRes)

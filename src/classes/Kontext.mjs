@@ -138,6 +138,7 @@ class Kontext {
 
     //--------------------------------------------------------------
     static async setUserRights(rights) {
+        console.log("Kontext setUserRights()",rights)
         Kontext.projectsRights=rights["projects"]
         Kontext.workspacesRights=rights["workspaces"]
     }
@@ -152,7 +153,9 @@ class Kontext {
 
  //--------------------------------------------------------------
     static async setAdmin(flag) {
-        Kontext.isAdmin = flag
+        console.log("Kontext setAdmin() flag",flag)
+        Kontext.isAdmin = (flag == 0)? false : true
+        console.log("Kontext setAdmin() isAdmin",Kontext.isAdmin)
     }
 
     //--------------------------------------------------------------
@@ -298,10 +301,12 @@ class Kontext {
                 return ({})
             }
 
-            const url = `${Kontext.getKanbearUrl()}/api/sql/report/${projectId}${query}`
+            //const url = `${Kontext.getKanbearUrl()}/api/sql/report/${projectId}${query}`
+            const url = `/api/sql/report/${projectId}${query}`
             console.log("Kontext.loadKanbearJsonBulkData() from kanbear", url)
             //const response = await fetch(url);
-            const response = await axios.get(url);
+            //const response = await axios.get(url);
+            const response = await new ApiCaller().get(url, {})
             console.log(response)
 
             //if (!response.ok) {

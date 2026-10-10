@@ -57,6 +57,7 @@ class SqlBuilder {
         })
 
         //let tableIdFilter=''
+        /*
         let kanbearRights = req.kanbearKontext.kanbearRights
         if (!kanbearRights.isAdmin) {
             const loadedRights = kanbearRights.load()[tableName]
@@ -75,6 +76,28 @@ class SqlBuilder {
                 filters.push(`id in ( ${ids.join(',')})`)
             }
         }
+            */
+        let token=req.kanbearKontext.decodedToken
+        Konsol.log("SqlBuilder.generateGetStatement() will token.rights ", token.rights)
+        if (token.isAdmin === 0) {
+            const loadedRights=token.rights[tableName]
+            Konsol.log("SqlBuilder.generateGetStatement() will add filter rights ", token.rights,  "table", tableName, "loadedRights", loadedRights)
+            //const ht = kanbearRights.load()[tableName]
+            let ids = []
+            const READ = 2
+            if (loadedRights) {
+                Object.entries(loadedRights).forEach(([id, rights]) => {
+                    Konsol.log("SqlBuilder.generateGetStatement() id", id, "rights", rights)
+                    if (parseInt(rights) & READ) {
+                        Konsol.log("SqlBuilder.generateGetStatement() will add id", id)
+                        ids.push(id)
+                    }
+                })
+                filters.push(`id in ( ${ids.join(',')})`)
+            }
+        }
+
+
         let whereStr = filters.join(' AND ')
         whereStr ? whereStr = 'WHERE ' + whereStr : ''
 
