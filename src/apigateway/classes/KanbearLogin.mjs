@@ -43,6 +43,27 @@ class KanbearLogin {
     //return (params)
   }
 
+  //--------------------------------------------------------------------------------------
+  generateToken(kanbearRights) {
+    const token = jwt.sign(
+          //{ userName: this.userName, userId: this.userResp[0].uId, isAdmin: this.userResp[0].uIsAdmin },
+          { isAdmin: this.userResp[0].uIsAdmin , userName: this.userName, userId: this.userResp[0].uId, rights: kanbearRights },
+           'kanbear',
+          { expiresIn: '15m' }
+        );
+    return(token)
+  }
+
+  //--------------------------------------------------------------------------------------
+  generateRefreshToken(kanbearRights) {
+    const refreshToken = jwt.sign(
+          //{ userName: this.userName, userId: this.userResp[0].uId, isAdmin: this.userResp[0].uIsAdmin },
+          { userName: this.userName, userId: this.userResp[0].uId, rights: kanbearRights },
+           'kanbear',
+          { expiresIn: '1h' }
+        );
+    return(refreshToken)
+  }
   //-----------------------------------------------------
   async check() {
     await this.selectUser()
@@ -55,15 +76,12 @@ class KanbearLogin {
       }
       const valid = bcrypt.compareSync(this.userPassword, this.userResp[0].uPassword);
       if (valid) {
-        const token = jwt.sign(
-          //{ userName: this.userName, userId: this.userResp[0].uId, isAdmin: this.userResp[0].uIsAdmin },
-          { userName: this.userName, userId: this.userResp[0].uId },
-           'kanbear',
-          { expiresIn: '1h' }
-        );
-        //Konsol.log("KanbearLogin.check()", "token", token)
         let kanbearRights = new KanbearRights(this.userResp[0].uId).load()
-        return ({userId: this.userResp[0].uId, rights: kanbearRights, token:token})
+        const token = this.generateToken(kanbearRights)
+        const refreshToken = this.generateRefreshToken(kanbearRights)
+        Konsol.log("KanbearLogin.check()", "token", token)
+        Konsol.log("KanbearLogin.check()", "refreshToken", refreshToken)
+        return ({userId: this.userResp[0].uId, rights: kanbearRights, token:token, refreshToken:refreshToken})
       } else {
         throw Error("Login check failed", { cause : "password"})
       }

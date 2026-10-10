@@ -40,10 +40,18 @@ document.addEventListener("loginCancelled", async (ev) => {
 let rightsTimer = null;
 document.addEventListener("loginOk", async (ev) => {
     await Kontext.init()
+    console.log("LoginOk listener decodedToken", ev.detail.decodedToken)
+    Kontext.setUserName(ev.detail.decodedToken.userName)
+    Kontext.setUserId(ev.detail.decodedToken.userId)
+    Kontext.setUserRights(ev.detail.decodedToken.rights)
+    Kontext.setAdmin(ev.detail.decodedToken.isAdmin)
+    Kontext.setJwtToken(ev.detail.rawToken)
+    Kontext.setJwtRefreshToken(ev.detail.rawRefreshToken)
+
     document.getElementById("resultsHeader").innerHTML = ""
     document.getElementById("results").innerHTML = ""
     console.log("loginOk listener fired <ev>", ev)
-    const isAdmin = await Kontext.isUserAdmin()
+    //const isAdmin = await Kontext.isUserAdmin()
 
     console.log("loginOk listener isAdmin", isAdmin)
     document.getElementById('Tags').style.visibility = "hidden"

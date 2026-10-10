@@ -25,7 +25,8 @@ class Kontext {
     static orderedColumnsList
     static projectsRights
     static workspacesRights
-    static jwtoken
+    static jwtToken
+    static jwtRefreshToken
     static currentUserId
     static currentUserName
 
@@ -34,7 +35,7 @@ class Kontext {
         Kontext.jsonBulkData = null
         Kontext.kanboardJsonBulkData = null
         //Kontext.kanbearConfig = null
-        Kontext.isAdmin = null
+        
         Kontext.projects = null
         Kontext.kanboardProjects = null
         Kontext.currentProject = null
@@ -46,9 +47,13 @@ class Kontext {
         Kontext.orderedColumnsList = null
         Kontext.projectsRights = null
         Kontext.workspacesRights = null
-        //Kontext.jwtoken = null
-        //Kontext.currentUserId = null
-        //Kontext.currentUserName = null
+        
+        // !!!! Do not refresh tokens !!!!!!!!!!!
+        Kontext.jwtToken = null
+        Kontext.jwtRefreshToken = null
+        Kontext.isAdmin = null
+        Kontext.currentUserId = null
+        Kontext.currentUserName = null
     }
 
     //--------------------------------------------------------------
@@ -131,6 +136,11 @@ class Kontext {
         return (Kontext.workspacesRights[Kontext.workspaceId])
     }
 
+    //--------------------------------------------------------------
+    static async setUserRights(rights) {
+        Kontext.projectsRights=rights["projects"]
+        Kontext.workspacesRights=rights["workspaces"]
+    }
 
     //--------------------------------------------------------------
     static async getUserRights() {
@@ -138,6 +148,11 @@ class Kontext {
         console.log("Kontext getUserRights()",rights.data)
         Kontext.projectsRights=rights.data["projects"]
         Kontext.workspacesRights=rights.data["workspaces"]
+    }
+
+ //--------------------------------------------------------------
+    static async setAdmin(flag) {
+        Kontext.isAdmin = flag
     }
 
     //--------------------------------------------------------------
@@ -162,13 +177,27 @@ class Kontext {
     }
 
     //--------------------------------------------------------------
-    static setJwtoken(jwtoken) {
-        Kontext.jwtoken = jwtoken
+    static setJwtToken(token) {
+        //console.log("Kontext setJwtToken()",token)
+        Kontext.jwtToken = token
     }
 
     //--------------------------------------------------------------
-    static getJwtoken() {
-        return (Kontext.jwtoken)
+    static setJwtRefreshToken(token) {
+        console.log("Kontext setJwtRefreshToken()",token)
+        Kontext.jwtRefreshToken = token
+    }
+
+
+    //--------------------------------------------------------------
+    static getJwtToken() {
+        //console.log("Kontext getJwtToken()",Kontext.jwtToken)
+        return(Kontext.jwtToken)
+    }
+
+    //--------------------------------------------------------------
+    static getJwtRefreshToken() {
+        return (Kontext.jwtRefreshToken)
     }
 
     //--------------------------------------------------------------

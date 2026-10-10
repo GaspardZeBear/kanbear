@@ -56,39 +56,39 @@ class RightsChecker {
     constructor(op) {
         Konsol.log("RightsCheckerFactory constructor", "op", op)
         this.op = op
-        this.requiredRights=null
+        this.requiredRights = null
     }
 
     //-----------------------------------------------------------------------------------
-    isAllowed(req,userRights) {
-        this.requiredRights=this.computeRights(req)
-        Konsol.log("RightsCheckerFactory requiredRights",this.requiredRights,"userRights=",userRights)
+    isAllowed(req, userRights) {
+        this.requiredRights = this.computeRights(req)
+        Konsol.log("RightsCheckerFactory requiredRights", this.requiredRights, "userRights=", userRights)
         // "requiredRights"={"workspaces":{"id":1,"rights":2},"projects":{"id":1,"rights":2}}
         // "userRights"={"workspaces":{"0":0},"projects":{"1":4,"2":6,"3":7,"4":0,"11":0,"12":0}}
-        if ( this.requiredRights.workspaces && this.requiredRights.workspaces.id > 0 ) {
-            Konsol.log("RightsCheckerFactory getRequiredRights(req) will check workspace require",this.requiredRights)
-            let wsId=this.requiredRights.workspaces.id 
+        if (this.requiredRights.workspaces && this.requiredRights.workspaces.id > 0) {
+            Konsol.log("RightsCheckerFactory getRequiredRights(req) will check workspace require", this.requiredRights)
+            let wsId = this.requiredRights.workspaces.id
             //wsId=0
-            let uRights=userRights?.workspaces?.[wsId]
+            let uRights = userRights?.workspaces?.[wsId]
             //Konsol.log("RightsCheckerFactory getRequiredRights(req) will check workspace",uRights)
-            if ( uRights & this.requiredRights.workspaces.rights ) {
-               Konsol.log("RightsCheckerFactory getRequiredRights(req)  check workspace OK")
+            if (uRights & this.requiredRights.workspaces.rights) {
+                Konsol.log("RightsCheckerFactory getRequiredRights(req)  check workspace OK")
             } else {
-               Konsol.log("RightsCheckerFactory getRequiredRights(req)  check workspace KO","uRights",uRights,"required",this.requiredRights.workspaces.rights)
-               return(false)
+                Konsol.log("RightsCheckerFactory getRequiredRights(req)  check workspace KO", "uRights", uRights, "required", this.requiredRights.workspaces.rights)
+                return (false)
             }
         }
-        if ( this.requiredRights.projects && this.requiredRights.projects.id > 0 ) {
+        if (this.requiredRights.projects && this.requiredRights.projects.id > 0) {
             Konsol.log("RightsCheckerFactory getRequiredRights(req) will check project")
-            let prId=this.requiredRights.projects.id 
+            let prId = this.requiredRights.projects.id
             //wsId=0
-            let uRights=userRights?.projects?.[prId]
-            Konsol.log("RightsCheckerFactory getRequiredRights(req) will check project",uRights)
-            if ( uRights & this.requiredRights.projects.rights ) {
-               Konsol.log("RightsCheckerFactory getRequiredRights(req)  check project OK")
+            let uRights = userRights?.projects?.[prId]
+            Konsol.log("RightsCheckerFactory getRequiredRights(req) will check project", uRights)
+            if (uRights & this.requiredRights.projects.rights) {
+                Konsol.log("RightsCheckerFactory getRequiredRights(req)  check project OK")
             } else {
-               Konsol.log("RightsCheckerFactory getRequiredRights(req)  check project KO")
-               return(false)
+                Konsol.log("RightsCheckerFactory getRequiredRights(req)  check project KO")
+                return (false)
             }
         }
         return (true)
@@ -98,8 +98,8 @@ class RightsChecker {
     getWorkspaceIdAndRights(projectId, rights) {
         if (projectId > 0) {
             let sqlReq = `select workspace_id from projects where id=${projectId}`
-            let workspaceId = this.sqlGetId('workspace_id',sqlReq)
-            return ({id: workspaceId, rights: rights })
+            let workspaceId = this.sqlGetId('workspace_id', sqlReq)
+            return ({ id: workspaceId, rights: rights })
         } else {
             //return ({id:0, rights: 0 })
             return ({})
@@ -107,16 +107,16 @@ class RightsChecker {
     }
 
     //-----------------------------------------------------------------------------------
-    sqlGetId(key,sqlReq) {
+    sqlGetId(key, sqlReq) {
         let resp
-        Konsol.log("RightsChecker sqlGetId() callback()", "key", key,"sqlReq", sqlReq)
+        Konsol.log("RightsChecker sqlGetId() callback()", "key", key, "sqlReq", sqlReq)
         db.all(sqlReq, [], (err, httpCode, sqlResp) => {
             Konsol.log("RightsChecker sqlGetId() callback()", "sqlResp", sqlResp)
             //this.rightsResp = sqlResp
             resp = sqlResp[0][key]
             //return (params)
         });
-        return(resp)
+        return (resp)
     }
 
 
@@ -127,8 +127,8 @@ class WorkspacesRightsChecker extends RightsChecker {
     computeRights(req) {
         Konsol.log("WorkspacesRightsChecker computeRights")
         return ({
-        //    "workspaces": { id: 0, rights: 0 },
-        //    "projects": { id: 0, rights: 0 }
+            //    "workspaces": { id: 0, rights: 0 },
+            //    "projects": { id: 0, rights: 0 }
         })
     }
 
@@ -140,7 +140,7 @@ class ProjectsRightsChecker extends RightsChecker {
     //-----------------------------------------------------------------------------------
     computeRights(req) {
         Konsol.log("ProjectsRightsChecker computeRights")
-        let workspaceId = 0, wrights=0
+        let workspaceId = 0, wrights = 0
         let projectId = 0, prights = 0
         let sqlReq
         switch (this.op) {
@@ -158,7 +158,7 @@ class ProjectsRightsChecker extends RightsChecker {
                 projectId = req.params["id"]
                 //sqlReq = `select workspace_id from projects where id=${projectId}`
                 //workspaceId = this.sqlGetId('workspace_id',sqlReq)
-                break  
+                break
             case 'patch':
                 //wrights = REFERENCE
                 prights = WRITE
@@ -167,14 +167,15 @@ class ProjectsRightsChecker extends RightsChecker {
                 //workspaceId = this.sqlGetId('workspace_id',sqlReq)
                 break
         }
-        if ( projectId > 0) {
-        return ({
-            "workspaces": { id : workspaceId, rights: wrights},
-            "projects": { id: projectId, rights: prights }
-        })} else {
+        if (projectId > 0) {
             return ({
-            "workspaces": { id : workspaceId, rights: wrights}
-        })
+                "workspaces": { id: workspaceId, rights: wrights },
+                "projects": { id: projectId, rights: prights }
+            })
+        } else {
+            return ({
+                "workspaces": { id: workspaceId, rights: wrights }
+            })
         }
     }
 }
@@ -203,13 +204,13 @@ class SwimlanesRightsChecker extends RightsChecker {
                 prights = READ
                 swimlaneId = req.params["id"]
                 sqlReq = `select project_id from swimlanes where id=${swimlaneId}`
-                projectId=this.sqlGetId('project_id',sqlReq)
+                projectId = this.sqlGetId('project_id', sqlReq)
                 break
             case 'patch':
                 prights = WRITE
                 swimlaneId = req.params["id"]
                 sqlReq = `select project_id from swimlanes where id=${swimlaneId}`
-                projectId=this.sqlGetId('project_id',sqlReq)
+                projectId = this.sqlGetId('project_id', sqlReq)
                 break
         }
         return ({
@@ -244,13 +245,13 @@ class ColumnsRightsChecker extends RightsChecker {
                 prights = WRITE
                 columnId = req.params["id"]
                 sqlReq = `select project_id from columns where id=${columnId}`
-                projectId=this.sqlGetId('project_id',sqlReq)
+                projectId = this.sqlGetId('project_id', sqlReq)
                 break
             case 'getById':
                 prights = READ
                 columnId = req.params["id"]
                 sqlReq = `select project_id from columns where id=${columnId}`
-                projectId=this.sqlGetId('project_id',sqlReq)
+                projectId = this.sqlGetId('project_id', sqlReq)
                 break
         }
         return ({
@@ -268,7 +269,7 @@ class TasksRightsChecker extends RightsChecker {
         Konsol.log("TasksRightsChecker computeRights")
         let projectId, prights
         let workspaceId, wrights
-        let sqlReq,subselect
+        let sqlReq, subselect
         switch (this.op) {
             case 'create':
                 prights = WRITE
@@ -281,7 +282,7 @@ class TasksRightsChecker extends RightsChecker {
                     where
                       id=(${subselect})
                 `
-                projectId = this.sqlGetId('project_id',sqlReq)
+                projectId = this.sqlGetId('project_id', sqlReq)
             case 'getAll':
                 break
             case 'getById':
@@ -295,11 +296,11 @@ class TasksRightsChecker extends RightsChecker {
                     where
                       id=(${subselect})
                 `
-                projectId = this.sqlGetId('project_id',sqlReq)
+                projectId = this.sqlGetId('project_id', sqlReq)
                 break
             case 'patch':
                 prights = WRITE
-                Konsol.log("TaskRightsChecker computeRights patch",req.params)
+                Konsol.log("TaskRightsChecker computeRights patch", req.params)
                 subselect = `select column_id from tasks  where id=${req.params["id"]}`
                 sqlReq = `
                     select
@@ -309,7 +310,7 @@ class TasksRightsChecker extends RightsChecker {
                     where
                       id=(${subselect})
                 `
-                projectId = this.sqlGetId('project_id',sqlReq)
+                projectId = this.sqlGetId('project_id', sqlReq)
                 break
         }
         return ({

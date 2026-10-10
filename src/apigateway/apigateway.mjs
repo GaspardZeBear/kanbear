@@ -54,13 +54,27 @@ app.post('/api/login',
     try {
       let login = new KanbearLogin({ userName: req.body.userName, userPassword: req.body.userPassword })
       const check = await login.check()
-
-      res.status(200).json({ message: 'Logged in', token:check.token, userId:check.userId, rights:check.rights });
+      res.status(200).json({ message: 'Logged in', token:check.token, userId:check.userId, rights:check.rights, refreshToken:check.refreshToken });
     } catch (error) {
       console.log("/api/login error ", error.message)
       res.status(500).json({ error: error.cause });
     }
   })
+
+app.post('/api/token',
+  async (req, res) => {
+    Konsol.log("apigateway login", req.body)
+    try {
+      let login = new KanbearLogin({ userName: req.body.userName, userPassword: req.body.userPassword })
+      const check = await login.check()
+
+      res.status(200).json({ message: 'Logged in', token:check.token, userId:check.userId, rights:check.rights, refreshToken:check.refreshToken });
+    } catch (error) {
+      console.log("/api/login error ", error.message)
+      res.status(500).json({ error: error.cause });
+    }
+  })
+
 app.use ((req,res,next) => controlToken(req,res,next))
 
 app.use('/api/assignees', assigneeRoutes);

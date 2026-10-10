@@ -1,7 +1,7 @@
 import { KanbearEntity } from "./KanbearEntity.mjs"
 import { KanbearEntityFactory } from './KanbearEntityFactory.mjs'
 import { sendEvent } from "../utils/sendEvent.mjs"
-import { mustDisable,REFERENCE,READ,WRITE } from "../utils/rights.mjs"
+import { mustDisable, REFERENCE, READ, WRITE } from "../utils/rights.mjs"
 
 class Dialog {
 
@@ -9,58 +9,58 @@ class Dialog {
 
     //------------------------------------------------------------------------
     constructor(kind) {
-        this.kind=kind
-        this.upperFirstKind=this.kind.charAt(0).toUpperCase() + this.kind.slice(1)
+        this.kind = kind
+        this.upperFirstKind = this.kind.charAt(0).toUpperCase() + this.kind.slice(1)
         this.dialog = null
     }
 
     //----------------------------------------------------------------------------
-    async create(params={}) {
+    async create(params = {}) {
         //this.workspaceId = workspaceId
-        this.params=params
+        this.params = params
         await this.subCreate(params)
         this.createDialog(this.save.bind(this))
-        this.showDialog("Create New "+this.kind)
+        this.showDialog("Create New " + this.kind)
     }
 
     //-------------------------------------------------------------------------------------
     async save() {
-        console.log("Dialog.save() dialog, <kind>",this.kind)
+        console.log("Dialog.save() dialog, <kind>", this.kind)
         const entity = await KanbearEntityFactory.generate(this.kind)
         await this.subSave(entity)
         //pr.setData("workspace_id", this.workspaceId)
         //this.fillDbFromForm(pr)
         try {
             let resp = await entity.create()
-            console.log("Dialog.save() <entity>",entity)
+            console.log("Dialog.save() <entity>", entity)
             this.closeDialog()
-            let eventId=`${this.kind}Id`
-            sendEvent(`${this.kind}Created`, { [eventId] : entity.getId() })
-            console.log("Dialog.save() <sendEvent>",`${this.kind}Created`)
+            let eventId = `${this.kind}Id`
+            sendEvent(`${this.kind}Created`, { [eventId]: entity.getId() })
+            console.log("Dialog.save() <sendEvent>", `${this.kind}Created`)
         } catch (error) {
-            console.log("Dialog.save() <error>",error)
+            console.log("Dialog.save() <error>", error)
             this.setMessage(error.cause?.msg)
             this.create(this.params)
         }
     }
 
-    
+
 
     //----------------------------------------------------------------------------
     async modify(params) {
-        this.params=params
+        this.params = params
         try {
             this.entity = await KanbearEntityFactory.generate(this.kind)
-            let id=await this.subModify(params)
+            let id = await this.subModify(params)
             this.entity.setId(id)
-            console.log("Dialog.modify() this.entity",this.entity)
+            console.log("Dialog.modify() this.entity", this.entity)
             this.entity[this.kind] = await this.entity.get()
-            
+
             await this.fillFormFromDb(this.entity[this.kind])
             console.log("Dialog.modify() <entity>", this.entity)
             //console.log("Dialog.modify() <ent>", this.ent)
             this.createDialog(this.saveModify.bind(this))
-            this.showDialog("Modify " + this.kind )
+            this.showDialog("Modify " + this.kind)
         } catch (error) {
             console.log(error)
             this.setMessage(error.cause?.msg)
@@ -70,18 +70,18 @@ class Dialog {
 
     //-------------------------------------------------------------------------------------
     async saveModify() {
-        console.log("Dialog.saveModify() <this.entity>",this.entity)
+        console.log("Dialog.saveModify() <this.entity>", this.entity)
         this.fillDbFromForm(this.entity)
         try {
             let resp = await this.entity.patch({})
             this.closeDialog()
             //sendEvent("projectModified", { projectId: this.project.getId() })
-            let eventId=`${this.kind}Id`
-            
+            let eventId = `${this.kind}Id`
+
             // Name does not work !!!
-            let eventName=`${this.kind}Name`
-            sendEvent(`${this.kind}Modified`, { [eventId] : this.entity.getId(), [eventName] : this.entity.getName()  })
-            console.log("Dialog.save() <sendEvent>",`${this.kind}Modified`)
+            let eventName = `${this.kind}Name`
+            sendEvent(`${this.kind}Modified`, { [eventId]: this.entity.getId(), [eventName]: this.entity.getName() })
+            console.log("Dialog.save() <sendEvent>", `${this.kind}Modified`)
         } catch (error) {
             console.log("Dialog.saveModify() error", error)
             this.setMessage(error.cause?.msg)
@@ -91,19 +91,19 @@ class Dialog {
 
     //------------------------------------------------------------------------------------------
     setMessage(message) {
-        document.getElementById(`${this.kind}DialogMessage`).innerHTML=message
+        document.getElementById(`${this.kind}DialogMessage`).innerHTML = message
     }
 
     //------------------------------------------------------------------------------------------
-    showDialog(title="No title") {
-        document.getElementById(`${this.kind}DialogTitle`).innerHTML=title
+    showDialog(title = "No title") {
+        document.getElementById(`${this.kind}DialogTitle`).innerHTML = title
         this.dialog.showModal();
     }
 
     //------------------------------------------------------------------------------------------------
     closeDialog() {
         console.log("closeDialog()", this.dialog)
-        console.log("close clickListeners",Dialog.clickListeners)
+        console.log("close clickListeners", Dialog.clickListeners)
         this.dialog.close();
     }
 
@@ -114,46 +114,54 @@ class Dialog {
     }
 
 
-     //-------------------------------------------------------------------------------------
-     // Build event listener on "Save" and "cancel" buttons, accordind to the action (create, modify etc..)
-    createDialog(save=()=>{}) {
-        console.log("Dialog.createDialog() ","kind",this.kind+"Dialog")
-        this.dialog = document.getElementById(this.kind+"Dialog")
+    //-------------------------------------------------------------------------------------
+    // Build event listener on "Save" and "cancel" buttons, accordind to the action (create, modify etc..)
+    createDialog(save = () => { }) {
+        console.log("Dialog.createDialog() ", "kind", this.kind + "Dialog")
+        this.dialog = document.getElementById(this.kind + "Dialog")
         let dialog = this.dialog
-        dialog.setAttribute("closedby","none")
+        dialog.setAttribute("closedby", "none")
         let close = this.closeDialog.bind(this)
         //let save = this.save.bind(this)
 
         //document.getElementById("projectNameDiv").setAttribute("hidden","")
-        let saveBtnId="save"+this.upperFirstKind+"Btn"
+        let saveBtnId = "save" + this.upperFirstKind + "Btn"
         console.log("Dialog.createDialog() create savefn function for <saveBtnId>", saveBtnId)
-        let saveFn=async function (event) {
-        //    console.log("eventListener ",saveBtnId," dialog")
-        //    console.log("eventListener ",save)
+        let saveFn = async function (event) {
+            //    console.log("eventListener ",saveBtnId," dialog")
+            //    console.log("eventListener ",save)
             await save()
         }
         //Dialog.clickListeners.push(saveFn)
         //console.log("createDialog() saveListeners after push",Dialog.clickListeners)
         //removeEventListener("click",saveFn)
-        console.log("Dialog.createDialog <saveBtn>",document.getElementById(saveBtnId))
-        document.getElementById(saveBtnId).disabled=mustDisable(WRITE)
+        console.log("Dialog.createDialog <saveBtn>", document.getElementById(saveBtnId))
+        switch (this.kind) {
+            case 'project':
+                document.getElementById(saveBtnId).disabled = mustDisable(REFERENCE, 'workspace')
+                break
+            default:
+                document.getElementById(saveBtnId).disabled = mustDisable(WRITE)
+                break
+        }
+        //document.getElementById(saveBtnId).disabled=mustDisable(WRITE)
         document.getElementById(saveBtnId).classList.add("add-item-btn")
 
-        document.getElementById(saveBtnId).addEventListener("click", saveFn, {once: true});
+        document.getElementById(saveBtnId).addEventListener("click", saveFn, { once: true });
         //document.getElementById(saveBtnId).addEventListener("mouseover", () => {console.log("Mouseover")});
 
-        let cancelBtnId="cancel"+this.upperFirstKind+"Btn"
+        let cancelBtnId = "cancel" + this.upperFirstKind + "Btn"
         let cancel = this.cancelDialog.bind(this)
-        let cancelFn=function (event) {
-            console.log("eventListener",cancelBtnId,"dialog")
-            let event1=`${cancelBtnId}`
-            sendEvent(event1, { })
-            console.log("Dialog.save() <sendEvent>",event1)
+        let cancelFn = function (event) {
+            console.log("eventListener", cancelBtnId, "dialog")
+            let event1 = `${cancelBtnId}`
+            sendEvent(event1, {})
+            console.log("Dialog.save() <sendEvent>", event1)
             cancel();
         }
         //Dialog.clickListeners.push(cancelFn)
         //removeEventListener("click",cancelFn)
-        document.getElementById(cancelBtnId).addEventListener("click", cancelFn, { once:true} );
+        document.getElementById(cancelBtnId).addEventListener("click", cancelFn, { once: true });
         //document.getElementById(cancelBtnId).addEventListener("mouseover", () => {console.log("Mouseover cancel")});
     }
 
@@ -161,4 +169,4 @@ class Dialog {
 
 }
 
-export {Dialog }
+export { Dialog }

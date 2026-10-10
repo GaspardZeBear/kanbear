@@ -7,10 +7,10 @@ import { AccessRights } from '../classes/AccessRights.mjs'
 //------------------------------------------------------------------------------------------------
 async function controlToken(req, res, next) {
     try {
-        //Konsol.log("controlAccessRights")
+        Konsol.log("controlToken() begin")
         let accessRights = new AccessRights(req, res)
-
-        if (!await accessRights.checkToken()) {
+        Konsol.log("controlToken() accesssRight init done")
+        if (!accessRights.checkToken()) {
             // Si non autorisé, renvoie une erreur 401
             return res.status(401).json({
                 error: 'Unauthorized',
@@ -20,7 +20,8 @@ async function controlToken(req, res, next) {
         accessRights.setKanbearKontext()
         next()
     } catch (err) {
-        //Konsol.log('Erreur dans authMiddleware:', err);
+        console.log(err)
+        Konsol.log('controlToken error', err);
         return res.status(500).json({
             error: 'Internal Server Error',
             message: 'Error when checking token.'

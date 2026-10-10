@@ -1,5 +1,6 @@
 // src/api.js
 import axios from 'axios';
+import { Kontext } from './Kontext.mjs'
 
 class AxiosInstance {
     // Crée une instance Axios avec une configuration de base
@@ -11,6 +12,18 @@ class AxiosInstance {
             timeout: 5000, // Timeout en ms
         });
 
+        this.instance.interceptors.request.use(
+            (config) => {
+                const token = Kontext.getJwtToken()
+                if (token) {
+                    //config.headers.Authorization = `Bearer ${token}`;
+                    config.headers.Authorization = `bearer ${token}`;
+                }
+                console.log("AxiosInstance constructor interceptor config",token)
+                return (config);
+            }
+        )
+
         // Ajoute un intercepteur pour les réponses
         this.instance.interceptors.response.use(
             (response) => {
@@ -19,7 +32,7 @@ class AxiosInstance {
                 return response;
             },
             (error) => {
-                console.log("AxiosInstance error ",error)
+                console.log("AxiosInstance error ", error)
                 if (error.response) {
                     // Cas d'une erreur 401 (Unauthorized)
                     if (error.response.status === 401 || error.response.status === 403) {
