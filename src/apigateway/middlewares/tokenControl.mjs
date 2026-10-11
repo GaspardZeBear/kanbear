@@ -6,7 +6,7 @@ async function controlToken(req, res, next) {
     Konsol.log("controlToken() begin")
     try {
         const token = req.headers['authorization'].split(' ')[1];
-        let decodedToken = new KanbearTokens().checkToken(token)
+        let decodedToken = new KanbearTokens().checkToken("access",token)
         req.kanbearKontext = {
             decodedToken: decodedToken,
         }
@@ -14,8 +14,8 @@ async function controlToken(req, res, next) {
     } catch (err) {
         console.log(err)
         Konsol.log('controlToken error', err);
-        return res.status(500).json({
-            error: 'Internal Server Error',
+        return res.status(401).json({
+            error: 'Token',
             message: 'Error when checking token.'
         });
     }

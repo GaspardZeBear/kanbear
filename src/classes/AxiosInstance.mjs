@@ -1,9 +1,14 @@
 // src/api.js
 import axios from 'axios';
 import { Kontext } from './Kontext.mjs'
+import { jwtDecode } from 'jwt-decode';
+import { Konsol } from 'konsol';
 
 class AxiosInstance {
     // Crée une instance Axios avec une configuration de base
+
+    static isRefreshing = false
+    static failedQueue = []
 
     constructor(url) {
         console.log("AxiosInstance constructor", "url", url)
@@ -17,9 +22,10 @@ class AxiosInstance {
                 const token = Kontext.getJwtToken()
                 if (token) {
                     //config.headers.Authorization = `Bearer ${token}`;
-                    config.headers.Authorization = `bearer ${token}`;
+                    config.headers.Authorization = `Bearer ${token}`;
+                    config._retry = true
                 }
-                console.log("AxiosInstance constructor interceptor config",token)
+                console.log("AxiosInstance constructor interceptor config", token)
                 return (config);
             }
         )
@@ -36,7 +42,7 @@ class AxiosInstance {
                 if (error.response) {
                     // Cas d'une erreur 401 (Unauthorized)
                     if (error.response.status === 401 || error.response.status === 403) {
-                        // Gère l'erreur 401 ici
+                        AxiosInstance.isRefreshing = true
                         this.handleUnauthorizedError(error);
                     }
                     console.log('AxiosInstance on error status', error.response.status);
@@ -56,6 +62,48 @@ class AxiosInstance {
     // Fonction pour gérer les erreurs 401
     handleUnauthorizedError(error) {
         console.log("AxiosInstance handleUnauthorizedError()", error)
+        if (AxiosInstance.isRefreshing) {
+            // put the failed request in queur
+            console.log("AxiosInstance handleUnauthorizedError() isRefreshing")
+            AxiosInstance.failedQueue.push(error.config)
+            navigator.locks.request("refreshLock", { mode : 'exclusive' },async (lock) => {
+                console.log("AxiosInstance handleUnauthorizedError() lock acquired")
+                const refresh = axios.post(`${Kontext.getKanbearUrl()}/api/auth/refresh`, {
+                    refreshToken: Kontext.getJwtRefreshToken()
+                });
+                refresh
+                    .then((response) => {
+                        const { data } = response
+                        console.log("AxiosInstance handleUnauthorizedError() refresh OK", data)
+                        let token=data.accessToken
+                        let decodedToken = jwtDecode(token)
+                        Kontext.setUserName(decodedToken.userName)
+                        Kontext.setUserId(decodedToken.userId)
+                        Kontext.setUserRights(decodedToken.rights)
+                        Kontext.setAdmin(decodedToken.isAdmin)
+                        Kontext.setJwtToken(token)
+                        /*
+                        AxiosInstance.failedQueue.forEach((request) => {
+                            if (!request._retry) {
+                                request._retry = false
+                            } else {
+                                request.headers.Authorization = `Bearer ${Kontext.getJwtToken()}`
+                                this.instance(request)
+                            }
+                        });
+                        */
+                        
+                    })
+                    .catch((err) => {
+                        console.log("AxiosInstance handleUnauthorizedError() refresh KO ",err)
+                     })
+                    .finally(() => {
+                        console.log("AxiosInstance handleUnauthorizedError() refresh finally")
+                        AxiosInstance.failedQueue=[]
+                     })
+            })
+
+        }
         // Exemple 1 : Rediriger vers la page de login
         //window.location.href = '/login?from=' + encodeURIComponent(window.location.pathname);
 

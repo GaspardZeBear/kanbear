@@ -67,7 +67,8 @@ class ApiCaller {
         try {
             console.log("ApiCaller.get() before"," token ",Kontext.getJwtToken());
             //const res = await axios.get(await this.url(uri), { headers : { Authorization : "gzb"} , params: params });
-            const res = await this.axiosInstance.get(await this.url(uri), { headers : { Authorization : Kontext.getJwtToken()} , params: params });
+            //const res = await this.axiosInstance.get(await this.url(uri), { headers : { Authorization : Kontext.getJwtToken()} , params: params });
+            const res = await this.axiosInstance.get(await this.url(uri), { params: params });
             console.log("ApiCaller.get() <res.status>", res.status); // Status Code
             return (res)
         } catch (error) {
@@ -80,7 +81,8 @@ class ApiCaller {
         this.header(["POST", uri, body])
         try {
             console.log("ApiCaller.post() before");
-            let res = await axios.post(await this.url(uri), body);
+            //let res = await axios.post(await this.url(uri), body);
+            let res = await this.axiosInstance.post(await this.url(uri), body);
             console.log("ApiCaller.post() <res.status>", res.status); // Status Code
             //console.log(res.data); // Response Data
             return (res)
@@ -95,7 +97,8 @@ class ApiCaller {
         this.header(["PUT", uri, body])
         try {
             console.log("ApiCaller.put() before");
-            const res = await axios.put(await url(this.uri), body);
+            //const res = await axios.put(await url(this.uri), body);
+            const res = await this.axiosInstance.put(await url(this.uri), body);
             console.log("ApiCaller.put() <res.status>", res.status); // Status Code
             //console.log(res.data); // Response Data
             return (res)
@@ -109,7 +112,8 @@ class ApiCaller {
         this.header(["PATCH", uri, body])
         try {
             console.log("ApiCaller.patch() before");
-            const res = await axios.patch(await this.url(uri), body);
+            //const res = await axios.patch(await this.url(uri), body);
+            const res = await this.axiosInstance.patch(await this.url(uri), body);
             console.log("ApiCaller.patch() <res.status>", res.status); // Status Code
             //console.log(res.data); // Response Data
             return (res)
@@ -123,7 +127,8 @@ class ApiCaller {
         this.header(["DELETE", uri])
         try {
             console.log("ApiCaller.erase() before"); // Status Code
-            const res = await axios.delete(await this.url(uri));
+            //const res = await axios.delete(await this.url(uri));
+            const res = await this.axiosInstance.delete(await this.url(uri));
             console.log("ApiCaller.erase() <res.status>", res.status); // Status Code
             //console.log(res.data); // Response Data
             return (res)

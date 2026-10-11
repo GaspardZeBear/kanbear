@@ -77,12 +77,6 @@ document.addEventListener("loginOk", async (ev) => {
             console.log(`index.mjs() ${id} listener creation`)
             document.getElementById(id).addEventListener("change", async (ev) => {
                 console.log(`index.mjs() ${id} listener fired <ev>`, ev)
-                //if (ev.currentTarget.checked) {
-                //    console.log('checked');
-                //} else {
-                //   console.log('not checked');
-                //}
-                //
                 Kontext.loadKanbearJsonBulkData()
                 Kontext.renderPanel()
             })

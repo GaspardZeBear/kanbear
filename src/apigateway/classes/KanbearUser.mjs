@@ -32,7 +32,7 @@ class KanbearUser {
 
     //-----------------------------------------------------
     async selectUserById(userId) {
-        Konsol.log("KanbearUser.selectUserByName()")
+        Konsol.log("KanbearUser.selectUserById()")
         let req = `
       select
         id uId,  
@@ -42,9 +42,10 @@ class KanbearUser {
       from 
         users
       where
-       id='${userId}'
+       id=${parseInt(userId)}
       `
-        db.all(req, [], ()=>{this.callAfterUser.bind(this);return(this)});
+        db.all(req, [], this.callAfterUser.bind(this));
+        return(this)
     }
 
     //--------------------------------------------------------

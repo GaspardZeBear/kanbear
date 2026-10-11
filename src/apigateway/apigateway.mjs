@@ -73,10 +73,10 @@ app.post('/api/login',
   })
 
 //-------------------------------------------------------------------------------
-app.post('/api/token',
+app.post('/api/auth/refresh',
   async (req, res) => {
-    Konsol.log("apigateway login", req.body)
-    const refreshToken = req.body.token;
+    Konsol.log("apigateway /api/auth/refresh", req.body)
+    const refreshToken = req.body.refreshToken;
     if (!refreshToken) return res.sendStatus(401);
     
     // Do not check for dev !!!
@@ -84,21 +84,27 @@ app.post('/api/token',
 
     // Vérification du Refresh Token
     try {
-      let decodedToken = new KanbearTokens().checkToken(refreshToken)
+      
+      let decodedToken = new KanbearTokens().checkToken("refresh",refreshToken)
       // Le refresh token est valide, on génère un nouvel access token
-      //let user0=new KanbearUser()
-      //await user0.selectUserById(decodedToken.userId)
-      //let user=user0.getUser()
-      let user = (await (new KanbearUser()).selectUserById(decodedToken.userId)).getUser()
+      let user0=new KanbearUser()
+      await user0.selectUserById(decodedToken.userId)
+      let user=user0.getUser()
+      Konsol.log("apigateway /api/auth/refresh refreshToken Ok")
+      //let user = (await (new KanbearUser()).selectUserById(decodedToken.userId)).getUser()
+      //Konsol.log("apigateway /api/auth/refresh refreshToken user Ok",user)
       let kanbearRights = new KanbearRights(decodedToken.userId).load()
+      //Konsol.log("apigateway /api/auth/refresh refreshToken rights Ok")
       const accessToken = new KanbearTokens().generateToken({
         userId : user.userId,
         userName : user.userName,
         isAdmin : user.isAdmin,
         rights: kanbearRights
         });
-      res.json({ accessToken: accessToken });
+      Konsol.log("apigateway /api/auth/refresh new accessToken",accessToken)
+      res.status(200).json({ accessToken: accessToken });
     } catch (err) {
+      Konsol.log("apigateway /api/auth/refresh refreshToken err",err)
       return res.sendStatus(403); // Token invalide ou expiré
     }
   })
