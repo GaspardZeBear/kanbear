@@ -72,44 +72,50 @@ app.post('/api/login',
     }
   })
 
+async function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 //-------------------------------------------------------------------------------
 app.post('/api/auth/refresh',
   async (req, res) => {
     Konsol.log("apigateway /api/auth/refresh", req.body)
     const refreshToken = req.body.refreshToken;
+    const sleepDuration = req.body.sleep ?? 0
     if (!refreshToken) return res.sendStatus(401);
-    
+
     // Do not check for dev !!!
     //if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403); // Si le token n'existe pas en BDD
-
+    if (sleepDuration > 0) {
+      await sleep(sleepDuration)
+    }
     // Vérification du Refresh Token
     try {
-      
-      let decodedToken = new KanbearTokens().checkToken("refresh",refreshToken)
+
+      let decodedToken = new KanbearTokens().checkToken("refresh", refreshToken)
       // Le refresh token est valide, on génère un nouvel access token
-      let user0=new KanbearUser()
+      let user0 = new KanbearUser()
       await user0.selectUserById(decodedToken.userId)
-      let user=user0.getUser()
+      let user = user0.getUser()
       Konsol.log("apigateway /api/auth/refresh refreshToken Ok")
       //let user = (await (new KanbearUser()).selectUserById(decodedToken.userId)).getUser()
       //Konsol.log("apigateway /api/auth/refresh refreshToken user Ok",user)
       let kanbearRights = new KanbearRights(decodedToken.userId).load()
       //Konsol.log("apigateway /api/auth/refresh refreshToken rights Ok")
       const accessToken = new KanbearTokens().generateToken({
-        userId : user.userId,
-        userName : user.userName,
-        isAdmin : user.isAdmin,
+        userId: user.userId,
+        userName: user.userName,
+        isAdmin: user.isAdmin,
         rights: kanbearRights
-        });
-      Konsol.log("apigateway /api/auth/refresh new accessToken",accessToken)
+      });
+      Konsol.log("apigateway /api/auth/refresh new accessToken", accessToken)
       res.status(200).json({ accessToken: accessToken });
     } catch (err) {
-      Konsol.log("apigateway /api/auth/refresh refreshToken err",err)
+      Konsol.log("apigateway /api/auth/refresh refreshToken err", err)
       return res.sendStatus(403); // Token invalide ou expiré
     }
   })
 
- //------------------------------------------------------------------------------- 
+//------------------------------------------------------------------------------- 
 app.use((req, res, next) => controlToken(req, res, next))
 
 app.use('/api/assignees', assigneeRoutes);

@@ -23,7 +23,7 @@ class AxiosInstance {
                 if (token) {
                     //config.headers.Authorization = `Bearer ${token}`;
                     config.headers.Authorization = `Bearer ${token}`;
-                    config._retry = true
+                    config._retryMe = true
                 }
                 console.log("AxiosInstance constructor interceptor config", token)
                 return (config);
@@ -38,13 +38,11 @@ class AxiosInstance {
                 return response;
             },
             (error) => {
-                console.log("AxiosInstance error ", error)
+                //console.log("AxiosInstance error ", error)
                 if (error.response) {
-                    // Cas d'une erreur 401 (Unauthorized)
-                    if (error.response.status === 401 || error.response.status === 403) {
-                        AxiosInstance.isRefreshing = true
-                        this.handleUnauthorizedError(error);
-                    }
+                    if (error.response.status === 401) {
+                        return(this.handle401Error(error));
+                       }
                     console.log('AxiosInstance on error status', error.response.status);
                     return Promise.reject(error);
                 } else if (error.request) {
@@ -59,22 +57,22 @@ class AxiosInstance {
         );
     }
 
-    // Fonction pour gérer les erreurs 401
-    handleUnauthorizedError(error) {
-        console.log("AxiosInstance handleUnauthorizedError()", error)
-        if (AxiosInstance.isRefreshing) {
+    //--------------------------------------------------------------------------------------------------------------
+    handle401Error(error) {
+        console.log("AxiosInstance handle401Error()", error)
+        //if (AxiosInstance.isRefreshing) {
             // put the failed request in queur
-            console.log("AxiosInstance handleUnauthorizedError() isRefreshing")
+            console.log("AxiosInstance handleUnauthorizedError() isRefreshing queueLength",AxiosInstance.failedQueue.length)
             AxiosInstance.failedQueue.push(error.config)
             navigator.locks.request("refreshLock", { mode : 'exclusive' },async (lock) => {
-                console.log("AxiosInstance handleUnauthorizedError() lock acquired")
+                console.log("AxiosInstance handle401Error() lock acquired")
                 const refresh = axios.post(`${Kontext.getKanbearUrl()}/api/auth/refresh`, {
                     refreshToken: Kontext.getJwtRefreshToken()
                 });
                 refresh
                     .then((response) => {
                         const { data } = response
-                        console.log("AxiosInstance handleUnauthorizedError() refresh OK", data)
+                        console.log("AxiosInstance handle401Error() refresh OK", data)
                         let token=data.accessToken
                         let decodedToken = jwtDecode(token)
                         Kontext.setUserName(decodedToken.userName)
@@ -82,36 +80,39 @@ class AxiosInstance {
                         Kontext.setUserRights(decodedToken.rights)
                         Kontext.setAdmin(decodedToken.isAdmin)
                         Kontext.setJwtToken(token)
-                        /*
+                        console.log("AxiosInstance handleUnauthorizedError() depiling queueLength",AxiosInstance.failedQueue.length)
                         AxiosInstance.failedQueue.forEach((request) => {
-                            if (!request._retry) {
-                                request._retry = false
+                            console.log("AxiosInstance handle401Error() retry ",request)
+                            if (request._retryMe) {
+                                request._retryMe = false
+                                //request.headers.Authorization = `Bearer ${Kontext.getJwtToken()}`
+                                request.headers.Authorization = `Bearer Lulu}`
+                                return(this.instance(request))
                             } else {
-                                request.headers.Authorization = `Bearer ${Kontext.getJwtToken()}`
-                                this.instance(request)
                             }
                         });
-                        */
+                        
                         
                     })
                     .catch((err) => {
-                        console.log("AxiosInstance handleUnauthorizedError() refresh KO ",err)
+                        console.log("AxiosInstance handle401Error() refresh KO ",err)
                      })
                     .finally(() => {
-                        console.log("AxiosInstance handleUnauthorizedError() refresh finally")
+                        console.log("AxiosInstance handle401Error() refresh finally")
                         AxiosInstance.failedQueue=[]
                      })
             })
 
-        }
+        //}
         // Exemple 1 : Rediriger vers la page de login
         //window.location.href = '/login?from=' + encodeURIComponent(window.location.pathname);
 
         // Exemple 2 : Afficher un message d'erreur (avec un toast, par exemple)
-        alert(`No authorized ${error}`);
+        //alert(`No authorized ${error}`);
 
         // Exemple 3 : Rafraîchir le token (si tu utilises JWT)
         // return refreshTokenAndRetry(error);
+        console.log("AxiosInstance handleUnauthorizedError() after lock queueLength",AxiosInstance.failedQueue.length)
     }
 
     // Méthodes HTTP

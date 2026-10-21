@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axios Instance Auth & Queue Loop</title>
+    <!-- Version corrigée et complète d'Axios via CDN -->
+     <!--
+    <script type="importmap">
+  {
+    "imports": {
+      "axios": "https://unpkg.com/axios@1.20.0/dist/axios.min.js"
+    }
+  }
+</script>
+-->
+    <script src="https://unpkg.com/axios@1.20.0/dist/axios.min.js"></script>
+    <script type="module" src="./AxiosInstance.mjs"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-section {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .log-box {
+            background: #222;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 4px;
+            height: 250px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .status-badge {
+            inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #dc3545;
+            color: white;
+        }
+
+        .status-connected {
+            background: #28a745;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Démonstration Axios : Login & Refresh Queue</h2>
+
+        <!-- ÉTAPE 2 : CONTRÔLE DES REQUÊTES -->
+        <div class="actions-section">
+            <button id="startBtn">Start</button>
+            <button id="stopBtn">Stop</button>
+        </div>
+
+        <!-- ZONE DE LOGS -->
+        <div class="log-box" id="logBox">En attente de connexion...</div>
+    </div>
+
+</body>
+
+</html>

@@ -36,6 +36,13 @@ document.addEventListener("loginCancelled", async (ev) => {
     location.reload();
 })
 
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    // Vérifier le token et rafraîchir si nécessaire
+    //verifierEtRafraichirToken();
+    console.log("visibilty change listener "decodedToken", ev.detail.decodedToken")
+  }
+});
 
 let rightsTimer = null;
 document.addEventListener("loginOk", async (ev) => {

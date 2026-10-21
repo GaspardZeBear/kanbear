@@ -181,20 +181,20 @@ class Kontext {
 
     //--------------------------------------------------------------
     static setJwtToken(token) {
-        console.log("Kontext setJwtToken()",token, "will replace",Kontext.jwtToken)
+        //console.log("Kontext setJwtToken()",token, "will replace",Kontext.jwtToken)
         Kontext.jwtToken = token
     }
 
     //--------------------------------------------------------------
     static setJwtRefreshToken(token) {
-        console.log("Kontext setJwtRefreshToken()",token)
+        //console.log("Kontext setJwtRefreshToken()",token)
         Kontext.jwtRefreshToken = token
     }
 
 
     //--------------------------------------------------------------
     static getJwtToken() {
-        console.log("Kontext getJwtToken()",Kontext.jwtToken)
+        //console.log("Kontext getJwtToken()",Kontext.jwtToken)
         return(Kontext.jwtToken)
     }
 
