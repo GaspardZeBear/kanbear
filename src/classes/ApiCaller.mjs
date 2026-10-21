@@ -18,11 +18,8 @@ class ApiCaller {
         }
         this.apiToken = apiToken;
         console.log("ApiCaller() constructor()", url)
-         
-        //axios.defaults.headers.common['Authorization'] = Kontext.getJwtToken()
-         
         this.headerArray = []
-        let ax=new AxiosInstance(this.kanbearUrl)
+        let ax=new AxiosInstance(this.kanbearUrl,Kontext.getTokensManager())
         this.axiosInstance=ax.getInstance()
     }
 
@@ -45,12 +42,6 @@ class ApiCaller {
         
         if (error.response) {
             console.log("ApiCaller.processError() <error>", error.response.status, "<data>", error.response.data.code);
-            //let myError = {
-            //    error:true,
-            //    status: error.response.status,
-            //    data: error.response.data.code,
-            //}
-            //console.log("ApiCaller <myError>",myError)
             let error0 = new Error("ApicallerError()", { cause: { "status": error.response.status, "msg": error.response.data.code } })
             throw error0
         } else {
@@ -65,9 +56,6 @@ class ApiCaller {
         this.header(["GET", uri, { params }])
         console.log("ApiCaller.get() url ", await this.url(uri), { params: params })
         try {
-            console.log("ApiCaller.get() before"," token ",Kontext.getJwtToken());
-            //const res = await axios.get(await this.url(uri), { headers : { Authorization : "gzb"} , params: params });
-            //const res = await this.axiosInstance.get(await this.url(uri), { headers : { Authorization : Kontext.getJwtToken()} , params: params });
             const res = await this.axiosInstance.get(await this.url(uri), { params: params });
             console.log("ApiCaller.get() <res.status>", res.status); // Status Code
             return (res)

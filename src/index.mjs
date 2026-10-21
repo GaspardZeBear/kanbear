@@ -23,6 +23,7 @@ import { UserDialog } from './classes/UserDialog.mjs';
 import { LoginDialog } from './classes/LoginDialog.mjs'
 
 await Kontext.loadConfig()
+await Kontext.init()
 
 let login = new LoginDialog('login')
 login.create({})
@@ -40,27 +41,16 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
     // Vérifier le token et rafraîchir si nécessaire
     //verifierEtRafraichirToken();
-    console.log("visibilty change listener "decodedToken", ev.detail.decodedToken")
+    console.log("visibilty change listener decodedToken, ev.detail.decodedToken")
   }
 });
 
 let rightsTimer = null;
 document.addEventListener("loginOk", async (ev) => {
     console.log("loginOk listener fired <ev>", ev)
-    await Kontext.init()
-    console.log("LoginOk listener decodedToken", ev.detail.decodedToken)
-    Kontext.setUserName(ev.detail.decodedToken.userName)
-    Kontext.setUserId(ev.detail.decodedToken.userId)
-    Kontext.setUserRights(ev.detail.decodedToken.rights)
-    Kontext.setAdmin(ev.detail.decodedToken.isAdmin)
-    Kontext.setJwtToken(ev.detail.rawToken)
-    Kontext.setJwtRefreshToken(ev.detail.rawRefreshToken)
-
+    //await Kontext.init()
     document.getElementById("resultsHeader").innerHTML = ""
     document.getElementById("results").innerHTML = ""
-    
-    //const isAdmin = await Kontext.isUserAdmin()
-    //console.log("loginOk listener isAdmin", isAdmin)
     document.getElementById('Tags').style.visibility = "hidden"
     if (!Kontext.isAdmin) {
         document.getElementById('Actors').style.visibility = "hidden"

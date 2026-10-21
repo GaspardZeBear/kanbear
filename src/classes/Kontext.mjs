@@ -6,6 +6,7 @@ import { sendMessage, sendErrorMessage } from '../utils/sendMessage.mjs'
 import { getOpenCloseSymbol, getOpenCloseQueryParms } from '../utils/openClose.mjs'
 import { Columns } from './Columns.mjs'
 import { ApiCaller } from './ApiCaller.mjs'
+import { TokensManager } from './TokensManager.mjs'
 import axios from 'axios';
 
 class Kontext {
@@ -25,13 +26,15 @@ class Kontext {
     static orderedColumnsList
     static projectsRights
     static workspacesRights
-    static jwtToken
-    static jwtRefreshToken
+    static tokensManager
+    //static jwtToken
+    //static jwtRefreshToken
     static currentUserId
     static currentUserName
 
     //--------------------------------------------------------------
     static async init() {
+        console.log("Kontext init() begin")
         Kontext.jsonBulkData = null
         Kontext.kanboardJsonBulkData = null
         //Kontext.kanbearConfig = null
@@ -47,13 +50,11 @@ class Kontext {
         Kontext.orderedColumnsList = null
         Kontext.projectsRights = null
         Kontext.workspacesRights = null
-        
-        // !!!! Do not refresh tokens !!!!!!!!!!!
-        Kontext.jwtToken = null
-        Kontext.jwtRefreshToken = null
+        Kontext.tokensManager=new TokensManager(`${Kontext.getKanbearUrl()}/api/auth/refresh`,null,null,Kontext.processAccessToken)
         Kontext.isAdmin = null
         Kontext.currentUserId = null
         Kontext.currentUserName = null
+        console.log("Kontext init() ends")
     }
 
     //--------------------------------------------------------------
@@ -64,20 +65,21 @@ class Kontext {
     }
 
     //--------------------------------------------------------------
+    static getTokensManager() {
+        return(Kontext.tokensManager)
+    }
+
+    //--------------------------------------------------------------
     static async setProject(projectId) {
         Kontext.currentProjectId = projectId
         if (projectId < 1) {
             Kontext.resetKanbearJsonBulkData()
             return
         }
-        //Kontext.currentProjectName=projectName[]
-        //Kontext.currentProjectName=projectName
         console.log("Kontext setProject()", " Kontext.currentProjectId ", Kontext.currentProjectId)
         await Kontext.loadKanbearJsonBulkData()
         console.log("Kontext setProject() after bulk ", Kontext.jsonBulkData)
         Kontext.currentProjectName = Kontext.jsonBulkData[projectId].name
-        //Kontext.orderedColumnsIds = Kontext.jsonBulkData[projectId].columnsOrdered
-        //await Kontext.loadKanboardJsonBulkData()
     }
 
     //--------------------------------------------------------------
@@ -179,28 +181,12 @@ class Kontext {
         return(Kontext.isAdmin)
     }
 
-    //--------------------------------------------------------------
-    static setJwtToken(token) {
-        //console.log("Kontext setJwtToken()",token, "will replace",Kontext.jwtToken)
-        Kontext.jwtToken = token
-    }
-
-    //--------------------------------------------------------------
-    static setJwtRefreshToken(token) {
-        //console.log("Kontext setJwtRefreshToken()",token)
-        Kontext.jwtRefreshToken = token
-    }
-
-
-    //--------------------------------------------------------------
-    static getJwtToken() {
-        //console.log("Kontext getJwtToken()",Kontext.jwtToken)
-        return(Kontext.jwtToken)
-    }
-
-    //--------------------------------------------------------------
-    static getJwtRefreshToken() {
-        return (Kontext.jwtRefreshToken)
+    //-----------------------------------------------------------------
+    static processAccessToken(decodedToken) {
+        Kontext.setUserName(decodedToken.userName)
+        Kontext.setUserId(decodedToken.userId)
+        Kontext.setUserRights(decodedToken.rights)
+        Kontext.setAdmin(decodedToken.isAdmin)
     }
 
     //--------------------------------------------------------------

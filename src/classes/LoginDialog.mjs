@@ -21,34 +21,16 @@ class LoginDialog {
     async submit() {
         console.log("LoginDialog.save() dialog")
         try {
-            //this.closeDialog()
-            //let eventId=`LoId`
-            // Here call /login !!!!!!!!!!!!!!!!!!!!!!!!!
-            // if success, save JWT token
-            //sendEvent(`LoginDone`, { [eventId] : entity.getId() })
-            //let userName=loginForm.userName.value
-            //let userPassword=loginForm.userPassword.value
             let params = {
                 userName: loginForm.loginName.value,
                 userPassword: loginForm.loginPassword.value
             }
             const resp = await new ApiCaller().post(`/api/login`, params)
             console.log("LoginDialog submit()", "userId", resp.data.userId, "rights", resp.data.rights, "resp token", resp.data.token)
-            
-            let decodedToken=jwtDecode(resp.data.token)
-            let decodedRefreshToken=jwtDecode(resp.data.refreshToken)
-            
-            //await Kontext.init()
-            //Kontext.setUserName(loginForm.loginName.value)
-            //Kontext.setUserId(resp.data.userId)
-            //Kontext.setJwtToken(resp.data.token)
-            //Kontext.setJwtRefreshToken(resp.data.refreshToken)
-            //sendEvent('loginOk',{ userName : Kontext.getUserName(), userId : Kontext.getUserId()})
-            sendEvent('loginOk',{ rawToken : resp.data.token, 
-                decodedToken : decodedToken,
-                rawRefreshToken : resp.data.refreshToken, 
-                decodedRefreshToken : decodedRefreshToken
-             })
+       
+            Kontext.getTokensManager().setRefreshToken(resp.data.refreshToken)
+            Kontext.getTokensManager().setAccessToken(resp.data.token)
+            sendEvent('loginOk',{})
         } catch (error) {
             console.log("LoginDialog.submit() <error>", error)
             sendEvent('loginKo')
