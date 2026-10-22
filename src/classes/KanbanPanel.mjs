@@ -124,7 +124,7 @@ class KanbanPanel {
       const status = document.createElement('span')
       status.innerHTML = ` ${getOpenCloseSymbol(swimlane.is_open)}`
       const separator1 = document.createElement('span')
-      separator1.innerHTML = `Swimlane<br/>#${swimlane.id}|`
+      separator1.innerHTML = `Swimlane#${swimlane.id}<br/>`
       //console.log(this.projectLink)
       //kSwimlaneDivH2.appendChild(separator0)
       //kSwimlaneDivH2.appendChild(projectLink)
@@ -180,7 +180,7 @@ class KanbanPanel {
         const columnLink = buildColumnLink(col.id, col.name)
         const kColumnId = document.createElement('span')
         //kColumnId.innerHTML = `#${col.id}| #${col.prevColumnId}<->#${col.nextColumnId} | `
-        kColumnId.innerHTML = `#${col.id}|`
+        kColumnId.innerHTML = `Column #${col.id}|`
         const kColumnHeaderDivH3 = document.createElement('h3')
         //kColumnHeaderDivH3.innerHTML = col.name
         kColumnHeaderDivH3.appendChild(kColumnId)

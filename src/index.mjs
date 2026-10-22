@@ -278,6 +278,11 @@ document.addEventListener("taskModified", async (ev) => {
     const kb = await KanbanPanel.builder()
     kb.render()
 })
+document.addEventListener("taskDeleted", async (ev) => {
+    console.log("index.mjs() task deleted listener fired <ev>", ev)
+    const kb = await KanbanPanel.builder()
+    kb.render()
+})
 document.addEventListener("dialogCanceled", async (ev) => {
     console.log("index.mjs() dialogCanceled listener fired <ev>", ev)
     const kb = await KanbanPanel.builder()

@@ -164,6 +164,7 @@ function buildAddWorkspaceButton() {
   const addWorkspaceButton = document.createElement('button')
   addWorkspaceButton.classList.add("add-item-btn")
   addWorkspaceButton.setAttribute("id", `addWorkspaceButton`)
+  addWorkspaceButton.setAttribute("title", `add workspace`)
   addWorkspaceButton.disabled = !isAdmin()
   //console.log("addWorkspaceButton isAdmin",isAdmin())
   //addTaskButton.innerHTML = "+\u{1F3CB}"
@@ -194,12 +195,13 @@ function buildAddDummyButton(parms = { inner: "?", alert: "Message" }) {
 }
 
 //------------------------------------------------------------------------
-function buildDeleteTaskButton(taskId, taskEntity, disabled) {
+function buildDeleteTaskButton(taskId, taskEntity, disabled, callback) {
   const deleteTaskButton = document.createElement('button')
   deleteTaskButton.classList.add("del-item-btn")
   deleteTaskButton.setAttribute("id", `deleteTaskButton-${taskId}`)
   deleteTaskButton.setAttribute("title", `delete task`)
-  deleteTaskButton.innerHTML = "\u{1F6AE}"
+  //deleteTaskButton.innerHTML = "\u{1F6AE}"
+  deleteTaskButton.innerHTML = "X"
   //deleteTaskButton.innerHTML = parms?.inner || "inner"
   if (disabled) {
     deleteTaskButton.setAttribute("disabled",true)
@@ -207,7 +209,12 @@ function buildDeleteTaskButton(taskId, taskEntity, disabled) {
   let deleteTaskFn = function (ev) {
     console.log("deleteTaskButton event Listener fired")
     ev.stopPropagation();
-    alert(`Confirm task ${taskId} ${taskEntity.name} delete`)
+    //if (confirm(`Confirm task ${taskId} ${taskEntity.task.name} delete`)) {
+      //taskEntity.delete()
+      callback(confirm(`Confirm task ${taskId} ${taskEntity.task.name} delete`))
+    //} else {
+    //  callback(false)
+    //}
   }
   deleteTaskButton.addEventListener('click', deleteTaskFn, { once: false });
   return (deleteTaskButton)

@@ -5,7 +5,8 @@ import { Ref } from "./Ref.mjs"
 import { buildAddDummyButton, buildAddNoteButton, buildAddOpenCloseButton, buildTasksCommentsButton, buildDeleteTaskButton } from "../utils/buttonBuilder.mjs"
 import { buildTasksCommentsLink } from "../utils/linkBuilder.mjs"
 import { getOpenCloseSymbol } from "../utils/openClose.mjs"
-import { mustDisable,REFERENCE,READ,WRITE, DELETE,ISADMIN } from "../utils/rights.mjs"
+import { mustDisable, REFERENCE, READ, WRITE, DELETE, ISADMIN } from "../utils/rights.mjs"
+import { sendEvent } from "../utils/sendEvent.mjs"
 
 class Task extends KanbearEntity {
 
@@ -125,8 +126,8 @@ class Task extends KanbearEntity {
         const href = document.createElement("a")
         href.setAttribute("id", `taskHref_${this.task.id}`)
         href.setAttribute("href", "javascript:void(0)")
+        href.innerHTML = `Task #${this.task.id} ${getOpenCloseSymbol(this.task.is_open)}<br/><b>${this.task.name}</b>`
 
-        href.innerHTML = `${this.task.name}`
         let myTask = this.task
         let editTaskFn = function (ev) {
             console.log("editTaskHref event Listener fired <swimlane>", myTask.swimlane_id, "<column>", myTask.column_id)
@@ -135,6 +136,7 @@ class Task extends KanbearEntity {
             task.modify({ taskId: myTask.id });
         }
         href.addEventListener('click', editTaskFn, { once: true });
+        
         const description = this.task.description ?? "noDescription"
         const tDescription = document.createElement("div")
         tDescription.classList.add("kanban-item-name")
@@ -142,10 +144,10 @@ class Task extends KanbearEntity {
 
         const note = this.task.note ?? "noNote"
         const tNote = document.createElement("div")
-        tNote.setAttribute("style","border:1px solid #ccc")
+        tNote.setAttribute("style", "border:1px solid #ccc")
         tNote.appendChild(buildAddNoteButton(this.task.id, this))
-        
-        const noteText=document.createElement("span")
+
+        const noteText = document.createElement("span")
         noteText.classList.add("kanban-item-name")
         let noteStyle = `background-color:pink;font-style:italic`
         noteText.setAttribute("style", noteStyle)
@@ -194,14 +196,28 @@ class Task extends KanbearEntity {
         topLineDiv.appendChild(noteDiv)
 */
 
+/*
         console.log("this.task", this.task)
         const openCloseDiv = document.createElement("div")
         openCloseDiv.innerHTML = getOpenCloseSymbol(this.task.is_open)
         topLineDiv.appendChild(openCloseDiv)
-
+*/
         const deleteDiv = document.createElement("div")
-        let disabled=false
-        deleteDiv.appendChild(buildDeleteTaskButton(this.task.id, this, disabled))
+        let disabled = mustDisable(DELETE)
+        deleteDiv.appendChild(buildDeleteTaskButton(this.task.id, this, disabled, (doIt) => {
+            if (doIt) {
+                this.delete().then(
+                    () => console.log("Task deleted resolve")
+                    )
+                    .catch(
+                    () =>    console.log("Task deleted reject")
+                    )
+                    .finally(
+                     () =>   console.log("Task deleted finally")
+                    )
+            }
+            sendEvent("taskDeleted", {})
+        }))
         /*
         if (mustDisable(DELETE)) {
             deleteDiv.setAttribute("disabled", true)
