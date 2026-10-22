@@ -4,7 +4,7 @@ import axios from 'https://esm.sh/axios';
 // ==========================================
 // 1. CLASSE AXIOS INSTANCE AVEC GESTION REFRESH
 // ==========================================
-class MyAxiosInstance {
+class AxiosInstance {
     constructor(url,tokens) {
         log("MyAxiosInstace constructor()")
         this.axiosInstance = axios.create({
@@ -100,7 +100,7 @@ class MyAxiosInstance {
 }
 
 //-----------------------------------------------------------------------------------------------------------------
-class Tokens {
+class TokensManager {
     constructor(url, accessToken, refreshToken) {
         this.url = url
         this.accessToken = accessToken
@@ -163,7 +163,7 @@ const ENDPOINT1 = "/api/workspaces/1"
 const SLEEP0 = 2000
 const SLEEP1 = 5000
 
-let tokens = new Tokens(REFRESH_URL, null, null)
+let tokensManager = new TokensManager(REFRESH_URL, null, null)
 let intervalId0, intervalId1
 
 // Injection de logs visuels dans le HTML
@@ -176,14 +176,14 @@ function log(message) {
     logBox.scrollTop = logBox.scrollHeight;
 }
 
-const myApi = new MyAxiosInstance(URL,tokens);
+const myApi = new AxiosInstance(URL,tokens);
 
 document.getElementById('startBtn').addEventListener('click', async (e) => {
     e.target.disabled = true; // Désactive le bouton pour éviter les doubles clics de boucle
     document.getElementById('stopBtn').disabled = false
     let response = await login(USER)
-    tokens.setAccessToken(response.token)
-    tokens.setRefreshToken (response.refreshToken)
+    tokensManager.setAccessToken(response.token)
+    tokensManager.setRefreshToken (response.refreshToken)
     intervalId0 = setInterval(() => {
         log(`main calling ${ENDPOINT0}`);
         callEndpoint(ENDPOINT0);
@@ -206,7 +206,7 @@ document.addEventListener('visibilitychange', async () => {
         // Vérifier le token et rafraîchir si nécessaire
         //verifierEtRafraichirToken();
         console.log("visibilty change listener ")
-        await tokens.handleRefreshToken()
+        await tokensManager.handleRefreshToken()
     }
 });
 

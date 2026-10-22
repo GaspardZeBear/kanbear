@@ -126,13 +126,24 @@ h1 {
 }
 
 
-.kanban-item-topline {
+.Xkanban-item-topline {
     xjustify-content: space-between;
     margin-bottom: 2px;
     background-color: white;
     display : grid;
     grid-template-columns: 45% 15% 15% 15% 10%;
     border:1px outset grey;
+}
+
+.kanban-item-topline {
+    margin-bottom: 2px;
+    background-color: white;
+    display : flex;
+    gap : 10px;
+    border:1px outset grey;
+}
+.kanban-item-topline > div:nth-child(3) {
+  margin-left: auto;   /* Pousse cet élément et le suivant vers la droite */
 }
 
 .kanban-item-name {
@@ -157,10 +168,22 @@ h1 {
 }
 
 .add-item-btn {
-    background-color: #168154;
+    background-color: #97f86a;
     color: white;
     border: none;
     padding: 5px;
+    margin: 5px 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+.del-item-btn {
+    background-color: #fdb25d;
+    color: white;
+    border: none;
+    padding: 1px;
     margin: 5px 5px;
     border-radius: 4px;
     cursor: pointer;

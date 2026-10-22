@@ -15,6 +15,9 @@ import { KanbearRights } from './KanbearRights.mjs';
 const READ = 2      // can READ this oject (modify attritbute)
 const WRITE = 1     // can write this oject (modify attritbute)
 const REFERENCE = 4 // is allowed to have a reference (iE foreign_key) to this object
+const DELETE = 8 // may delete minor things
+const ISADMIN = 16 // may delete or make important ops 
+
 
 //-----------------------------------------------------------------------------------------
 class KanbearRightsCheckerFactory {
@@ -166,6 +169,13 @@ class ProjectsRightsChecker extends RightsChecker {
                 //sqlReq = `select workspace_id from projects where id=${projectId}`
                 //workspaceId = this.sqlGetId('workspace_id',sqlReq)
                 break
+            case 'delete':
+                //wrights = REFERENCE
+                prights = ISADMIN
+                projectId = req.params["id"]
+                //sqlReq = `select workspace_id from projects where id=${projectId}`
+                //workspaceId = this.sqlGetId('workspace_id',sqlReq)
+                break
         }
         if (projectId > 0) {
             return ({
@@ -212,6 +222,12 @@ class SwimlanesRightsChecker extends RightsChecker {
                 sqlReq = `select project_id from swimlanes where id=${swimlaneId}`
                 projectId = this.sqlGetId('project_id', sqlReq)
                 break
+            case 'delete':
+                prights = DELETE
+                swimlaneId = req.params["id"]
+                sqlReq = `select project_id from swimlanes where id=${swimlaneId}`
+                projectId = this.sqlGetId('project_id', sqlReq)
+                break
         }
         return ({
             "workspaces": this.getWorkspaceIdAndRights(projectId, READ),
@@ -249,6 +265,12 @@ class ColumnsRightsChecker extends RightsChecker {
                 break
             case 'getById':
                 prights = READ
+                columnId = req.params["id"]
+                sqlReq = `select project_id from columns where id=${columnId}`
+                projectId = this.sqlGetId('project_id', sqlReq)
+                break
+            case 'delete':
+                prights = DELETE
                 columnId = req.params["id"]
                 sqlReq = `select project_id from columns where id=${columnId}`
                 projectId = this.sqlGetId('project_id', sqlReq)
@@ -300,6 +322,20 @@ class TasksRightsChecker extends RightsChecker {
                 break
             case 'patch':
                 prights = WRITE
+                Konsol.log("TaskRightsChecker computeRights patch", req.params)
+                subselect = `select column_id from tasks  where id=${req.params["id"]}`
+                sqlReq = `
+                    select
+                      project_id 
+                    from 
+                      columns
+                    where
+                      id=(${subselect})
+                `
+                projectId = this.sqlGetId('project_id', sqlReq)
+                break
+            case 'delete':
+                prights = DELETE
                 Konsol.log("TaskRightsChecker computeRights patch", req.params)
                 subselect = `select column_id from tasks  where id=${req.params["id"]}`
                 sqlReq = `

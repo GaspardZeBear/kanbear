@@ -1,6 +1,7 @@
 import { Kontext } from "../classes/Kontext.mjs"
 
-
+const DELETE = 8
+const ISADMIN = 16
 const REFERENCE = 4
 const READ = 2
 const WRITE = 1
@@ -35,7 +36,7 @@ function mustDisable(perm, kind = "project") {
 }
 
 export {
-    REFERENCE,READ,WRITE,
+    REFERENCE,READ,WRITE,ISADMIN,DELETE,
     isAdmin,
   mustDisable
 }

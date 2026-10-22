@@ -2,10 +2,10 @@ import { KanbearEntity } from "./KanbearEntity.mjs"
 import { TaskDialog } from "./TaskDialog.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { Ref } from "./Ref.mjs"
-import { buildAddDummyButton, buildAddNoteButton, buildAddOpenCloseButton, buildTasksCommentsButton } from "../utils/buttonBuilder.mjs"
+import { buildAddDummyButton, buildAddNoteButton, buildAddOpenCloseButton, buildTasksCommentsButton, buildDeleteTaskButton } from "../utils/buttonBuilder.mjs"
 import { buildTasksCommentsLink } from "../utils/linkBuilder.mjs"
 import { getOpenCloseSymbol } from "../utils/openClose.mjs"
-import { mustDisable,REFERENCE,READ,WRITE } from "../utils/rights.mjs"
+import { mustDisable,REFERENCE,READ,WRITE, DELETE,ISADMIN } from "../utils/rights.mjs"
 
 class Task extends KanbearEntity {
 
@@ -135,12 +135,6 @@ class Task extends KanbearEntity {
             task.modify({ taskId: myTask.id });
         }
         href.addEventListener('click', editTaskFn, { once: true });
-
-        /*
-        const top = document.createElement("div")
-        top.classList.add("kanban-item-name")
-        top.innerHTML = `#${this.task.id} ${this.task.name}`
-*/
         const description = this.task.description ?? "noDescription"
         const tDescription = document.createElement("div")
         tDescription.classList.add("kanban-item-name")
@@ -148,10 +142,15 @@ class Task extends KanbearEntity {
 
         const note = this.task.note ?? "noNote"
         const tNote = document.createElement("div")
-        tNote.classList.add("kanban-item-name")
-        let noteStyle = `font-style:italic`
-        tNote.setAttribute("style", noteStyle)
-        tNote.innerHTML = `Note : ${note}`
+        tNote.setAttribute("style","border:1px solid #ccc")
+        tNote.appendChild(buildAddNoteButton(this.task.id, this))
+        
+        const noteText=document.createElement("span")
+        noteText.classList.add("kanban-item-name")
+        let noteStyle = `background-color:pink;font-style:italic`
+        noteText.setAttribute("style", noteStyle)
+        noteText.innerHTML = `${note}`
+        tNote.appendChild(noteText)
 
         //headerDiv.appendChild(top)
         const assignee = Kontext.getCurrentProject().assignees[this.task.assignee_id]?.name || "noAssignee"
@@ -184,28 +183,33 @@ class Task extends KanbearEntity {
         commentDiv.appendChild(buildTasksCommentsButton(this.task.id, 'Co'))
         topLineDiv.appendChild(commentDiv)
 
+        /*
         const tagDiv = document.createElement("div")
         tagDiv.appendChild(buildAddDummyButton({ inner: "Ta", message: "AddTag" }))
         topLineDiv.appendChild(tagDiv)
+        
 
         const noteDiv = document.createElement("div")
         noteDiv.appendChild(buildAddNoteButton(this.task.id, this))
         topLineDiv.appendChild(noteDiv)
-
+*/
 
         console.log("this.task", this.task)
         const openCloseDiv = document.createElement("div")
-        //let callback=(val) => {
-        //    alert(val)
-        //  const task = new TaskDialog()
-        //  task.modify({taskId:myTask.id});
-        //}
-        //openCloseDiv.appendChild(buildAddOpenCloseButton(this.task.id,this.task.is_open,callback))
-        //this.task.is_open ? addAddOpenCloseButton.innerHTML='O/c' : addAddOpenCloseButton.innerHTML='o/C'
-        //let oc
-        //this.task.is_open ? oc="O" : oc="C"
         openCloseDiv.innerHTML = getOpenCloseSymbol(this.task.is_open)
         topLineDiv.appendChild(openCloseDiv)
+
+        const deleteDiv = document.createElement("div")
+        let disabled=false
+        deleteDiv.appendChild(buildDeleteTaskButton(this.task.id, this, disabled))
+        /*
+        if (mustDisable(DELETE)) {
+            deleteDiv.setAttribute("disabled", true)
+        }
+            */
+        //deleteDiv.setAttribute("disabled", true)
+        topLineDiv.appendChild(deleteDiv)
+
 
         const dummyDiv = document.createElement("div")
         dummyDiv.innerHTML = "Open/close,Del,Comment"
@@ -226,9 +230,6 @@ class Task extends KanbearEntity {
         })
 
         taskElement.addEventListener('dragend', (ev) => {
-            //console.log("dragend")
-            //ev.dataTransfer.setData('dragId', dragId);
-            //console.log(ev.dataTransfer)
             ev.target.classList.remove("dragging")
         })
         return (taskElement)

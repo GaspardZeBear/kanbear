@@ -17,7 +17,7 @@ class KanbearTokens {
         const token = jwt.sign(
             userInfos,
             'kanbear',
-            { expiresIn: '10s' }
+            { expiresIn: '5m' }
         );
         Konsol.log("KanbearTokens generateToken() access", token)
         return (token)
@@ -30,7 +30,7 @@ class KanbearTokens {
         const refreshToken = jwt.sign(
             userInfos,
             'kanbear',
-            { expiresIn: '1h' }
+            { expiresIn: '8h' }
         );
         Konsol.log("KanbearTokens generateRefreshToken() refresh", refreshToken)
         return (refreshToken)

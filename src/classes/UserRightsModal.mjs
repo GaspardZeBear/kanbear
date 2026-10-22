@@ -13,6 +13,8 @@ import { buildAddProjectsRightsButton, buildAddWorkspacesRightsButton } from '..
 const REFERENCEFLAG = 4
 const READFLAG = 2
 const WRITEFLAG = 1
+const DELETEFLAG = 8
+const ISADMINFLAG = 16
 
 class UserRightsModal {
 
@@ -124,6 +126,12 @@ class UserRightsModal {
       if (document.getElementById(`${r.id}:write`).checked) {
         cRights += WRITEFLAG
       }
+      if (document.getElementById(`${r.id}:delete`).checked) {
+        cRights += DELETEFLAG
+      }
+      if (document.getElementById(`${r.id}:isadmin`).checked) {
+        cRights += ISADMINFLAG
+      }
       console.log("UserRightsModal saveRights", r.id, r.value, "cRights", cRights)
       if (cRights != r.value) {
         console.log("UserRightsModal saveRights", r.id, " update")
@@ -223,6 +231,8 @@ class UserRightsModal {
         <th>Kind</th>
         <th>${kind}Id</th>
         <th>${kind}Name</th>
+        <th>isAdmin</th>
+        <th>Delete</th>
         <th>Reference</th>
         <th>Read</th>
         <th>Write</th>
@@ -256,10 +266,24 @@ class UserRightsModal {
       row.appendChild(td(kind))
       row.appendChild(td(rights[`${lkind}_id`]))
       row.appendChild(td(rights[`${lkind}_name`]))
+      let isadminChecked = ((rights.rights & ISADMINFLAG) > 0) ? "checked" : ""
+      let deleteChecked = ((rights.rights & DELETEFLAG) > 0) ? "checked" : ""
       let referenceChecked = ((rights.rights & REFERENCEFLAG) > 0) ? "checked" : ""
       let readChecked = ((rights.rights & READFLAG) > 0) ? "checked" : ""
       let writeChecked = ((rights.rights & WRITEFLAG) > 0) ? "checked" : ""
       //let readId = `projectsRights_read_${rightId}`
+      let isadminId = this.getItemId(lkinds, 'isadmin', rightId)
+      row.appendChild(td(`<input class="userRightsCheckbox"
+         type="checkbox"
+         name="${rights.rights}"
+         id="${isadminId}"
+         ${isadminChecked}/>`))
+      let deleteId = this.getItemId(lkinds, 'delete', rightId)
+      row.appendChild(td(`<input class="userRightsCheckbox"
+         type="checkbox"
+         name="${rights.rights}"
+         id="${deleteId}"
+         ${deleteChecked}/>`))
       let referenceId = this.getItemId(lkinds, 'reference', rightId)
       row.appendChild(td(`<input class="userRightsCheckbox"
          type="checkbox"
