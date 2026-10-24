@@ -79,16 +79,16 @@ input[type="text"] {
 
 button {
     padding: 10px;
-    background: grey;
+    xbackground: grey;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background 0.3s;
+    xtransition: background 0.3s;
 }
 
 button:hover {
-    background: darkGrey;
+    Xbackground: darkGrey;
 }
 
 .content {
@@ -199,7 +199,7 @@ th {
     border-radius: 4px;
     cursor: pointer;
     font-size: 1rem;
-    transition: background-color 0.3s;
+    
 }
 .is_open1 {
     background-color: #21ed1a;
@@ -210,7 +210,6 @@ th {
     border-radius: 4px;
     cursor: pointer;
     font-size: 1rem;
-    transition: background-color 0.3s;
 }
 
 .add-item-btn {
@@ -222,7 +221,6 @@ th {
     border-radius: 4px;
     cursor: pointer;
     font-size: 1rem;
-    transition: background-color 0.3s;
 }
 
 .del-item-btn {

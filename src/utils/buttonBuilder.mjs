@@ -227,11 +227,9 @@ function buildOpenCloseButton(entity, disabled, callback) {
   let openCloseFn = function (ev) {
     console.log("openCloseButton event Listener fired")
     ev.stopPropagation();
-    //if (confirm(`Confirm task ${taskId} ${taskEntity.task.name} delete`)) {
-    //taskEntity.delete()
     let doIt=false
     if (entity.getOpen() > 0) {
-      if (confirm("Close this thing  ?")) {
+      if (confirm(`Close ${entity.kind} ${entity.getName()} #${entity.getId()} ? `)) {
         entity.setOpen(0)
         doIt=true
       } 
@@ -240,37 +238,15 @@ function buildOpenCloseButton(entity, disabled, callback) {
       doIt=true
     }
     callback(doIt)
-    //} else {
-    //  callback(false)
-    //}
   }
   const openCloseButton = createElement('button', {
     textContent: `${getOpenCloseSymbol(entity.getOpen())}`,
     classes: [`${getOpenCloseClass(entity.getOpen())}`],
     onclick: [openCloseFn, { once: true }]
   })
-  /*
-//deleteTaskButton.setAttribute("id", `deleteTaskButton-${taskId}`)
-//deleteTaskButton.setAttribute("title", `delete task`)
-//deleteTaskButton.innerHTML = "\u{1F6AE}"
-deleteTaskButton.innerHTML = "X"
-//deleteTaskButton.innerHTML = parms?.inner || "inner"
-if (disabled) {
-  deleteTaskButton.setAttribute("disabled",true)
-}
-let deleteTaskFn = function (ev) {
-  console.log("deleteTaskButton event Listener fired")
-  ev.stopPropagation();
-  //if (confirm(`Confirm task ${taskId} ${taskEntity.task.name} delete`)) {
-    //taskEntity.delete()
-    callback(confirm(`Confirm task ${taskId} ${taskEntity.task.name} delete`))
-  //} else {
-  //  callback(false)
-  //}
-}
-deleteTaskButton.addEventListener('click', deleteTaskFn, { once: false });
-return (deleteTaskButton)
-*/
+  if (disabled) {
+    openCloseButton.setAttribute("disabled", true)
+  }
   return (openCloseButton)
 }
 

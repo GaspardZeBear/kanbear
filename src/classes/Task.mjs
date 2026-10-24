@@ -56,8 +56,6 @@ class Task extends KanbearEntity {
 
     //-----------------------------------------------------------------------------------------------------
     getTaskDisplayColor(col = undefined) {
-        //console.log("Task.getTaskDisplayColor()", "task", this.task, "color")
-        //console.log("Task.getTaskDisplayColor()", "taskColorLen", this.task.color.length)
         if (this.task.color && this.task.color.length > 0) {
             return (this.task.color)
         }
@@ -67,32 +65,36 @@ class Task extends KanbearEntity {
         //console.log("Task.getTaskDisplayColor()", "col", col)
         return (col.color)
     }
+
     //-----------------------------------------------------------------------------------------------------
-    createKanbanTaskElement() {
-        //const dragId = `drag-${task.id}`
-        const dragId = Ref.getRefFromTask('drag', this.task)
-        const taskElement = document.createElement('div');
-        this.elementId = dragId
-        taskElement.setAttribute("id", dragId)
-        taskElement.classList.add('kanban-item');
-        if (!mustDisable(WRITE)) {
-            taskElement.setAttribute("draggable", true)
-        }
-        let style = `background-color:${this.getTaskDisplayColor()}`
-        taskElement.setAttribute("style", style)
-        const headerDiv = document.createElement("div")
-        headerDiv.classList.add("kanban-item-header")
-        let myTask = this.task
-        let myTaskEntity = this
+    getHeaderDiv() {
+        return (createElement("div", {
+            classes: ["kanban-item-header"],
+            children: [
+                name,
+                createElement("div", {
+                    classes: ["kanban-item-description"],
+                    textContent: this.task.description ?? "noDescription"
+                }),
+                createElement("div", {
+                    classes: ["kanban-assignee-name"],
+                    textContent: Kontext.getCurrentProject().assignees[this.task.assignee_id]?.name || "noAssignee"
+                })
+            ]
+        }))
+
+    }
+
+    //----------------------------------------------------------------------------------
+    getIdentityDiv() {
         let editTaskFn = function (ev) {
             console.log("editTaskFn event Listener fired <myTask>", myTaskEntity)
             ev.stopPropagation();
             const task = new TaskDialog()
             task.modify({ taskId: myTaskEntity.id });
         }
-
-        let ocDisabled = mustDisable(WRITE)
-        const href = createElement('div', {
+            let myTaskEntity = this
+        return (createElement('div', {
             children: [
                 createElement("a", {
                     id: `taskHref_${this.task.id}`,
@@ -100,89 +102,80 @@ class Task extends KanbearEntity {
                     innerHTML: `Task #${this.task.id}`,
                     onclick: [editTaskFn, { once: true }]
                 }),
-                buildOpenCloseButton(this, ocDisabled, (doIt) => {
+                buildOpenCloseButton(this, mustDisable(WRITE), (doIt) => {
                     if (doIt) {
                         myTaskEntity.patch({ is_open: myTaskEntity.getOpen() }).catch(() => { })
                     }
                     sendEvent("taskModified", {})
-                }
-                ),
-                //createElement("span",{textContent:`${getOpenCloseSymbol(this.task.is_open)}`}),
+                }),
                 createElement('br'),
                 createElement('b', {
                     children: [createElement("span", { textContent: this.task.name })]
                 })
             ]
         })
+        )
+    }
 
-        const description = this.task.description ?? "noDescription"
-        const tDescription = document.createElement("div")
-        tDescription.classList.add("kanban-item-name")
-        tDescription.innerHTML = `${description}`
-
-        const note = this.task.note ?? "noNote"
-        const tNote = document.createElement("div")
-        tNote.setAttribute("style", "border:1px solid #ccc")
-        tNote.appendChild(buildAddNoteButton(this.task.id, this))
-
-        const noteText = document.createElement("span")
-        noteText.classList.add("kanban-item-name")
-        let noteStyle = `background-color:pink;font-style:italic`
-        noteText.setAttribute("style", noteStyle)
-        noteText.innerHTML = `${note}`
-        tNote.appendChild(noteText)
-
-        //headerDiv.appendChild(top)
-        const assignee = Kontext.getCurrentProject().assignees[this.task.assignee_id]?.name || "noAssignee"
-        const tAssignee = document.createElement("div")
-        tAssignee.classList.add("kanban-item-name")
-        tAssignee.innerHTML = `${assignee}`
-
-
-        headerDiv.appendChild(tDescription)
-        //headerDiv.appendChild(tNote)
-        headerDiv.appendChild(tAssignee)
-
-
-        // !!!!!!!!!!!!!!!!!!! Append link to headerDiv does not work !!!! 
-        // Must append it to taskElement
-        // //////:headerDiv.appendChild(href)
-        //taskElement.appendChild(href)
-
-        // let's try 
-        const topLineDiv = document.createElement("div")
-        topLineDiv.classList.add("kanban-item-topline")
-
-        const hrefDiv = document.createElement("div")
-
-        hrefDiv.appendChild(href)
-        topLineDiv.appendChild(hrefDiv)
-
-        const commentDiv = document.createElement("div")
-        //commentDiv.appendChild(buildTasksCommentsLink(this.task.id,'Co'))
-        commentDiv.appendChild(buildTasksCommentsButton(this.task.id, 'Co'))
-        topLineDiv.appendChild(commentDiv)
-
+    //---------------------------------------------------------------------------------------------------
+    getDeleteDiv() {
         const deleteDiv = document.createElement("div")
-        let disabled = mustDisable(DELETE)
-        deleteDiv.appendChild(buildDeleteTaskButton(this.task.id, this, disabled, (doIt) => {
+        return (deleteDiv.appendChild(buildDeleteTaskButton(this.task.id, this, mustDisable(DELETE), (doIt) => {
             if (doIt) {
                 this.delete().catch(() => console.log("Task deleted reject"))
             }
             sendEvent("taskDeleted", {})
         }))
+        )
+    }
 
-        topLineDiv.appendChild(deleteDiv)
+    //---------------------------------------------------------------------
+    getTopLineDiv() {
+        return (createElement("div", {
+            classes: ["kanban-item-topline"],
+            children: [
+                createElement("div", { children: [this.getIdentityDiv()] }),
+                createElement("div", { children: [buildTasksCommentsButton(this.task.id, 'Co')] }),
+                this.getDeleteDiv()
+            ]
+        }))
+    }
 
+    //------------------------------------------------------------------------------------------
+    getNoteDiv() {
+        return (createElement("div", {
+            style: "border:1px solid #ccc",
+            children: [
+                buildAddNoteButton(this.task.id, this),
+                createElement("span", {
+                    classes: ["kanban-item-name"],
+                    //style: `background-color:pink;font-style:italic`,
+                    textContent: this.task.note ?? "noNote"
+                })
+            ]
+        })
+        )
+    }
 
-        const dummyDiv = document.createElement("div")
-        dummyDiv.innerHTML = "Open/close,Del,Comment"
-        //topLineDiv.appendChild(dummyDiv)
-
-        taskElement.appendChild(topLineDiv)
-
-        taskElement.appendChild(headerDiv)
-        taskElement.appendChild(tNote)
+    //-----------------------------------------------------------------------------------------------------
+    createKanbanTaskElement() {
+        //const dragId = `drag-${task.id}`
+        const dragId = Ref.getRefFromTask('drag', this.task)
+    
+        
+        // !!!!!!!!!!!!!!!!!!! Append link to headerDiv does not work !!!! 
+        // Must append it to taskElement
+        const taskElement = createElement("div", {
+            id: dragId,
+            classes: ['kanban-item'],
+            style: `background-color:${this.getTaskDisplayColor()}`,
+            draggable: !mustDisable(WRITE),
+            children: [
+                this.getTopLineDiv(),
+                this.getHeaderDiv(),
+                this.getNoteDiv()
+            ]
+        })
 
         taskElement.addEventListener('dragstart', (ev) => {
             //console.log("dragstart")

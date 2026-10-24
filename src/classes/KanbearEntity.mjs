@@ -22,7 +22,10 @@ class KanbearEntity {
         this.data = {} // will contain attributes to create or patch 
         //this.fromDb = {} // conatains raw retried from db
         this.fromDb= {...from} 
-        from.id ? this.id = from.id : undefined
+        this.fromDb.name ? this.setName(this.fromDb.name) : undefined
+        this.fromDb.description ? this.setDescription(this.fromDb.description) : undefined
+        this.fromDb.id ? this.setId(this.fromDb.id) : undefined
+        this.fromDb.is_open ? this.setOpen(this.fromDb.is_open) : undefined
         //console.log("KanbearEntity.constructor()","<kind>",kind,"<this.kind>", this.kind)
         //console.log("KanbearEntity.constructor() <from>", from)
         //console.log("KanbearEntity.constructor() <this>", this)
