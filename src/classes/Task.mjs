@@ -2,49 +2,14 @@ import { KanbearEntity } from "./KanbearEntity.mjs"
 import { TaskDialog } from "./TaskDialog.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { Ref } from "./Ref.mjs"
-import { buildAddDummyButton, buildAddNoteButton, buildAddOpenCloseButton, buildTasksCommentsButton, buildDeleteTaskButton } from "../utils/buttonBuilder.mjs"
+import { buildAddDummyButton, buildAddNoteButton, buildAddOpenCloseButton, buildTasksCommentsButton, buildDeleteTaskButton, buildOpenCloseButton } from "../utils/buttonBuilder.mjs"
 import { buildTasksCommentsLink } from "../utils/linkBuilder.mjs"
-import { getOpenCloseSymbol } from "../utils/openClose.mjs"
+import { getOpenCloseSymbol, getOpenCloseClass } from "../utils/openClose.mjs"
 import { mustDisable, REFERENCE, READ, WRITE, DELETE, ISADMIN } from "../utils/rights.mjs"
 import { sendEvent } from "../utils/sendEvent.mjs"
+import { createElement } from "../utils/createHtml.mjs"
 
 class Task extends KanbearEntity {
-
-    static db2Form = {
-        'id': '',
-        'name': 'taskName',
-        'description': 'taskDescription',
-        'note': 'taskNote',
-        'color': 'taskColor',
-        'color_rules': 'taskColorRules',
-        'column_id': '',
-        'user_id': '',
-        'assignee_id': 'taskAssignee',
-        'position': '',
-        'is_open': 'taskIsOpen',
-        'priority': 'taskPriority',
-        'swimlane_id': '',
-        'date_created': '',
-        'date_started': 'taskDateStarted',
-        'date_moved': '',
-        'date_closed': '',
-        'date_due': 'taskDateDue',
-        'date_checked': '',
-        'date_modified': '',
-        'moved_warning': 'taskMovedWarning',
-        'due_warning': 'taskDueWarning',
-        'checked_warning ': 'taskCheckedWarning'
-    }
-
-    static form2Db = {}
-
-    static {
-        Object.entries(Task.db2Form).forEach(([col, form]) => {
-            if (form.length > 0) {
-                Task.form2Db[form] = col
-            }
-        })
-    }
 
     //------------------------------------------------------------------------
     constructor(task) {
@@ -113,30 +78,43 @@ class Task extends KanbearEntity {
         if (!mustDisable(WRITE)) {
             taskElement.setAttribute("draggable", true)
         }
-        //let style=`background-color:${this.task.color}`
         let style = `background-color:${this.getTaskDisplayColor()}`
         taskElement.setAttribute("style", style)
-        //taskElement.style.setAttribute("background-color",this.task.color)
-        //taskElement.style.setAttribute("style","italic")
-
-
         const headerDiv = document.createElement("div")
         headerDiv.classList.add("kanban-item-header")
-
-        const href = document.createElement("a")
-        href.setAttribute("id", `taskHref_${this.task.id}`)
-        href.setAttribute("href", "javascript:void(0)")
-        href.innerHTML = `Task #${this.task.id} ${getOpenCloseSymbol(this.task.is_open)}<br/><b>${this.task.name}</b>`
-
         let myTask = this.task
+        let myTaskEntity = this
         let editTaskFn = function (ev) {
-            console.log("editTaskHref event Listener fired <swimlane>", myTask.swimlane_id, "<column>", myTask.column_id)
+            console.log("editTaskFn event Listener fired <myTask>", myTaskEntity)
             ev.stopPropagation();
             const task = new TaskDialog()
-            task.modify({ taskId: myTask.id });
+            task.modify({ taskId: myTaskEntity.id });
         }
-        href.addEventListener('click', editTaskFn, { once: true });
-        
+
+        let ocDisabled = mustDisable(WRITE)
+        const href = createElement('div', {
+            children: [
+                createElement("a", {
+                    id: `taskHref_${this.task.id}`,
+                    href: "javascript:void(0)",
+                    innerHTML: `Task #${this.task.id}`,
+                    onclick: [editTaskFn, { once: true }]
+                }),
+                buildOpenCloseButton(this, ocDisabled, (doIt) => {
+                    if (doIt) {
+                        myTaskEntity.patch({ is_open: myTaskEntity.getOpen() }).catch(() => { })
+                    }
+                    sendEvent("taskModified", {})
+                }
+                ),
+                //createElement("span",{textContent:`${getOpenCloseSymbol(this.task.is_open)}`}),
+                createElement('br'),
+                createElement('b', {
+                    children: [createElement("span", { textContent: this.task.name })]
+                })
+            ]
+        })
+
         const description = this.task.description ?? "noDescription"
         const tDescription = document.createElement("div")
         tDescription.classList.add("kanban-item-name")
@@ -185,45 +163,15 @@ class Task extends KanbearEntity {
         commentDiv.appendChild(buildTasksCommentsButton(this.task.id, 'Co'))
         topLineDiv.appendChild(commentDiv)
 
-        /*
-        const tagDiv = document.createElement("div")
-        tagDiv.appendChild(buildAddDummyButton({ inner: "Ta", message: "AddTag" }))
-        topLineDiv.appendChild(tagDiv)
-        
-
-        const noteDiv = document.createElement("div")
-        noteDiv.appendChild(buildAddNoteButton(this.task.id, this))
-        topLineDiv.appendChild(noteDiv)
-*/
-
-/*
-        console.log("this.task", this.task)
-        const openCloseDiv = document.createElement("div")
-        openCloseDiv.innerHTML = getOpenCloseSymbol(this.task.is_open)
-        topLineDiv.appendChild(openCloseDiv)
-*/
         const deleteDiv = document.createElement("div")
         let disabled = mustDisable(DELETE)
         deleteDiv.appendChild(buildDeleteTaskButton(this.task.id, this, disabled, (doIt) => {
             if (doIt) {
-                this.delete().then(
-                    () => console.log("Task deleted resolve")
-                    )
-                    .catch(
-                    () =>    console.log("Task deleted reject")
-                    )
-                    .finally(
-                     () =>   console.log("Task deleted finally")
-                    )
+                this.delete().catch(() => console.log("Task deleted reject"))
             }
             sendEvent("taskDeleted", {})
         }))
-        /*
-        if (mustDisable(DELETE)) {
-            deleteDiv.setAttribute("disabled", true)
-        }
-            */
-        //deleteDiv.setAttribute("disabled", true)
+
         topLineDiv.appendChild(deleteDiv)
 
 

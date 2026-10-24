@@ -125,16 +125,6 @@ h1 {
     pointer-events: none;
 }
 
-
-.Xkanban-item-topline {
-    xjustify-content: space-between;
-    margin-bottom: 2px;
-    background-color: white;
-    display : grid;
-    grid-template-columns: 45% 15% 15% 15% 10%;
-    border:1px outset grey;
-}
-
 .kanban-item-topline {
     margin-bottom: 2px;
     background-color: white;
@@ -167,7 +157,7 @@ h1 {
     right: 5px;
 }
 
-.add-item-btn {
+.Xadd-item-btn {
     background-color: #97f86a;
     color: white;
     border: none;
@@ -179,7 +169,7 @@ h1 {
     transition: background-color 0.3s;
 }
 
-.del-item-btn {
+.Xdel-item-btn {
     background-color: #fdb25d;
     color: white;
     border: none;

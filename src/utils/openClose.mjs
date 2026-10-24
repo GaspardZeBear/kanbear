@@ -5,6 +5,12 @@ function getOpenCloseSymbol(val) {
 }
 
 //--------------------------------------------------------------------------------------------
+function getOpenCloseClass(val) {
+    return (`is_open${val}`)
+    //return(val ? '<i class="material-icons">lock</i>':'<i class="material-icons">lock</i>')
+}
+
+//--------------------------------------------------------------------------------------------
 function getOpenCloseParmBoolean(kind, openSelected, closeSelected) {
     //console.log("getOpenCloseParmBoolean() <kind>", kind, openSelected, closeSelected)
     if (openSelected && closeSelected) {
@@ -56,4 +62,4 @@ function getOpenCloseQueryParms(kinds=['project', 'swimlane', 'task']) {
 //--------------------------------------------------------------------------------------------
 
 
-export { getOpenCloseSymbol, getOpenCloseQueryParms, getOpenCloseParmBoolean }
+export { getOpenCloseSymbol, getOpenCloseClass, getOpenCloseQueryParms, getOpenCloseParmBoolean }

@@ -20,7 +20,8 @@ class KanbearEntity {
             this.kind = KanbearEntity.apiTablesMap[kind]
         }
         this.data = {} // will contain attributes to create or patch 
-        this.fromDb = {} // conatains raw retried from db 
+        //this.fromDb = {} // conatains raw retried from db
+        this.fromDb= {...from} 
         from.id ? this.id = from.id : undefined
         //console.log("KanbearEntity.constructor()","<kind>",kind,"<this.kind>", this.kind)
         //console.log("KanbearEntity.constructor() <from>", from)
@@ -51,6 +52,13 @@ class KanbearEntity {
     setOpen(open) {
         this.data.is_open = open
     }
+
+    //----------------------------------------------------------------------------
+    getOpen() {
+        console.log("KanbearEntity.getOpen() <this>", this.data)
+        return(this.fromDb.is_open)
+    }
+
 
     //----------------------------------------------------------------------------
     setDescription(description) {

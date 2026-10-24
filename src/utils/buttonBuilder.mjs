@@ -11,6 +11,8 @@ import { sendEvent } from "./sendEvent.mjs"
 import { Kontext } from "../classes/Kontext.mjs"
 import { TasksCommentsModal } from "../classes/TasksCommentsModal.mjs"
 import { isAdmin, mustDisable, REFERENCE, READ, WRITE } from "../utils/rights.mjs"
+import { createElement } from "./createHtml.mjs"
+import { getOpenCloseClass, getOpenCloseSymbol } from "./openClose.mjs"
 
 //------------------------------------------------------------------------
 function buildAddSwimlaneButton(projectId) {
@@ -204,20 +206,72 @@ function buildDeleteTaskButton(taskId, taskEntity, disabled, callback) {
   deleteTaskButton.innerHTML = "X"
   //deleteTaskButton.innerHTML = parms?.inner || "inner"
   if (disabled) {
-    deleteTaskButton.setAttribute("disabled",true)
+    deleteTaskButton.setAttribute("disabled", true)
   }
   let deleteTaskFn = function (ev) {
     console.log("deleteTaskButton event Listener fired")
     ev.stopPropagation();
     //if (confirm(`Confirm task ${taskId} ${taskEntity.task.name} delete`)) {
-      //taskEntity.delete()
-      callback(confirm(`Confirm task ${taskId} ${taskEntity.task.name} delete`))
+    //taskEntity.delete()
+    callback(confirm(`Confirm task ${taskId} ${taskEntity.task.name} delete`))
     //} else {
     //  callback(false)
     //}
   }
   deleteTaskButton.addEventListener('click', deleteTaskFn, { once: false });
   return (deleteTaskButton)
+}
+
+//------------------------------------------------------------------------
+function buildOpenCloseButton(entity, disabled, callback) {
+  let openCloseFn = function (ev) {
+    console.log("openCloseButton event Listener fired")
+    ev.stopPropagation();
+    //if (confirm(`Confirm task ${taskId} ${taskEntity.task.name} delete`)) {
+    //taskEntity.delete()
+    let doIt=false
+    if (entity.getOpen() > 0) {
+      if (confirm("Close this thing  ?")) {
+        entity.setOpen(0)
+        doIt=true
+      } 
+    } else {
+      entity.setOpen(1)
+      doIt=true
+    }
+    callback(doIt)
+    //} else {
+    //  callback(false)
+    //}
+  }
+  const openCloseButton = createElement('button', {
+    textContent: `${getOpenCloseSymbol(entity.getOpen())}`,
+    classes: [`${getOpenCloseClass(entity.getOpen())}`],
+    onclick: [openCloseFn, { once: true }]
+  })
+  /*
+//deleteTaskButton.setAttribute("id", `deleteTaskButton-${taskId}`)
+//deleteTaskButton.setAttribute("title", `delete task`)
+//deleteTaskButton.innerHTML = "\u{1F6AE}"
+deleteTaskButton.innerHTML = "X"
+//deleteTaskButton.innerHTML = parms?.inner || "inner"
+if (disabled) {
+  deleteTaskButton.setAttribute("disabled",true)
+}
+let deleteTaskFn = function (ev) {
+  console.log("deleteTaskButton event Listener fired")
+  ev.stopPropagation();
+  //if (confirm(`Confirm task ${taskId} ${taskEntity.task.name} delete`)) {
+    //taskEntity.delete()
+    callback(confirm(`Confirm task ${taskId} ${taskEntity.task.name} delete`))
+  //} else {
+  //  callback(false)
+  //}
+}
+deleteTaskButton.addEventListener('click', deleteTaskFn, { once: false });
+return (deleteTaskButton)
+*/
+  return (openCloseButton)
 }
 
 //------------------------------------------------------------------------
@@ -291,4 +345,5 @@ export {
   buildAddNoteButton,
   buildAddOpenCloseButton,
   buildTasksCommentsButton,
+  buildOpenCloseButton
 }
