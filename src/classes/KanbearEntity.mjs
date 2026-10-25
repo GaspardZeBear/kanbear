@@ -1,6 +1,8 @@
 import { sendEvent } from "../utils/sendEvent.mjs"
 import { sendErrorMessage } from "../utils/sendMessage.mjs"
 import { ApiCaller } from "./ApiCaller.mjs"
+//import { createElement } from "../utils/createHtml.mjs"
+//import { buildOpenCloseButton } from "../utils/buttonBuilder.mjs"
 
 class KanbearEntity {
 
@@ -12,6 +14,8 @@ class KanbearEntity {
         "workspacesRights": "workspaces_right",
         
      }
+
+
     //------------------------------------------------------------------------
     constructor(kind, from = {}) {
         console.log("KanbearEntity.constructor() <kind>", kind, "<from>", from)
@@ -22,13 +26,14 @@ class KanbearEntity {
         this.data = {} // will contain attributes to create or patch 
         //this.fromDb = {} // conatains raw retried from db
         this.fromDb= {...from} 
+        console.log("KanbearEntity.constructor() <kind>", kind, "<fromDb>", this.fromDb)
         this.fromDb.name ? this.setName(this.fromDb.name) : undefined
         this.fromDb.description ? this.setDescription(this.fromDb.description) : undefined
         this.fromDb.id ? this.setId(this.fromDb.id) : undefined
         this.fromDb.is_open ? this.setOpen(this.fromDb.is_open) : undefined
         //console.log("KanbearEntity.constructor()","<kind>",kind,"<this.kind>", this.kind)
         //console.log("KanbearEntity.constructor() <from>", from)
-        //console.log("KanbearEntity.constructor() <this>", this)
+        console.log("KanbearEntity.constructor() <this>", this)
     }
 
     //----------------------------------------------------------------------------
@@ -49,11 +54,13 @@ class KanbearEntity {
     //----------------------------------------------------------------------------
     setName(name) {
         this.data.name = name
+        this.name = name
     }
 
     //----------------------------------------------------------------------------
     setOpen(open) {
-        this.data.is_open = open
+        this.data.is_open=open
+        this.is_open = open
     }
 
     //----------------------------------------------------------------------------
@@ -62,9 +69,9 @@ class KanbearEntity {
         return(this.fromDb.is_open)
     }
 
-
     //----------------------------------------------------------------------------
     setDescription(description) {
+        this.description = description
         this.data.description = description
     }
 

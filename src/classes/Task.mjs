@@ -7,7 +7,7 @@ import { buildTasksCommentsLink } from "../utils/linkBuilder.mjs"
 import { getOpenCloseSymbol, getOpenCloseClass } from "../utils/openClose.mjs"
 import { mustDisable, REFERENCE, READ, WRITE, DELETE, ISADMIN } from "../utils/rights.mjs"
 import { sendEvent } from "../utils/sendEvent.mjs"
-import { createElement } from "../utils/createHtml.mjs"
+import { createElement, getIdentityDiv } from "../utils/createHtml.mjs"
 
 class Task extends KanbearEntity {
 
@@ -86,14 +86,15 @@ class Task extends KanbearEntity {
     }
 
     //----------------------------------------------------------------------------------
-    getIdentityDiv() {
+    XgetIdentityDiv() {
+        let myTaskEntity = this
         let editTaskFn = function (ev) {
             console.log("editTaskFn event Listener fired <myTask>", myTaskEntity)
             ev.stopPropagation();
             const task = new TaskDialog()
             task.modify({ taskId: myTaskEntity.id });
         }
-            let myTaskEntity = this
+            
         return (createElement('div', {
             children: [
                 createElement("a", {
@@ -134,7 +135,7 @@ class Task extends KanbearEntity {
         return (createElement("div", {
             classes: ["kanban-item-topline"],
             children: [
-                createElement("div", { children: [this.getIdentityDiv()] }),
+                createElement("div", { children: [getIdentityDiv(this, new TaskDialog())] }),
                 createElement("div", { children: [buildTasksCommentsButton(this.task.id, 'Co')] }),
                 this.getDeleteDiv()
             ]

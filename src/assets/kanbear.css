@@ -79,7 +79,7 @@ input[type="text"] {
 
 button {
     padding: 10px;
-    xbackground: grey;
+    background: grey;
     color: white;
     border: none;
     border-radius: 4px;
@@ -227,7 +227,7 @@ th {
     background-color: #fdb25d;
     color: white;
     border: none;
-    padding: 1px;
+    xpadding: 1px;
     margin: 5px 5px;
     border-radius: 4px;
     cursor: pointer;
