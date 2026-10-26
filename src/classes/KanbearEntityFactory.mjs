@@ -12,40 +12,40 @@ import { Workspace } from './Workspace.mjs'
 
 class KanbearEntityFactory {
     //------------------------------------------------------------------------
-    static async generate(entity) {
-        switch (entity) {
+    static async generate(kind,parms={}) {
+        switch (kind) {
             case 'assignee':
-                return new Assignee({})
+                return new Assignee(parms)
                 break
             case 'column':
-                return new Column({})
+                return new Column(parms)
                 break
             case 'project':
-                return new Project({})
+                return new Project(parms)
                 break
             case 'projectsRights':
-                return new ProjectsRights({})
+                return new ProjectsRights(parms)
                 break
             case 'swimlane':
-                return new Swimlane({})
+                return new Swimlane(parms)
                 break
             case 'task':
-                return new Task({})
+                return new Task(parms)
                 break
             case 'tasksComments':
-                return new TasksComments({})
+                return new TasksComments(parms)
                 break
             case 'user':
-                return new User({})
+                return new User(parms)
                 break
             case 'workspace':
-                return new Workspace({})
+                return new Workspace(parms)
                 break
             case 'workspacesRights':
-                return new WorkspacesRights({})
+                return new WorkspacesRights(parms)
                 break
             default:
-                console.log("KanbearEntity.generate() bad entity", entity)
+                console.log("KanbearEntity.generate() bad kind", kind)
                 break
         }
     }

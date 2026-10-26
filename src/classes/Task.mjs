@@ -15,9 +15,7 @@ class Task extends KanbearEntity {
     constructor(task) {
         super('task', task)
         this.task = task
-        //this.id=task.id
         this.ref = null
-        //this.openPopup()
     }
 
     //-------------------------------------------------------------------------
@@ -85,6 +83,7 @@ class Task extends KanbearEntity {
 
     }
 
+    /*
     //----------------------------------------------------------------------------------
     XgetIdentityDiv() {
         let myTaskEntity = this
@@ -117,6 +116,7 @@ class Task extends KanbearEntity {
         })
         )
     }
+        */
 
     //---------------------------------------------------------------------------------------------------
     getDeleteDiv() {
@@ -179,11 +179,8 @@ class Task extends KanbearEntity {
         })
 
         taskElement.addEventListener('dragstart', (ev) => {
-            //console.log("dragstart")
             ev.dataTransfer.setData('dragId', dragId);
-            //console.log(ev.dataTransfer)
             ev.target.classList.add("dragging")
-            //ev.stopPropagation()
             ev.dataTransfer.effectAllowed = 'move';
         })
 

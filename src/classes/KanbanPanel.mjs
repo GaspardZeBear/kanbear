@@ -15,6 +15,10 @@ import { buildAddColumnButton, buildAddTaskButton, buildAddSwimlaneButton } from
 import { getOpenCloseSymbol } from "../utils/openClose.mjs"
 import { KanbearEntityFactory } from "./KanbearEntityFactory.mjs"
 import { sendEvent } from "../utils/sendEvent.mjs"
+import { createElement, getIdentityDiv } from "../utils/createHtml.mjs"
+import { Swimlane } from "./Swimlane.mjs"
+import { Column } from "./Column.mjs"
+import { mustDisable, REFERENCE, READ, WRITE, DELETE, ISADMIN } from "../utils/rights.mjs"
 
 class KanbanPanel {
   //------------------------------------------------------------------------
@@ -96,116 +100,104 @@ class KanbanPanel {
     this.loadTasksForProject(this.project)
   }
 
+  //-----------------------------------------------------------------------------
+  getSwimlaneHeaderDiv(swimlaneEntity) {
+    return (createElement('div', {
+      classes: ["swimlane-header"],
+      children: [getIdentityDiv(swimlaneEntity, new SwimlaneDialog())]
+    }))
+  }
+
+  //-----------------------------------------------------------------------------
+  getColumnHeaderCounterDiv(projectId, swimlaneId, columnId) {
+    return (createElement('div', {
+      classes: ["kanban-count"],
+      id: `counter:${projectId}:${swimlaneId}:_:${columnId}`,
+      textContent: "0"
+    })
+    )
+  }
+
   //----------------------------------------------------------------------------------------
   buildKanbanDivsForProject(project) {
     console.log("buildKanbanDivsForProject", "this", this, "project", project)
-    const kanbanDiv = document.createElement('div')
-    kanbanDiv.classList.add("kanban-board")
-    kanbanDiv.setAttribute("id", project.id)
-    kanbanDiv.setAttribute("data-projectid", project.id)
-    //const projectLink = buildProjectLink(project.id, project.name)
-
+    const kanbanDiv = createElement("div", {
+      classes: ["kanban-board"],
+      id: project.id,
+      "data-projectid": project.id
+    }
+    )
 
     //console.log("KanbanPanel.buildKanbanDivsForProject() ", orderedColumnsList)
     Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
+      let swimlaneEntity = new Swimlane(swimlane)
       if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
-      // create kanban-swimlane
-      const kSwimlaneDiv = document.createElement('div')
-      kSwimlaneDiv.classList.add("kanban-swimlane")
-      kSwimlaneDiv.setAttribute("data-swimlane-id", swimlane.id)
-      // create swimlane-header
-      const kSwimlaneHeaderDiv = document.createElement('div')
-      kSwimlaneHeaderDiv.classList.add("swimlane-header")
-      // create fill-in header
-      const kSwimlaneDivH2 = document.createElement('h2')
-      const projectLink = buildProjectLink(project.id, project.name)
-      const swimlaneLink = buildSwimlaneLink(swimlane.id, swimlane.name)
-      //kSwimlaneDivH2.innerHTML = `${project.name}::`
-      const status = document.createElement('span')
-      status.innerHTML = ` ${getOpenCloseSymbol(swimlane.is_open)}`
-      const separator1 = document.createElement('span')
-      separator1.innerHTML = `Swimlane#${swimlane.id}<br/>`
-      //console.log(this.projectLink)
-      //kSwimlaneDivH2.appendChild(separator0)
-      //kSwimlaneDivH2.appendChild(projectLink)
-      kSwimlaneDivH2.appendChild(separator1)
-      kSwimlaneDivH2.appendChild(swimlaneLink)
-      kSwimlaneDivH2.appendChild(status)
-
-
-      kSwimlaneHeaderDiv.appendChild(kSwimlaneDivH2)
-      kSwimlaneDiv.appendChild(kSwimlaneHeaderDiv)
+      const kSwimlaneDiv = createElement('div', {
+        classes: ["kanban-swimlane"],
+        "data-swimlane-id": swimlane.id,
+        children: [this.getSwimlaneHeaderDiv(swimlaneEntity)
+        ]
+      })
 
       // create columns for this swimlane
-      const kSwimlaneColumnsDiv = document.createElement('div')
-      kSwimlaneColumnsDiv.classList.add("swimlane-columns")
+      const kSwimlaneColumnsDiv = createElement('div', {
+        classes: ["swimlane-columns"]
+      })
 
       //Object.entries(project.columns).forEach(([tKey, col]) => {
       this.orderedColumnsList.forEach(col => {
         console.log("KanbanPanelbuildKanbanDivsForProject() ", "col", col)
-        // create a kanban-column
-        //console.log("buildkColumnsDivsForProject(project) col=", col)
-        const kColumnDiv = document.createElement('div')
-        kColumnDiv.classList.add("kanban-column")
-        kColumnDiv.setAttribute("data-column-id", col.id)
-        kColumnDiv.setAttribute("data-swimlane-id", swimlane.id)
-        kColumnDiv.setAttribute("style", `background-color:${col.color}`)
-
+        let columnEntity = new Column(col)
+        const kColumnDiv = createElement('div', {
+          classes: ["kanban-column"],
+          "data-column-id": col.id,
+          "data-swimlane-id": swimlane.id,
+          "style": `background-color:${col.color}`
+        })
 
         // create kanban-column-header
-        const kColumnHeaderDiv = document.createElement('div')
-        kColumnHeaderDiv.setAttribute("data-swimlane-id", swimlane.id)
-        kColumnHeaderDiv.setAttribute("draggable", true)
         const dragId = Ref.getRef('drag', project.id, swimlane.id, "_", col.id)
-        kColumnHeaderDiv.setAttribute("data-column-id", col.id)
-        kColumnHeaderDiv.classList.add("kanban-column-header")
-        kColumnHeaderDiv.addEventListener('dragstart', (ev) => {
-          console.log("kColumnHeaderDiv dragstart")
-          ev.dataTransfer.setData('dragId', dragId);
-          console.log(ev.dataTransfer)
-          ev.target.classList.add("dragging")
-          //ev.stopPropagation()
-          ev.dataTransfer.effectAllowed = 'move';
+
+        console.log("KanbanPanel buildKanbanDivsForProject() columnEntity", columnEntity)
+        const kColumnHeaderDiv = createElement('div', {
+          classes: ["kanban-column-header"],
+          "data-swimlane-id": swimlane.id,
+          "draggable": true,
+          "data-column-id": col.id,
+          "ondragstart": (ev) => {
+            ev.dataTransfer.setData('dragId', dragId);
+            ev.target.classList.add("dragging")
+            ev.dataTransfer.effectAllowed = 'move';
+          },
+          "ondragend": (ev) => {
+            ev.target.classList.remove("dragging")
+          },
+          children: [
+            getIdentityDiv(columnEntity, new ColumnDialog()),
+            this.getColumnHeaderCounterDiv(project.id, swimlane.id, col.id),
+            buildAddTaskButton(swimlane.id, col.id)
+          ]
         })
-
-        kColumnHeaderDiv.addEventListener('dragend', (ev) => {
-          console.log("kColumnHeaderDiv dragend")
-          //ev.dataTransfer.setData('dragId', dragId);
-          //console.log(ev.dataTransfer)
-          ev.target.classList.remove("dragging")
-        })
-
-
-        // fillin column header
-        const columnLink = buildColumnLink(col.id, col.name)
-        const kColumnId = document.createElement('span')
-        //kColumnId.innerHTML = `#${col.id}| #${col.prevColumnId}<->#${col.nextColumnId} | `
-        kColumnId.innerHTML = `Column #${col.id}|`
-        const kColumnHeaderDivH3 = document.createElement('h3')
-        //kColumnHeaderDivH3.innerHTML = col.name
-        kColumnHeaderDivH3.appendChild(kColumnId)
-        kColumnHeaderDivH3.appendChild(columnLink)
-        const kCounterDiv = document.createElement('span')
-        kCounterDiv.classList.add("kanban-count")
-        kCounterDiv.setAttribute("id", `counter:${project.id}:${swimlane.id}:_:${col.id}`)
-        kCounterDiv.innerHTML = 0
 
         // create kanban-items
-        const kColumnItemsDiv = document.createElement('div')
-        kColumnItemsDiv.classList.add("kanban-items")
-        kColumnItemsDiv.setAttribute("data-column-id", col.id)
-        kColumnItemsDiv.setAttribute("data-swimlane-id", swimlane.id)
+        const kColumnItemsDiv = createElement('div', {
+          classes: ["kanban-items"],
+          "data-column-id": col.id,
+          "data-swimlane-id": swimlane.id
+        })
 
         //const addTaskButton =this.buildAddTaskButton(swimlane.id,col.id)
-        const addTaskButton = buildAddTaskButton(swimlane.id, col.id)
+        //const addTaskButton = buildAddTaskButton(swimlane.id, col.id)
 
 
         // link all
-        kColumnHeaderDiv.appendChild(kColumnHeaderDivH3)
-        kColumnHeaderDiv.appendChild(kCounterDiv)
+        //kColumnHeaderDiv.appendChild(kColumnHeaderDivH3)
+        //kColumnHeaderDiv.appendChild(kCounterDiv)
+
+
         kColumnDiv.appendChild(kColumnHeaderDiv)
         kColumnDiv.appendChild(kColumnItemsDiv)
-        kColumnHeaderDiv.appendChild(addTaskButton)
+        //kColumnHeaderDiv.appendChild(addTaskButton)
         // kColumnDiv.appendChild(addButtonDiv)
 
 

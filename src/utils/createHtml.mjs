@@ -1,6 +1,7 @@
 import { buildOpenCloseButton } from "./buttonBuilder.mjs";
 import { mustDisable, WRITE } from "./rights.mjs";
 import { KanbearEntity } from "../classes/KanbearEntity.mjs";
+import { sendEvent } from "./sendEvent.mjs";
 
 
 //-----------------------------------------------------------------------------------------------
@@ -69,7 +70,7 @@ function createElement(tag, options = {}) {
             ev.stopPropagation();
             //const task = new TaskDialog()
             //task.modify({ taskId: myEntity.id });
-            dialog.modify({ [`${myEntity.kind}Id`]: myEntity.id })
+            dialog.modify({ [`${myEntity.getKind()}Id`]: myEntity.id })
         }
             
         return (createElement('div', {
@@ -77,14 +78,14 @@ function createElement(tag, options = {}) {
                 createElement("a", {
                     id: `${myEntity.kind}_href_${myEntity.id}`,
                     href: "javascript:void(0)",
-                    innerHTML: `${myEntity.kind} #${myEntity.id}`,
+                    innerHTML: `${myEntity.getKind()} #${myEntity.id}`,
                     onclick: [editFn, { once: true }]
                 }),
                 buildOpenCloseButton(myEntity, mustDisable(WRITE), (doIt) => {
                     if (doIt) {
                         myEntity.patch({ is_open: myEntity.getOpen() }).catch(() => { })
                     }
-                    sendEvent("taskModified", {})
+                    sendEvent(`${myEntity.getKind()}Modified`, {})
                 }),
                 createElement('br'),
                 createElement('b', {
