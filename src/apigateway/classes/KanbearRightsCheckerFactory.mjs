@@ -295,6 +295,7 @@ class TasksRightsChecker extends RightsChecker {
         switch (this.op) {
             case 'create':
                 prights = WRITE
+                /*
                 subselect = `select column_id from tasks  where id=${req.body["column_id"]}`
                 sqlReq = `
                     select
@@ -304,6 +305,15 @@ class TasksRightsChecker extends RightsChecker {
                     where
                       id=(${subselect})
                 `
+                */
+               sqlReq = `
+                    select
+                      project_id 
+                    from 
+                      columns
+                    where
+                      id=${req.body["column_id"]}
+                      `
                 projectId = this.sqlGetId('project_id', sqlReq)
             case 'getAll':
                 break

@@ -186,21 +186,8 @@ class KanbanPanel {
           "data-swimlane-id": swimlane.id
         })
 
-        //const addTaskButton =this.buildAddTaskButton(swimlane.id,col.id)
-        //const addTaskButton = buildAddTaskButton(swimlane.id, col.id)
-
-
-        // link all
-        //kColumnHeaderDiv.appendChild(kColumnHeaderDivH3)
-        //kColumnHeaderDiv.appendChild(kCounterDiv)
-
-
         kColumnDiv.appendChild(kColumnHeaderDiv)
         kColumnDiv.appendChild(kColumnItemsDiv)
-        //kColumnHeaderDiv.appendChild(addTaskButton)
-        // kColumnDiv.appendChild(addButtonDiv)
-
-
         kSwimlaneColumnsDiv.appendChild(kColumnDiv)
         kSwimlaneDiv.appendChild(kSwimlaneColumnsDiv)
 

@@ -224,13 +224,19 @@ th {
 }
 
 .del-item-btn {
-    background-color: #fdb25d;
-    color: white;
-    border: none;
-    xpadding: 1px;
-    margin: 5px 5px;
-    border-radius: 4px;
+    background-color: white;
+    color: black;
+    border: 1px solid;
+    padding: 3px 3px;
+    margin: 1px ;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.3s;
+    font-size: 1rem;
+    
+    display : inline-block;
+    vertical-align: top;
+    height: 18px;
+    line-height: 0.751;
+    overflow : hidden;
+    xtransition: background-color 0.3s;
 }

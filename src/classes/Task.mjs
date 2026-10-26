@@ -7,7 +7,7 @@ import { buildTasksCommentsLink } from "../utils/linkBuilder.mjs"
 import { getOpenCloseSymbol, getOpenCloseClass } from "../utils/openClose.mjs"
 import { mustDisable, REFERENCE, READ, WRITE, DELETE, ISADMIN } from "../utils/rights.mjs"
 import { sendEvent } from "../utils/sendEvent.mjs"
-import { createElement, getIdentityDiv } from "../utils/createHtml.mjs"
+import { createElement, getIdentityDiv, getDeleteEntityDiv } from "../utils/createHtml.mjs"
 
 class Task extends KanbearEntity {
 
@@ -83,41 +83,6 @@ class Task extends KanbearEntity {
 
     }
 
-    /*
-    //----------------------------------------------------------------------------------
-    XgetIdentityDiv() {
-        let myTaskEntity = this
-        let editTaskFn = function (ev) {
-            console.log("editTaskFn event Listener fired <myTask>", myTaskEntity)
-            ev.stopPropagation();
-            const task = new TaskDialog()
-            task.modify({ taskId: myTaskEntity.id });
-        }
-            
-        return (createElement('div', {
-            children: [
-                createElement("a", {
-                    id: `taskHref_${this.task.id}`,
-                    href: "javascript:void(0)",
-                    innerHTML: `Task #${this.task.id}`,
-                    onclick: [editTaskFn, { once: true }]
-                }),
-                buildOpenCloseButton(this, mustDisable(WRITE), (doIt) => {
-                    if (doIt) {
-                        myTaskEntity.patch({ is_open: myTaskEntity.getOpen() }).catch(() => { })
-                    }
-                    sendEvent("taskModified", {})
-                }),
-                createElement('br'),
-                createElement('b', {
-                    children: [createElement("span", { textContent: this.task.name })]
-                })
-            ]
-        })
-        )
-    }
-        */
-
     //---------------------------------------------------------------------------------------------------
     getDeleteDiv() {
         const deleteDiv = document.createElement("div")
@@ -137,6 +102,7 @@ class Task extends KanbearEntity {
             children: [
                 createElement("div", { children: [getIdentityDiv(this, new TaskDialog())] }),
                 createElement("div", { children: [buildTasksCommentsButton(this.task.id, 'Co')] }),
+                //getDeleteEntityDiv(this,buildDeleteTaskButton(this.task.id, this, mustDisable(DELETE)))
                 this.getDeleteDiv()
             ]
         }))

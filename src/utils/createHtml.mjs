@@ -7,11 +7,9 @@ import { sendEvent } from "./sendEvent.mjs";
 //-----------------------------------------------------------------------------------------------
 function createElement(tag, options = {}) {
   // On extrait les clés connues, le reste (rest) contiendra nos onEvent, classes, attributes...
-  const { classes = [], textContent = '', innerHTML='', children = [], ...rest } = options;
-
+  const { classes = [], textContent = '', innerHTML = '', children = [], ...rest } = options;
   const element = document.createElement(tag);
 
-  // 1. Classes CSS
   if (Array.isArray(classes) && classes.length > 0) {
     element.classList.add(...classes.filter(Boolean));
   } else if (typeof classes === 'string' && classes.trim() !== '') {
@@ -21,14 +19,13 @@ function createElement(tag, options = {}) {
   // 2. Séparation et traitement des Attributs et des Événements "onEvent"
   for (const [key, value] of Object.entries(rest)) {
     if (value === undefined || value === null) continue;
-
     // Si la clé commence par "on" (ex: onclick, oninput, onmouseover)
     if (key.startsWith('on') && key.length > 2) {
       const eventType = key.slice(2).toLowerCase(); // Extraire "click" de "onclick"
-      console.log("createElement() key",key, "value", value)
+      console.log("createElement() key", key, "value", value)
       if (typeof value === 'function') {
         // Syntaxe ultra-simple : onclick: (e) => {}
-          console.log("createElement() add listener",element)
+        console.log("createElement() add listener", element)
         element.addEventListener(eventType, value);
       } else if (Array.isArray(value) && typeof value[0] === 'function') {
         // Syntaxe avec options : onclick: [(e) => {}, { once: true }]
@@ -41,16 +38,12 @@ function createElement(tag, options = {}) {
     }
   }
 
-  // 3. Texte
   if (textContent) {
     element.textContent = textContent;
   }
-
   if (innerHTML) {
     element.textContent = innerHTML;
   }
-
-  // 4. Enfants
   if (Array.isArray(children)) {
     children.forEach(child => {
       if (child instanceof Node) {
@@ -64,37 +57,50 @@ function createElement(tag, options = {}) {
 
 
 //----------------------------------------------------------------------------------
-    function getIdentityDiv(myEntity,dialog) {
-        let editFn = function (ev) {
-            console.log("editFn event Listener fired <myTEntity>", myEntity.kind, myEntity.id)
-            ev.stopPropagation();
-            //const task = new TaskDialog()
-            //task.modify({ taskId: myEntity.id });
-            dialog.modify({ [`${myEntity.getKind()}Id`]: myEntity.id })
+function getIdentityDiv(entity, dialog) {
+  let editFn = function (ev) {
+    console.log("editFn event Listener fired <myTEntity>", entity.kind, entity.id)
+    ev.stopPropagation();
+    //const task = new TaskDialog()
+    //task.modify({ taskId: myEntity.id });
+    dialog.modify({ [`${entity.getKind()}Id`]: entity.id })
+  }
+
+  return (createElement('div', {
+    children: [
+      createElement("a", {
+        id: `${entity.kind}_href_${entity.id}`,
+        href: "javascript:void(0)",
+        innerHTML: `${entity.getKind()} #${entity.id}`,
+        onclick: [editFn, { once: true }]
+      }),
+      buildOpenCloseButton(entity, mustDisable(WRITE), (doIt) => {
+        if (doIt) {
+          entity.patch({ is_open: entity.getOpen() }).catch(() => { })
         }
-            
-        return (createElement('div', {
-            children: [
-                createElement("a", {
-                    id: `${myEntity.kind}_href_${myEntity.id}`,
-                    href: "javascript:void(0)",
-                    innerHTML: `${myEntity.getKind()} #${myEntity.id}`,
-                    onclick: [editFn, { once: true }]
-                }),
-                buildOpenCloseButton(myEntity, mustDisable(WRITE), (doIt) => {
-                    if (doIt) {
-                        myEntity.patch({ is_open: myEntity.getOpen() }).catch(() => { })
-                    }
-                    sendEvent(`${myEntity.getKind()}Modified`, {})
-                }),
-                createElement('br'),
-                createElement('b', {
-                    children: [createElement("span", { textContent: myEntity.getName() })]
-                })
-            ]
-        })
-        )
+        sendEvent(`${entity.getKind()}Modified`, {})
+      }),
+      createElement('br'),
+      createElement('b', {
+        children: [createElement("span", { textContent: entity.getName() })]
+      })
+    ]
+  })
+  )
+}
+
+
+    //---------------------------------------------------------------------------------------------------
+function getDeleteEntityDiv(entity,buttonDiv) {
+        const deleteDiv = document.createElement("div")
+        return (deleteDiv.appendChild(buttonDiv, (doIt) => {
+            if (doIt) {
+                entity.delete().catch(() => console.log(`${entity.getKind()} error `))
+            }
+            sendEvent(`${entity.getKind()}Deleted`, {})
+        }))
+  
     }
 
 
-export { createElement, getIdentityDiv }
+export { createElement, getIdentityDiv, getDeleteEntityDiv }

@@ -30,7 +30,7 @@ class UnifiedController {
                     "kanbearKontext=", req.kanbearKontext
                 )
 
-                console.log(req.kanbearKontext.decodedToken)
+                //console.log(req.kanbearKontext.decodedToken)
                      
                 /*
                 let kanbearRights = new KanbearRights(req.kanbearKontext.decodedToken.userId)

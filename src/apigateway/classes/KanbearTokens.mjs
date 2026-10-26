@@ -38,7 +38,7 @@ class KanbearTokens {
     //-----------------------------------------------------
     checkToken(kind, token) {
         //await sleep(2500)
-        Konsol.log(`KanbearTokens checkToken() will check ${kind}`, "token", token)
+        //Konsol.log(`KanbearTokens checkToken() will check ${kind}`, "token", token)
         if (!token) {
             //this.res.status(401).json({ message: 'No token' });
             throw Error("No token")
@@ -50,7 +50,7 @@ class KanbearTokens {
             const exp = decodedToken.exp;
             const dateExp = new Date(exp * 1000);
 
-            Konsol.log("checkToken() iat ", dateCreation, "exp", dateExp);
+            //Konsol.log("checkToken() iat ", dateCreation, "exp", dateExp);
             return (decodedToken)
         } catch (e) {
             console.log(e)
