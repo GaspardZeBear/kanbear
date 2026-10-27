@@ -1,6 +1,7 @@
 import { KanboardFilter } from "./KanboardFilter.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { Task } from "./Task.mjs"
+import { Project } from "./Project.mjs"
 import { ProjectManager } from "./ProjectManager.mjs"
 import { ProjectDialog } from "./ProjectDialog.mjs"
 import { SwimlaneDialog } from "./SwimlaneDialog.mjs"
@@ -11,7 +12,7 @@ import { TaskDialog } from "./TaskDialog.mjs"
 import { buildProjectLink, buildSwimlaneLink, buildColumnLink } from "../utils/linkBuilder.mjs"
 import { getFiltersMap } from "../utils/filters.mjs"
 import { Ref } from "./Ref.mjs"
-import { buildAddColumnButton, buildAddTaskButton, buildAddSwimlaneButton } from "../utils/buttonBuilder.mjs"
+import { buildAddColumnButton, buildAddTaskButton, buildAddSwimlaneButton, buildDeleteEntityButton } from "../utils/buttonBuilder.mjs"
 import { getOpenCloseSymbol } from "../utils/openClose.mjs"
 import { KanbearEntityFactory } from "./KanbearEntityFactory.mjs"
 import { sendEvent } from "../utils/sendEvent.mjs"
@@ -30,12 +31,31 @@ class KanbanPanel {
     if (Kontext.getCurrentProjectId()) {
       console.log("KanbanPanel.constructor() ", Kontext.getJsonBulkData())
       this.project = Kontext.getJsonBulkData()[Kontext.getCurrentProjectId()]
+      this.projectEntity = new Project(this.project)
     }
     this.orderedColumnsList = []
+
     console.log("KanbanPanel.constructor", "columnsOrder", this.project.jsonColumnsOrder)
+    let columnAlready = new Set()
+
     for (let colId of this.project.jsonColumnsOrder) {
-      this.orderedColumnsList.push(this.project.columns[colId])
+      // maybe column was deleted
+      // or col twice 
+      if (this.project.columns[colId] && !columnAlready.has(colId)) {
+        this.orderedColumnsList.push(this.project.columns[colId])
+        columnAlready.add(colId)
+      }
     }
+
+    //-------------------------------------------------------------------------
+    // quick and dirty fix 
+    if (this.project.jsonColumnsOrder.length !== columnAlready.size) {
+      console.log("KanbanPanel unconsistent column Order", this.project.jsonColumnsOrder, " should be ", Array.from(columnAlready))
+      // It's a promise, but don't worry about it
+      new Project(this.project).resetColumnsOrder(Array.from(columnAlready))
+    }
+
+    //--------------------------------------------------------------
     //console.log("KanbanPanel.constructor() orderedColumnsList", this.orderedColumnsList)
     this.htmlElement = 'results'
     this.kanboardFilter = new KanboardFilter(getFiltersMap())
@@ -64,34 +84,22 @@ class KanbanPanel {
       return
     }
 
-    const addSwimlaneButton = buildAddSwimlaneButton(this.project.id)
-    const addColumnButton = buildAddColumnButton(this.project.id)
-    //const projectLink = this.buildProjectLink(this.project.id, this.project.name)
-    const projectLink = buildProjectLink(this.project.id, this.project.name)
-
-    //let resultTitleWorkspace = document.createElement('h2')
-    //resultTitleWorkspace.innerHTML="Workspace " + this.project.workspace_id
-    let resultTitleProject = document.createElement('h3')
-    resultTitleProject.appendChild(addSwimlaneButton)
-    resultTitleProject.appendChild(addColumnButton)
-    let titleProject = document.createElement("span")
-    titleProject.innerHTML = ` Project #${this.project.id}|`
-    let statusProject = document.createElement("span")
-    statusProject.innerHTML = ` ${getOpenCloseSymbol(this.project.is_open)}`
-    resultTitleProject.appendChild(titleProject)
-    resultTitleProject.appendChild(projectLink)
-    resultTitleProject.appendChild(statusProject)
-    let filters = document.createElement("span")
-    filters.innerHTML = " filtered by..."
-    resultTitleProject.appendChild(filters)
-
-    let resultTitle = document.createElement("div")
-    //resultTitle.appendChild(resultTitleWorkspace)
-    resultTitle.appendChild(resultTitleProject)
+    let resultTitle = createElement('div', {
+      classes: ["kanban-item-topline"],
+      children: [
+        getIdentityDiv(this.projectEntity, new ProjectDialog()),
+        buildAddSwimlaneButton(this.project.id),
+        buildAddColumnButton(this.project.id),
+        createElement("span", {
+          innerHTML: " filtered by..."
+        })
+      ]
+    })
 
     const elementHeader = `${this.htmlElement}Header`
     document.getElementById(elementHeader).replaceChildren(resultTitle)
     document.getElementById(this.htmlElement).replaceChildren()
+
 
     this.buildKanbanDivsForProject(this.project)
     //this.buildkColumnsQuerySelectors(this.projects[0])
@@ -103,8 +111,10 @@ class KanbanPanel {
   //-----------------------------------------------------------------------------
   getSwimlaneHeaderDiv(swimlaneEntity) {
     return (createElement('div', {
-      classes: ["swimlane-header"],
-      children: [getIdentityDiv(swimlaneEntity, new SwimlaneDialog())]
+      classes: ["kanban-item-topline","kanban-swimlane-header"],
+      children: [
+        getIdentityDiv(swimlaneEntity, new SwimlaneDialog()),
+        buildDeleteEntityButton(swimlaneEntity, mustDisable(DELETE), null)]
     }))
   }
 
@@ -125,8 +135,7 @@ class KanbanPanel {
       classes: ["kanban-board"],
       id: project.id,
       "data-projectid": project.id
-    }
-    )
+    })
 
     //console.log("KanbanPanel.buildKanbanDivsForProject() ", orderedColumnsList)
     Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
@@ -160,7 +169,7 @@ class KanbanPanel {
 
         console.log("KanbanPanel buildKanbanDivsForProject() columnEntity", columnEntity)
         const kColumnHeaderDiv = createElement('div', {
-          classes: ["kanban-column-header"],
+          classes: ["kanban-column-header","kanban-item-topline"],
           "data-swimlane-id": swimlane.id,
           "draggable": true,
           "data-column-id": col.id,
@@ -175,7 +184,8 @@ class KanbanPanel {
           children: [
             getIdentityDiv(columnEntity, new ColumnDialog()),
             this.getColumnHeaderCounterDiv(project.id, swimlane.id, col.id),
-            buildAddTaskButton(swimlane.id, col.id)
+            buildAddTaskButton(swimlane.id, col.id),
+            buildDeleteEntityButton(columnEntity, mustDisable(DELETE), null)
           ]
         })
 

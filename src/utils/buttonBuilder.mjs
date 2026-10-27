@@ -237,11 +237,16 @@ function buildDeleteEntityButton(entity, disabled, callback = null) {
         if (doIt) {
           if (callback) {
             callback(doIt)
+            sendEvent(`${entity.getKind()}Deleted`, {})
           } else {
-            entity.delete().catch(() => console.log(`${entity.getKind()} delete error `))
+            entity.delete()
+              .then(() => console.log(`${entity.getKind()} deleted then`))
+              .catch(() => console.log(`${entity.getKind()} delete error `))
+              .finally( () => sendEvent(`${entity.getKind()}Deleted`, {}) )
+            console.log(`${entity.getKind()} deleted after`)
           }
         }
-        sendEvent(`${entity.getKind()}Deleted`, {})
+        //sendEvent(`${entity.getKind()}Deleted`, {})
       },
       { once: false }]
   })

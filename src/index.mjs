@@ -192,8 +192,8 @@ document.addEventListener("projectSelected", async (ev) => {
 document.addEventListener("projectModified", async (ev) => {
     console.log("index.mjs() project modified listener fired <ev>", ev)
     //buildKanbearProjectsSelectBox()
-    await Kontext.setProject(ev.detail.projectId);
-    sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
+    await Kontext.setProject(ev.detail.id);
+    sendEvent("_projectReloaded", { projectId: ev.detail.id })
     //let projectLink=buildProjectLink(Kontext.getCurrentProjectId(),Kontext.getCurrentProjectName())
     //document.getElementById("project").replaceChildren(projectLink)
     const kb = await KanbanPanel.builder()
@@ -217,13 +217,19 @@ document.addEventListener("projectDeleted", (ev) => {
 })
 
 document.addEventListener("swimlaneCreated", async (ev) => {
-    console.log("index.mjs() swimlane listener fired <ev>", ev)
+    console.log("index.mjs() swimlane listener Created fired <ev>", ev)
     const kb = await KanbanPanel.builder()
     kb.render()
 })
 
 document.addEventListener("swimlaneModified", async (ev) => {
-    console.log("index.mjs() swimlane listener fired <ev>", ev)
+    console.log("index.mjs() swimlane Modified listener fired <ev>", ev)
+    const kb = await KanbanPanel.builder()
+    kb.render()
+})
+
+document.addEventListener("swimlaneDeleted", async (ev) => {
+    console.log("index.mjs() swimlane deleted listener fired <ev>", ev)
     const kb = await KanbanPanel.builder()
     kb.render()
 })

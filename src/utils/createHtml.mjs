@@ -67,8 +67,10 @@ function getIdentityDiv(entity, dialog) {
   }
 
   return (createElement('div', {
+    classes : ["kanban-identity"],
     children: [
       createElement("a", {
+        
         id: `${entity.kind}_href_${entity.id}`,
         href: "javascript:void(0)",
         innerHTML: `${entity.getKind()} #${entity.id}`,
@@ -76,9 +78,14 @@ function getIdentityDiv(entity, dialog) {
       }),
       buildOpenCloseButton(entity, mustDisable(WRITE), (doIt) => {
         if (doIt) {
-          entity.patch({ is_open: entity.getOpen() }).catch(() => { })
+          entity.patch({ is_open: entity.getOpen() })
+          .then( () => {})
+          .catch(() => { })
+          .finally( () => sendEvent(`${entity.getKind()}Modified`, entity))
         }
-        sendEvent(`${entity.getKind()}Modified`, {})
+        // Event will be sent twice, to be fixed  !!!!
+        // Must be sent even if cancel to reset once on the listener
+        sendEvent(`${entity.getKind()}Modified`, entity)
       }),
       createElement('br'),
       createElement('b', {
@@ -91,7 +98,7 @@ function getIdentityDiv(entity, dialog) {
 
 
     //---------------------------------------------------------------------------------------------------
-function getDeleteEntityDiv(entity,buttonDiv) {
+function XgetDeleteEntityDiv(entity,buttonDiv) {
         const deleteDiv = document.createElement("div")
         return (deleteDiv.appendChild(buttonDiv, (doIt) => {
             if (doIt) {
@@ -101,6 +108,14 @@ function getDeleteEntityDiv(entity,buttonDiv) {
         }))
   
     }
+
+        //---------------------------------------------------------------------------------------------------
+function getDeleteEntityDiv(entity,buttonDiv) {
+        const deleteDiv = document.createElement("div")
+        return (deleteDiv.appendChild(buttonDiv))
+  
+    }
+
 
 
 export { createElement, getIdentityDiv, getDeleteEntityDiv }
