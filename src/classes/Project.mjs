@@ -10,10 +10,13 @@ class Project extends KanbearEntity {
     }
 
     //-------------------------------------------------------------------------
-    async XgetOrderedColumnsList() {
-
-    }
-
+    async resetColumnsOrder(jsonColumnsOrder) {
+        console.log("Project() restColumnsOrder", jsonColumnsOrder)
+        //this.data.jsonColumnsOrder=JSON.stringify(jsonColumnsOrder)
+        this.setData("columns_order", JSON.stringify(jsonColumnsOrder))
+        this.patch()
+    } 
+    
     //-------------------------------------------------------------------------
     async insertColumnAtPos(columnsOrder, columnId, pos) {
         console.log("Project()", "insertColumnAtPos", this, columnId, pos)

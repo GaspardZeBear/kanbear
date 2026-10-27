@@ -258,7 +258,7 @@ document.addEventListener("assigneeModified", async (ev) => {
 })
 
 document.addEventListener("columnCreated", async (ev) => {
-    console.log("index.mjs() column listener fired <ev>", ev)
+    console.log("index.mjs() column created listener fired <ev>", ev)
     //await Kontext.loadKanbearJsonBulkData()
     //new Columns().chain(ev.detail.columnId)
     const kb = await KanbanPanel.builder()
@@ -266,7 +266,13 @@ document.addEventListener("columnCreated", async (ev) => {
 })
 
 document.addEventListener("columnModified", async (ev) => {
-    console.log("index.mjs() column listener fired <ev>", ev)
+    console.log("index.mjs() column  modified listener fired <ev>", ev)
+    const kb = await KanbanPanel.builder()
+    kb.render()
+})
+
+document.addEventListener("columnDeleted", async (ev) => {
+    console.log("index.mjs() column deleted listener fired <ev>", ev)
     const kb = await KanbanPanel.builder()
     kb.render()
 })

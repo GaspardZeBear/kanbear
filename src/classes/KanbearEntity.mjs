@@ -151,6 +151,11 @@ class KanbearEntity {
     async postPatch() {
     }
 
+    //-------------------------------------------------------------------------------------
+    // once deleted in db, maybe need something to do 
+    async postDelete() {
+    }
+
     //-------------------------------------------------------------------------------
     async delete(kind, params) {
         const data = {}
@@ -160,6 +165,7 @@ class KanbearEntity {
         console.log("KanbearEntity.delete()", "<kind>", this.kind, "<id>", this.id, "<data>", data)
         const resp = await new ApiCaller().erase(`/api/${this.kind}s/${this.id}`, data)
         console.log("KanbearEntity.delete() <resp>", resp)
+        await this.postDelete()
         return (resp.data)
     }
 

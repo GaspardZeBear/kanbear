@@ -75,6 +75,11 @@ class Column extends KanbearEntity {
         console.log("Column.postPatch()","fired","id",this.id,"data",data)
     }
 
+    //-------------------------------------------------------------------------------------
+    async postDelete(data) {
+        console.log("Column.postDelete()","fired","id",this.id,"data",data)
+    }
+
 }
 
 export { Column }
