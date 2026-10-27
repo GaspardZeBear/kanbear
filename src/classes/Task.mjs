@@ -2,12 +2,18 @@ import { KanbearEntity } from "./KanbearEntity.mjs"
 import { TaskDialog } from "./TaskDialog.mjs"
 import { Kontext } from "./Kontext.mjs"
 import { Ref } from "./Ref.mjs"
-import { buildAddDummyButton, buildAddNoteButton, buildAddOpenCloseButton, buildTasksCommentsButton, buildDeleteTaskButton, buildOpenCloseButton } from "../utils/buttonBuilder.mjs"
+import { buildAddDummyButton, 
+    buildAddNoteButton, 
+    buildAddOpenCloseButton,
+    buildTasksCommentsButton, 
+    buildDeleteEntityButton, 
+    buildOpenCloseButton } from "../utils/buttonBuilder.mjs"
 import { buildTasksCommentsLink } from "../utils/linkBuilder.mjs"
 import { getOpenCloseSymbol, getOpenCloseClass } from "../utils/openClose.mjs"
 import { mustDisable, REFERENCE, READ, WRITE, DELETE, ISADMIN } from "../utils/rights.mjs"
 import { sendEvent } from "../utils/sendEvent.mjs"
 import { createElement, getIdentityDiv, getDeleteEntityDiv } from "../utils/createHtml.mjs"
+//import { buildDeleteEntityButton } from "../utils/buttonBuilder.mjs"
 
 class Task extends KanbearEntity {
 
@@ -102,8 +108,9 @@ class Task extends KanbearEntity {
             children: [
                 createElement("div", { children: [getIdentityDiv(this, new TaskDialog())] }),
                 createElement("div", { children: [buildTasksCommentsButton(this.task.id, 'Co')] }),
-                //getDeleteEntityDiv(this,buildDeleteTaskButton(this.task.id, this, mustDisable(DELETE)))
-                this.getDeleteDiv()
+                //getDeleteEntityDiv(this,buildDeleteEntityButton(this,mustDisable(DELETE),null))
+                buildDeleteEntityButton(this,mustDisable(DELETE),null)
+                //this.getDeleteDiv()
             ]
         }))
     }

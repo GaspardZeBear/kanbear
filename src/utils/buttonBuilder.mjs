@@ -197,7 +197,7 @@ function buildAddDummyButton(parms = { inner: "?", alert: "Message" }) {
 }
 
 //------------------------------------------------------------------------
-function buildDeleteTaskButton(taskId, taskEntity, disabled, callback) {
+function XbuildDeleteTaskButton(taskId, taskEntity, disabled, callback) {
   const deleteTaskButton = document.createElement('button')
   deleteTaskButton.classList.add("del-item-btn")
   deleteTaskButton.setAttribute("id", `deleteTaskButton-${taskId}`)
@@ -223,19 +223,49 @@ function buildDeleteTaskButton(taskId, taskEntity, disabled, callback) {
 }
 
 //------------------------------------------------------------------------
+function buildDeleteEntityButton(entity, disabled, callback = null) {
+  const deleteEntityButton = createElement('button', {
+    classes: ["del-item-btn"],
+    id: `delete-${entity.getKind()}-${entity.getId()}`,
+    title: `delete ${entity.getKind()}`,
+    innerHTML: "X",
+    onclick: [
+      function (ev) {
+        console.log(`delete-${entity.getKind()} event Listener fired`)
+        ev.stopPropagation();
+        let doIt = confirm(`Confirm ${entity.getKind()} #${entity.getId()} ${entity.getName()} delete`)
+        if (doIt) {
+          if (callback) {
+            callback(doIt)
+          } else {
+            entity.delete().catch(() => console.log(`${entity.getKind()} delete error `))
+          }
+        }
+        sendEvent(`${entity.getKind()}Deleted`, {})
+      },
+      { once: false }]
+  })
+  //deleteTaskButton.addEventListener('click', deleteTaskFn, { once: false });
+  if (disabled) {
+    deleteEntityButton.setAttribute("disabled", true)
+  }
+  return (deleteEntityButton)
+}
+
+//------------------------------------------------------------------------
 function buildOpenCloseButton(entity, disabled, callback) {
   let openCloseFn = function (ev) {
     console.log("openCloseButton event Listener fired")
     ev.stopPropagation();
-    let doIt=false
+    let doIt = false
     if (entity.getOpen() > 0) {
       if (confirm(`Close ${entity.kind} ${entity.getName()} #${entity.getId()} ? `)) {
         entity.setOpen(0)
-        doIt=true
-      } 
+        doIt = true
+      }
     } else {
       entity.setOpen(1)
-      doIt=true
+      doIt = true
     }
     callback(doIt)
   }
@@ -312,7 +342,8 @@ export {
   buildAddColumnButton,
   buildAddSwimlaneButton,
   buildAddTaskButton,
-  buildDeleteTaskButton,
+  XbuildDeleteTaskButton,
+  buildDeleteEntityButton,
   buildAddProjectButton,
   buildAddProjectsRightsButton,
   buildAddWorkspacesRightsButton,
