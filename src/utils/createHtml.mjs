@@ -59,10 +59,8 @@ function createElement(tag, options = {}) {
 //----------------------------------------------------------------------------------
 function getIdentityDiv(entity, dialog) {
   let editFn = function (ev) {
-    console.log("editFn event Listener fired <myTEntity>", entity.kind, entity.id)
+    console.log("editFn event Listener fired <myEntity>", entity.kind, entity.id)
     ev.stopPropagation();
-    //const task = new TaskDialog()
-    //task.modify({ taskId: myEntity.id });
     dialog.modify({ [`${entity.getKind()}Id`]: entity.id })
   }
 
@@ -70,7 +68,6 @@ function getIdentityDiv(entity, dialog) {
     classes : ["kanban-identity"],
     children: [
       createElement("a", {
-        
         id: `${entity.kind}_href_${entity.id}`,
         href: "javascript:void(0)",
         innerHTML: `${entity.getKind()} #${entity.id}`,
@@ -96,25 +93,11 @@ function getIdentityDiv(entity, dialog) {
   )
 }
 
-
-    //---------------------------------------------------------------------------------------------------
-function XgetDeleteEntityDiv(entity,buttonDiv) {
-        const deleteDiv = document.createElement("div")
-        return (deleteDiv.appendChild(buttonDiv, (doIt) => {
-            if (doIt) {
-                entity.delete().catch(() => console.log(`${entity.getKind()} error `))
-            }
-            sendEvent(`${entity.getKind()}Deleted`, {})
-        }))
-  
-    }
-
-        //---------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------------
 function getDeleteEntityDiv(entity,buttonDiv) {
         const deleteDiv = document.createElement("div")
         return (deleteDiv.appendChild(buttonDiv))
-  
-    }
+}
 
 
 

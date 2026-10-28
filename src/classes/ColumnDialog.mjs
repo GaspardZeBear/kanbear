@@ -48,8 +48,6 @@ class ColumnDialog extends Dialog {
         //const pr = await KanbearEntityFactory.generate('project')
         co.setData("project_id", this.projectId)
         this.fillDbFromForm(co)
-        co.setData("next_column_id", -1) 
-        co.setData("prev_column_id", -1)
     }
 
     

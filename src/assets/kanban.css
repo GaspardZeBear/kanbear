@@ -113,6 +113,8 @@ h1 {
 
 .kanban-identity {
     background-color: rgb(255, 183, 0);
+    width: fit-content;
+    height: fit-content;
 }
 
 
@@ -138,6 +140,9 @@ h1 {
     border:1px outset grey;
 }
 
+.kanban-item-header > *:last-child {
+  margin-left: auto;   /* Pousse cet élément et le suivant vers la droite */
+}
 .kanban-item-topline > div:last-child {
   margin-left: auto;   /* Pousse cet élément et le suivant vers la droite */
 }

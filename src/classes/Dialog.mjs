@@ -130,7 +130,9 @@ class Dialog {
         let saveFn = async function (event) {
             //    console.log("eventListener ",saveBtnId," dialog")
             //    console.log("eventListener ",save)
-            await save()
+            save()
+              .finally(() => console.log("Dialog saveFn() finally() after save")
+            )
         }
         //Dialog.clickListeners.push(saveFn)
         //console.log("createDialog() saveListeners after push",Dialog.clickListeners)

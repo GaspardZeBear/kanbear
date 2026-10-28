@@ -81,6 +81,7 @@ button {
     padding: 10px;
     background: grey;
     color: white;
+    margin : 5px 5px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -212,12 +213,23 @@ th {
     font-size: 1rem;
 }
 
-.add-item-btn {
-    background-color: #369a08;
+.is_openundefined {
+    background-color: #686968;
     color: white;
     border: none;
     padding: 5px;
     margin: 5px 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.add-item-btn {
+    background-color: #369a08;
+    color: white;
+    border: none;
+    xpadding: 5px;
+    xmargin: 5px 5px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 1rem;

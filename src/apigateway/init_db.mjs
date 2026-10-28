@@ -16,13 +16,11 @@ import bcrypt from 'bcrypt'
     CREATE TABLE IF NOT EXISTS columns (
       id INTEGER PRIMARY KEY,
       name TEXT NOT NULL,
-      project_id INTEGER NOT NULL DEFAULT 0,
+      project_id INTEGER,
       color TEXT DEFAULT 'white',
       position INTEGER default 0,
       description TEXT,
-      prev_column_id INTEGER DEFAULT 0,
-      next_column_id INTEGER DEFAULT 0,
-      FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE SET DEFAULT,
+      FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE SET NULL,
       UNIQUE (name, project_id)
     )
   `);
@@ -71,9 +69,9 @@ import bcrypt from 'bcrypt'
       name TEXT NOT NULL,
       position INTEGER DEFAULT 1,
       is_open INTEGER DEFAULT 1,
-      project_id INTEGER NOT NULL DEFAULT 0,
+      project_id INTEGER,
       description TEXT,
-      FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE SET DEFAULT,
+      FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE SET NULL,
       UNIQUE (name, project_id)
     )
   `);
@@ -125,14 +123,14 @@ import bcrypt from 'bcrypt'
   db.exec(`
     CREATE TABLE IF NOT EXISTS tasks_comments (
       id INTEGER PRIMARY KEY,
-      task_id INTEGER NOT NULL DEFAULT 0,
-      user_id INTEGER NOT NULL DEFAULT 0,
+      task_id INTEGER,
+      user_id INTEGER,
       date_created DATETIME DEFAULT CURRENT_TIMESTAMP,
       comment TEXT NOT NULL,
       reference VARCHAR(50),
       date_modified DATETIME,
-      FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE SET DEFAULT,
-      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET DEFAULT
+      FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE SET NULL,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL
     )
   `);
 
