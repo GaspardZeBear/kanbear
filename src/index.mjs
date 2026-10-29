@@ -21,6 +21,7 @@ import { buildAddDummyButton, buildAddProjectButton, buildAddWorkspaceButton } f
 import { getOpenCloseParmBoolean } from './utils/openClose.mjs'
 import { UserDialog } from './classes/UserDialog.mjs';
 import { LoginDialog } from './classes/LoginDialog.mjs'
+import { createElement } from './utils/createHtml.mjs';
 
 await Kontext.loadConfig()
 await Kontext.init()
@@ -206,14 +207,18 @@ document.addEventListener("_projectReloaded", async (ev) => {
     buildKanbearProjectsSelectBox()
     let projectLink = buildProjectLink(Kontext.getCurrentProjectId(), Kontext.getCurrentProjectName())
     document.getElementById("project").replaceChildren(projectLink)
-    //const kb = await KanbanPanel.builder()
-    //kb.render()
+    const kb = await KanbanPanel.builder()
+    kb.render()
 })
 
 document.addEventListener("projectDeleted", (ev) => {
     console.log("projectDeleted listener fired <ev>", ev)
-    sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
-    //buildKanbearProjectsSelectBox()
+    let projectLink = buildProjectLink(Kontext.getCurrentProjectId(), Kontext.getCurrentProjectName())
+    document.getElementById("project").replaceChildren(createElement('span',{
+        textContent : "deleted"
+    }))
+    //sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
+    buildKanbearProjectsSelectBox()
 })
 
 document.addEventListener("swimlaneCreated", async (ev) => {

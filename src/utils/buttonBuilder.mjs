@@ -230,25 +230,36 @@ function buildDeleteEntityButton(entity, disabled, callback = null) {
     title: `delete ${entity.getKind()}`,
     innerHTML: "X",
     onclick: [
-      function (ev) {
-        console.log(`delete-${entity.getKind()} event Listener fired`)
+      async function (ev) {
+        console.log(`delete-${entity.getKind()} event Listener fired, will ask confirm`)
         ev.stopPropagation();
         let doIt = confirm(`Confirm ${entity.getKind()} #${entity.getId()} ${entity.getName()} delete`)
         if (doIt) {
+          console.log(`delete-${entity.getKind()} event Listener confirmed`)
           if (callback) {
-            callback(doIt)
-            sendEvent(`${entity.getKind()}Deleted`, {})
+            let deleted = await callback(doIt)
+            sendEvent(`${entity.getKind()}Deleted`, { deleted: deleted })
           } else {
             entity.delete()
-              .then(() => console.log(`${entity.getKind()} deleted then`))
-              .catch(() => console.log(`${entity.getKind()} delete error `))
-              .finally( () => sendEvent(`${entity.getKind()}Deleted`, {}) )
-            console.log(`${entity.getKind()} deleted after`)
+              .then(() => {
+                console.log(`${entity.getKind()} deleted then`)
+                sendEvent(`${entity.getKind()}Deleted`, { deleted: true })
+              })
+              .catch(() => {
+                console.log(`${entity.getKind()} delete error `)
+                sendEvent(`${entity.getKind()}Deleted`, { deleted: false })
+              })
+              .finally(() => {
+                //sendEvent(`${entity.getKind()}Deleted`, {}))
+              })
+            console.log(`${entity.getKind()} deleted over`)
           }
         }
         //sendEvent(`${entity.getKind()}Deleted`, {})
+        console.log(`delete-${entity.getKind()} event Listener cancelled`)
+        sendEvent(`${entity.getKind()}Deleted`, { deleted: false })
       },
-      { once: false }]
+      { once: true }]
   })
   //deleteTaskButton.addEventListener('click', deleteTaskFn, { once: false });
   if (disabled) {

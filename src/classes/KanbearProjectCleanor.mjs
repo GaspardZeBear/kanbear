@@ -11,6 +11,7 @@ import { Ref } from "./Ref.mjs"
 import { selectBoxBuilder } from "../utils/selectBoxBuilder.mjs";
 import { log } from '../utils/logListBuilder.mjs'
 import { getFiltersMap } from "../utils/filters.mjs";
+import { createElement } from "../utils/createHtml.mjs";
 
 class KanbearProjectCleanor {
     constructor() {
@@ -19,21 +20,36 @@ class KanbearProjectCleanor {
         this.kanboardFilter = new KanboardFilter(getFiltersMap())
         this.buttons = {}
         this.table = undefined
-        let resultTitle = document.createElement('h2')
-        resultTitle.innerHTML = `Delete project  ${Kontext.getCurrentProject().name}`
-        document.getElementById(this.htmlElement).replaceChildren(resultTitle)
+        document.getElementById('resultsHeader').replaceChildren(
+            createElement('h2', {
+                textContent: `Delete project  ${Kontext.getCurrentProject().name} operation`
+            }))
+        this.logDiv = document.createElement("ul")
+        //let resultTitle = document.createElement('h2')
+        //resultTitle.innerHTML = `Delete project  ${Kontext.getCurrentProject().name}`
+        document.getElementById(this.htmlElement).replaceChildren(createElement('span'))
         //cleanup(Kontext.getCurrentProject())
     }
 
     //-----------------------------------------------------------------------------------
-    cleanup() {
+    async cleanup() {
         console.log(Kontext.getCurrentProject())
-        if (confirm(`Delete project  ${Kontext.getCurrentProject().name} ?`)) {
-            this.doCleanup(Kontext.getCurrentProject())
+        if (confirm(`Cleanor : Really delete project  ${Kontext.getCurrentProject().name} ?`)) {
+            await this.doCleanup(Kontext.getCurrentProject())
+                .then(() => {
+                    log(this.logDiv, "Delete finished successfully")
+                    return (true)
+                })
+                .catch(() => {
+                    log(this.logDiv, "Delete Failed")
+                    return (false)
+                })
+                .finally(() => document.getElementById(this.htmlElement).appendChild(this.logDiv))
         } else {
             let cancelTitle = document.createElement('h2')
             cancelTitle.innerHTML = `Delete cancelled`
             document.getElementById(this.htmlElement).appendChild(cancelTitle)
+            return (false)
         }
     }
     //-----------------------------------------------------------------------------------
@@ -42,14 +58,14 @@ class KanbearProjectCleanor {
     // then remove project
     // Beware : asynchronous !!!!! Force rendez-vous
     async doCleanup(project) {
-        let logDiv = document.createElement("ul")
+        this.logDiv = document.createElement("ul")
 
         const taskDeletePromises = []
         Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
-            log(logDiv, "tasks in  swimlane ", swimlane.name)
+            log(this.logDiv, "tasks in  swimlane ", swimlane.name)
             Object.entries(swimlane.tasks).forEach(async ([tKey, task]) => {
                 const taskDelete = new Promise(async (resolve, reject) => {
-                    log(logDiv, "delete task <id>", task.id, "<name>", task.name)
+                    log(this.logDiv, "delete task <id>", task.id, "<name>", task.name)
                     const ta = new Task(task)
                     await ta.delete()
                     resolve(["OK", task.name, task.id])
@@ -62,7 +78,7 @@ class KanbearProjectCleanor {
 
         const swimlaneDeletePromises = []
         Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
-            log(logDiv, "delete swimlane <id>", swimlane.id, "<name> ", swimlane.name)
+            log(this.logDiv, "delete swimlane <id>", swimlane.id, "<name> ", swimlane.name)
             const swDelete = new Promise(async (resolve, reject) => {
                 const sw = new Swimlane(swimlane)
                 await sw.delete()
@@ -75,7 +91,7 @@ class KanbearProjectCleanor {
 
         const columnDeletePromises = []
         Object.entries(project.columns).forEach(([sKey, column]) => {
-            log(logDiv, "delete column <id>", column.id, "<name> ", column.name)
+            log(this.logDiv, "delete column <id>", column.id, "<name> ", column.name)
             const coDelete = new Promise(async (resolve, reject) => {
                 const co = new Column(column)
                 await co.delete()
@@ -87,12 +103,12 @@ class KanbearProjectCleanor {
         let columnPromises = await Promise.all(columnDeletePromises)
         console.log("doCleanup() <columnPromises>", columnPromises)
 
-        log(logDiv, "delete project <id>", project.id, "<name> ", project.name)
+        log(this.logDiv, "delete project <id>", project.id, "<name> ", project.name)
         const pr = new Project(project)
         await pr.delete()
 
 
-        document.getElementById(this.htmlElement).appendChild(logDiv)
+
         const projectDeletedEvent = new CustomEvent("projectDeleted", {
             detail: { projectId: pr.getId() },
             bubbles: true,
@@ -100,8 +116,10 @@ class KanbearProjectCleanor {
             composed: true
         })
         //document.querySelectorAll(".projectCreated").dispatchEvent(projectCreatedEvent)
+        console.log("doCleanup() over")
+
         Kontext.resetKanbearJsonBulkData()
-        document.dispatchEvent(projectDeletedEvent)
+        //document.dispatchEvent(projectDeletedEvent)
     }
 
 }

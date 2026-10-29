@@ -20,6 +20,7 @@ import { createElement, getIdentityDiv } from "../utils/createHtml.mjs"
 import { Swimlane } from "./Swimlane.mjs"
 import { Column } from "./Column.mjs"
 import { mustDisable, REFERENCE, READ, WRITE, DELETE, ISADMIN } from "../utils/rights.mjs"
+import { KanbearProjectCleanor } from "./KanbearProjectCleanor.mjs"
 
 class KanbanPanel {
   //------------------------------------------------------------------------
@@ -92,6 +93,11 @@ class KanbanPanel {
         buildAddColumnButton(this.project.id),
         createElement("span", {
           innerHTML: " filtered by..."
+        }),
+        buildDeleteEntityButton(this.projectEntity, mustDisable(DELETE), async () => {
+          let cleanor=new KanbearProjectCleanor()
+          await cleanor.cleanup()
+          return(cleanor)
         })
       ]
     })
