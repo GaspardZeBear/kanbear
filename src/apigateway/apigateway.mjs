@@ -45,12 +45,16 @@ import { controlToken } from './middlewares/tokenControl.mjs';
 import { KanbearTokens } from './classes/KanbearTokens.mjs';
 import { KanbearUser } from './classes/KanbearUser.mjs';
 import { KanbearRights } from './classes/KanbearRights.mjs';
+import { auditMiddleware } from './middlewares/auditMiddleware.mjs';
+import pkg0 from 'winston'
+const { winston} = pkg0
 
-
-
+import pkg from 'express-winston'
+const { expressWinston} = pkg
 
 app.use(express.static('public'))
 // Crud api
+app.use(auditMiddleware);
 
 let refreshTokens = [];
 
