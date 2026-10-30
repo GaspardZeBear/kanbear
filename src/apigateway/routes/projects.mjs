@@ -5,7 +5,7 @@ import { UnifiedController } from '../controllers/UnifiedController.mjs';
 
 // Routes pour les projets
 //router.post('/', projectController.createProject);
-router.post('/', UnifiedController.getFunction('projects','create'))
+router.post('/', UnifiedController.getFunction('projects','createProjectAndSetRights'))
 //router.get('/', projectController.getAllProjects);
 router.get('/', UnifiedController.getFunction('projects','getAll'))
 //router.get('/:id', projectController.getProjectById);

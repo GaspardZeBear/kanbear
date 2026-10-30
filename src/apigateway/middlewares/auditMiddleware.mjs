@@ -29,6 +29,8 @@ const auditMiddleware = (req, res, next) => {
         category: 'AUDIT_HTTP',
         actor: {
           userId: req?.kanbearKontext?.decodedToken?.userName ??  'ANONYMOUS', // ID utilisateur si authentifié
+          isAdmin: req?.kanbearKontext?.decodedToken?.isAdmin ??  '?', // ID utilisateur si authentifié
+          rights: req?.kanbearKontext?.decodedToken?.rights ??  '?', // ID utilisateur si authentifié
         },
         action: `${req.method}_${req.baseUrl}${req.path}`,
         data : data,

@@ -4,6 +4,7 @@ import { SqlBuilder } from './SqlBuilder.mjs'
 import { Konsol } from 'konsol'
 import bcrypt from 'bcrypt'
 import { KanbearRights } from '../classes/KanbearRights.mjs'
+import { REFERENCE, READ, WRITE, ISADMIN, DELETE } from '../classes/KanbearRightsCheckerFactory.mjs'
 
 class UnifiedModel {
 
@@ -22,6 +23,7 @@ class UnifiedModel {
     static UnifiedModelOp = {}
     static {
         UnifiedModel.UnifiedModelOp['create'] = UnifiedModel.create
+        UnifiedModel.UnifiedModelOp['createProjectAndSetRights'] = UnifiedModel.createProjectAndSetRights
         UnifiedModel.UnifiedModelOp['hashAndCreateUser'] = UnifiedModel.hashAndCreateUser
         UnifiedModel.UnifiedModelOp['getAll'] = UnifiedModel.getAll
         UnifiedModel.UnifiedModelOp['getById'] = UnifiedModel.getById
@@ -43,8 +45,33 @@ class UnifiedModel {
             res.lastInsertRowid ? callback(null, 201, res) : callback(res, 500, null)
         });
     }
+    //------------------------------------------------------------------
+    static createProjectAndSetRights(table, req, opParms, callback) {
+        const { sql, bindVariables } = new SqlBuilder().generateCreateStatement(table, req.body)
+        db.run(sql, bindVariables, (res, httpCode) => {
+            Konsol.log("UnifiedModel.createProjectsAndSetRights(), project created", "<res>", res)
+            if (!res.lastInsertRowid) {
+                callback(res, 500, null)
+            }
+            Konsol.log("UnifiedModel.createProjectsAndSetRights(), project right", "<kanbearKontex>", req.kanbearKontext.decodedToken)
+            if (req.kanbearKontext.decodedToken.isAdmin === 0) {
+                let rights = ISADMIN + REFERENCE + READ + WRITE + DELETE
+                let userId = req.kanbearKontext.decodedToken.userId
+                const giveRightsSql = `INSERT INTO projects_rights (user_id, project_id, rights) values (${userId},${res.lastInsertRowid},${rights})`
+                Konsol.log("UnifiedModel.createProjectsAndSetRights(), project right", "<giveRights>", giveRightsSql)
+                db.run(giveRightsSql, [], (res1, code) => {
+                    Konsol.log("UnifiedModel.createProjectsAndSetRights(), project rights created", "<res>", res1, "code",code)
+                    res.lastInsertRowid ? callback(null, 201, res) : callback(res, 500, null)
+                })
+            } else {
+                Konsol.log("UnifiedModel.createProjectsAndSetRights(), no need to set rights")
+                callback(null, 201, res)
+            }
+        })
+    }
 
-//------------------------------------------------------------------
+
+    //------------------------------------------------------------------
     static getProjectsRightsByUserid(table, req, opParms, callback) {
         Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<params>", req.params)
         Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<body>", req.body)
@@ -58,19 +85,19 @@ class UnifiedModel {
                             on p.id=r.project_id
                         WHERE r.user_id = ${req.params["user_id"]}
                         `
-                   
+
         Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<sql>", sql)
-        
+
         db.all(sql, [], (err, httpCode, res) => {
-             Konsol.log("UnifiedModel.getProjectsRightsByUserid()(), will call callback","<res>", err)
-            Konsol.log("UnifiedModel.getProjectsRightsByUserid()(), will call callback","<res>", res)
-             Konsol.log("UnifiedModel.getProjectsRightsByUserid()(), will call callback","<httpCode>", httpCode)
+            Konsol.log("UnifiedModel.getProjectsRightsByUserid()(), will call callback", "<res>", err)
+            Konsol.log("UnifiedModel.getProjectsRightsByUserid()(), will call callback", "<res>", res)
+            Konsol.log("UnifiedModel.getProjectsRightsByUserid()(), will call callback", "<httpCode>", httpCode)
             //res.lastInsertRowid ? callback(null, 201,res.lastInsertRowid) : callback(res, null)
-            callback(null, 200,res)
+            callback(null, 200, res)
         });
-        
-        
-       //db.run(sql, [], callback)
+
+
+        //db.run(sql, [], callback)
     }
 
     //------------------------------------------------------------------
@@ -87,19 +114,19 @@ class UnifiedModel {
                             on w.id=r.workspace_id
                         WHERE r.user_id = ${req.params["user_id"]}
                         `
-                   
+
         Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()", "<sql>", sql)
-        
+
         db.all(sql, [], (err, httpCode, res) => {
-             Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()(), will call callback","<res>", err)
-            Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()(), will call callback","<res>", res)
-             Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()(), will call callback","<httpCode>", httpCode)
+            Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()(), will call callback", "<res>", err)
+            Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()(), will call callback", "<res>", res)
+            Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()(), will call callback", "<httpCode>", httpCode)
             //res.lastInsertRowid ? callback(null, 201,res.lastInsertRowid) : callback(res, null)
-            callback(null, 200,res)
+            callback(null, 200, res)
         });
-        
-        
-       //db.run(sql, [], callback)
+
+
+        //db.run(sql, [], callback)
     }
 
     //------------------------------------------------------------------
@@ -113,8 +140,8 @@ class UnifiedModel {
         //UnifiedModel.getById('users', bogusReq, {}, (err, httpCode, params) => { admin = params })
         //Konsol.log("UnifiedModel.hashAndCreateUser()", "admin", admin)
         //if (admin.is_admin) {
-        //if ( req.kanbearKontext.token.isAdmin ) {
-            if ( true ) {
+        let isAdmin = req?.kanbearKontext?.decodedToken?.isAdmin ?? false
+        if (isAdmin) {
             const hashedPassword = bcrypt.hashSync(req.body.password, 10)
             req.body.password = hashedPassword
             UnifiedModel.create(table, req, opParms, callback)
@@ -135,13 +162,13 @@ class UnifiedModel {
     //------------------------------------------------------------------
     static getRightsForUser(table, req, opParms, callback) {
         Konsol.log("UnifiedModel.getRightsForUser()", "<id>", req.params["id"])
-        let rights=new KanbearRights(req.params["id"]).load()
-        callback(null,200,rights)
+        let rights = new KanbearRights(req.params["id"]).load()
+        callback(null, 200, rights)
     }
 
     //------------------------------------------------------------------
     static getAll(table, req, opParms, callback) {
-        
+
         const { sql, bindVariables } = new SqlBuilder().generateGetStatement(table, req)
         //const sql = `SELECT * FROM ${table}`;
         Konsol.log("UnifiedModel.getAll()", "<table>", table, "<req.query>", req.query, "<sql>", sql)

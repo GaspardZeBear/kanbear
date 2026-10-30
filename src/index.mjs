@@ -22,7 +22,7 @@ import { getOpenCloseParmBoolean } from './utils/openClose.mjs'
 import { UserDialog } from './classes/UserDialog.mjs';
 import { LoginDialog } from './classes/LoginDialog.mjs'
 import { createElement, buildKanbearProjectsSelectBox, buildWorkspacesSelectBox } from './utils/createHtml.mjs';
-import { sendMessage } from './utils/sendMessage.mjs';
+import { sendMessage, sendErrorMessage } from './utils/sendMessage.mjs';
 
 await Kontext.loadConfig()
 await Kontext.init()
@@ -92,7 +92,7 @@ document.addEventListener("loginOk", async (ev) => {
         }
     }
 
-    /*
+    
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             stopRightsTimer()
@@ -103,12 +103,12 @@ document.addEventListener("loginOk", async (ev) => {
     });
     Kontext.getUserRights()
     startRightsTimer();
-    */
+    
 
 })
 
 function startRightsTimer() {
-    rightsTimer = setInterval(Kontext.getUserRights, 60_000);
+    rightsTimer = setInterval(Kontext.getUserRights, 600_000);
 }
 function stopRightsTimer() {
     clearInterval(rightsTimer)
@@ -156,7 +156,10 @@ document.addEventListener("workspaceSelected", async (ev) => {
 //document.querySelectorAll("projectCreated").addEventListener("projectCreated", (ev) => {
 document.addEventListener("projectCreated", async (ev) => {
     console.log("projectCreated listener fired <ev>", ev)
-    //buildKanbearProjectsSelectBox()
+    // project was created and given rights
+    // Maybe something to do with accessToken !
+    await Kontext.getUserRights()
+    await buildKanbearProjectsSelectBox()
     await Kontext.setProject(ev.detail.projectId);
     sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
     new KanbanPanel().render()
@@ -214,15 +217,6 @@ document.addEventListener("_projectReloaded", async (ev) => {
 
 document.addEventListener("projectDeleted", async (ev) => {
     console.log("projectDeleted listener fired <ev>", ev)
-    /*
-    try {
-        throw Error("deleted")
-    } catch(err) {
-        console.log(err)
-    }
-        */
-    //let projectLink = buildProjectLink(Kontext.getCurrentProjectId(), Kontext.getCurrentProjectName())
-    //sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
     if (ev.detail.deleted) {
         document.getElementById("project").replaceChildren(createElement('span', {
             textContent: ""
@@ -284,8 +278,6 @@ document.addEventListener("assigneeModified", async (ev) => {
 
 document.addEventListener("columnCreated", async (ev) => {
     console.log("index.mjs() column created listener fired <ev>", ev)
-    //await Kontext.loadKanbearJsonBulkData()
-    //new Columns().chain(ev.detail.columnId)
     const kb = await KanbanPanel.builder()
     kb.render()
 })
@@ -331,10 +323,9 @@ document.addEventListener("dialogCanceled", async (ev) => {
 })
 document.addEventListener("error", async (ev) => {
     console.log("index.mjs() error listener fired <ev>", ev)
-    document.getElementById("message").innerHTML = "Error : " + ev.detail.error
+    //document.getElementById("message").innerHTML = "Error : " + ev.detail.error
+    sendErrorMessage(ev.detail.errors)
 })
-//document.getElementById(project.id).addEventListener("taskModified", (ev) => {
-
 
 document.getElementById('kanboard').href = Kontext.getKanboardUrl()
 
