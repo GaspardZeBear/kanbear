@@ -238,6 +238,7 @@ function buildDeleteEntityButton(entity, disabled, callback = null) {
           console.log(`delete-${entity.getKind()} event Listener confirmed`)
           if (callback) {
             let deleted = await callback(doIt)
+            console.log(`delete-${entity.getKind()} callback called`, deleted)
             sendEvent(`${entity.getKind()}Deleted`, { deleted: deleted })
           } else {
             entity.delete()
@@ -254,10 +255,11 @@ function buildDeleteEntityButton(entity, disabled, callback = null) {
               })
             console.log(`${entity.getKind()} deleted over`)
           }
+        } else {
+          //sendEvent(`${entity.getKind()}Deleted`, {})
+          console.log(`delete-${entity.getKind()} event Listener cancelled`)
+          sendEvent(`${entity.getKind()}Deleted`, { deleted: false })
         }
-        //sendEvent(`${entity.getKind()}Deleted`, {})
-        console.log(`delete-${entity.getKind()} event Listener cancelled`)
-        sendEvent(`${entity.getKind()}Deleted`, { deleted: false })
       },
       { once: true }]
   })

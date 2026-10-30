@@ -96,8 +96,8 @@ class KanbanPanel {
         }),
         buildDeleteEntityButton(this.projectEntity, mustDisable(DELETE), async () => {
           let cleanor=new KanbearProjectCleanor()
-          await cleanor.cleanup()
-          return(cleanor)
+          let deleted=await cleanor.cleanup()
+          return(deleted)
         })
       ]
     })

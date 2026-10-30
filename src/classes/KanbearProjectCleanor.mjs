@@ -13,6 +13,9 @@ import { log } from '../utils/logListBuilder.mjs'
 import { getFiltersMap } from "../utils/filters.mjs";
 import { createElement } from "../utils/createHtml.mjs";
 
+/*------------------------------------------------------------
+Replaces raw delete on project
+*/
 class KanbearProjectCleanor {
     constructor() {
         //this.project = Kontext.getCurrentProject()
@@ -33,18 +36,15 @@ class KanbearProjectCleanor {
 
     //-----------------------------------------------------------------------------------
     async cleanup() {
-        console.log(Kontext.getCurrentProject())
+        console.log("KanbearProjectCleanor cleanup() current project", Kontext.getCurrentProject())
+
         if (confirm(`Cleanor : Really delete project  ${Kontext.getCurrentProject().name} ?`)) {
-            await this.doCleanup(Kontext.getCurrentProject())
-                .then(() => {
-                    log(this.logDiv, "Delete finished successfully")
-                    return (true)
-                })
-                .catch(() => {
-                    log(this.logDiv, "Delete Failed")
-                    return (false)
-                })
-                .finally(() => document.getElementById(this.htmlElement).appendChild(this.logDiv))
+            console.log("KanbearProjectCleanor cleanup() confirmed")
+            let deleted = await this.doCleanup(Kontext.getCurrentProject())
+            console.log("KanbearProjectCleanor cleanup() after await")
+            log(this.logDiv, "Project deleted")
+            document.getElementById(this.htmlElement).replaceChildren(this.logDiv)
+            return (deleted)
         } else {
             let cancelTitle = document.createElement('h2')
             cancelTitle.innerHTML = `Delete cancelled`
@@ -119,6 +119,7 @@ class KanbearProjectCleanor {
         console.log("doCleanup() over")
 
         Kontext.resetKanbearJsonBulkData()
+        return (true)
         //document.dispatchEvent(projectDeletedEvent)
     }
 

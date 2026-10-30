@@ -21,7 +21,8 @@ import { buildAddDummyButton, buildAddProjectButton, buildAddWorkspaceButton } f
 import { getOpenCloseParmBoolean } from './utils/openClose.mjs'
 import { UserDialog } from './classes/UserDialog.mjs';
 import { LoginDialog } from './classes/LoginDialog.mjs'
-import { createElement } from './utils/createHtml.mjs';
+import { createElement, buildKanbearProjectsSelectBox, buildWorkspacesSelectBox } from './utils/createHtml.mjs';
+import { sendMessage } from './utils/sendMessage.mjs';
 
 await Kontext.loadConfig()
 await Kontext.init()
@@ -39,11 +40,11 @@ document.addEventListener("loginCancelled", async (ev) => {
 })
 
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') {
-    // Vérifier le token et rafraîchir si nécessaire
-    //verifierEtRafraichirToken();
-    console.log("visibilty change listener decodedToken, ev.detail.decodedToken")
-  }
+    if (document.visibilityState === 'visible') {
+        // Vérifier le token et rafraîchir si nécessaire
+        //verifierEtRafraichirToken();
+        console.log("visibilty change listener decodedToken, ev.detail.decodedToken")
+    }
 });
 
 let rightsTimer = null;
@@ -55,30 +56,30 @@ document.addEventListener("loginOk", async (ev) => {
     document.getElementById('Tags').style.visibility = "hidden"
     if (!Kontext.isAdmin) {
         //document.getElementById('Actors').style.visibility = "hidden"
-        document.getElementById('Actors').setAttribute("aria-disabled",true)
-         document.getElementById('Actors').setAttribute("tabindex",-1)
+        document.getElementById('Actors').setAttribute("aria-disabled", true)
+        document.getElementById('Actors').setAttribute("tabindex", -1)
         //document.getElementById('Kanboard').style.visibility = "hidden"
         //document.getElementById('showEvents').style.visibility = "hidden"
         //document.getElementById('clearProject').style.visibility = "hidden"
-        document.getElementById('Kanboard').disabled=true
-        document.getElementById('showEvents').disabled=true
-        document.getElementById('clearProject').disabled=true
+        document.getElementById('Kanboard').disabled = true
+        document.getElementById('showEvents').disabled = true
+        document.getElementById('clearProject').disabled = true
         document.getElementById('isAdmin').innerHTML = `N`;
     } else {
         //document.getElementById('Actors').style.visibility = "visible"
-        document.getElementById('Actors').setAttribute("aria-disabled",false)
-         document.getElementById('Actors').setAttribute("tabindex",0)
+        document.getElementById('Actors').setAttribute("aria-disabled", false)
+        document.getElementById('Actors').setAttribute("tabindex", 0)
         //document.getElementById('Kanboard').style.visibility = "visible"
         //document.getElementById('showEvents').style.visibility = "visible"
         //document.getElementById('clearProject').style.visibility = "visible"
-        document.getElementById('Kanboard').disabled=false
-        document.getElementById('showEvents').disabled=false
-        document.getElementById('clearProject').disabled=false
+        document.getElementById('Kanboard').disabled = false
+        document.getElementById('showEvents').disabled = false
+        document.getElementById('clearProject').disabled = false
         document.getElementById('isAdmin').innerHTML = `Y`;
     }
     document.getElementById('user').innerHTML = `${Kontext.getUserName()}`;
-    buildWorkspacesSelectBox()
-    buildKanbearProjectsSelectBox()
+    await buildWorkspacesSelectBox()
+    await buildKanbearProjectsSelectBox()
     for (let item of ['project', 'swimlane', 'task']) {
         for (let status of ['Open', 'Closed']) {
             const id = `${item}${status}`
@@ -211,14 +212,27 @@ document.addEventListener("_projectReloaded", async (ev) => {
     kb.render()
 })
 
-document.addEventListener("projectDeleted", (ev) => {
+document.addEventListener("projectDeleted", async (ev) => {
     console.log("projectDeleted listener fired <ev>", ev)
-    let projectLink = buildProjectLink(Kontext.getCurrentProjectId(), Kontext.getCurrentProjectName())
-    document.getElementById("project").replaceChildren(createElement('span',{
-        textContent : "deleted"
-    }))
+    /*
+    try {
+        throw Error("deleted")
+    } catch(err) {
+        console.log(err)
+    }
+        */
+    //let projectLink = buildProjectLink(Kontext.getCurrentProjectId(), Kontext.getCurrentProjectName())
     //sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
-    buildKanbearProjectsSelectBox()
+    if (ev.detail.deleted) {
+        document.getElementById("project").replaceChildren(createElement('span', {
+            textContent: ""
+        }))
+        buildKanbearProjectsSelectBox()
+        sendMessage("Project deleted")
+    } else {
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    }
 })
 
 document.addEventListener("swimlaneCreated", async (ev) => {
@@ -333,146 +347,6 @@ document.getElementById('loadProject').addEventListener('click', async () => {
         //document.getElementById('message').innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
     }
 })
-
-//---------------------------------------------------------------------------------
-async function buildKanbearProjectsSelectBox() {
-    let workspaceId = Kontext.getWorkspaceId()
-    let projects = []
-    console.log("buildKanbearProjectsSelectBox() <workspaceId>", workspaceId)
-    if (workspaceId) {
-        const isOpen = document.getElementById("projectOpen").checked;
-        const isClosed = document.getElementById("projectClosed").checked;
-        const openClosed = getOpenCloseParmBoolean('project', isOpen, isClosed)
-        const parms = { workspace_id: workspaceId }
-        if (!(openClosed === undefined)) {
-            parms["is_open"] = openClosed
-        }
-        projects = await Project.getAll('projects', parms)
-        //projects.unshift({ id: -1, name: '* Create new project' })
-    }
-    console.log("buildKanbearProjectsSelectBox <Kontext.getCurrentProjectId>", Kontext.getCurrentProjectId())
-    let boxName = "kanbearProjectSelectBox"
-    let buttons = []
-
-    if (workspaceId > 0) {
-        buttons.push(buildAddProjectButton(workspaceId))
-    } else {
-        buttons.push(buildAddDummyButton())
-    }
-    let checkboxes = []
-
-    let boxParams = {
-        domId: boxName,
-        boxLabel: "Project",
-        buttons: buttons,
-        checkboxes: checkboxes,
-        items: projects,
-        labelText: "Project",
-        klass: "filter-group",
-        selectedOption: Kontext.getCurrentProjectId()
-    }
-    let wsDiv = await selectBoxBuilder(boxParams)
-    wsDiv.classList.add("projectCreated")
-    document.getElementById("kanbearProjectsDiv").replaceChildren(wsDiv)
-    document.getElementById(boxName).addEventListener('change', async (e) => {
-        console.log({ boxName }, e.target)
-        let projectId = e.target.value;
-        //Kontext.setProject(e.target.value);
-        //let projectLink=buildProjectLink(projectId,"xxx")
-        //document.getElementById("project").replaceChildren(projectLink)
-        sendEvent("projectSelected", { projectId: projectId })
-    });
-}
-
-//---------------------------------------------------------------------------------
-async function buildWorkspacesSelectBox() {
-
-    /*
-    let wss0
-    let wss = []
-
-    
-    let retries = 10
-    while (!Array.isArray(wss0)) {
-        try {
-            wss0 = await Workspace.getAll('workspaces')
-            console.log("buildWorkspacesSelectBox() ", "retries", retries, "wss0", wss0)
-            retries--
-            if (retries == 0) {
-                // throw("Workspaces list not avalailable")
-                wss0 = []
-            }
-        } catch (err) {
-            console.log("buildWorkspacesSelectBox() error", err.cause)
-            document.getElementById("message").innerHTML = "Cannot get workspace list (is back launched ?)"
-            setTimeout(function () {
-                location.reload();
-            }, 30000);
-        }
-    }
-        */
-
-    let wss0 = []
-    try {
-        wss0 = await Workspace.getAll('workspaces')
-    } catch (err) {
-
-    }
-    let wss = wss0
-
-    //document.getElementById("message").innerHTML = "Ready"
-
-    if (wss.length == 0) {
-        document.getElementById("message").innerHTML = "No workspace found"
-        alert("Could not initialize workspaces, are you logged in with a right user  ?")
-    } else {
-        document.getElementById("message").innerHTML = "Ready"
-    }
-    // as wss will be modified, let's keep a copy
-    let wssOrigin = []
-    for (let i = 0; i < wss.length; i++) {
-        wssOrigin[i] = wss[i]
-    }
-    console.log("wssOrigin init", wssOrigin)
-
-    //wss.unshift({ id: -1, name: '* Create new workspace' })
-    let addWorkspaceButton = buildAddWorkspaceButton()
-    let boxName = "kanbearWorkspaceSelectBox"
-    let boxParams = {
-        domId: boxName,
-        boxLabel: "workspace",
-        buttons: [addWorkspaceButton],
-        items: wss,
-        labelText: "Workspace",
-        klass: "filter-group",
-        selectedOption: Kontext.getWorkspaceId()
-        //headItems:[['* Create new workspace',-1]]
-    }
-    let wsDiv = await selectBoxBuilder(boxParams)
-    document.getElementById("kanbearWorkspacesDiv").replaceChildren(wsDiv)
-    document.getElementById(boxName).addEventListener('change', async (e) => {
-
-        let workspaceId = parseInt(e.target.value)
-        if (workspaceId < 0) {
-            sendEvent("workspaceSelected", workspaceId)
-            return
-        }
-        Kontext.setWorkspaceId(e.target.value);
-        //console.log("wss",e.wss)
-        let box = document.getElementById("kanbearWorkspaceSelectBox")
-
-        //let addedElementsCount=box.length-wssOrigin.length
-        console.log("wssOrigin in listener", wssOrigin)
-        const ws = wssOrigin.find((element) => element.id == workspaceId)
-        console.log("ws", ws)
-        Kontext.setWorkspaceName(ws.name);
-        document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
-        let workspaceLink = buildWorkspaceLink(ws.id, ws.name)
-        document.getElementById("workspace").replaceChildren(workspaceLink)
-        buildKanbearProjectsSelectBox()
-        console.log({ boxName }, e.target.value)
-    });
-}
 
 //------------------- migrate from kanboard to kanbear --------------------------------------
 function migrateFromKanboard() {

@@ -1,7 +1,13 @@
-import { buildOpenCloseButton } from "./buttonBuilder.mjs";
+import { buildOpenCloseButton, buildAddDummyButton, buildAddProjectButton, buildAddWorkspaceButton } from "./buttonBuilder.mjs";
 import { mustDisable, WRITE } from "./rights.mjs";
 import { KanbearEntity } from "../classes/KanbearEntity.mjs";
 import { sendEvent } from "./sendEvent.mjs";
+import { Kontext } from "../classes/Kontext.mjs";
+import { Project } from "../classes/Project.mjs";
+import { Workspace } from "../classes/Workspace.mjs";
+import { selectBoxBuilder } from "./selectBoxBuilder.mjs";
+import { getOpenCloseParmBoolean } from "./openClose.mjs";
+import { buildWorkspaceLink, buildProjectLink } from './linkBuilder.mjs';
 
 
 //-----------------------------------------------------------------------------------------------
@@ -100,5 +106,145 @@ function getDeleteEntityDiv(entity,buttonDiv) {
 }
 
 
+//---------------------------------------------------------------------------------
+async function buildKanbearProjectsSelectBox() {
+    let workspaceId = Kontext.getWorkspaceId()
+    let projects = []
+    console.log("buildKanbearProjectsSelectBox() <workspaceId>", workspaceId)
+    if (workspaceId) {
+        const isOpen = document.getElementById("projectOpen").checked;
+        const isClosed = document.getElementById("projectClosed").checked;
+        const openClosed = getOpenCloseParmBoolean('project', isOpen, isClosed)
+        const parms = { workspace_id: workspaceId }
+        if (!(openClosed === undefined)) {
+            parms["is_open"] = openClosed
+        }
+        projects = await Project.getAll('projects', parms)
+        //projects.unshift({ id: -1, name: '* Create new project' })
+    }
+    console.log("buildKanbearProjectsSelectBox <Kontext.getCurrentProjectId>", Kontext.getCurrentProjectId())
+    let boxName = "kanbearProjectSelectBox"
+    let buttons = []
 
-export { createElement, getIdentityDiv, getDeleteEntityDiv }
+    if (workspaceId > 0) {
+        buttons.push(buildAddProjectButton(workspaceId))
+    } else {
+        buttons.push(buildAddDummyButton())
+    }
+    let checkboxes = []
+
+    let boxParams = {
+        domId: boxName,
+        boxLabel: "Project",
+        buttons: buttons,
+        checkboxes: checkboxes,
+        items: projects,
+        labelText: "Project",
+        klass: "filter-group",
+        selectedOption: Kontext.getCurrentProjectId()
+    }
+    let wsDiv = await selectBoxBuilder(boxParams)
+    wsDiv.classList.add("projectCreated")
+    document.getElementById("kanbearProjectsDiv").replaceChildren(wsDiv)
+    document.getElementById(boxName).addEventListener('change', async (e) => {
+        console.log({ boxName }, e.target)
+        let projectId = e.target.value;
+        //Kontext.setProject(e.target.value);
+        //let projectLink=buildProjectLink(projectId,"xxx")
+        //document.getElementById("project").replaceChildren(projectLink)
+        sendEvent("projectSelected", { projectId: projectId })
+    });
+}
+
+
+//---------------------------------------------------------------------------------
+async function buildWorkspacesSelectBox() {
+
+    /*
+    let wss0
+    let wss = []
+
+    
+    let retries = 10
+    while (!Array.isArray(wss0)) {
+        try {
+            wss0 = await Workspace.getAll('workspaces')
+            console.log("buildWorkspacesSelectBox() ", "retries", retries, "wss0", wss0)
+            retries--
+            if (retries == 0) {
+                // throw("Workspaces list not avalailable")
+                wss0 = []
+            }
+        } catch (err) {
+            console.log("buildWorkspacesSelectBox() error", err.cause)
+            document.getElementById("message").innerHTML = "Cannot get workspace list (is back launched ?)"
+            setTimeout(function () {
+                location.reload();
+            }, 30000);
+        }
+    }
+        */
+
+    let wss0 = []
+    try {
+        wss0 = await Workspace.getAll('workspaces')
+    } catch (err) {
+
+    }
+    let wss = wss0
+
+    //document.getElementById("message").innerHTML = "Ready"
+
+    if (wss.length == 0) {
+        document.getElementById("message").innerHTML = "No workspace found"
+        alert("Could not initialize workspaces, are you logged in with a right user  ?")
+    } else {
+        document.getElementById("message").innerHTML = "Ready"
+    }
+    // as wss will be modified, let's keep a copy
+    let wssOrigin = []
+    for (let i = 0; i < wss.length; i++) {
+        wssOrigin[i] = wss[i]
+    }
+    console.log("wssOrigin init", wssOrigin)
+
+    //wss.unshift({ id: -1, name: '* Create new workspace' })
+    let addWorkspaceButton = buildAddWorkspaceButton()
+    let boxName = "kanbearWorkspaceSelectBox"
+    let boxParams = {
+        domId: boxName,
+        boxLabel: "workspace",
+        buttons: [addWorkspaceButton],
+        items: wss,
+        labelText: "Workspace",
+        klass: "filter-group",
+        selectedOption: Kontext.getWorkspaceId()
+        //headItems:[['* Create new workspace',-1]]
+    }
+    let wsDiv = await selectBoxBuilder(boxParams)
+    document.getElementById("kanbearWorkspacesDiv").replaceChildren(wsDiv)
+    document.getElementById(boxName).addEventListener('change', async (e) => {
+
+        let workspaceId = parseInt(e.target.value)
+        if (workspaceId < 0) {
+            sendEvent("workspaceSelected", workspaceId)
+            return
+        }
+        Kontext.setWorkspaceId(e.target.value);
+        //console.log("wss",e.wss)
+        let box = document.getElementById("kanbearWorkspaceSelectBox")
+
+        //let addedElementsCount=box.length-wssOrigin.length
+        console.log("wssOrigin in listener", wssOrigin)
+        const ws = wssOrigin.find((element) => element.id == workspaceId)
+        console.log("ws", ws)
+        Kontext.setWorkspaceName(ws.name);
+        document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
+        let workspaceLink = buildWorkspaceLink(ws.id, ws.name)
+        document.getElementById("workspace").replaceChildren(workspaceLink)
+        buildKanbearProjectsSelectBox()
+        console.log({ boxName }, e.target.value)
+    });
+}
+
+export { createElement, getIdentityDiv, getDeleteEntityDiv, buildKanbearProjectsSelectBox, buildWorkspacesSelectBox }
