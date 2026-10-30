@@ -157,8 +157,7 @@ document.addEventListener("workspaceSelected", async (ev) => {
 document.addEventListener("projectCreated", async (ev) => {
     console.log("projectCreated listener fired <ev>", ev)
     // project was created and given rights
-    // Maybe something to do with accessToken !
-    await Kontext.getUserRights()
+    await Kontext.getTokensManager().handleRefreshToken();
     await buildKanbearProjectsSelectBox()
     await Kontext.setProject(ev.detail.projectId);
     sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
@@ -167,19 +166,11 @@ document.addEventListener("projectCreated", async (ev) => {
 
 document.addEventListener("cancelProjectBtn", async (ev) => {
     console.log("projectCreationCancelled listener fired <ev>", ev)
-    //buildKanbearProjectsSelectBox()
-    //await Kontext.setProject(ev.detail.projectId);
-    //sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
-    //new KanbanPanel().render()
     document.getElementById('addProjectButton').replaceWith(buildAddProjectButton(Kontext.getWorkspaceId()))
 })
 
 document.addEventListener("cancelWorkspaceBtn", async (ev) => {
     console.log("workspaceCreationCancelled listener fired <ev>", ev)
-    //buildKanbearProjectsSelectBox()
-    //await Kontext.setProject(ev.detail.projectId);
-    //sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
-    //new KanbanPanel().render()
     document.getElementById('addWorkspaceButton').replaceWith(buildAddWorkspaceButton())
 })
 

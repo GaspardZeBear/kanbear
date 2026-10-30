@@ -34,6 +34,7 @@ class UnifiedModel {
         UnifiedModel.UnifiedModelOp['update'] = UnifiedModel.update
         UnifiedModel.UnifiedModelOp['patch'] = UnifiedModel.patch
         UnifiedModel.UnifiedModelOp['delete'] = UnifiedModel.delete
+        UnifiedModel.UnifiedModelOp['deleteProjectsRightsAndProject'] = UnifiedModel.deleteProjectsRightsAndProject
     }
 
     //------------------------------------------------------------------
@@ -133,13 +134,6 @@ class UnifiedModel {
     static hashAndCreateUser(table, req, opParms, callback) {
         Konsol.log("UnifiedModel.hashAndCreateUser()", "<kanbearKontext>", req.kanbearKontext)
         Konsol.log("UnifiedModel.hashAndCreateUser()", "<passwd>", req.body.password)
-
-        // only user is_admin true can create user
-        //let bogusReq = { params: { id: req.kanbearKontext.token.userId } }
-        //let admin
-        //UnifiedModel.getById('users', bogusReq, {}, (err, httpCode, params) => { admin = params })
-        //Konsol.log("UnifiedModel.hashAndCreateUser()", "admin", admin)
-        //if (admin.is_admin) {
         let isAdmin = req?.kanbearKontext?.decodedToken?.isAdmin ?? false
         if (isAdmin) {
             const hashedPassword = bcrypt.hashSync(req.body.password, 10)
@@ -148,15 +142,6 @@ class UnifiedModel {
         } else {
             throw Error("Not admin")
         }
-        /*
-        const { sql, bindVariables } = new SqlBuilder().generateCreateStatement(table, req.body)
-        db.run(sql, bindVariables, (res, httpCode) => {
-            Konsol.log("UnifiedModel.hashAndCreateUser(), will call callback","<res>", res)
-            //res.lastInsertRowid ? callback(null, 201,res.lastInsertRowid) : callback(res, null)
-            res.lastInsertRowid ? callback(null, 201,res) : callback(res, 500, null)
-        });
-        */
-
     }
 
     //------------------------------------------------------------------
@@ -222,6 +207,20 @@ class UnifiedModel {
             //res.lastInsertRowid != null ? callback(null, res.lastInsertRowid) : callback(res, null)
             res.lastInsertRowid != null ? callback(null, 200, res) : callback(res, 500, null)
         });
+    }
+
+   //------------------------------------------------------------------
+    static deleteProjectsRightsAndProject(table, req, opParms, callback) {
+        Konsol.log("UnifiedModel.deleteProjectsRightsAndProject(), <params>", req.params, "<body>", req.body)
+        const sql = `DELETE FROM projects_rights WHERE project_id = ${req.params["id"]}`;
+        //const { sql, bindVariables } = new SqlBuilder().generateDeleteStatement(table, req)
+        db.run(sql, [], (res) => {
+            Konsol.log("UnifiedModel.deleteProjectsRightsAndProject()  projects-rights", "<res>", res)
+            //res.lastInsertRowid != null ? callback(null, res.lastInsertRowid) : callback(res, null)
+            //res.lastInsertRowid != null ? callback(null, 204, res) : callback(res, 500, null)
+            UnifiedModel.delete(table, req, opParms, callback);
+        })
+        
     }
 
     //------------------------------------------------------------------

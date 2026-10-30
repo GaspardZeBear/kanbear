@@ -367,4 +367,4 @@ class TasksRightsChecker extends RightsChecker {
 }
 
 
-export { KanbearRightsCheckerFactory }
+export { KanbearRightsCheckerFactory, READ,WRITE,REFERENCE,DELETE,ISADMIN }
