@@ -1,6 +1,6 @@
 import express from 'express'
 const router = express.Router();
-import { projectController } from '../controllers/projects.mjs';
+//import { projectController } from '../controllers/projects.mjs';
 import { UnifiedController } from '../controllers/UnifiedController.mjs';
 
 // Routes pour les projets
@@ -17,7 +17,7 @@ router.put('/:id', UnifiedController.getFunction('projects','update'))
 // Did not exist
 router.patch('/:id', UnifiedController.getFunction('projects','patch'));
 
-router.delete('/:id', UnifiedController.getFunction('projects','delete'))
+router.delete('/:id', UnifiedController.getFunction('projects','deleteProjectsRightsAndProject'))
 export default router
 
 

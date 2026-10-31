@@ -1,6 +1,6 @@
 import express from 'express'
 const router = express.Router();
-import { swimlaneController } from '../controllers/swimlanes.mjs'
+//import { swimlaneController } from '../controllers/swimlanes.mjs'
 import { UnifiedController } from '../controllers/UnifiedController.mjs';
 
 //router.post('/', swimlaneController.createSwimlane);
