@@ -43,6 +43,12 @@ class UserRightsModal {
     let saveRightsButton = this.buildSaveRightsButton()
     resultTitleRights.appendChild(saveRightsButton)
     result.replaceChildren(resultTitleRights)
+    this.workspaces = await Workspace.getAll('workspaces', {})
+    this.workspacesHash = {}
+    this.workspaces.forEach((w) => {
+      this.workspacesHash[w.id] = w
+    })
+    this.projects = await Project.getAll('projects', {})
     result.appendChild(await this.renderProjects())
     result.appendChild(await this.renderWorkspaces())
   }
@@ -114,7 +120,7 @@ class UserRightsModal {
   saveRights() {
     let hiddenRights = document.querySelectorAll(".hiddenRights")
     for (let r of hiddenRights) {
-    //hiddenRights.forEach((r) => {
+      //hiddenRights.forEach((r) => {
       console.log("UserRightsModal saveRights", r.id, r.value)
       let cRights = 0
       if (document.getElementById(`${r.id}:reference`).checked) {
@@ -174,10 +180,16 @@ class UserRightsModal {
 
   //--------------------------------------------------------------
   async buildProjectsSelectBox() {
-    let projects = await Project.getAll('projects', {})
+    //let projects = await Project.getAll('projects', {})
+
     let boxName = "kanbearProjectsRightsSelectBox"
     let buttons = [buildAddProjectsRightsButton(boxName, this.userId, true)]
     let checkboxes = []
+    let projects = []
+    this.projects.forEach((p) => {
+      p.name = `${this.workspacesHash[p.workspace_id].name}/${p.name}`
+      projects.push(p)
+    })
     let boxParams = {
       domId: boxName,
       boxLabel: "ProjectsRights",
@@ -194,7 +206,8 @@ class UserRightsModal {
 
   //--------------------------------------------------------------
   async buildWorkspacesSelectBox() {
-    let workspaces = await Workspace.getAll('workspaces', {})
+    //let workspaces = await Workspace.getAll('workspaces', {})
+
     let boxName = "kanbearWorkspacesRightsSelectBox"
     let buttons = [buildAddWorkspacesRightsButton(boxName, this.userId, true)]
     let checkboxes = []
@@ -203,7 +216,7 @@ class UserRightsModal {
       boxLabel: "WorkspacesRights",
       buttons: buttons,
       checkboxes: checkboxes,
-      items: workspaces,
+      items: this.workspaces,
       labelText: "WorkspacesRights",
       klass: "filter-group",
     }
