@@ -25,8 +25,9 @@ class KanbearLogin {
     const valid = bcrypt.compareSync(this.userPassword, user.password);
     Konsol.log("KanbearLogin.check() ", "user/password valid", valid)
     if (valid) {
-      let kanbearRights = new KanbearRights(user.userId).load()
-      Konsol.log("KanbearLogin.check() ", kanbearRights)
+      Konsol.log("KanbearLogin.check() kanbearRights")
+      let kanbearRights = new KanbearRights('user',user.userId).load()
+      Konsol.log("KanbearLogin.check() ok", kanbearRights)
       return ({
         isAdmin: user.isAdmin,
         userName: user.userName,

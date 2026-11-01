@@ -19,6 +19,7 @@ app.use(bodyParser.json());
 import assigneeRoutes from './routes/assignees.mjs'
 import columnRoutes from './routes/columns.mjs'
 import swimlaneRoutes from './routes/swimlanes.mjs'
+import rightsRoutes from './routes/rights.mjs'
 import tagRoutes from './routes/tags.mjs'
 import projectRoutes from './routes/projects.mjs'
 import projectRightsRoutes from './routes/projectRights.mjs'
@@ -133,6 +134,7 @@ app.use('/api/workspaces', workspaceRoutes);
 app.use('/api/projects_users', projectUserRoutes);
 app.use('/api/task_has_tags', taskHasTagRoutes);
 app.use('/api/tasks_comments', taskCommentRoutes);
+app.use('/api/rights', rightsRoutes);
 app.use('/api/projects_rights', projectRightsRoutes);
 app.use('/api/workspaces_rights', workspaceRightsRoutes);
 

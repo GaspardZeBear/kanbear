@@ -29,7 +29,9 @@ class UnifiedModel {
         UnifiedModel.UnifiedModelOp['getById'] = UnifiedModel.getById
         UnifiedModel.UnifiedModelOp['getByForeignKey'] = UnifiedModel.getByForeignKey
         UnifiedModel.UnifiedModelOp['getProjectsRightsByUserid'] = UnifiedModel.getProjectsRightsByUserid
+        UnifiedModel.UnifiedModelOp['getProjectsRightsByGroupid'] = UnifiedModel.getProjectsRightsByGroupid
         UnifiedModel.UnifiedModelOp['getWorkspacesRightsByUserid'] = UnifiedModel.getWorkspacesRightsByUserid
+        UnifiedModel.UnifiedModelOp['getWorkspacesRightsByGroupid'] = UnifiedModel.getWorkspacesRightsByGroupid
         UnifiedModel.UnifiedModelOp['getRightsForUser'] = UnifiedModel.getRightsForUser
         UnifiedModel.UnifiedModelOp['update'] = UnifiedModel.update
         UnifiedModel.UnifiedModelOp['patch'] = UnifiedModel.patch
@@ -77,14 +79,16 @@ class UnifiedModel {
         Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<params>", req.params)
         Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<body>", req.body)
         const sql = `SELECT r.id id,
-                            r.user_id user_id,
+                            r.owner_id owner_id,
+                             r.owner_type owner_type,
                             r.project_id project_id,
                             r.rights rights,
                             p.name project_name
                         FROM projects_rights as r
                         LEFT JOIN projects as p
                             on p.id=r.project_id
-                        WHERE r.user_id = ${req.params["user_id"]}
+                        WHERE r.owner_id = ${req.params["owner_id"]}
+                        AND r.owner_type = 'user'
                         `
 
         Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<sql>", sql)
@@ -96,9 +100,30 @@ class UnifiedModel {
             //res.lastInsertRowid ? callback(null, 201,res.lastInsertRowid) : callback(res, null)
             callback(null, 200, res)
         });
+    }
 
+        //------------------------------------------------------------------
+    static getProjectsRightsByGroupid(table, req, opParms, callback) {
+        Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<params>", req.params)
+        Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<body>", req.body)
+        const sql = `SELECT r.id id,
+                            r.owner_id owner_id,
+                            r.owner_type owner_type,
+                            r.project_id project_id,
+                            r.rights rights,
+                            p.name project_name
+                        FROM projects_rights as r
+                        LEFT JOIN projects as p
+                            on p.id=r.project_id
+                        WHERE r.owner_id = ${req.params["owner_id"]}
+                        AND r.owner_type = 'group'
+                        `
 
-        //db.run(sql, [], callback)
+        Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<sql>", sql)
+
+        db.all(sql, [], (err, httpCode, res) => {
+            callback(null, 200, res)
+        });
     }
 
     //------------------------------------------------------------------
@@ -106,23 +131,48 @@ class UnifiedModel {
         Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()", "<params>", req.params)
         Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()", "<body>", req.body)
         const sql = `SELECT r.id id,
-                            r.user_id user_id,
+                            r.owner_id owner_id,
+                            r.owner_type owner_type,
                             r.workspace_id workspace_id,
                             r.rights rights,
                             w.name workspace_name
                         FROM workspaces_rights as r
                         LEFT JOIN workspaces as w
                             on w.id=r.workspace_id
-                        WHERE r.user_id = ${req.params["user_id"]}
+                        WHERE r.user_id = ${req.params["owner_id"]}
+                        AND r.owner_type = 'user'
                         `
 
         Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()", "<sql>", sql)
 
         db.all(sql, [], (err, httpCode, res) => {
-            Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()(), will call callback", "<res>", err)
-            Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()(), will call callback", "<res>", res)
-            Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()(), will call callback", "<httpCode>", httpCode)
-            //res.lastInsertRowid ? callback(null, 201,res.lastInsertRowid) : callback(res, null)
+            callback(null, 200, res)
+        });
+
+
+        //db.run(sql, [], callback)
+    }
+
+       //------------------------------------------------------------------
+    static getWorkspacesRightsByGroupid(table, req, opParms, callback) {
+        Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()", "<params>", req.params)
+        Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()", "<body>", req.body)
+        const sql = `SELECT r.id id,
+                            r.owner_id owner_id,
+                            r.owner_type owner_type,
+                            r.workspace_id workspace_id,
+                            r.rights rights,
+                            w.name workspace_name
+                        FROM workspaces_rights as r
+                        LEFT JOIN workspaces as w
+                            on w.id=r.workspace_id
+                        WHERE r.user_id = ${req.params["owner_id"]}
+                        AND r.owner_type = 'group'
+                        `
+
+        Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()", "<sql>", sql)
+
+        db.all(sql, [], (err, httpCode, res) => {
             callback(null, 200, res)
         });
 
@@ -147,7 +197,7 @@ class UnifiedModel {
     //------------------------------------------------------------------
     static getRightsForUser(table, req, opParms, callback) {
         Konsol.log("UnifiedModel.getRightsForUser()", "<id>", req.params["id"])
-        let rights = new KanbearRights(req.params["id"]).load()
+        let rights = new KanbearRights('user',req.params["id"]).load()
         callback(null, 200, rights)
     }
 

@@ -9,18 +9,23 @@ import { db } from '../config/database.mjs';
 
 class KanbearRights {
 
-  constructor(userId) {
+  constructor(ownerType, ownerId) {
     //Konsol.log("KanbearRights.constructor()", "userId", userId)
     //this.db = new DatabaseSync('db.sqlite', { readonly: true });
     //this.db = db
-    this.userId = userId
-    this.isAdmin = this.isAdminSql()
+    Konsol.log("KanbearRights.constructor()", ownerType, ownerId)
+    this.ownerId = ownerId
+    this.ownerType = ownerType
+    Konsol.log("KanbearRights.constructor()", this.ownerType, this.ownerId)
+    if (this.ownerType === 'user') {
+      this.isAdmin = this.isAdminSql()
+    }
     this.rights = null
   }
 
   //-----------------------------------------------------
   isAdminSql() {
-    Konsol.log("KanbearRights.isAdmin()")
+    Konsol.log("KanbearRights.isAdmin()", this.ownerType, this.ownerId)
     let req = `
       select
         id id,  
@@ -29,7 +34,7 @@ class KanbearRights {
       from 
         users
       where
-       id='${this.userId}'
+       id='${this.ownerId}'
       `
     //    db.all(req, [], this.callAfterRights.bind(this));
     let user
@@ -50,6 +55,42 @@ class KanbearRights {
   //-----------------------------------------------------
   loadRights() {
     Konsol.log("KanbearRights.loadRights()")
+    let req = `
+      select
+        id id,
+        owner_id as owner_id,
+        owner_type as owner_type,
+        target_kind as target_kind,
+        target_id as target_id,
+        rights rights
+      from 
+        rights
+      where
+       owner_id='${this.ownerId}'
+       and owner_type='${this.ownerType}'
+    `
+    let resp
+    db.all(req, [], (err, httpCode, sqlResp) => {
+      //Konsol.log("KanbearRights loadRights() callback()", "wreq", wreq)
+      //Konsol.log("KanbearRights loadRights() callback()", "sqlResp", sqlResp)
+      resp = sqlResp
+      //return (params)
+    });
+
+    let rights = { data: { workspaces: {}, projects: {} } }
+    resp.forEach(element => {
+      rights.data[element.target_kind][element.target_id] = element.rights
+    });
+
+    Konsol.log("KanbearRights.loadRights() over", "<rights>", rights)
+    this.resp = rights["data"] ?? null
+    return (this.resp)
+  }
+
+
+  //-----------------------------------------------------
+  XloadRights() {
+    Konsol.log("KanbearRights.loadRights()")
     let wreq = `
       select
         id id,
@@ -58,8 +99,9 @@ class KanbearRights {
       from 
         workspaces_rights
       where
-       user_id='${this.userId}'
-       `
+       owner_id_id='${this.ownerId}'
+       and owner_type='user'
+              `
     let preq = `
       select
         id id,
@@ -68,7 +110,8 @@ class KanbearRights {
       from 
         projects_rights
       where
-       user_id='${this.userId}'
+       owner_id='${this.ownerId}'
+       and owner_type='user'
       `
     //    db.all(req, [], this.callAfterRights.bind(this));
     let wResp
@@ -93,8 +136,8 @@ class KanbearRights {
     pResp.forEach(element => {
       rights.data["projects"][element.project_id] = element.rights
     });
-    Konsol.log("KanbearRights.loadRights() over","<rights>",rights)
-    this.resp = rights["data"]??null
+    Konsol.log("KanbearRights.loadRights() over", "<rights>", rights)
+    this.resp = rights["data"] ?? null
   }
 
   //-----------------------------------------------------
@@ -103,7 +146,7 @@ class KanbearRights {
       this.loadRights()
     }
     return (this.resp)
-  } 
+  }
 
   //-----------------------------------------------------
   async isAllowed(kind, name) {

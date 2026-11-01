@@ -29,40 +29,22 @@ class UnifiedController {
                     "req.query=", req.query,
                     "kanbearKontext=", req.kanbearKontext
                 )
-
-                //console.log(req.kanbearKontext.decodedToken)
-                     
-                /*
-                let kanbearRights = new KanbearRights(req.kanbearKontext.decodedToken.userId)
-                req.kanbearKontext.kanbearRights=kanbearRights
-                // admin users have all rights
-                if (!kanbearRights.isAdmin) {
+                let token = req.kanbearKontext.decodedToken
+                if (token.isAdmin === 0) {
+                    Konsol.log("UnifiedController : not admin : checking rights")
                     let kanbearRightsChecker = KanbearRightsCheckerFactory.create(table, op)
                     if (kanbearRightsChecker !== null) {
                         //let isAllowed = true
-                        if (!kanbearRightsChecker.isAllowed(req,kanbearRights.load())) {
-                            Konsol.log(`UnifiedController ${op}_${table} error 403 kanbearRights=`, kanbearRights.load())
-                            res.status(403).json({ error: "Access denied" });
-                            return
-                        }
-                    }
-                } 
-                    */
-                   let token=req.kanbearKontext.decodedToken
-                   if (token.isAdmin === 0) {
-                    let kanbearRightsChecker = KanbearRightsCheckerFactory.create(table, op)
-                    if (kanbearRightsChecker !== null) {
-                        //let isAllowed = true
-                        if (!kanbearRightsChecker.isAllowed(req,token.rights)) {
+                        if (!kanbearRightsChecker.isAllowed(req, token.rights)) {
                             Konsol.log(`UnifiedController ${op}_${table} error 403 kanbearRights=`, token.rights)
                             res.status(403).json({ error: "Access denied" });
                             return
                         }
                     }
-                } 
-
-
-
+                } else {
+                    Konsol.log("UnifiedController : is admin")
+                }
+                Konsol.log("UnifiedController : calling ", UnifiedModel[op])
                 UnifiedModel[op](table, req, opParms, (err, httpCode, sqlRes) => {
                     Konsol.log(`UnifiedModel ${op}_${table}() callback function,'<err>`, err, '<sqlRes>', sqlRes)
                     if (err) {

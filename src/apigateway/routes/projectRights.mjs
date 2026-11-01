@@ -5,12 +5,13 @@ const router = express.Router();
 import { UnifiedController } from '../controllers/UnifiedController.mjs';
 
 
-router.post('/', UnifiedController.getFunction('projects_rights','create'))
-router.get('/', UnifiedController.getFunction('projects_rights','getAll'))
-router.get('/:id', UnifiedController.getFunction('projects_rights','getById'))
-router.get('/user/:user_id', UnifiedController.getFunction('projects_rights','getProjectsRightsByUserid'))
-router.patch('/:id', UnifiedController.getFunction('projects_rights','patch'))
-router.delete('/:id', UnifiedController.getFunction('projects_rights','delete'))
+router.post('/', UnifiedController.getFunction('rights','create'))
+router.get('/', UnifiedController.getFunction('rights','getAll'))
+router.get('/:id', UnifiedController.getFunction('rights','getById'))
+router.get('/user/:owner_id', UnifiedController.getFunction('rights','getRightsByUserid'))
+router.get('/group/:owner_id', UnifiedController.getFunction('rights','getRightsByGroupid'))
+router.patch('/:id', UnifiedController.getFunction('rights','patch'))
+router.delete('/:id', UnifiedController.getFunction('rights','delete'))
 
 
 export default router

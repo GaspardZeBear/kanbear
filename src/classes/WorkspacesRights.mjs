@@ -14,7 +14,7 @@ class WorkspacesRights extends KanbearEntity {
     async getByUserId() {
         console.log("WorkspacesRights.getByUserId())")
         let params={}
-        const resp = await new ApiCaller().get(`/api/workspaces_rights/user/${this.userId}`, params)
+        const resp = await new ApiCaller().get(`/api/rights/user/${this.userId}`, params)
         console.log("WorkspacesRights.getByUserId())", resp.data)
         return (resp.data)
     }

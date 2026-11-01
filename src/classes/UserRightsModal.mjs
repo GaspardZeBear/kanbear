@@ -8,15 +8,40 @@ import { sendEvent } from '../utils/sendEvent.mjs'
 import { formatDuration, dateToString, getDurationFromNow } from "../utils/dateAndTime.mjs";
 import { selectBoxBuilder } from '../utils/selectBoxBuilder.mjs';
 import { buildAddProjectsRightsButton, buildAddWorkspacesRightsButton } from '../utils/buttonBuilder.mjs'
+import { RightsModal } from './RightsModal.mjs'
 
 // Rights flags
+/*
 const REFERENCEFLAG = 4
 const READFLAG = 2
 const WRITEFLAG = 1
 const DELETEFLAG = 8
 const ISADMINFLAG = 16
+*/
 
-class UserRightsModal {
+class UserRightsModal extends RightsModal{
+
+  //------------------------------------------------------------------------
+  constructor(userId, userName) {
+    super(userId,userName)
+  }
+
+  //-----------------------------------------------------------------------------
+  async getRightsList() {
+    const projectsRightsEntity = new ProjectsRights({ ownerId: this.ownerId })
+    let rightsList = await projectsRightsEntity.getByUserId()
+    return(rightsList)
+  }
+
+    //------------------------------------------------------------------------
+  getItemId(kind, action, id) {
+    return (`${kind}:${id}:rights:${action}`)
+  }
+
+
+}
+
+class XUserRightsModal {
 
 
   //------------------------------------------------------------------------
@@ -49,8 +74,9 @@ class UserRightsModal {
       this.workspacesHash[w.id] = w
     })
     this.projects = await Project.getAll('projects', {})
-    result.appendChild(await this.renderProjects())
+
     result.appendChild(await this.renderWorkspaces())
+    result.appendChild(await this.renderProjects())
   }
 
   //-----------------------------------------------------------------
@@ -187,7 +213,7 @@ class UserRightsModal {
     let checkboxes = []
     let projects = []
     this.projects.forEach((p) => {
-      p.name = `${this.workspacesHash[p.workspace_id].name}/${p.name}`
+      p.name = `${this.workspacesHash[p.workspace_id].name}/${p.name}/#${p.id}`
       projects.push(p)
     })
     let boxParams = {

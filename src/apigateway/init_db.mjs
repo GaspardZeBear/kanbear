@@ -42,26 +42,41 @@ import bcrypt from 'bcrypt'
   db.exec(`
     CREATE TABLE IF NOT EXISTS projects_rights (
       id INTEGER PRIMARY KEY,
-      user_id INTEGER NOT NULL DEFAULT 0,
+      owner_type TEXT,
+      owner_id INTEGER NOT NULL DEFAULT 0,
       project_id INTEGER NOT NULL DEFAULT 0,
       rights INTEGER NOT NULL DEFAULT 0,
-      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET DEFAULT
       FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE SET DEFAULT,
-      UNIQUE(project_id, user_id)
+      UNIQUE(project_id, owner_type, owner_id)
     )
   `);
+  //-- FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET DEFAULT
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS workspaces_rights (
       id INTEGER PRIMARY KEY,
-      user_id INTEGER NOT NULL DEFAULT 0,
+      owner_type TEXT,
+      owner_id INTEGER NOT NULL DEFAULT 0,
       workspace_id INTEGER NOT NULL DEFAULT 0,
       rights INTEGER NOT NULL DEFAULT 0,
-      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET DEFAULT
       FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE SET DEFAULT,
-      UNIQUE(workspace_id, user_id)
+      UNIQUE(workspace_id, owner_type, owner_id)
     )
   `);
+//FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET DEFAULT
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS rights (
+      id INTEGER PRIMARY KEY,
+      owner_type TEXT,
+      owner_id INTEGER NOT NULL DEFAULT 0,
+      target_kind TEXT,
+      target_id INTEGER NOT NULL DEFAULT 0,
+      rights INTEGER NOT NULL DEFAULT 0,
+      UNIQUE(target_id, owner_type, owner_id)
+    )
+  `);
+
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS swimlanes (
