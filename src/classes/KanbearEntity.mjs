@@ -12,6 +12,7 @@ class KanbearEntity {
         "tasksComments": "tasks_comment",
         "projectsRights": "projects_right",
         "workspacesRights": "workspaces_right",
+        "rights": "right",
         
      }
 

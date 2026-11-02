@@ -32,6 +32,8 @@ class UnifiedModel {
         UnifiedModel.UnifiedModelOp['getProjectsRightsByGroupid'] = UnifiedModel.getProjectsRightsByGroupid
         UnifiedModel.UnifiedModelOp['getWorkspacesRightsByUserid'] = UnifiedModel.getWorkspacesRightsByUserid
         UnifiedModel.UnifiedModelOp['getWorkspacesRightsByGroupid'] = UnifiedModel.getWorkspacesRightsByGroupid
+        UnifiedModel.UnifiedModelOp['getRightsByUserid'] = UnifiedModel.getRightsByUserid
+        UnifiedModel.UnifiedModelOp['getRightsByGroupid'] = UnifiedModel.getRightsByGroupid
         UnifiedModel.UnifiedModelOp['getRightsForUser'] = UnifiedModel.getRightsForUser
         UnifiedModel.UnifiedModelOp['update'] = UnifiedModel.update
         UnifiedModel.UnifiedModelOp['patch'] = UnifiedModel.patch
@@ -124,6 +126,43 @@ class UnifiedModel {
         db.all(sql, [], (err, httpCode, res) => {
             callback(null, 200, res)
         });
+    }
+
+    //------------------------------------------------------------------
+    static getRightsByUserid(table, req, opParms, callback) {
+        Konsol.log("UnifiedModel.getRightsByUserid()", "<params>", req.params)
+        Konsol.log("UnifiedModel.getRightsByUserid()", "<body>", req.body)
+        const sql0 = `SELECT r.id id,
+                            r.owner_id owner_id,
+                            r.owner_type owner_type,
+                            r.target_id target_id,
+                            r.target_kind target_kind,
+                            r.rights rights,
+                            w.name workspace_name
+                        FROM rights as r
+                        LEFT JOIN workspaces as w
+                            on w.id=r.target_id
+                            LEFT JOIN projects as p
+                            on p.id=r.target_id
+                        WHERE r.owner_id = ${req.params["owner_id"]}
+                        AND r.owner_type = 'user'
+        `
+       const sql = ` SELECT r.*, p.name AS target_name
+             FROM rights r JOIN projects   p ON p.id = r.target_id
+             WHERE r.target_kind = 'project'
+           UNION ALL
+           SELECT r.*, w.name AS target_name
+             FROM rights r JOIN workspaces w ON w.id = r.target_id
+            WHERE r.target_kind = 'workspace';
+                    `
+        Konsol.log("UnifiedModel.getRightsByUserid()", "<sql>", sql)
+        db.all(sql, [], (err, httpCode, res) => {
+            callback(null, 200, res)
+        });
+
+
+
+        //db.run(sql, [], callback)
     }
 
     //------------------------------------------------------------------

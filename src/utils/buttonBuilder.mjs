@@ -6,6 +6,7 @@ import { ColumnDialog } from "../classes/ColumnDialog.mjs"
 import { TaskDialog } from "../classes/TaskDialog.mjs"
 import { Task } from "../classes/Task.mjs"
 import { ProjectsRights } from "../classes/ProjectsRights.mjs"
+import { Rights } from "../classes/Rights.mjs"
 import { WorkspacesRights } from "../classes/WorkspacesRights.mjs"
 import { sendEvent } from "./sendEvent.mjs"
 import { Kontext } from "../classes/Kontext.mjs"
@@ -101,6 +102,43 @@ function buildAddProjectButton(workspaceId) {
 
 
 //------------------------------------------------------------------------
+function buildAddRightsButton(boxId, params, once = false) {
+  console.log("buildAddRightsButton event Listener fired", "params", params)
+  const addRightsButton = document.createElement('button')
+  const buttonIds={
+    'project' : 'AddProjectsRightsButton',
+    'workspace' : 'AddWorkspacesRightsButton'
+  }
+  const selectIds={
+    'project' : 'AddProjectsRightsButton',
+    'workspace' : 'AddWorkspacesRightsButton'
+  }
+  addRightsButton.setAttribute("id", buttonIds[params.targetKind])
+  addRightsButton.innerHTML = "+R"
+  let addRightsFn = function (ev) {
+    console.log("addRightsButton event Listener fired", ev.target)
+    //let el = document.getElementById(`kanbear${params.targetKind}RightsSelectBox`)
+    //console.log("addRightsButton event Listener fired, selected", el.value)
+    ev.stopPropagation();
+    let targetId = parseInt(document.getElementById(boxId).value)
+    if (targetId > 0) {
+      const rights = new Rights({})
+      rights.setData("target_id", targetId)
+      rights.setData("target_kind", params.targetKind)
+      rights.setData("owner_id", params.ownerId)
+      rights.setData("owner_type", params.ownerType)
+      rights.create();
+      sendEvent(`${params.targetKind}RightsCreated`, {})
+    } else {
+      alert(`Select a  ${params.targetKind} to add to ${params.targetKind}s`)
+    }
+  }
+  //removeEventListener("click", addSwimlaneFn)
+  addRightsButton.addEventListener('click', addRightsFn, { once: true });
+  return (addRightsButton)
+}
+
+//------------------------------------------------------------------------
 function buildAddProjectsRightsButton(boxId, userId, once = false) {
   console.log("buildAddProjectsRightsButton event Listener fired", "userId", userId)
   const addProjectsRightsButton = document.createElement('button')
@@ -114,10 +152,15 @@ function buildAddProjectsRightsButton(boxId, userId, once = false) {
     ev.stopPropagation();
     let projectId = parseInt(document.getElementById(boxId).value)
     if (projectId > 0) {
-      const projectsRights = new ProjectsRights('projectsRights', {})
+      const projectsRights = new Rights({})
       projectsRights.setData("project_id", projectId)
       projectsRights.setData("user_id", userId)
       projectsRights.create()
+
+      projectsRights.setData("target_id", workspaceId)
+      projectsRights.setData("target_kind", "project")
+      projectsRights.setData("owner_id", userId)
+      projectsRights.setData("owner_type", "user")
       //projectsRights.create();
       sendEvent('projectsRightsCreated', {})
     } else {
@@ -144,9 +187,11 @@ function buildAddWorkspacesRightsButton(boxId, userId, once = false) {
     ev.stopPropagation();
     let workspaceId = parseInt(document.getElementById(boxId).value)
     if (workspaceId > 0) {
-      const workspacesRights = new WorkspacesRights('workspacesRights', {})
-      workspacesRights.setData("workspace_id", workspaceId)
-      workspacesRights.setData("user_id", userId)
+      const workspacesRights = new Rights({})
+      workspacesRights.setData("target_id", workspaceId)
+      workspacesRights.setData("target_kind", "workspace")
+      workspacesRights.setData("owner_id", userId)
+      workspacesRights.setData("owner_type", "user")
       workspacesRights.create()
       //projectsRights.create();
       sendEvent('workspacesRightsCreated', {})
@@ -363,8 +408,9 @@ export {
   XbuildDeleteTaskButton,
   buildDeleteEntityButton,
   buildAddProjectButton,
-  buildAddProjectsRightsButton,
-  buildAddWorkspacesRightsButton,
+  //buildAddProjectsRightsButton,
+  //buildAddWorkspacesRightsButton,
+  buildAddRightsButton,
   buildAddWorkspaceButton,
   buildAddDummyButton,
   buildAddNoteButton,

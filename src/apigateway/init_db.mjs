@@ -73,7 +73,7 @@ import bcrypt from 'bcrypt'
       target_kind TEXT,
       target_id INTEGER NOT NULL DEFAULT 0,
       rights INTEGER NOT NULL DEFAULT 0,
-      UNIQUE(target_id, owner_type, owner_id)
+      UNIQUE(target_kind,target_id, owner_type, owner_id)
     )
   `);
 

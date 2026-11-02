@@ -5,7 +5,7 @@ import { ColumnDialog } from '../classes/ColumnDialog.mjs'
 import { WorkspaceDialog } from '../classes/WorkspaceDialog.mjs'
 import { AssigneeDialog } from '../classes/AssigneeDialog.mjs'
 import { TasksCommentsModal } from '../classes/TasksCommentsModal.mjs'
-import { UserRightsModal } from '../classes/UserRightsModal.mjs'
+import { RightsModal } from '../classes/RightsModal.mjs'
 import { UserDialog } from '../classes/UserDialog.mjs'
 
 class LinkCounter {
@@ -139,7 +139,7 @@ class LinkCounter {
       console.log("editUserHref event Listener fired ")
       ev.stopPropagation();
       //const userRights = new UserDialog()
-      let modal=new UserRightsModal(userId,userName)
+      let modal=new RightsModal('user',userId,userName)
       //userRights.modify({userId:uId});
     }
     href.addEventListener('click', editUserRightsFn, { once: false });
