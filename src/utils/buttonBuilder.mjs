@@ -134,77 +134,9 @@ function buildAddRightsButton(boxId, params, once = false) {
     }
   }
   //removeEventListener("click", addSwimlaneFn)
-  addRightsButton.addEventListener('click', addRightsFn, { once: true });
+  addRightsButton.addEventListener('click', addRightsFn, { once: once });
   return (addRightsButton)
 }
-
-//------------------------------------------------------------------------
-function buildAddProjectsRightsButton(boxId, userId, once = false) {
-  console.log("buildAddProjectsRightsButton event Listener fired", "userId", userId)
-  const addProjectsRightsButton = document.createElement('button')
-  addProjectsRightsButton.classList.add("add-item-btn")
-  addProjectsRightsButton.setAttribute("id", "addProjectsRightsButton")
-  addProjectsRightsButton.innerHTML = "+R"
-  let addProjectsRightsFn = function (ev) {
-    console.log("addProjectsRightsButton event Listener fired", ev.target)
-    let el = document.getElementById("kanbearProjectsRightsSelectBox")
-    console.log("addProjectsRightsButton event Listener fired, selected", el.value)
-    ev.stopPropagation();
-    let projectId = parseInt(document.getElementById(boxId).value)
-    if (projectId > 0) {
-      const projectsRights = new Rights({})
-      projectsRights.setData("project_id", projectId)
-      projectsRights.setData("user_id", userId)
-      projectsRights.create()
-
-      projectsRights.setData("target_id", workspaceId)
-      projectsRights.setData("target_kind", "project")
-      projectsRights.setData("owner_id", userId)
-      projectsRights.setData("owner_type", "user")
-      //projectsRights.create();
-      sendEvent('projectsRightsCreated', {})
-    } else {
-      alert("Select a project to add user to")
-    }
-  }
-  //removeEventListener("click", addSwimlaneFn)
-  addProjectsRightsButton.addEventListener('click', addProjectsRightsFn, { once: once });
-  return (addProjectsRightsButton)
-}
-
-
-//------------------------------------------------------------------------
-function buildAddWorkspacesRightsButton(boxId, userId, once = false) {
-  console.log("buildAddWorkspacesRightsButton event Listener fired", "userId", userId)
-  const addWorkspacesRightsButton = document.createElement('button')
-  addWorkspacesRightsButton.classList.add("add-item-btn")
-  addWorkspacesRightsButton.setAttribute("id", "addWorkspacesRightsButton")
-  addWorkspacesRightsButton.innerHTML = "+R"
-  let addWorkspacesRightsFn = function (ev) {
-    console.log("addWorkspacesRightsButton event Listener fired", ev.target)
-    let el = document.getElementById("kanbearWorkspacesRightsSelectBox")
-    console.log("addWorkspacesRightsButton event Listener fired, selected", el.value)
-    ev.stopPropagation();
-    let workspaceId = parseInt(document.getElementById(boxId).value)
-    if (workspaceId > 0) {
-      const workspacesRights = new Rights({})
-      workspacesRights.setData("target_id", workspaceId)
-      workspacesRights.setData("target_kind", "workspace")
-      workspacesRights.setData("owner_id", userId)
-      workspacesRights.setData("owner_type", "user")
-      workspacesRights.create()
-      //projectsRights.create();
-      sendEvent('workspacesRightsCreated', {})
-    } else {
-      alert("Select a workspaces to add user to")
-    }
-  }
-  //removeEventListener("click", addSwimlaneFn)
-  addWorkspacesRightsButton.addEventListener('click', addWorkspacesRightsFn, { once: once });
-  return (addWorkspacesRightsButton)
-}
-
-
 
 //------------------------------------------------------------------------
 function buildAddWorkspaceButton() {
@@ -239,32 +171,6 @@ function buildAddDummyButton(parms = { inner: "?", alert: "Message" }) {
   }
   addDummyButton.addEventListener('click', addDummyFn, { once: false });
   return (addDummyButton)
-}
-
-//------------------------------------------------------------------------
-function XbuildDeleteTaskButton(taskId, taskEntity, disabled, callback) {
-  const deleteTaskButton = document.createElement('button')
-  deleteTaskButton.classList.add("del-item-btn")
-  deleteTaskButton.setAttribute("id", `deleteTaskButton-${taskId}`)
-  deleteTaskButton.setAttribute("title", `delete task`)
-  //deleteTaskButton.innerHTML = "\u{1F6AE}"
-  deleteTaskButton.innerHTML = "X"
-  //deleteTaskButton.innerHTML = parms?.inner || "inner"
-  if (disabled) {
-    deleteTaskButton.setAttribute("disabled", true)
-  }
-  let deleteTaskFn = function (ev) {
-    console.log("deleteTaskButton event Listener fired")
-    ev.stopPropagation();
-    //if (confirm(`Confirm task ${taskId} ${taskEntity.task.name} delete`)) {
-    //taskEntity.delete()
-    callback(confirm(`Confirm task ${taskId} ${taskEntity.task.name} delete`))
-    //} else {
-    //  callback(false)
-    //}
-  }
-  deleteTaskButton.addEventListener('click', deleteTaskFn, { once: false });
-  return (deleteTaskButton)
 }
 
 //------------------------------------------------------------------------
@@ -405,11 +311,8 @@ export {
   buildAddColumnButton,
   buildAddSwimlaneButton,
   buildAddTaskButton,
-  XbuildDeleteTaskButton,
   buildDeleteEntityButton,
   buildAddProjectButton,
-  //buildAddProjectsRightsButton,
-  //buildAddWorkspacesRightsButton,
   buildAddRightsButton,
   buildAddWorkspaceButton,
   buildAddDummyButton,

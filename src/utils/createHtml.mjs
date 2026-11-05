@@ -160,31 +160,6 @@ async function buildKanbearProjectsSelectBox() {
 //---------------------------------------------------------------------------------
 async function buildWorkspacesSelectBox() {
 
-    /*
-    let wss0
-    let wss = []
-
-    
-    let retries = 10
-    while (!Array.isArray(wss0)) {
-        try {
-            wss0 = await Workspace.getAll('workspaces')
-            console.log("buildWorkspacesSelectBox() ", "retries", retries, "wss0", wss0)
-            retries--
-            if (retries == 0) {
-                // throw("Workspaces list not avalailable")
-                wss0 = []
-            }
-        } catch (err) {
-            console.log("buildWorkspacesSelectBox() error", err.cause)
-            document.getElementById("message").innerHTML = "Cannot get workspace list (is back launched ?)"
-            setTimeout(function () {
-                location.reload();
-            }, 30000);
-        }
-    }
-        */
-
     let wss0 = []
     try {
         wss0 = await Workspace.getAll('workspaces')
