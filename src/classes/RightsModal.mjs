@@ -52,9 +52,9 @@ class RightsModal {
     //await this.renderTree()
     //rights, users, groups, workspaces, projects) {
     let rightsTree = await this.buildRightsTreeMistral(this.rights, this.users, [], this.workspaces, this.projects)
-    let tree =await this.renderTreeMistral(rightsTree)
-    console.log("tree",rightsTree)
-       
+    let tree = await this.renderTreeMistral(rightsTree)
+    console.log("tree", tree)
+
     document.getElementById(this.htmlElement).replaceChildren(createElement("div", {
       style: "display : flex ;",
       children: [workspaceDiv, userDiv, filterRightsButton, createRightsButton]
@@ -160,129 +160,52 @@ class RightsModal {
   // ...
 ]
   */
+  //-----------------------------------------------------------------------------------------
   async renderTreeMistral(tree) {
-    let content= tree.map(w => `
-    <div class="workspace">
-      <h2>🗂 ${w.name}</h2>
-      <div>👤 ${w.users.map(u => `${u.name} (${u.rights})`).join(', ') || '—'}</div>
-      <div>👥 ${w.groups.map(g => `${g.name} (${g.rights})`).join(', ') || '—'}</div>
-      ${w.projects.map(p => `
-        <div class="project">
-          <h3>📁 ${p.name}</h3>
-          <div>👤 ${p.users.map(u => `${u.name} (${u.rights})`).join(', ') || '—'}</div>
-          <div>👥 ${p.groups.map(g => `${g.name} (${g.rights})`).join(', ') || '—'}</div>
-        </div>`).join('')}
-    </div>`).join('');
-    return(createElement("div",{
-      innerHTML:content
+    let wDivs = []
+    for (let w of tree) {
+      let wDiv = []
+      for (let g of w.groups) {
+        let gDiv = createElement('div', {
+          textContent: `${g.name} ${g.rights}`
+        })
+        wDiv.push(gDiv)
+      }
+
+      for (let u of w.users) {
+        let uDiv = createElement('div', {
+          textContent: `${u.name} ${u.rights}`
+        })
+        wDiv.push(uDiv)
+      }
+
+      for (let p of w.projects) {
+        for (let g of w.groups) {
+          let gDiv = createElement('div', {
+            textContent: `${p.name} ${g.name} ${g.rights}`
+          })
+          wDiv.push(gDiv)
+        }
+
+        for (let u of w.users) {
+          let uDiv = createElement('div', {
+            textContent: `${p.name} ${u.name} ${u.rights}`
+          })
+          wDiv.push(uDiv)
+        }
+        //wDivs.push(wDiv)
+
+      }
+      wDivs.push(createElement("div", {
+        textContent: `Workspace ${w.name}#${w.id}`,
+        children: wDiv
+      }))
+    }
+
+    return (createElement("div", {
+      textContent: `xxxx`,
+      children: wDivs
     }))
-  }
-
-  //-------------------------------------------------------------------------
-  async buildRightsTree() {
-    
-    console.log("RightsModal buildRightsTree() this.rights ", this.rights)
-    this.workspacesWithRights = this.rights.filter((r) => r.target_kind === 'workspace')
-    this.rightsTree = {}
-    for (let w of this.workspacesWithRights) {
-      if (!this.rightsTree[w.target_id]) {
-        this.rightsTree[w.target_id] = { id: w.id, projects: {}, users: [], groups: [] }
-      }
-    }
-
-    let wsStruct = {}
-    let prStruct = {}
-    for (let r of this.rights) {
-      console.log("RightsModal buildRightsTree() r ", r)
-      switch (r.target_kind) {
-        case 'workspace':
-          if (!wsStruct[r.target_id]) {
-            wsStruct[r.target_id] = { project: {}, user: {}, group: {} }
-          }
-          wsStruct[r.target_id][r.owner_type][r.id] = r
-          break
-        case 'project':
-          if (!prStruct[r.target_id]) {
-            prStruct[r.target_id] = { user: {}, group: {} }
-          }
-          prStruct[r.target_id][r.owner_type][r.id] = r
-          let wsId = this.projectsHash[r.target_id].id
-          wsStruct[wsId].project[r.target_id] = prStruct[r.target_id][r.owner_type][r.id]
-          break
-      }
-    }
-
-
-
-    console.log("RightsModal buildRightsTree() wsStruct ", wsStruct, prStruct)
-    /*
-    this.projectsWithRights = this.rights.filter((r) => r.target_kind === 'project')
-    console.log("RightsModal buildRightsTree() this.projectsWithRights ", this.projectsWithRights)
-    for (let p of this.projectsWithRights) {
-      let wsId = this.projectsHash[p.target_id]["workspace_id"]
-      console.log("RightsModal buildRightsTree() wsId ", wsId, this.rightsTree[wsId])
-      this.rightsTree[wsId]["projects"].push(p)
-    }
-    
-    for (let r of this.rights) {
-      console.log("RightsModal buildRightsTree() r ", r)
-      switch (r.target_kind) {
-        case 'workspace':
-          this.rightsTree[r.target_id][`${r.owner_type}s`].push(r)
-          break
-        case 'project':
-          // find l'id du workspace du project
-          console.log("RightsModal buildRightsTree() this.projectsHash ", this.projectsHash)
-          let wsId = this.projectsHash[r.target_id].id
-          if (!this.rightsTree[wsId].projects[r.target_id]) {
-            this.rightsTree[wsId].projects[r.target_id] = { id: r.target_id, users: [], groups: [] }
-          }
-
-          this.rightsTree[wsId].projects.push(r)
-          break
-        default:
-          break
-      }
-    }
-      */
-    this.rightsTree = wsStruct
-
-    console.log("RightsModal buildRightsTree() this.rightsTree ", this.rightsTree)
-  }
-
-  //---------------------------------------------------------------------------------
-  async renderTree() {
-    let wsDivs = []
-    Object.keys(this.rightsTree).forEach((ws) => {
-      console.log("ws", ws)
-      let wuDivs = []
-      Object.keys(this.rightsTree[ws].user).forEach(([k, u]) => {
-        console.log("u", u)
-        let uDiv = createElement("div", {
-          textContent: `${u.owner_type} ${u.owner_id}# ${u.target_kind} ${u.target_id}`
-        })
-        wuDivs.push(uDiv)
-      })
-      let wpDivs = []
-      Object.keys(this.rightsTree[ws].project).forEach(([k, p]) => {
-        console.log("p", p)
-        let pDiv = createElement("div", {
-          textContent: `${this.projectsHash[p].name}#${p.id}`
-        })
-        wpDivs.push(pDiv)
-      })
-      let wsDiv = createElement('div', {
-        //textContent: `${this.workspacesHash[ws.target_id].name}#${ws.target_id}`,
-        children: [wuDivs, wpDivs]
-      })
-      wsDivs.push(wsDiv)
-    })
-
-
-    let all = createElement("div", {
-      children: wsDivs
-    })
-
   }
 
 
