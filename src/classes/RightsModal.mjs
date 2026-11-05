@@ -34,10 +34,12 @@ class RightsModal {
 
   //-------------------------------------------------------------------------
   async render() {
-    this.rights = await Rights.getAll('rights')
+
+    await this.loadRights()
     await this.loadWorkspaces()
     await this.loadProjects()
     await this.loadUsers()
+    console.log("render() workspaces", this.workspaces)
     let workspaceDiv = await this.buildWorkspaceSelectBox()
     let userDiv = await this.buildUserSelectBox()
     let createRightsButton = createElement("Button", {
@@ -51,8 +53,10 @@ class RightsModal {
     //await this.buildRightsTree()
     //await this.renderTree()
     //rights, users, groups, workspaces, projects) {
-    let rightsTree = await this.buildRightsTreeMistral(this.rights, this.users, [], this.workspaces, this.projects)
-    let tree = await this.renderTreeMistral(rightsTree)
+    let rightsTree = this.buildRightsTreeMistral(this.rights, this.users, [], this.workspaces, this.projects)
+    console.log("render() rightsTree", rightsTree)
+    let tree = this.renderTreeMistral(rightsTree)
+    let treeAsTable = this.NrenderTreeMistral(rightsTree)
     console.log("tree", tree)
 
     document.getElementById(this.htmlElement).replaceChildren(createElement("div", {
@@ -60,6 +64,7 @@ class RightsModal {
       children: [workspaceDiv, userDiv, filterRightsButton, createRightsButton]
     }))
     document.getElementById(this.htmlElement).appendChild(tree)
+    document.getElementById(this.htmlElement).appendChild(treeAsTable)
 
   }
 
@@ -67,6 +72,7 @@ class RightsModal {
   //-------------------------------------------------------------------------
   async loadWorkspaces() {
     this.workspaces = await Workspace.getAll('workspaces')
+    console.log("loadWorkspaces() workspaces", this.workspaces)
     this.workspacesHash = {}
     this.workspaces.forEach((w) => {
       this.workspacesHash[w.id] = w
@@ -92,9 +98,19 @@ class RightsModal {
     })
   }
 
+  //-------------------------------------------------------------------------
+
+  async loadRights() {
+    this.rights = await Rights.getAll('rights')
+    this.rightsHash = {}
+    this.rights.forEach((r) => {
+      this.rightsHash[r.id] = r
+    })
+  }
+
 
   //-------------------------------------------------------------------------
-  async buildRightsTreeMistral(rights, users, groups, workspaces, projects) {
+  buildRightsTreeMistral(rights, users, groups, workspaces, projects) {
     const usersById = new Map(users.map(u => [u.id, u]));
     const groupsById = new Map(groups.map(g => [g.id, g]));
 
@@ -118,22 +134,33 @@ class RightsModal {
       });
     }
 
+
+
     // 2. index target_id → node pour ranger les droits en O(1)
     const targetIndex = new Map(); // "kind:id" → node
     for (const w of workspaceNodes.values()) {
       targetIndex.set(`workspace:${w.id}`, w);
-      for (const p of w.projects.values()) targetIndex.set(`project:${p.id}`, p);
+      for (const p of w.projects.values()) {
+        targetIndex.set(`project:${p.id}`, p);
+      }
     }
+    console.log("buildRightsTreeMistral() targetIndex", targetIndex)
 
     // 3. Répartition des droits
+    console.log("buildRightsTreeMistral() rights", rights)
     for (const r of rights) {
-      const node = targetIndex.get(`${r.target_kind}:${r.target_id}`);
+      console.log("buildRightsTreeMistral() right", r)
+      const key = `${r.target_kind}:${r.target_id}`
+      const node = targetIndex.get(key);
+      console.log("buildRightsTreeMistral() right", r, "key", key, "node", node)
       if (!node) continue; // cible inconnue/supprimée → ligne ignorée (ou logger)
 
       const list = r.owner_type === 'user' ? node.users : node.groups;
-      list.push({ ...ownerRef(r.owner_type, r.owner_id), rights: r.rights });
+
+      list.push({ ...ownerRef(r.owner_type, r.owner_id), rightsId: r.id });
     }
 
+    console.log("buildRightsTreeMistral() workspaceNodes ", workspaceNodes)
     // 4. Map → Array
     return [...workspaceNodes.values()].map(w => ({
       ...w,
@@ -146,13 +173,13 @@ class RightsModal {
   [
   {
     id: 101, name: "Workspace Kanbear",
-    users:  [ { id: 1, name: "Gaspard", rights: 18 } ],
-    groups: [ { id: 10, name: "Équipe Design", rights: 2 } ],
+    users:  [ { id: 1, name: "Gaspard", rightsId: 1 } ],
+    groups: [ { id: 10, name: "Équipe Design", rightsId: 2 } ],
     projects: [
       {
         id: 201, name: "Site vitrine",
-        users:  [ { id: 1, name: "Gaspard", rights: 2 } ],
-        groups: [ { id: 11, name: "Dev Backend", rights: 18 } ],
+        users:  [ { id: 1, name: "Gaspard", rightsId: 3 } ],
+        groups: [ { id: 11, name: "Dev Backend", rightsId: 4 } ],
       },
       // ... autres projets sans droits : présents, listes vides
     ],
@@ -161,35 +188,35 @@ class RightsModal {
 ]
   */
   //-----------------------------------------------------------------------------------------
-  async renderTreeMistral(tree) {
+  renderTreeMistral(tree) {
     let wDivs = []
     for (let w of tree) {
       let wDiv = []
       for (let g of w.groups) {
         let gDiv = createElement('div', {
-          textContent: `${g.name} ${g.rights}`
+          textContent: `${g.name} ${g.rightsId}`
         })
         wDiv.push(gDiv)
       }
 
       for (let u of w.users) {
         let uDiv = createElement('div', {
-          textContent: `${u.name} ${u.rights}`
+          textContent: `${u.name} ${u.rightsId}`
         })
         wDiv.push(uDiv)
       }
 
       for (let p of w.projects) {
-        for (let g of w.groups) {
+        for (let g of p.groups) {
           let gDiv = createElement('div', {
-            textContent: `${p.name} ${g.name} ${g.rights}`
+            textContent: `${p.name} ${g.name} ${g.rightsId}`
           })
           wDiv.push(gDiv)
         }
 
-        for (let u of w.users) {
+        for (let u of p.users) {
           let uDiv = createElement('div', {
-            textContent: `${p.name} ${u.name} ${u.rights}`
+            textContent: `${p.name} ${u.name} ${u.rightsId}`
           })
           wDiv.push(uDiv)
         }
@@ -207,6 +234,131 @@ class RightsModal {
       children: wDivs
     }))
   }
+
+  //--------------------------------------------------------------------------------------------------------
+  NrenderTreeMistral(tree) {
+    let wDivs = []
+    for (let w of tree) {
+      let wDiv = []
+      wDiv.push(this.buidRightsTable(w.groups, w.users))
+      for (let p of w.projects) {
+        wDiv.push(this.buidRightsTable(p.groups, p.users))
+      }
+      wDivs.push(createElement("div", {
+        textContent: `Workspace ${w.name}#${w.id}`,
+        children: wDiv
+      }))
+    }
+
+    return (createElement("div", {
+      textContent: `xxxx`,
+      children: wDivs
+    }))
+  }
+
+  //----------------------------------------------------------------------------------------------------------
+  buidRightsTableHead() {
+    const thead = createElement('thead', {
+      children: [
+        createElement('tr', {
+          children: [
+            createElement('th', {}),
+            createElement('th', {}),
+            createElement('th', { innerHTML: 'RightsId' }),
+            createElement('th', { innerHTML: 'isAdmin' }),
+            createElement('th', { innerHTML: 'Delete' }),
+            createElement('th', { innerHTML: 'Reference' }),
+            createElement('th', { innerHTML: 'Read' }),
+            createElement('th', { innerHTML: 'Write' }),
+          ]
+        })
+      ]
+    })
+    return (thead)
+  }
+
+  //------------------------------------------------------------------------
+  //users:  [ { id: 1, name: "Gaspard", rightsId: 1 } ],
+  //  groups: [ { id: 10, name: "Équipe Design", rightsId: 2 } ],
+  buidRightsTable(groups, users) {
+
+    console.log("UserRightsModal.buildRightsTable()", "groups", groups, "users", users)
+    let table = document.createElement('table')
+    table.appendChild(this.buidRightsTableHead())
+    const tbody = document.createElement('tbody')
+
+
+    const td = (p) => {
+      const td = document.createElement('td')
+      td.innerHTML = p
+      return (td)
+    }
+    const tdHref = (href) => {
+      const td = document.createElement('td')
+      td.appendChild(href)
+      return (td)
+    }
+
+    //Object.entries(projectsRightsList).forEach((projectsRightsEntity) => {
+    users.forEach((user) => {
+      console.log("UserRightsModal.buildRightsTable() tr ", "user", user)
+      const row = document.createElement('tr');
+      let rightsId = `${user.rightsId}`
+      let hiddenRights = `<input type="hidden" class="hiddenRights" id="user:${rightsId}" value="${rightsId}">`
+      console.log("UserRightsModal.buildRightsTable() tr ", "id", rightsId, "rightsHash", this.rightsHash)
+      let rights = this.rightsHash[rightsId]
+      const lkinds = rights.target_kind
+      row.appendChild(td(""))
+      row.appendChild(td(""))
+      row.appendChild(td(`${rightsId} ${hiddenRights}`))
+      row.appendChild(td(`user ${user.name}#${user.id}`))
+      //row.appendChild(td(rights[`${lkind}_id`]))
+      //row.appendChild(td(rights[`${lkind}_name`]))
+      row.appendChild(td(rights[`target_id`]))
+      let isadminChecked = ((rights.rights & ISADMINFLAG) > 0) ? "checked" : ""
+      let deleteChecked = ((rights.rights & DELETEFLAG) > 0) ? "checked" : ""
+      let referenceChecked = ((rights.rights & REFERENCEFLAG) > 0) ? "checked" : ""
+      let readChecked = ((rights.rights & READFLAG) > 0) ? "checked" : ""
+      let writeChecked = ((rights.rights & WRITEFLAG) > 0) ? "checked" : ""
+      //let readId = `projectsRights_read_${rightId}`
+      let isadminId = this.getItemId(lkinds, 'isadmin', rightsId)
+      row.appendChild(td(`<input class="userRightsCheckbox"
+         type="checkbox"
+         name="${rights.rights}"
+         id="${isadminId}"
+         ${isadminChecked}/>`))
+      let deleteId = this.getItemId(lkinds, 'delete', rightsId)
+      row.appendChild(td(`<input class="userRightsCheckbox"
+         type="checkbox"
+         name="${rights.rights}"
+         id="${deleteId}"
+         ${deleteChecked}/>`))
+      let referenceId = this.getItemId(lkinds, 'reference', rightsId)
+      row.appendChild(td(`<input class="userRightsCheckbox"
+         type="checkbox"
+         name="${rights.rights}"
+         id="${referenceId}"
+         ${referenceChecked}/>`))
+      let readId = this.getItemId(lkinds, 'read', rightsId)
+      row.appendChild(td(`<input class="userRightsCheckbox"
+         type="checkbox"
+         name="${rights.rights}"
+         id="${readId}"
+         ${readChecked}/>`))
+      //let writeId = `projectsRights_write_${rightId}`
+      let writeId = this.getItemId(lkinds, 'write', rightsId)
+      row.appendChild(td(`<input class="userRightsCheckbox" 
+         type="checkbox"
+         id="${writeId}"
+         ${writeChecked}/>`))
+
+      tbody.appendChild(row);
+    }
+    );
+    table.appendChild(tbody)
+    return (table)
+  }
+
 
 
   //-------------------------------------------------------------------------
@@ -228,6 +380,7 @@ class RightsModal {
       //selectedOption: Kontext.getWorkspaceId()
       //headItems:[['* Create new workspace',-1]]
     }
+    console.log("RightsModal buildWorkspaceSelectBox() workspaces ", this.workspaces)
     let workspaceSelectBox = await selectBoxBuilder(workspaceBoxParams)
     let myThis = this
     workspaceSelectBox.addEventListener('change', async (e) => {
@@ -269,7 +422,7 @@ class RightsModal {
 
   //-------------------------------------------------------------------------
   async buildUserSelectBox() {
-    this.users = await User.getAll('users')
+    //this.users = await User.getAll('users')
     let addUserButton = createElement("Button", {
       textContent: "U",
       onclick: [() => { alert("click") }]
@@ -286,6 +439,7 @@ class RightsModal {
       //headItems:[['* Create new workspace',-1]]
     }
     let userSelectBox = await selectBoxBuilder(userBoxParams)
+
     let myThis = this
     userSelectBox.addEventListener('change', async (e) => {
       console.log("RightsModal render() user ", e.target.value)
@@ -296,40 +450,7 @@ class RightsModal {
 
   }
 
-  //-----------------------------------------------------------------
-  async Xrender() {
-    console.log("RightsModal render() fired")
-    const result = document.getElementById(this.htmlElement);
-    //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
 
-    let resultTitleRights = document.createElement('h3')
-    let exitRightsButton = this.buildExitRightsButton()
-    resultTitleRights.appendChild(exitRightsButton)
-    let saveRightsButton = this.buildSaveRightsButton()
-    resultTitleRights.appendChild(saveRightsButton)
-    result.replaceChildren(resultTitleRights)
-    console.log("RightsModal render() collecting workspaces")
-    this.workspaces = await Workspace.getAll('workspaces', {})
-    this.workspacesHash = {}
-    this.workspaces.forEach((w) => {
-      this.workspacesHash[w.id] = w
-    })
-    console.log("RightsModal render() workspaces collected")
-    console.log("RightsModal render() collecting projects")
-    this.projects = await Project.getAll('projects', {})
-    console.log("RightsModal render() projects collected")
-    this.projectsHash = {}
-    this.projects.forEach((p) => {
-      this.projectsHash[p.id] = p
-    })
-    console.log("RightsModal render() rendering workspaces")
-    result.appendChild(await this.renderWorkspaces())
-    console.log("RightsModal render() workspaces  rendered")
-
-    console.log("RightsModal render() rendering projects")
-    result.appendChild(await this.renderProjects())
-    console.log("RightsModal render() projects rendered")
-  }
 
   //-----------------------------------------------------------------------------
   async getRightsList(kind) {
@@ -338,43 +459,6 @@ class RightsModal {
     console.log("RightsModal this.getRightsList() ", rightsList)
     return (rightsList
       .filter((right) => right.target_kind === kind && right.owner_type === this.ownerType))
-  }
-
-  //-----------------------------------------------------------------
-  async renderProjects() {
-    let projectsDiv = document.createElement("div")
-    let titleprojectsRights = document.createElement('span')
-    titleprojectsRights.innerHTML = `Projects rights list for owner <b>${this.ownerName}</b> filtered by .....`
-    projectsDiv.replaceChildren(titleprojectsRights)
-
-    let projectsSelectBox = await this.buildProjectsSelectBox()
-    projectsDiv.appendChild(projectsSelectBox)
-
-    //const projectsRightsEntity = new ProjectsRights({ ownerId: this.ownerId })
-    //let rightsList = await projectsRightsEntity.getByUserId()
-
-    let rightsList = await this.getRightsList('project')
-    let projectsTable = await this.createTable('Projects', rightsList)
-    projectsDiv.appendChild(projectsTable)
-    return (projectsDiv)
-  }
-
-  //-----------------------------------------------------------------
-  async renderWorkspaces() {
-    let workspacesDiv = document.createElement("div")
-    let titleWorkspacesRights = document.createElement('span')
-    titleWorkspacesRights.innerHTML = `Workspaces rights list for owner <b>${this.ownerName}</b> filtered by .....`
-    workspacesDiv.replaceChildren(titleWorkspacesRights)
-
-    let workspacesSelectBox = await this.buildWorkspacesSelectBox()
-    workspacesDiv.appendChild(workspacesSelectBox)
-
-    //const workspacesRightsEntity = new Rights({ ownerId: this.ownerId })
-    //let rightsList = await workspacesRightsEntity.getByUserId()
-    let rightsList = await this.getRightsList('workspace')
-    let workspacesTable = await this.createTable('Workspaces', rightsList)
-    workspacesDiv.appendChild(workspacesTable)
-    return (workspacesDiv)
   }
 
   //---------------------------------------------------------------------
@@ -534,119 +618,6 @@ class RightsModal {
     return (`${wsName}/${this.projectsHash[projectId].name}/${this.projectsHash[projectId].workspace_id}`)
   }
 
-  //------------------------------------------------------------------------
-  async createTable(kind, rightsList) {
-    const lkinds = kind[0].toLowerCase() + kind.slice(1)
-    const lkind = lkinds.slice(0, -1)
-
-    console.log("UserRightsModal.createTable()", "kind", kind, "<rightsList>", rightsList)
-    let table = document.createElement('table')
-    const thead = document.createElement('thead')
-    const hrow = document.createElement('tr')
-    hrow.innerHTML = `
-        <th>RightsId</th>
-        <th>Kind</th>
-        <th>${kind}Id</th>
-        <th>${kind}Name</th>
-        <th>isAdmin</th>
-        <th>Delete</th>
-        <th>Reference</th>
-        <th>Read</th>
-        <th>Write</th>
-      `
-    thead.appendChild(hrow)
-    table.appendChild(thead)
-    const tbody = document.createElement('tbody')
-
-
-    const td = (p) => {
-      const td = document.createElement('td')
-      td.innerHTML = p
-      return (td)
-    }
-    const tdHref = (href) => {
-      const td = document.createElement('td')
-      td.appendChild(href)
-      return (td)
-    }
-
-    //Object.entries(projectsRightsList).forEach((projectsRightsEntity) => {
-    Object.entries(rightsList).forEach((rightsItem) => {
-      const rights = rightsItem[1]
-      console.log("KanbearRightsPanel.createTable() <Rights>", rights)
-      const row = document.createElement('tr');
-
-      let kId = rights[`${lkind}_id`]
-      let rightId = `${rights.id}:${kId}:${rights.user_id}`
-      let hiddenRights = `<input type="hidden" class="hiddenRights" id="${lkinds}:${rightId}:rights" value="${rights.rights}">`
-      row.appendChild(td(`${rights.id} ${hiddenRights}`))
-      row.appendChild(td(kind))
-      //row.appendChild(td(rights[`${lkind}_id`]))
-      //row.appendChild(td(rights[`${lkind}_name`]))
-      row.appendChild(td(rights[`target_id`]))
-      switch (rights.target_kind) {
-        case 'workspace':
-          row.appendChild(td(rights[`target_name`]))
-          break
-        case 'project':
-          /*
-          let wsName
-          try {
-            wsName = this.workspacesHash[this.projectsHash[rights.target_id].workspace_id].name ?? "unknown wsName"
-          } catch (error) {
-            console.log("RightsModal hash ", this.workspacesHash, " target ", rights.target_id)
-          }
-          let fqn = `${wsName}/${rights.target_name}/${this.projectsHash[rights.target_id].workspace_id}`
-          */
-          row.appendChild(td(this.getFullProjectName(rights.target_id)))
-          break
-        default:
-          row.appendChild(td("Bad kind"))
-          break
-      }
-      let isadminChecked = ((rights.rights & ISADMINFLAG) > 0) ? "checked" : ""
-      let deleteChecked = ((rights.rights & DELETEFLAG) > 0) ? "checked" : ""
-      let referenceChecked = ((rights.rights & REFERENCEFLAG) > 0) ? "checked" : ""
-      let readChecked = ((rights.rights & READFLAG) > 0) ? "checked" : ""
-      let writeChecked = ((rights.rights & WRITEFLAG) > 0) ? "checked" : ""
-      //let readId = `projectsRights_read_${rightId}`
-      let isadminId = this.getItemId(lkinds, 'isadmin', rightId)
-      row.appendChild(td(`<input class="userRightsCheckbox"
-         type="checkbox"
-         name="${rights.rights}"
-         id="${isadminId}"
-         ${isadminChecked}/>`))
-      let deleteId = this.getItemId(lkinds, 'delete', rightId)
-      row.appendChild(td(`<input class="userRightsCheckbox"
-         type="checkbox"
-         name="${rights.rights}"
-         id="${deleteId}"
-         ${deleteChecked}/>`))
-      let referenceId = this.getItemId(lkinds, 'reference', rightId)
-      row.appendChild(td(`<input class="userRightsCheckbox"
-         type="checkbox"
-         name="${rights.rights}"
-         id="${referenceId}"
-         ${referenceChecked}/>`))
-      let readId = this.getItemId(lkinds, 'read', rightId)
-      row.appendChild(td(`<input class="userRightsCheckbox"
-         type="checkbox"
-         name="${rights.rights}"
-         id="${readId}"
-         ${readChecked}/>`))
-      //let writeId = `projectsRights_write_${rightId}`
-      let writeId = this.getItemId(lkinds, 'write', rightId)
-      row.appendChild(td(`<input class="userRightsCheckbox" 
-         type="checkbox"
-         id="${writeId}"
-         ${writeChecked}/>`))
-
-      tbody.appendChild(row);
-    }
-    );
-    table.appendChild(tbody)
-    return (table)
-  }
 
 }
 
