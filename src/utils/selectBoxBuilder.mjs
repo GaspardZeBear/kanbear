@@ -6,7 +6,7 @@ async function selectBoxBuilder(params) {
   let boxLabel = params.boxLabel
   let items = params.items
   let labelText = params.labelText
-  let buttons=params.buttons ? params.buttons : []
+  let buttons = params.buttons ? params.buttons : []
   let klass = params.klass
   let selected = params.selected
   let selectedOption = params.selectedOption
@@ -30,7 +30,9 @@ async function selectBoxBuilder(params) {
 
   const select = document.createElement("select")
   select.setAttribute("name", boxLabel)
-  select.setAttribute("id", domId)
+  if (domId && domId.length > 0) {
+    select.setAttribute("id", domId)
+  }
 
   const fakeOption = document.createElement('option')
   fakeOption.setAttribute("value", -items.length)
@@ -77,21 +79,21 @@ async function colorBoxBuilder(params) {
   //console.log("colorBox <params>",params)
   let box = await selectBoxBuilder(params)
 
-  return(box)
+  return (box)
 }
 
-        //---------------------------------------------------------------------------
-async function buildColorSelectBox(selectedColor,name,labelText) {
-        let color = colorBoxBuilder({
-            domId: name,
-            label: name,
-            labelText: labelText,
-            boxLabel: name,
-            klass: 'filter-group',
-            selected: selectedColor
-        })
-        return(color)
-    }
+//---------------------------------------------------------------------------
+async function buildColorSelectBox(selectedColor, name, labelText) {
+  let color = colorBoxBuilder({
+    domId: name,
+    label: name,
+    labelText: labelText,
+    boxLabel: name,
+    klass: 'filter-group',
+    selected: selectedColor
+  })
+  return (color)
+}
 
 
 

@@ -102,9 +102,10 @@ function buildAddProjectButton(workspaceId) {
 
 
 //------------------------------------------------------------------------
-function buildAddRightsButton(boxId, params, once = false) {
-  console.log("buildAddRightsButton event Listener fired", "params", params)
+function buildAddRightsButton(boxId, rightsModal, params, once = false) {
+  console.log("buildAddRightsButton event Listener fired", "boxId",boxId,"params", params)
   const addRightsButton = document.createElement('button')
+  /*
   const buttonIds={
     'project' : 'AddProjectsRightsButton',
     'workspace' : 'AddWorkspacesRightsButton'
@@ -114,23 +115,25 @@ function buildAddRightsButton(boxId, params, once = false) {
     'workspace' : 'AddWorkspacesRightsButton'
   }
   addRightsButton.setAttribute("id", buttonIds[params.targetKind])
+  */
+  addRightsButton.setAttribute("id", boxId)
   addRightsButton.innerHTML = "+R"
   let addRightsFn = function (ev) {
     console.log("addRightsButton event Listener fired", ev.target)
     //let el = document.getElementById(`kanbear${params.targetKind}RightsSelectBox`)
     //console.log("addRightsButton event Listener fired, selected", el.value)
     ev.stopPropagation();
-    let targetId = parseInt(document.getElementById(boxId).value)
-    if (targetId > 0) {
+    //let targetId = parseInt(document.getElementById(boxId).value)
+    if (rightsModal.targetId && rightsModal.targetId > 0) {
       const rights = new Rights({})
-      rights.setData("target_id", targetId)
-      rights.setData("target_kind", params.targetKind)
-      rights.setData("owner_id", params.ownerId)
-      rights.setData("owner_type", params.ownerType)
+      rights.setData("target_id", rightsModal.targetId)
+      rights.setData("target_kind", rightsModal.targetKind)
+      rights.setData("owner_id", rightsModal.ownerId)
+      rights.setData("owner_type", rightsModal.ownerType)
       rights.create();
-      sendEvent(`${params.targetKind}RightsCreated`, {})
+      sendEvent(`${rightsModal.targetKind}RightsCreated`, {})
     } else {
-      alert(`Select a  ${params.targetKind} to add to ${params.targetKind}s`)
+      alert(`Select a  ${rightsModal.targetKind} to add to ${rightsModal.targetKind}s`)
     }
   }
   //removeEventListener("click", addSwimlaneFn)
