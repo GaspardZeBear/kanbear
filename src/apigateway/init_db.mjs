@@ -44,9 +44,9 @@ import bcrypt from 'bcrypt'
   db.exec(`
     CREATE TABLE IF NOT EXISTS rights (
       id INTEGER PRIMARY KEY,
-      owner_type TEXT,
+      owner_type TEXT not NULL DEFAULT '',
       owner_id INTEGER NOT NULL DEFAULT 0,
-      target_kind TEXT,
+      target_kind TEXT not NULL DEFAULT '',
       target_id INTEGER NOT NULL DEFAULT 0,
       rights INTEGER NOT NULL DEFAULT 0,
       UNIQUE(target_kind,target_id, owner_type, owner_id)

@@ -103,39 +103,65 @@ function buildAddProjectButton(workspaceId) {
 
 //------------------------------------------------------------------------
 function buildAddRightsButton(boxId, rightsModal, params, once = false) {
-  console.log("buildAddRightsButton event Listener fired", "boxId",boxId,"params", params)
+  console.log("buildAddRightsButton event Listener fired", "boxId", boxId)
   const addRightsButton = document.createElement('button')
-  /*
-  const buttonIds={
-    'project' : 'AddProjectsRightsButton',
-    'workspace' : 'AddWorkspacesRightsButton'
-  }
-  const selectIds={
-    'project' : 'AddProjectsRightsButton',
-    'workspace' : 'AddWorkspacesRightsButton'
-  }
-  addRightsButton.setAttribute("id", buttonIds[params.targetKind])
-  */
   addRightsButton.setAttribute("id", boxId)
   addRightsButton.innerHTML = "+R"
-  let addRightsFn = function (ev) {
-    console.log("addRightsButton event Listener fired", ev.target)
-    //let el = document.getElementById(`kanbear${params.targetKind}RightsSelectBox`)
-    //console.log("addRightsButton event Listener fired, selected", el.value)
-    ev.stopPropagation();
-    //let targetId = parseInt(document.getElementById(boxId).value)
-    if (rightsModal.targetId && rightsModal.targetId > 0) {
+  let addRightsFn
+  if (params.addRightsFn) {
+    addRightsFn = params.addRightsFn
+  } else {
+    addRightsFn = function (ev) {
+      console.log("addRightsButton event Listener fired",
+        "target_id", rightsModal.targetId,
+        "target_kind", rightsModal.targetKind,
+        "owner_id", rightsModal.ownerId,
+        "owner_type", rightsModal.ownerType)
+      //let el = document.getElementById(`kanbear${params.targetKind}RightsSelectBox`)
+      //console.log("addRightsButton event Listener fired, selected", el.value)
+      ev.stopPropagation();
+      //let targetId = parseInt(document.getElementById(boxId).value)
+      //if (rightsModal.targetId && rightsModal.targetId > 0) {
       const rights = new Rights({})
-      rights.setData("target_id", rightsModal.targetId)
-      rights.setData("target_kind", rightsModal.targetKind)
-      rights.setData("owner_id", rightsModal.ownerId)
-      rights.setData("owner_type", rightsModal.ownerType)
-      rights.create();
-      sendEvent(`${rightsModal.targetKind}RightsCreated`, {})
-    } else {
-      alert(`Select a  ${rightsModal.targetKind} to add to ${rightsModal.targetKind}s`)
+      console.log("addRightsButton event Listener fired", "params", params)
+      let doIt = true
+      switch (params.action) {
+        case "addWorkspace":
+          rights.setData("target_id", rightsModal.targetId)
+          rights.setData("target_kind", 'workspace')
+          break
+        case "addProjectToWorkspace":
+          rights.setData("target_id", rightsModal.targetId)
+          rights.setData("target_kind", 'project')
+          break
+        case "addUserToWorkspace":
+          rights.setData("owner_id", rightsModal.ownerId)
+          rights.setData("owner_type", 'user')
+          rights.setData("target_id", params.workspaceId)
+          rights.setData("target_kind", 'workspace')
+          break
+        case "addUserToProject":
+          rights.setData("owner_id", rightsModal.ownerId)
+          rights.setData("owner_type", 'user')
+          rights.setData("target_id", params.projectId)
+          rights.setData("target_kind", 'project')
+          break
+        default:
+          doIt=false
+          console.log("addRightsButton event Listener unknown action", params.action)
+          break
+      }
+      if (doIt) {
+        rights.create()
+          .finally(() => sendEvent(`${rightsModal.targetKind}RightsCreated`, {}))
+      }
+      //} else {
+      //  alert(`Select a  ${rightsModal.targetKind} to add to ${rightsModal.targetKind}s`)
+      //}
     }
   }
+
+
   //removeEventListener("click", addSwimlaneFn)
   addRightsButton.addEventListener('click', addRightsFn, { once: once });
   return (addRightsButton)

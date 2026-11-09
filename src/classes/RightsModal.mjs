@@ -47,11 +47,11 @@ class RightsModal {
       textContent: "+R",
       onclick: [() => { alert(`add ${this.targetKind} ${this.targetId} ${this.ownerId}`) }]
     })
-    let addRightsButton = buildAddRightsButton(`addWorkspacesRights}`, this, {
-      //  ownerType: this.ownerType,
-      //  ownerId: this.ownerId,
-      targetKind: 'workspace',
-    }, false)
+    let addRightsButton = buildAddRightsButton(`addWorkspacesRights}`,
+      this,
+      { action: "addWorkspace" },
+      false)
+
     let filterRightsButton = createElement("Button", {
       textContent: "+F",
       onclick: [() => { alert(`filter ${this.targetKind} ${this.targetId} `) }]
@@ -67,7 +67,7 @@ class RightsModal {
       this.havingRightsProjects
     )
     console.log("render() rightsTree", rightsTree)
-    //let tree = this.XrenderTreeMistral(rightsTree)
+    let tree = this.XrenderTreeMistral(rightsTree)
     let treeAsTable = await this.renderTreeMistral(rightsTree)
     //console.log("tree", tree)
 
@@ -82,7 +82,7 @@ class RightsModal {
         saveRightsButton
       ]
     }))
-    //document.getElementById(this.htmlElement).appendChild(tree)
+    document.getElementById(this.htmlElement).appendChild(tree)
     document.getElementById(this.htmlElement).appendChild(treeAsTable)
 
   }
@@ -135,26 +135,51 @@ class RightsModal {
       switch (r.target_kind) {
         case 'workspace':
           console.log("RightsModal buildHavingRightsThings workspace r", r)
-          havingRightsWorkspaces.add(this.workspaces[r.target_id])
+          havingRightsWorkspaces.add(this.workspacesHash[r.target_id].id)
           break
         case 'project':
           console.log("RightsModal buildHavingRightsThings project r", r)
-          havingRightsProjects.add(this.projects[r.target_id])
+          havingRightsProjects.add(this.projectsHash[r.target_id].id)
           break
       }
     })
     console.log("RightsModal buildHavingRightsThings havingRightsWorkspaces", havingRightsWorkspaces)
     console.log("RightsModal buildHavingRightsThings havingRightsProjects", havingRightsProjects)
 
-    this.havingRightsWorkspaces = [...havingRightsWorkspaces]
+    this.havingRightsWorkspaces = []
+    for (let wId of havingRightsWorkspaces) {
+      this.havingRightsWorkspaces.push(this.workspacesHash[wId])
+    }
+    this.havingRightsProjects = []
+    for (let pId of havingRightsProjects) {
+      this.havingRightsProjects.push(this.projectsHash[pId])
+    }
+
+    /*
     this.havingRightsProjects = [...havingRightsProjects]
-      .filter((p) => (p?.workspace_id !== undefined) ? havingRightsWorkspaces.has(p.workspace_id) : false)
+       .filter((pId) => {
+        let p=this.projects[pId]
+        if (!p?.workspace_id) {
+          console.log("buildHavingRightsThings() no workspace_id")
+          return(false)
+        }
+        if ( !havingRightsWorkspaces.has(p.workspace_id)) {
+          console.log("buildHavingRightsThings() workspace_id not found")
+          return(false)
+        }
+        return(true)
+       })
+        */
+    //      havingRightsWorkspaces.has(p.workspace_id) : false)
+    //    .filter((p) => (p?.workspace_id !== undefined) ? havingRightsWorkspaces.has(p.workspace_id) : false)
 
   }
 
 
   //-------------------------------------------------------------------------
   buildRightsTreeMistral(rights, users, groups, workspaces, projects) {
+    console.log("buildRightsTreeMistral() workspaces", workspaces)
+    console.log("buildRightsTreeMistral() projects", projects)
     const usersById = new Map(users.map(u => [u.id, u]));
     const groupsById = new Map(groups.map(g => [g.id, g]));
 
@@ -177,6 +202,7 @@ class RightsModal {
         ),
       });
     }
+    console.log("buildRightsTreeMistral() workspaceNodes", workspaceNodes)
 
     // 2. index target_id → node pour ranger les droits en O(1)
     const targetIndex = new Map(); // "kind:id" → node
@@ -186,6 +212,7 @@ class RightsModal {
         targetIndex.set(`project:${p.id}`, p);
       }
     }
+    console.log("buildRightsTreeMistral() targetIndex", targetIndex)
 
     for (const r of rights) {
       console.log("buildRightsTreeMistral() right", r)
@@ -198,10 +225,11 @@ class RightsModal {
     }
 
     // 4. Map → Array
-    return [...workspaceNodes.values()].map(w => ({
+    let tree = [...workspaceNodes.values()].map(w => ({
       ...w,
       projects: [...w.projects.values()],
     }));
+    return (tree)
   }
 
   //---------------------------------------------------------------------------------
@@ -270,43 +298,87 @@ class RightsModal {
     }))
   }
 
-  //--------------------------------------------------------------------------------------------------------
-  async renderTreeMistral(tree) {
-    let wDivs = []
-    for (let w of tree) {
-      let wDiv = []
-      let wsProjects = this.projects.filter((p) => { return p.workspace_id === w.id })
-      console.log(" NrenderTreeMistral() w.id", w.id, " projects", this.projects, " wsProjects ", wsProjects)
-      let projectsSelectBox = await this.buildProjectsSelectBox(wsProjects)
-
+  //--------------------------------------------------------------------------------------------------------------
+  async renderProjectsInWorkspace(w) {
+    let wDiv = []
+    for (let p of w.projects) {
       let userSelectBox = await this.buildUserSelectBox()
-      let addRightsButton = buildAddRightsButton(`addProjectsRightsToWorkspace-${w.id}`, this, {
-        //  ownerType: this.ownerType,
-        //  ownerId: this.ownerId,
-        targetKind: 'project',
-      }, false)
+      let addUserRightsButton = buildAddRightsButton(`addRightsToProject-${p.id}`,
+        this,
+        {
+          action: "addUserToProject",
+          projectId: p.id,
+          NaddRightsFn: () => alert('AddRightsFn')
+        },
+        false)
       wDiv.push(createElement('div', {
         style: "display:flex;border 5px;",
         children: [
           createElement('div', {
-            style: "background-color : pink;width : 300px;",
-            textContent: `Workspace ${w.name}#${w.id}`,
+            style: "background-color : green;width : 300px;",
+            textContent: `Workspace ${p.name}#${p.id}`,
           }),
-          projectsSelectBox,
           userSelectBox,
-          addRightsButton
+          addUserRightsButton
         ]
       }))
+      wDiv.push(this.buidRightsTable('project', p.groups, p.users))
+    }
+    return (createElement("div", {
+      //textContent: `Workspace ${w.name}#${w.id}`,
+      children: wDiv
+    }))
+  }
 
+  //------------------------------------------------------------------------------------------------------------------
+
+  async renderWorkspaceHeader(w) {
+    let wDiv = []
+    let wsProjects = this.projects.filter((p) => { return p.workspace_id === w.id })
+    //console.log(" NrenderTreeMistral() w.id", w.id, " projects", this.projects, " wsProjects ", wsProjects)
+    let projectsSelectBox = await this.buildProjectsSelectBox(wsProjects)
+    let addProjectRightsButton = buildAddRightsButton(`addRightsToWorkspace-${w.id}`,
+      this,
+      {
+        action: "addProjectToWorkspace",
+        workspaceId: w.id,
+        NaddRightsFn: () => alert('AddRightsFn')
+      },
+      false)
+    let userSelectBox = await this.buildUserSelectBox()
+    let addUserRightsButton = buildAddRightsButton(`addRightsToWorkspace-${w.id}`,
+      this,
+      {
+        action: "addUserToWorkspace",
+        workspaceId: w.id,
+        NaddRightsFn: () => alert('AddRightsFn')
+      },
+      false)
+    wDiv.push(createElement('div', {
+      style: "display:flex;border 5px;",
+      children: [
+        createElement('div', {
+          style: "background-color : pink;width : 300px;",
+          textContent: `Workspace ${w.name}#${w.id}`,
+        }),
+        projectsSelectBox,
+        addProjectRightsButton,
+        userSelectBox,
+        addUserRightsButton
+      ]
+    }))
+    return(wDiv)
+  }
+
+  //--------------------------------------------------------------------------------------------------------
+  async renderTreeMistral(tree) {
+    let wDivs = []
+    for (let w of tree) {
+      let wDiv=[]
+      wDiv.push(await this.renderWorkspaceHeader(w))
       wDiv.push(this.buidRightsTable('workspace', w.groups, w.users))
-      for (let p of w.projects) {
-        wDiv.push(createElement('h3', {
-          style: "border 5px;",
-          textContent: `Project ${p.name}#${p.id}`,
-        }))
-        wDiv.push(this.buidRightsTable('project', p.groups, p.users))
-      }
 
+      wDiv.push(await this.renderProjectsInWorkspace(w))
       wDivs.push(createElement("div", {
         //textContent: `Workspace ${w.name}#${w.id}`,
         children: wDiv
