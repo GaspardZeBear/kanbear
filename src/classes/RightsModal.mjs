@@ -42,14 +42,17 @@ class RightsModal {
     await this.buildHavingRightsThings()
     console.log("render() workspaces", this.workspaces, "righted workspaces", this.havingRightsWorkspaces)
     let workspaceDiv = await this.buildWorkspaceSelectBox()
-    let userDiv = await this.buildUserSelectBox()
-    let createRightsButton = createElement("Button", {
-      textContent: "+R",
-      onclick: [() => { alert(`add ${this.targetKind} ${this.targetId} ${this.ownerId}`) }]
-    })
-    let addRightsButton = buildAddRightsButton(`addWorkspacesRights}`,
-      this,
-      { action: "addWorkspace" },
+    //let userDiv = await this.buildUserSelectBox()
+    //let createRightsButton = createElement("Button", {
+    //  textContent: "+R",
+    //  onclick: [() => { alert(`add ${this.targetKind} ${this.targetId} ${this.ownerId}`) }]
+    //})
+    let addRightsButton = buildAddRightsButton(
+      `addWorkspacesRights`,
+      this.getAddRightsFn(
+        { action: "addWorkspace"
+        }
+      ),
       false)
 
     let filterRightsButton = createElement("Button", {
@@ -154,25 +157,6 @@ class RightsModal {
     for (let pId of havingRightsProjects) {
       this.havingRightsProjects.push(this.projectsHash[pId])
     }
-
-    /*
-    this.havingRightsProjects = [...havingRightsProjects]
-       .filter((pId) => {
-        let p=this.projects[pId]
-        if (!p?.workspace_id) {
-          console.log("buildHavingRightsThings() no workspace_id")
-          return(false)
-        }
-        if ( !havingRightsWorkspaces.has(p.workspace_id)) {
-          console.log("buildHavingRightsThings() workspace_id not found")
-          return(false)
-        }
-        return(true)
-       })
-        */
-    //      havingRightsWorkspaces.has(p.workspace_id) : false)
-    //    .filter((p) => (p?.workspace_id !== undefined) ? havingRightsWorkspaces.has(p.workspace_id) : false)
-
   }
 
 
@@ -298,18 +282,81 @@ class RightsModal {
     }))
   }
 
+
+  getTargetId() {
+    return(this.targetId)
+  }
+
+  //-----------------------------------------------------------------------------------------------
+  getAddRightsFn(params) {
+    let myThis=this
+    let addRightsFn = function (ev) {
+
+      // trick to get values at time of firing the function, not creating it
+      let getThis = () => {console.log("getThis fired",myThis);return(myThis)}
+      console.log("addRightsButton event Listener fired",
+        "params", params,
+        "target_id", getThis().targetId,
+        "target_id() ", getThis().targetId,
+        "target_kind", getThis().targetKind,
+        "owner_id", getThis().ownerId,
+        "owner_type", getThis().ownerType)
+      //let el = document.getElementById(`kanbear${params.targetKind}RightsSelectBox`)
+      //console.log("addRightsButton event Listener fired, selected", el.value)
+      ev.stopPropagation();
+      //let targetId = parseInt(document.getElementById(boxId).value)
+      //if (rightsModal.targetId && rightsModal.targetId > 0) {
+      const rights = new Rights({})
+      console.log("addRightsButton event Listener fired", "params", params)
+      let doIt = true
+      switch (params.action) {
+        case "addWorkspace":
+          this.targetKind = 'workspace'
+          rights.setData("target_id", getThis().targetId)
+          rights.setData("target_kind", getThis().targetKind)
+          break
+        case "addProjectToWorkspace":
+          this.targetKind = 'project'
+          rights.setData("target_id", getThis().targetId)
+          rights.setData("target_kind", getThis().targetKind)
+          break
+        case "addUserToWorkspace":
+          this.targetKind = 'workspace'
+          rights.setData("owner_id", getThis().ownerId)
+          rights.setData("owner_type", 'user')
+          rights.setData("target_id", params.workspaceId)
+          rights.setData("target_kind", getThis().targetKind)
+          break
+        case "addUserToProject":
+          rights.setData("owner_id", getThis().ownerId)
+          rights.setData("owner_type", 'user')
+          rights.setData("target_id", params.projectId)
+          rights.setData("target_kind", 'project')
+          break
+        default:
+          doIt = false
+          console.log("addRightsButton event Listener unknown action", params.action)
+          break
+      }
+      if (doIt) {
+        rights.create()
+          .finally(() => sendEvent(`${getThis().targetKind}RightsCreated`, {}))
+      }
+    }
+    return(addRightsFn)
+  }
+
   //--------------------------------------------------------------------------------------------------------------
   async renderProjectsInWorkspace(w) {
     let wDiv = []
     for (let p of w.projects) {
       let userSelectBox = await this.buildUserSelectBox()
-      let addUserRightsButton = buildAddRightsButton(`addRightsToProject-${p.id}`,
-        this,
-        {
+      let addUserRightsButton = buildAddRightsButton(
+        `addRightsToProject-${p.id}`,
+        this.getAddRightsFn({
           action: "addUserToProject",
-          projectId: p.id,
-          NaddRightsFn: () => alert('AddRightsFn')
-        },
+          projectId: p.id
+        }),
         false)
       wDiv.push(createElement('div', {
         style: "display:flex;border 5px;",
@@ -337,23 +384,23 @@ class RightsModal {
     let wsProjects = this.projects.filter((p) => { return p.workspace_id === w.id })
     //console.log(" NrenderTreeMistral() w.id", w.id, " projects", this.projects, " wsProjects ", wsProjects)
     let projectsSelectBox = await this.buildProjectsSelectBox(wsProjects)
-    let addProjectRightsButton = buildAddRightsButton(`addRightsToWorkspace-${w.id}`,
-      this,
-      {
+    let addProjectRightsButton = buildAddRightsButton(
+      `addProjectRightsToWorkspace-${w.id}`,
+      this.getAddRightsFn({
         action: "addProjectToWorkspace",
-        workspaceId: w.id,
-        NaddRightsFn: () => alert('AddRightsFn')
-      },
+        workspaceId: w.id
+      }),
+
       false)
     let userSelectBox = await this.buildUserSelectBox()
-    let addUserRightsButton = buildAddRightsButton(`addRightsToWorkspace-${w.id}`,
-      this,
-      {
+    let addUserRightsButton = buildAddRightsButton(
+      `addUserRightsToWorkspace-${w.id}`,
+      this.getAddRightsFn({
         action: "addUserToWorkspace",
-        workspaceId: w.id,
-        NaddRightsFn: () => alert('AddRightsFn')
-      },
+        workspaceId: w.id
+      }),
       false)
+
     wDiv.push(createElement('div', {
       style: "display:flex;border 5px;",
       children: [
@@ -367,17 +414,21 @@ class RightsModal {
         addUserRightsButton
       ]
     }))
-    return(wDiv)
+    console.log("renderWorkspaceHeader() w.id", w.id, " projects", this.projects, " wsProjects ", wsProjects)
+    console.log("renderWorkspaceHeader() wDiv",wDiv)
+     return (createElement("div", {
+        //textContent: `Workspace ${w.name}#${w.id}`,
+        children: wDiv
+      }))
   }
 
   //--------------------------------------------------------------------------------------------------------
   async renderTreeMistral(tree) {
     let wDivs = []
     for (let w of tree) {
-      let wDiv=[]
+      let wDiv = []
       wDiv.push(await this.renderWorkspaceHeader(w))
       wDiv.push(this.buidRightsTable('workspace', w.groups, w.users))
-
       wDiv.push(await this.renderProjectsInWorkspace(w))
       wDivs.push(createElement("div", {
         //textContent: `Workspace ${w.name}#${w.id}`,
@@ -515,9 +566,9 @@ class RightsModal {
     let workspaceSelectBox = await selectBoxBuilder(workspaceBoxParams)
     let myThis = this
     workspaceSelectBox.addEventListener('change', async (e) => {
-      console.log("RightsModal render() workspace ", e.target.value)
-      myThis.targetId = e.target.value
-      myThis.targetKind = 'workspace'
+      console.log("RightsModal buildWorkspaceSelectBox() workspace ", e.target.value)
+      this.targetId = e.target.value
+      this.targetKind = 'workspace'
     });
     return (workspaceSelectBox)
   }
@@ -687,11 +738,14 @@ class RightsModal {
     //let workspaces = await Workspace.getAll('workspaces', {})
 
     let boxName = "kanbearWorkspacesRightsSelectBox"
-    let buttons = [buildAddRightsButton(boxName, this, {
-      ownerType: this.ownerType,
-      ownerId: this.ownerId,
-      targetKind: 'workspace',
-    }, false)]
+    let buttons = [buildAddRightsButton(
+      boxName,
+      this.getAddRightsFn({
+        action: "addWorkspaceToRights",
+        projectId: p.id
+      }),
+      false)]
+
     let checkboxes = []
     let boxParams = {
       domId: boxName,
