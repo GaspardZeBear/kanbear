@@ -70,12 +70,12 @@ class RightsModal {
       this.havingRightsProjects
     )
     console.log("render() rightsTree", rightsTree)
-    let tree = this.XrenderTreeMistral(rightsTree)
+    //let tree = this.XrenderTreeMistral(rightsTree)
     let treeAsTable = await this.renderTreeMistral(rightsTree)
     //console.log("tree", tree)
 
     document.getElementById(this.htmlElement).replaceChildren(createElement("div", {
-      style: "display : flex ;",
+      style: "display : flex ;position: sticky; top: 0; z-index: 1000;margin-bottom : 10px;background-color: lightgrey;",
       children: [workspaceDiv,
         //userDiv,
         filterRightsButton,
@@ -85,7 +85,7 @@ class RightsModal {
         saveRightsButton
       ]
     }))
-    document.getElementById(this.htmlElement).appendChild(tree)
+    //document.getElementById(this.htmlElement).appendChild(tree)
     document.getElementById(this.htmlElement).appendChild(treeAsTable)
 
   }
@@ -138,11 +138,15 @@ class RightsModal {
       switch (r.target_kind) {
         case 'workspace':
           console.log("RightsModal buildHavingRightsThings workspace r", r)
-          havingRightsWorkspaces.add(this.workspacesHash[r.target_id].id)
+          if (this.workspacesHash[r.target_id]) {
+            havingRightsWorkspaces.add(this.workspacesHash[r.target_id].id)
+          }
           break
         case 'project':
           console.log("RightsModal buildHavingRightsThings project r", r)
-          havingRightsProjects.add(this.projectsHash[r.target_id].id)
+          if (this.projectsHash[r.target_id]) {
+            havingRightsProjects.add(this.projectsHash[r.target_id].id)
+          }
           break
       }
     })
@@ -350,10 +354,10 @@ class RightsModal {
 
   //--------------------------------------------------------------------------------------------------------------
   async renderProjectsInWorkspace(w) {
-    console.log("renderProjectsInWorkspace(w)",w)
+    console.log("renderProjectsInWorkspace(w)", w)
     let wDiv = []
     for (let p of w.projects) {
-      console.log("renderProjectsInWorkspace(w) project ",p)
+      console.log("renderProjectsInWorkspace(w) project ", p)
       let userSelectBox = await this.buildUserSelectBox()
       let addUserRightsButton = buildAddRightsButton(
         `addUserRightsToProject-${p.id}`,
@@ -389,7 +393,7 @@ class RightsModal {
   async renderWorkspaceHeader(w) {
     console.log("renderWorkspaceHeader(w)", w)
     let wsProjects = this.projects.filter((p) => { return p.workspace_id === w.id })
-    
+
     let projectsSelectBox = await this.buildProjectsSelectBox(wsProjects)
     let addProjectRightsButton = buildAddRightsButton(
       `addProjectRightsToWorkspace-${w.id}`,
@@ -431,12 +435,12 @@ class RightsModal {
       children: wDiv
     }))
       */
-    let wDiv=createElement('div', {
+    let wDiv = createElement('div', {
       class: "grid-item level-0",
       style: "background-color : pink;display:flex;",
       children: [createElement('div', {
         textContent: `Workspace ${w.name}#${w.id}`,
-        }),
+      }),
         projectsSelectBox,
         addProjectRightsButton,
         userSelectBox,
@@ -451,7 +455,7 @@ class RightsModal {
   //--------------------------------------------------------------------------------------------------------
   async renderTreeMistral(tree) {
     let wDivs = []
-    this.wDiv=[]
+    this.wDiv = []
     for (let w of tree) {
       let wDiv = []
       //wDivs.push(await this.renderWorkspaceHeader(w))
@@ -473,7 +477,7 @@ class RightsModal {
       //style : "display:inline-grid",
       class: "tree-grid",
       //children: wDivs
-      children : this.wDiv
+      children: this.wDiv
     }))
   }
 
