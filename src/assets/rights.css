@@ -1,0 +1,30 @@
+.tree-grid {
+  display: grid;
+  /* Crée 3 colonnes : ajustez les largeurs selon vos besoins */
+  grid-template-columns: 200px 200px 200px; 
+  gap: 8px 0; /* Espace vertical entre les lignes, pas d'espace horizontal */
+  font-family: sans-serif;
+}
+
+/* Base pour tous les items pour qu'ils créent automatiquement une nouvelle ligne */
+.grid-item {
+  grid-column-end: span 1;
+}
+
+/* Positionnement par colonne selon le niveau */
+.level-0 {
+  grid-column-start: 1;
+  font-weight: bold;
+  color: #e21111;
+}
+
+.level-1 {
+  grid-column-start: 2;
+  color: #34495e;
+}
+
+.level-2 {
+  grid-column-start: 3;
+  color: #7f8c8d;
+  font-style: italic;
+}

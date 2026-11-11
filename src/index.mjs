@@ -21,6 +21,7 @@ import { buildAddDummyButton, buildAddProjectButton, buildAddWorkspaceButton } f
 import { getOpenCloseParmBoolean } from './utils/openClose.mjs'
 import { UserDialog } from './classes/UserDialog.mjs';
 import { LoginDialog } from './classes/LoginDialog.mjs'
+import { RightsModal } from './classes/RightsModal.mjs';
 import { createElement, buildKanbearProjectsSelectBox, buildWorkspacesSelectBox } from './utils/createHtml.mjs';
 import { sendMessage, sendErrorMessage } from './utils/sendMessage.mjs';
 
@@ -348,6 +349,11 @@ document.getElementById('assigneePanel').addEventListener('click', () => {
 //------------------- User --------------------------------------
 document.getElementById('userPanel').addEventListener('click', () => {
     new KanbearUserPanel().render()
+});
+
+//------------------- User --------------------------------------
+document.getElementById('rightPanel').addEventListener('click', () => {
+    new RightsModal().render()
 });
 
 //------------------- Login --------------------------------------

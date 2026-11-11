@@ -29,12 +29,11 @@ class RightsModal {
     this.dialog.showModal();
     this.htmlElement = `rightsModalResults`
     this.createListeners(this)
-    this.render()
+    //this.render()
   }
 
   //-------------------------------------------------------------------------
   async render() {
-
     await this.loadRights()
     await this.loadWorkspaces()
     await this.loadProjects()
@@ -50,7 +49,8 @@ class RightsModal {
     let addRightsButton = buildAddRightsButton(
       `addWorkspacesRights`,
       this.getAddRightsFn(
-        { action: "addWorkspace"
+        {
+          action: "addWorkspace"
         }
       ),
       false)
@@ -284,16 +284,16 @@ class RightsModal {
 
 
   getTargetId() {
-    return(this.targetId)
+    return (this.targetId)
   }
 
   //-----------------------------------------------------------------------------------------------
   getAddRightsFn(params) {
-    let myThis=this
+    let myThis = this
     let addRightsFn = function (ev) {
 
       // trick to get values at time of firing the function, not creating it
-      let getThis = () => {console.log("getThis fired",myThis);return(myThis)}
+      let getThis = () => { console.log("getThis fired", myThis); return (myThis) }
       console.log("addRightsButton event Listener fired",
         "params", params,
         "target_id", getThis().targetId,
@@ -309,29 +309,31 @@ class RightsModal {
       const rights = new Rights({})
       console.log("addRightsButton event Listener fired", "params", params)
       let doIt = true
+      let kind
       switch (params.action) {
         case "addWorkspace":
-          this.targetKind = 'workspace'
+          kind = 'workspace'
           rights.setData("target_id", getThis().targetId)
-          rights.setData("target_kind", getThis().targetKind)
+          rights.setData("target_kind", kind)
           break
         case "addProjectToWorkspace":
-          this.targetKind = 'project'
+          kind = 'project'
           rights.setData("target_id", getThis().targetId)
-          rights.setData("target_kind", getThis().targetKind)
+          rights.setData("target_kind", kind)
           break
         case "addUserToWorkspace":
-          this.targetKind = 'workspace'
+          kind = 'workspace'
           rights.setData("owner_id", getThis().ownerId)
           rights.setData("owner_type", 'user')
           rights.setData("target_id", params.workspaceId)
-          rights.setData("target_kind", getThis().targetKind)
+          rights.setData("target_kind", kind)
           break
         case "addUserToProject":
+          kind = 'project'
           rights.setData("owner_id", getThis().ownerId)
           rights.setData("owner_type", 'user')
           rights.setData("target_id", params.projectId)
-          rights.setData("target_kind", 'project')
+          rights.setData("target_kind", kind)
           break
         default:
           doIt = false
@@ -340,49 +342,54 @@ class RightsModal {
       }
       if (doIt) {
         rights.create()
-          .finally(() => sendEvent(`${getThis().targetKind}RightsCreated`, {}))
+          .finally(() => sendEvent(`${kind}sRightsCreated`, {}))
       }
     }
-    return(addRightsFn)
+    return (addRightsFn)
   }
 
   //--------------------------------------------------------------------------------------------------------------
   async renderProjectsInWorkspace(w) {
+    console.log("renderProjectsInWorkspace(w)",w)
     let wDiv = []
     for (let p of w.projects) {
+      console.log("renderProjectsInWorkspace(w) project ",p)
       let userSelectBox = await this.buildUserSelectBox()
       let addUserRightsButton = buildAddRightsButton(
-        `addRightsToProject-${p.id}`,
+        `addUserRightsToProject-${p.id}`,
         this.getAddRightsFn({
           action: "addUserToProject",
           projectId: p.id
         }),
         false)
-      wDiv.push(createElement('div', {
-        style: "display:flex;border 5px;",
+      this.wDiv.push(createElement('div', {
+        style: "display:flex;",
+        class: "grid-item level-1",
         children: [
           createElement('div', {
-            style: "background-color : green;width : 300px;",
-            textContent: `Workspace ${p.name}#${p.id}`,
+            style: "background-color : lightgreen;",
+            textContent: `Project ${p.name}#${p.id}`,
           }),
           userSelectBox,
           addUserRightsButton
         ]
       }))
-      wDiv.push(this.buidRightsTable('project', p.groups, p.users))
+      this.buidRightsTable("grid-item level-2", p.groups, p.users)
     }
-    return (createElement("div", {
-      //textContent: `Workspace ${w.name}#${w.id}`,
-      children: wDiv
-    }))
+    //return (createElement("div", {
+    //textContent: `Workspace ${w.name}#${w.id}`,
+    //  children: wDiv
+    //}))
+    //console.log("renderProjectsInWorkspace(w) over",w,"wDiv",wDiv)
+    //return (wDiv)
   }
 
   //------------------------------------------------------------------------------------------------------------------
 
   async renderWorkspaceHeader(w) {
-    let wDiv = []
+    console.log("renderWorkspaceHeader(w)", w)
     let wsProjects = this.projects.filter((p) => { return p.workspace_id === w.id })
-    //console.log(" NrenderTreeMistral() w.id", w.id, " projects", this.projects, " wsProjects ", wsProjects)
+    
     let projectsSelectBox = await this.buildProjectsSelectBox(wsProjects)
     let addProjectRightsButton = buildAddRightsButton(
       `addProjectRightsToWorkspace-${w.id}`,
@@ -401,43 +408,72 @@ class RightsModal {
       }),
       false)
 
-    wDiv.push(createElement('div', {
-      style: "display:flex;border 5px;",
-      children: [
-        createElement('div', {
-          style: "background-color : pink;width : 300px;",
-          textContent: `Workspace ${w.name}#${w.id}`,
+    /*
+  wDiv.push(createElement('div', {
+    style: "display:flex;border 5px;",
+    
+    children: [
+      createElement('div', {
+        style: "background-color : pink;width : 300px;",
+        textContent: `Workspace ${w.name}#${w.id}`,
+      }),
+      projectsSelectBox,
+      addProjectRightsButton,
+      userSelectBox,
+      addUserRightsButton
+    ]
+  }))
+  console.log("renderWorkspaceHeader() w.id", w.id, " projects", this.projects, " wsProjects ", wsProjects)
+  
+   return (createElement("div", {
+      //textContent: `Workspace ${w.name}#${w.id}`,
+      class: "grid-item level-0",
+      children: wDiv
+    }))
+      */
+    let wDiv=createElement('div', {
+      class: "grid-item level-0",
+      style: "background-color : pink;display:flex;",
+      children: [createElement('div', {
+        textContent: `Workspace ${w.name}#${w.id}`,
         }),
         projectsSelectBox,
         addProjectRightsButton,
         userSelectBox,
-        addUserRightsButton
-      ]
-    }))
-    console.log("renderWorkspaceHeader() w.id", w.id, " projects", this.projects, " wsProjects ", wsProjects)
-    console.log("renderWorkspaceHeader() wDiv",wDiv)
-     return (createElement("div", {
-        //textContent: `Workspace ${w.name}#${w.id}`,
-        children: wDiv
-      }))
+        addUserRightsButton]
+    })
+    this.wDiv.push(wDiv)
+    console.log("renderWorkspaceHeader(w)", w, "wDiv", wDiv)
+    //return(wDiv)
+
   }
 
   //--------------------------------------------------------------------------------------------------------
   async renderTreeMistral(tree) {
     let wDivs = []
+    this.wDiv=[]
     for (let w of tree) {
       let wDiv = []
-      wDiv.push(await this.renderWorkspaceHeader(w))
-      wDiv.push(this.buidRightsTable('workspace', w.groups, w.users))
-      wDiv.push(await this.renderProjectsInWorkspace(w))
-      wDivs.push(createElement("div", {
+      //wDivs.push(await this.renderWorkspaceHeader(w))
+      //wDivs.push(this.buidRightsTable("grid-item level-1", w.groups, w.users))
+      //wDivs.push(await this.renderProjectsInWorkspace(w))
+
+      await this.renderWorkspaceHeader(w)
+      this.buidRightsTable("grid-item level-1", w.groups, w.users)
+      await this.renderProjectsInWorkspace(w)
+      /*wDivs.push(createElement("div", {
+        
+        //style : "display:inline-grid",
         //textContent: `Workspace ${w.name}#${w.id}`,
         children: wDiv
-      }))
+      }))*/
     }
 
     return (createElement("div", {
-      children: wDivs
+      //style : "display:inline-grid",
+      class: "tree-grid",
+      //children: wDivs
+      children : this.wDiv
     }))
   }
 
@@ -465,11 +501,13 @@ class RightsModal {
   //------------------------------------------------------------------------
   //users:  [ { id: 1, name: "Gaspard", rightsId: 1 } ],
   //  groups: [ { id: 10, name: "Équipe Design", rightsId: 2 } ],
-  buidRightsTable(kind, groups, users) {
+  buidRightsTable(cssClass, groups, users) {
 
     console.log("UserRightsModal.buildRightsTable()", "groups", groups, "users", users)
-    let table = document.createElement('table')
-    table.appendChild(this.buidRightsTableHead())
+    //let table = document.createElement('table')
+    let table = createElement('table', {
+    })
+    //table.appendChild(this.buidRightsTableHead())
     const tbody = document.createElement('tbody')
 
     const td = (p) => {
@@ -507,32 +545,32 @@ class RightsModal {
       let writeChecked = ((rights.rights & WRITEFLAG) > 0) ? "checked" : ""
       //let readId = `projectsRights_read_${rightId}`
       let isadminId = this.getItemId(radix, 'isadmin', rightsId)
-      row.appendChild(td(`<input class="userRightsCheckbox"
+      row.appendChild(td(`isAdmin <input class="userRightsCheckbox"
          type="checkbox"
          name="${rights.rights}"
          id="${isadminId}"
          ${isadminChecked}/>`))
       let deleteId = this.getItemId(radix, 'delete', rightsId)
-      row.appendChild(td(`<input class="userRightsCheckbox"
+      row.appendChild(td(`delete <input class="userRightsCheckbox"
          type="checkbox"
          name="${rights.rights}"
          id="${deleteId}"
          ${deleteChecked}/>`))
       let referenceId = this.getItemId(radix, 'reference', rightsId)
-      row.appendChild(td(`<input class="userRightsCheckbox"
+      row.appendChild(td(`reference <input class="userRightsCheckbox"
          type="checkbox"
          name="${rights.rights}"
          id="${referenceId}"
          ${referenceChecked}/>`))
       let readId = this.getItemId(radix, 'read', rightsId)
-      row.appendChild(td(`<input class="userRightsCheckbox"
+      row.appendChild(td(`read <input class="userRightsCheckbox"
          type="checkbox"
          name="${rights.rights}"
          id="${readId}"
          ${readChecked}/>`))
       //let writeId = `projectsRights_write_${rightId}`
       let writeId = this.getItemId(radix, 'write', rightsId)
-      row.appendChild(td(`<input class="userRightsCheckbox" 
+      row.appendChild(td(`write <input class="userRightsCheckbox" 
          type="checkbox"
          id="${writeId}"
          ${writeChecked}/>`))
@@ -541,7 +579,14 @@ class RightsModal {
     }
     );
     table.appendChild(tbody)
-    return (table)
+    this.wDiv.push(createElement('div', {
+      class: cssClass,
+      children: [createElement('h2',{textContent:cssClass}),table]
+    }))
+    //return (createElement('div', {
+    //  class: cssClass,
+    //  children: [table]
+    //}))
   }
 
   //-------------------------------------------------------------------------
