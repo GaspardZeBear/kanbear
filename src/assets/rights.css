@@ -1,4 +1,4 @@
-.tree-grid {
+.tree-flex {
   display: flex;
   flex-direction:column;
   /* Crée 3 colonnes : ajustez les largeurs selon vos besoins */
@@ -8,27 +8,31 @@
 }
 
 /* Base pour tous les items pour qu'ils créent automatiquement une nouvelle ligne */
-.grid-item {
+.rights-base {
   grid-column-end: span 1;
 }
 
 /* Positionnement par colonne selon le niveau */
-.level-0 {
-  
-  grid-column-start: 1;
+.right-level-0 {
   font-weight: bold;
   color: #e21111;
+  background-color : pink;
+  display : flex;
 }
 
-.level-1 {
-  padding-left:100px;
-  grid-column-start: 2;
+.right-level-1 {
+  font-weight: bold;
+  margin-left:50px;
+  background-color : lightgreen;
   color: #34495e;
+    display : flex;
 }
 
-.level-2 {
-  padding-left:200px;
-  grid-column-start: 3;
-  color: #7f8c8d;
-  font-style: italic;
+.right-level-2 {
+  xfont-weight: bold;
+  margin-left:100px;
+  color: black;
+  background-color : lightblue;
+    display : flex;
+  xfont-style: italic;
 }
