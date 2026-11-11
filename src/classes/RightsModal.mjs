@@ -581,7 +581,7 @@ class RightsModal {
     table.appendChild(tbody)
     this.wDiv.push(createElement('div', {
       class: cssClass,
-      children: [createElement('h2',{textContent:cssClass}),table]
+      children: [table]
     }))
     //return (createElement('div', {
     //  class: cssClass,
