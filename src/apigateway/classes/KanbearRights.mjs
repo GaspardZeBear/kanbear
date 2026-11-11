@@ -87,61 +87,11 @@ class KanbearRights {
     return (this.resp)
   }
 
-
-  //-----------------------------------------------------
-  XloadRights() {
-    Konsol.log("KanbearRights.loadRights()")
-    let wreq = `
-      select
-        id id,
-        workspace_id as workspace_id,
-        rights rights
-      from 
-        workspaces_rights
-      where
-       owner_id_id='${this.ownerId}'
-       and owner_type='user'
-              `
-    let preq = `
-      select
-        id id,
-        project_id as project_id,
-        rights
-      from 
-        projects_rights
-      where
-       owner_id='${this.ownerId}'
-       and owner_type='user'
-      `
-    //    db.all(req, [], this.callAfterRights.bind(this));
-    let wResp
-    db.all(wreq, [], (err, httpCode, sqlResp) => {
-      //Konsol.log("KanbearRights loadRights() callback()", "wreq", wreq)
-      //Konsol.log("KanbearRights loadRights() callback()", "sqlResp", sqlResp)
-      wResp = sqlResp
-      //return (params)
-    });
-    let pResp
-    db.all(preq, [], (err, httpCode, sqlResp) => {
-      //Konsol.log("KanbearRights loadRights() callback()", "preq", preq)
-      //Konsol.log("KanbearRights loadRights() callback()", "sqlResp", sqlResp)
-      //this.rightsResp = sqlResp
-      pResp = sqlResp
-      //return (params)
-    });
-    let rights = { data: { workspaces: {}, projects: {} } }
-    wResp.forEach(element => {
-      rights.data["workspaces"][element.workspace_id] = element.rights
-    });
-    pResp.forEach(element => {
-      rights.data["projects"][element.project_id] = element.rights
-    });
-    Konsol.log("KanbearRights.loadRights() over", "<rights>", rights)
-    this.resp = rights["data"] ?? null
-  }
-
   //-----------------------------------------------------
   load() {
+    if ( this.isAdmin ) {
+      return({})
+    }
     if (!this.resp) {
       this.loadRights()
     }
