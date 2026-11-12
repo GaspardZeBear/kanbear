@@ -85,11 +85,8 @@ class RightsModal {
         saveRightsButton
       ]
     }))
-    //document.getElementById(this.htmlElement).appendChild(tree)
     document.getElementById(this.htmlElement).appendChild(treeAsTable)
-
   }
-
 
   //-------------------------------------------------------------------------
   async loadWorkspaces() {
@@ -100,8 +97,8 @@ class RightsModal {
       this.workspacesHash[w.id] = w
     })
   }
-  //-------------------------------------------------------------------------
 
+  //-------------------------------------------------------------------------
   async loadProjects() {
     this.projects = await Project.getAll('projects')
     this.projectsHash = {}
@@ -150,9 +147,8 @@ class RightsModal {
           break
       }
     })
-    console.log("RightsModal buildHavingRightsThings havingRightsWorkspaces", havingRightsWorkspaces)
-    console.log("RightsModal buildHavingRightsThings havingRightsProjects", havingRightsProjects)
-
+    //console.log("RightsModal buildHavingRightsThings havingRightsWorkspaces", havingRightsWorkspaces)
+    //console.log("RightsModal buildHavingRightsThings havingRightsProjects", havingRightsProjects)
     this.havingRightsWorkspaces = []
     for (let wId of havingRightsWorkspaces) {
       this.havingRightsWorkspaces.push(this.workspacesHash[wId])
@@ -176,49 +172,34 @@ class RightsModal {
       return { id, name: row ? row.name : `#${type}:${id}` };
     };
 
-    /*
-    const workspacesRightIds=rights.filter( r => (
-      r.owner_type.length === 0
-      && r.target_id > 0
-      && r.target_kind === 'workspace'
-    )) 
-    const workspacesRightIdsMap=new Map(workspacesRightIds.map( elt => [elt.target_id, elt ]))
-    //console.log("buildRightsTreeMistral() workspacesRightIdsMap", workspacesRightIdsMap)
-    const projectsRightIds=rights.filter( r => (
-      r.owner_type.length === 0
-      && r.target_id > 0
-      && r.target_kind === 'projects'
-    )) 
-    //console.log("buildRightsTreeMistral() workspacesRightIds", workspacesRightIds)
-    const projectsRightIdsMap=new Map(projectsRightIds.map( elt => [elt.target_id, elt ]))
-*/
     const createKindMap = (rights, kind) => new Map(
-  rights
-    .filter(r => !r.owner_type && r.target_id > 0 && r.target_kind === kind)
-    .map(r => [r.target_id, r])
-);
+      rights
+        .filter(r => !r.owner_type && r.target_id > 0 && r.target_kind === kind)
+        .map(r => [r.target_id, r])
+    );
+    const workspacesRightIdsMap = createKindMap(rights, 'workspace');
+    const projectsRightIdsMap = createKindMap(rights, 'project');
 
-const workspacesRightIdsMap = createKindMap(rights, 'workspace');
-const projectsRightIdsMap   = createKindMap(rights, 'project');
-
+    console.log("buildRightsTreeMistral() workspacesRightIdsMap", workspacesRightIdsMap)
+    console.log("buildRightsTreeMistral() projectsRightIdsMap", projectsRightIdsMap)
 
     // 1. Noeuds workspaces, chacun avec ses projets
     const workspaceNodes = new Map();
     for (const w of workspaces) {
-      console.log("buildRightsTreeMistral() w", w,"w.id",w.id, workspacesRightIdsMap.get(w.id) ?? "not found")
+      console.log("buildRightsTreeMistral() w", w, "w.id", w.id, workspacesRightIdsMap.get(w.id) ?? "not found")
       workspaceNodes.set(w.id, {
         id: w.id,
         name: w.name,
-        rightsId : workspacesRightIdsMap.get(w.id).id,
+        rightsId: workspacesRightIdsMap.get(w.id).id,
         users: [],
         groups: [],
         projects: new Map(projects
           .filter(p => p.workspace_id === w.id)
-          .map(p => [p.id, { id: p.id, name: p.name, rightsId : projectsRightIdsMap.get(p.id).id, users: [], groups: [] }])
+          .map(p => [p.id, { id: p.id, name: p.name, rightsId: projectsRightIdsMap.get(p.id).id, users: [], groups: [] }])
         ),
       });
     }
-    console.log("buildRightsTreeMistral() workspaceNodes", workspaceNodes)
+    //console.log("buildRightsTreeMistral() workspaceNodes", workspaceNodes)
 
     // 2. index target_id → node pour ranger les droits en O(1)
     const targetIndex = new Map(); // "kind:id" → node
@@ -228,7 +209,7 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
         targetIndex.set(`project:${p.id}`, p);
       }
     }
-    console.log("buildRightsTreeMistral() targetIndex", targetIndex)
+    //console.log("buildRightsTreeMistral() targetIndex", targetIndex)
 
     for (const r of rights) {
       //console.log("buildRightsTreeMistral() right", r)
@@ -252,12 +233,12 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
   /*
   [
   {
-    id: 101, name: "Workspace Kanbear",
+    id: 101, name: "Workspace Kanbear", rightsId: 13,
     users:  [ { id: 1, name: "Gaspard", rightsId: 1 } ],
     groups: [ { id: 10, name: "Équipe Design", rightsId: 2 } ],
     projects: [
       {
-        id: 201, name: "Site vitrine",
+        id: 201, name: "Site vitrine", rightsId: 45
         users:  [ { id: 1, name: "Gaspard", rightsId: 3 } ],
         groups: [ { id: 11, name: "Dev Backend", rightsId: 4 } ],
       },
@@ -267,8 +248,8 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
   // ...
 ]
   */
-  
-//-----------------------------------------------------------------------------------------
+
+  //-----------------------------------------------------------------------------------------
   getTargetId() {
     return (this.targetId)
   }
@@ -280,13 +261,14 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
 
       // trick to get values at time of firing the function, not creating it
       let getThis = () => { console.log("getThis fired", myThis); return (myThis) }
-      console.log("addRightsButton event Listener fired",
+      /*console.log("addRightsButton event Listener fired",
         "params", params,
         "target_id", getThis().targetId,
         "target_id() ", getThis().targetId,
         "target_kind", getThis().targetKind,
         "owner_id", getThis().ownerId,
         "owner_type", getThis().ownerType)
+        */
       //let el = document.getElementById(`kanbear${params.targetKind}RightsSelectBox`)
       //console.log("addRightsButton event Listener fired, selected", el.value)
       ev.stopPropagation();
@@ -299,24 +281,30 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
       switch (params.action) {
         case "addWorkspace":
           kind = 'workspace'
+          if (getThis().targetId < 1) { doIt = false }
           rights.setData("target_id", getThis().targetId)
           rights.setData("target_kind", kind)
           break
         case "addProjectToWorkspace":
           kind = 'project'
+          if (getThis().targetId < 1) { doIt = false }
           rights.setData("target_id", getThis().targetId)
           rights.setData("target_kind", kind)
           break
         case "addUserToWorkspace":
           kind = 'workspace'
+          if (getThis().ownerId < 1 || params.workspaceId < 1) { doIt = false }
           rights.setData("owner_id", getThis().ownerId)
+          getThis().ownerId = -99
           rights.setData("owner_type", 'user')
           rights.setData("target_id", params.workspaceId)
           rights.setData("target_kind", kind)
           break
         case "addUserToProject":
           kind = 'project'
+          if (getThis().ownerId < 1 || params.workspaceId < 1) { doIt = false }
           rights.setData("owner_id", getThis().ownerId)
+          getThis().ownerId = -99
           rights.setData("owner_type", 'user')
           rights.setData("target_id", params.projectId)
           rights.setData("target_kind", kind)
@@ -328,14 +316,21 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
       }
       if (doIt) {
         rights.create()
-          .finally(() => sendEvent(`${kind}sRightsCreated`, {}))
+          .finally(() => {
+            console.log("rightsUserSelectBox", document.getElementsByClassName("rightsUserSelectBox"))
+            for (let s of document.getElementsByClassName("rightsUserSelectBox")) {
+              s.selectedIndex = -1
+            }
+            sendEvent(`${kind}sRightsCreated`, {})
+          })
+
       }
     }
     return (addRightsFn)
   }
 
   //--------------------------------------------------------------------------------------------------------------
-  async renderProjectsInWorkspace(divs,w) {
+  async renderProjectsInWorkspace(divs, w) {
     console.log("renderProjectsInWorkspace(w)", w)
     for (let p of w.projects) {
       console.log("renderProjectsInWorkspace(w) project ", p)
@@ -347,24 +342,27 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
           projectId: p.id
         }),
         false)
+      let delRightButton = this.buildDelRightButton(p.rightsId,
+        (!(p.users.length === 0 ) )
+        )
       divs.push(createElement('div', {
         //style: "display:flex;",
         class: "rights-item right-level-1",
         children: [
+          delRightButton,
           createElement('div', {
-             textContent: `${p.rightsId} Project ${p.name}#${p.id}`,
+            textContent: `${p.rightsId} Project ${p.name}#${p.id}`,
           }),
           userSelectBox,
           addUserRightsButton
         ]
       }))
-      this.buidRightsTable(divs,"rights-base right-level-2", p.groups, p.users)
+      this.buidRightsTable(divs, "rights-base right-level-2", p.groups, p.users)
     }
   }
 
   //------------------------------------------------------------------------------------------------------------------
-
-  async renderWorkspaceHeader(divs,w) {
+  async renderWorkspaceHeader(divs, w) {
     console.log("renderWorkspaceHeader(w)", w)
     let wsProjects = this.projects.filter((p) => { return p.workspace_id === w.id })
 
@@ -385,12 +383,19 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
         workspaceId: w.id
       }),
       false)
+    let delRightButton = this.buildDelRightButton(w.rightsId,
+      //( ! (w.users.length === 0 && w.groups.length === 0 && w.projects.length === 0) )
+      (!(w.users.length === 0 && w.projects.length === 0))
+      //false
+    )
     let wDiv = createElement('div', {
       class: "rights-base right-level-0",
       //style: "background-color : pink;display:flex;",
-      children: [createElement('div', {
-        textContent: `${w.rightsId} Workspace ${w.name}#${w.id}`,
-      }),
+      children: [
+        delRightButton,
+        createElement('div', {
+          textContent: `${w.rightsId} Workspace ${w.name}#${w.id}`,
+        }),
         projectsSelectBox,
         addProjectRightsButton,
         userSelectBox,
@@ -404,9 +409,9 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
   async renderTreeMistral(tree) {
     this.wDiv = []
     for (let w of tree) {
-      await this.renderWorkspaceHeader(this.wDiv,w)
-      this.buidRightsTable(this.wDiv,"rights-base right-level-1", w.groups, w.users)
-      await this.renderProjectsInWorkspace(this.wDiv,w)
+      await this.renderWorkspaceHeader(this.wDiv, w)
+      this.buidRightsTable(this.wDiv, "rights-base right-level-1", w.groups, w.users)
+      await this.renderProjectsInWorkspace(this.wDiv, w)
     }
 
     return (createElement("div", {
@@ -441,9 +446,6 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
   //users:  [ { id: 1, name: "Gaspard", rightsId: 1 } ],
   //  groups: [ { id: 10, name: "Équipe Design", rightsId: 2 } ],
   buidRightsTable(divs, cssClass, groups, users) {
-
-    //console.log("UserRightsModal.buildRightsTable()", "groups", groups, "users", users)
-    //let table = document.createElement('table')
     let table = createElement('table', {
     })
     //table.appendChild(this.buidRightsTableHead())
@@ -454,6 +456,13 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
       td.innerHTML = p
       return (td)
     }
+    const tdElement = (p) => {
+      const td = createElement('td',{
+        children: [p]
+      })
+      return (td)
+    }
+
     const tdHref = (href) => {
       const td = document.createElement('td')
       td.appendChild(href)
@@ -467,15 +476,11 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
       let rightsId = `${user.rightsId}`
       let radix = `rights:${rightsId}`
       let rights = this.rightsHash[rightsId]
+      let delRightButton = this.buildDelRightButton(rightsId,false)
+      row.appendChild(tdElement(delRightButton))
       let hiddenRights = `<input type="hidden" class="hiddenRights" id="${radix}" value="${rights.rights}">`
-      //console.log("UserRightsModal.buildRightsTable() tr ", "id", rightsId, "rightsHash", this.rightsHash)
-
-      //row.appendChild(td(""))
-      //row.appendChild(td(""))
       row.appendChild(td(`${rightsId} ${hiddenRights}`))
       row.appendChild(td(`user ${user.name}#${user.id}`))
-      //row.appendChild(td(rights[`${lkind}_id`]))
-      //row.appendChild(td(rights[`${lkind}_name`]))
       row.appendChild(td(`${rights.target_kind}#${rights.target_id} : ${rights.rights}`))
       let isadminChecked = ((rights.rights & ISADMINFLAG) > 0) ? "checked" : ""
       let deleteChecked = ((rights.rights & DELETEFLAG) > 0) ? "checked" : ""
@@ -522,10 +527,6 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
       class: cssClass,
       children: [table]
     }))
-    //return (createElement('div', {
-    //  class: cssClass,
-    //  children: [table]
-    //}))
   }
 
   //-------------------------------------------------------------------------
@@ -573,7 +574,7 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
       //buttons: [addUserButton],
       items: this.users,
       labelText: "User",
-      klass: "filter-group",
+      klass: "filter-group rightsUserSelectBox",
       //selectedOption: Kontext.getWorkspaceId()
       //headItems:[['* Create new workspace',-1]]
     }
@@ -587,8 +588,6 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
     });
     return (userSelectBox)
   }
-
-
 
   //-----------------------------------------------------------------------------
   async getRightsList(kind) {
@@ -609,6 +608,10 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
       console.log("RightsModal() workspacesRightsCreated listener fired <ev>", ev)
       thisClass.render()
     })
+    document.addEventListener("rightDeleted", async (ev) => {
+      console.log("RightsModal() rightDeleted listener fired <ev>", ev)
+      thisClass.render()
+    })
   }
 
   //------------------------------------------------------------------------
@@ -626,6 +629,35 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
     //let dialog = document.getElementById(`projectsRightsModal`)
     exitRightsButton.addEventListener('click', exitRightsFn, { once: true });
     return (exitRightsButton)
+  }
+
+  //------------------------------------------------------------------------
+  buildDelRightButton(rightId, disabled) {
+    const myThis = this
+    let delRightFn = async function (ev) {
+      console.log("delRightButton event Listener fired")
+      ev.stopPropagation();
+      if ( confirm(`delRightButton_${rightId}`)) {
+        let rightsEntity
+        rightsEntity = new Rights({})
+        rightsEntity.setId(rightId)
+        //rightsEntity.setData("rights", cRights)
+        //rightsEntity.setData("target_type", kind)
+        await rightsEntity.delete()
+      }
+      sendEvent("rightDeleted",{})
+    }
+    //let dialog = document.getElementById(`projectsRightsModal`)
+    const delRightButton = createElement('button', {
+      class: "add-item-btn",
+      innerHTML: "X",
+      id: `delRightButton_${rightId}`,
+      onclick: [delRightFn, { once: true }]
+    })
+    if (disabled) {
+      delRightButton.setAttribute("disabled", "")
+    }
+    return (delRightButton)
   }
 
   //------------------------------------------------------------------------
@@ -664,7 +696,6 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
     }
   }
 
-
   //------------------------------------------------------------------------
   buildSaveRightsButton() {
     const saveRightsButton = document.createElement('button')
@@ -687,12 +718,10 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
   //--------------------------------------------------------------
   async buildProjectsSelectBox(projects) {
     //let projects = await Project.getAll('projects', {})
-
     let boxName = "kanbearProjectsRightsSelectBox"
-
     let checkboxes = []
     //let projects = []
-    console.log("RightsModal buildProjectsSelectBox()", this.projects)
+    //console.log("RightsModal buildProjectsSelectBox()", this.projects)
     //this.projects.forEach((p) => {
     //  p.name = `${this.workspacesHash[p.workspace_id].name}/${p.name}/#${p.id}`
     //  projects.push(p)
@@ -717,33 +746,6 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
     return (projectsSelectBox)
   }
 
-  //--------------------------------------------------------------
-  async buildWorkspacesSelectBox() {
-    //let workspaces = await Workspace.getAll('workspaces', {})
-
-    let boxName = "kanbearWorkspacesRightsSelectBox"
-    let buttons = [buildAddRightsButton(
-      boxName,
-      this.getAddRightsFn({
-        action: "addWorkspaceToRights",
-        projectId: p.id
-      }),
-      false)]
-
-    let checkboxes = []
-    let boxParams = {
-      domId: boxName,
-      boxLabel: "WorkspacesRights",
-      buttons: buttons,
-      checkboxes: checkboxes,
-      items: this.workspaces,
-      labelText: "WorkspacesRights",
-      klass: "filter-group",
-    }
-    let wsDiv = await selectBoxBuilder(boxParams)
-    console.log("UserRightsModal <buildProjectsSelectBox()>", wsDiv)
-    return (wsDiv)
-  }
 
   //------------------------------------------------------------------------
   getItemId(radix, action) {
@@ -760,8 +762,6 @@ const projectsRightIdsMap   = createKindMap(rights, 'project');
     }
     return (`${wsName}/${this.projectsHash[projectId].name}/${this.projectsHash[projectId].workspace_id}`)
   }
-
-
 }
 
 export { RightsModal }

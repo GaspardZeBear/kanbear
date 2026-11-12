@@ -14,7 +14,10 @@ async function selectBoxBuilder(params) {
 
   //console.log("selectBoxBuilder", items)
   const itemDiv = document.createElement("div")
-  itemDiv.classList.add(klass)
+  const classes = klass.split(" ")
+  for (let c of classes) {
+    itemDiv.classList.add(c)
+  }
   //const label = document.createElement(boxLabel)
 
   const label = document.createElement('label')
