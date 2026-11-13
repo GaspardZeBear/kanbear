@@ -27,6 +27,7 @@ import workspaceRightsRoutes from './routes/workspaceRights.mjs'
 import userRoutes from './routes/users.mjs'
 import taskRoutes from './routes/tasks.mjs'
 import workspaceRoutes from './routes/workspaces.mjs'
+import groupRoutes from './routes/groups.mjs'
 import projectUserRoutes from './routes/projectUsers.mjs'
 import userGroupRoutes from './routes/userGroups.mjs'
 import taskHasTagRoutes from './routes/taskHasTags.mjs'
@@ -132,6 +133,7 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/workspaces', workspaceRoutes);
+app.use('/api/groups', groupRoutes);
 app.use('/api/projects_users', projectUserRoutes);
 app.use('/api/users_groups', userGroupRoutes);
 app.use('/api/task_has_tags', taskHasTagRoutes);
