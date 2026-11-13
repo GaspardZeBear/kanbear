@@ -28,6 +28,14 @@
     display : flex;
 }
 
+.right-project {
+  background-color : rgb(238, 144, 202);
+}
+
+.right-actor {
+  background-color : rgb(236, 228, 233);
+}
+
 .right-level-2 {
   xfont-weight: bold;
   margin-left:100px;

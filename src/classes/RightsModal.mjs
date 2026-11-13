@@ -41,15 +41,9 @@ class RightsModal {
     await this.buildHavingRightsThings()
     console.log("render() workspaces", this.workspaces, "righted workspaces", this.havingRightsWorkspaces)
     let workspaceDiv = await this.buildWorkspaceSelectBox()
-    //let userDiv = await this.buildUserSelectBox()
-    //let createRightsButton = createElement("Button", {
-    //  textContent: "+R",
-    //  onclick: [() => { alert(`add ${this.targetKind} ${this.targetId} ${this.ownerId}`) }]
-    //})
     let addRightsButton = buildAddRightsButton(
       `addWorkspacesRights`,
-      this.getAddRightsFn(
-        {
+      this.getAddRightsFn({
           action: "addWorkspace"
         }
       ),
@@ -61,17 +55,13 @@ class RightsModal {
     })
     let saveRightsButton = this.buildSaveRightsButton()
     let exitRightsButton = this.buildExitRightsButton()
-    //await this.buildRightsTree()
-    //await this.renderTree()
-    //rights, users, groups, workspaces, projects) {
-    let rightsTree = this.buildRightsTreeMistral(this.rights,
+    let rightsTree = this.buildRightsTree(this.rights,
       this.users, [],
       this.havingRightsWorkspaces,
       this.havingRightsProjects
     )
     console.log("render() rightsTree", rightsTree)
-    //let tree = this.XrenderTreeMistral(rightsTree)
-    let treeAsTable = await this.renderTreeMistral(rightsTree)
+        let treeAsTable = await this.renderTree(rightsTree)
     //console.log("tree", tree)
 
     document.getElementById(this.htmlElement).replaceChildren(createElement("div", {
@@ -91,7 +81,9 @@ class RightsModal {
   //-------------------------------------------------------------------------
   async loadWorkspaces() {
     this.workspaces = await Workspace.getAll('workspaces')
-    console.log("loadWorkspaces() workspaces", this.workspaces)
+    console.log("RightsModal loadWorkspaces", this.workspaces)
+    this.workspaces.sort((a, b) => a.name.localeCompare(b.name))
+    console.log("RightsModal loadWorkspaces sorted", this.workspaces)
     this.workspacesHash = {}
     this.workspaces.forEach((w) => {
       this.workspacesHash[w.id] = w
@@ -101,6 +93,7 @@ class RightsModal {
   //-------------------------------------------------------------------------
   async loadProjects() {
     this.projects = await Project.getAll('projects')
+    this.projects.sort()
     this.projectsHash = {}
     this.projects.forEach((w) => {
       this.projectsHash[w.id] = w
@@ -157,13 +150,15 @@ class RightsModal {
     for (let pId of havingRightsProjects) {
       this.havingRightsProjects.push(this.projectsHash[pId])
     }
+    this.havingRightsWorkspaces.sort((a, b) => a.name.localeCompare(b.name))
+    this.havingRightsProjects.sort((a, b) => a.name.localeCompare(b.name))
   }
 
 
   //-------------------------------------------------------------------------
-  buildRightsTreeMistral(rights, users, groups, workspaces, projects) {
-    console.log("buildRightsTreeMistral() workspaces", workspaces)
-    console.log("buildRightsTreeMistral() projects", projects)
+  buildRightsTree(rights, users, groups, workspaces, projects) {
+    console.log("buildRightsTree() workspaces", workspaces)
+    console.log("buildRightsTree() projects", projects)
     const usersById = new Map(users.map(u => [u.id, u]));
     const groupsById = new Map(groups.map(g => [g.id, g]));
 
@@ -180,13 +175,13 @@ class RightsModal {
     const workspacesRightIdsMap = createKindMap(rights, 'workspace');
     const projectsRightIdsMap = createKindMap(rights, 'project');
 
-    console.log("buildRightsTreeMistral() workspacesRightIdsMap", workspacesRightIdsMap)
-    console.log("buildRightsTreeMistral() projectsRightIdsMap", projectsRightIdsMap)
+    console.log("buildRightsTree() workspacesRightIdsMap", workspacesRightIdsMap)
+    console.log("buildRightsTree() projectsRightIdsMap", projectsRightIdsMap)
 
     // 1. Noeuds workspaces, chacun avec ses projets
     const workspaceNodes = new Map();
     for (const w of workspaces) {
-      console.log("buildRightsTreeMistral() w", w, "w.id", w.id, workspacesRightIdsMap.get(w.id) ?? "not found")
+      console.log("buildRightsTree() w", w, "w.id", w.id, workspacesRightIdsMap.get(w.id) ?? "not found")
       workspaceNodes.set(w.id, {
         id: w.id,
         name: w.name,
@@ -199,9 +194,7 @@ class RightsModal {
         ),
       });
     }
-    //console.log("buildRightsTreeMistral() workspaceNodes", workspaceNodes)
-
-    // 2. index target_id → node pour ranger les droits en O(1)
+        // 2. index target_id → node pour ranger les droits en O(1)
     const targetIndex = new Map(); // "kind:id" → node
     for (const w of workspaceNodes.values()) {
       targetIndex.set(`workspace:${w.id}`, w);
@@ -209,13 +202,10 @@ class RightsModal {
         targetIndex.set(`project:${p.id}`, p);
       }
     }
-    //console.log("buildRightsTreeMistral() targetIndex", targetIndex)
-
+    
     for (const r of rights) {
-      //console.log("buildRightsTreeMistral() right", r)
       const key = `${r.target_kind}:${r.target_id}`
       const node = targetIndex.get(key);
-      //console.log("buildRightsTreeMistral() right", r, "key", key, "node", node)
       if (!node) continue; // cible inconnue/supprimée → ligne ignorée (ou logger)
       const list = r.owner_type === 'user' ? node.users : node.groups;
       list.push({ ...ownerRef(r.owner_type, r.owner_id), rightsId: r.id });
@@ -347,7 +337,7 @@ class RightsModal {
         )
       divs.push(createElement('div', {
         //style: "display:flex;",
-        class: "rights-item right-level-1",
+        class: "rights-item right-level-1 right-project",
         children: [
           delRightButton,
           createElement('div', {
@@ -357,7 +347,7 @@ class RightsModal {
           addUserRightsButton
         ]
       }))
-      this.buidRightsTable(divs, "rights-base right-level-2", p.groups, p.users)
+      this.buidRightsTable(divs, "rights-base right-level-2 right-actor", p.groups, p.users)
     }
   }
 
@@ -406,11 +396,11 @@ class RightsModal {
   }
 
   //--------------------------------------------------------------------------------------------------------
-  async renderTreeMistral(tree) {
+  async renderTree(tree) {
     this.wDiv = []
     for (let w of tree) {
       await this.renderWorkspaceHeader(this.wDiv, w)
-      this.buidRightsTable(this.wDiv, "rights-base right-level-1", w.groups, w.users)
+      this.buidRightsTable(this.wDiv, "rights-base right-level-1 right-actor", w.groups, w.users)
       await this.renderProjectsInWorkspace(this.wDiv, w)
     }
 
@@ -745,7 +735,6 @@ class RightsModal {
     console.log("UserRightsModal <buildProjectsSelectBox()>", projectsSelectBox)
     return (projectsSelectBox)
   }
-
 
   //------------------------------------------------------------------------
   getItemId(radix, action) {

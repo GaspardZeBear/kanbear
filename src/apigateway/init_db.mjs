@@ -13,6 +13,14 @@ import bcrypt from 'bcrypt'
   `);
 
   db.exec(`
+    CREATE TABLE IF NOT EXISTS groups (
+      id INTEGER PRIMARY KEY,
+      name TEXT NOCASE NOT NULL,
+      description TEXT
+    )
+  `);
+
+  db.exec(`
     CREATE TABLE IF NOT EXISTS columns (
       id INTEGER PRIMARY KEY,
       name TEXT NOT NULL,
@@ -122,6 +130,17 @@ import bcrypt from 'bcrypt'
       date_modified DATETIME,
       FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE SET NULL,
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL
+    )
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users_groups (
+      id INTEGER PRIMARY KEY,
+      user_id INTEGER NOT NULL DEFAULT 0,
+      group_id INTEGER NOT NULL DEFAULT 0,
+      FOREIGN KEY(group_id) REFERENCES groups(id) ON DELETE SET DEFAULT,
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET DEFAULT,
+      UNIQUE(user_id,group_id)
     )
   `);
 
