@@ -5,6 +5,7 @@ import { KanbanPanel } from './classes/KanbanPanel.mjs';
 import { KanbearEntityFactory } from './classes/KanbearEntityFactory.mjs';
 import { KanbearAssigneePanel } from './classes/KanbearAssigneePanel.mjs';
 import { KanbearUserPanel } from './classes/KanbearUserPanel.mjs';
+import { KanbearGroupPanel } from './classes/KanbearGroupPanel.mjs';
 import { KanbearListPanel } from './classes/KanbearListPanel.mjs';
 import { KanbearMigrator } from './classes/KanbearMigrator.mjs';
 import { KanbearProjectCleanor } from './classes/KanbearProjectCleanor.mjs';
@@ -254,6 +255,11 @@ document.addEventListener("userCreated", async (ev) => {
     new KanbearUserPanel().render()
 })
 
+document.addEventListener("groupCreated", async (ev) => {
+    console.log("index.mjs() groupCreated listener fired <ev>", ev)
+    new KanbearGroupPanel().render()
+})
+
 document.addEventListener("userDeleted", async (ev) => {
     console.log("index.mjs() userDeleted listener fired <ev>", ev)
     new KanbearUserPanel().render()
@@ -349,6 +355,11 @@ document.getElementById('assigneePanel').addEventListener('click', () => {
 //------------------- User --------------------------------------
 document.getElementById('userPanel').addEventListener('click', () => {
     new KanbearUserPanel().render()
+});
+
+//------------------- User --------------------------------------
+document.getElementById('groupPanel').addEventListener('click', () => {
+    new KanbearGroupPanel().render()
 });
 
 //------------------- User --------------------------------------

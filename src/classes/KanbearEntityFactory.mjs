@@ -2,6 +2,7 @@ import { ApiCaller } from "./ApiCaller.mjs"
 import { Assignee } from './Assignee.mjs'
 import { Column } from './Column.mjs'
 import { Project } from './Project.mjs'
+import { Group } from './Group.mjs'
 import { ProjectsRights } from "./ProjectsRights.mjs"
 import { WorkspacesRights } from "./WorkspacesRights.mjs"
 import { Swimlane } from './Swimlane.mjs'
@@ -38,6 +39,9 @@ class KanbearEntityFactory {
                 break
             case 'user':
                 return new User(parms)
+                break
+            case 'group':
+                return new Group(parms)
                 break
             case 'workspace':
                 return new Workspace(parms)
