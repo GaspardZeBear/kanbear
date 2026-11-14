@@ -11,7 +11,7 @@ import { SmartTable } from "./SmartTable.mjs";
 
 class KanbearUserPanel {
   constructor() {
-    this.projects = Kontext.getJsonBulkData()
+    //this.projects = Kontext.getJsonBulkData()
     this.htmlElement = 'results'
     this.kanboardFilter = new KanboardFilter(getFiltersMap())
     this.buttons = {}

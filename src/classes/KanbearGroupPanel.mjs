@@ -3,7 +3,7 @@ import { formatDuration, dateToString, getDurationFromNow } from "../utils/dateA
 import { Kontext } from "./Kontext.mjs";
 import { Group } from "./Group.mjs"
 import { GroupDialog } from "./GroupDialog.mjs"
-//import { buildGroupLink, buildGroupRightsLink } from "../utils/linkBuilder.mjs";
+import { buildGroupLink, buildGroupRightsLink } from "../utils/linkBuilder.mjs";
 import { sendEvent } from "../utils/sendEvent.mjs";
 import { getFiltersMap } from "../utils/filters.mjs";
 import { SmartTable } from "./SmartTable.mjs";
@@ -11,7 +11,7 @@ import { SmartTable } from "./SmartTable.mjs";
 
 class KanbearGroupPanel {
   constructor() {
-    this.projects = Kontext.getJsonBulkData()
+    //this.projects = Kontext.getJsonBulkData()
     this.htmlElement = 'results'
     this.kanboardFilter = new KanboardFilter(getFiltersMap())
     this.buttons = {}
@@ -134,8 +134,8 @@ class KanbearGroupPanel {
         const id = "groupSel"
         row.appendChild(td('<input class="groupCheckbox" groupId=' + group.id + ' type="checkbox"/>'))
         row.appendChild(td(group.id))
-        //row.appendChild(tdHref(buildGroupLink(group.id, group.name)))
-        row.appendChild(td(group.name))
+        row.appendChild(tdHref(buildGroupLink(group.id, group.name)))
+        //row.appendChild(td(group.name))
         row.appendChild(td(group.description))
         tbody.appendChild(row);
       }

@@ -260,6 +260,18 @@ document.addEventListener("groupCreated", async (ev) => {
     new KanbearGroupPanel().render()
 })
 
+
+document.addEventListener("groupDeleted", async (ev) => {
+    console.log("index.mjs() groupDeleted listener fired <ev>", ev)
+    new KanbearGroupPanel().render()
+})
+
+
+document.addEventListener("groupModified", async (ev) => {
+    console.log("index.mjs() groupModified listener fired <ev>", ev)
+    new KanbearGroupPanel().render()
+})
+
 document.addEventListener("userDeleted", async (ev) => {
     console.log("index.mjs() userDeleted listener fired <ev>", ev)
     new KanbearUserPanel().render()

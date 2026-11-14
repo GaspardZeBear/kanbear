@@ -7,6 +7,7 @@ import { AssigneeDialog } from '../classes/AssigneeDialog.mjs'
 import { TasksCommentsModal } from '../classes/TasksCommentsModal.mjs'
 import { RightsModal } from '../classes/RightsModal.mjs'
 import { UserDialog } from '../classes/UserDialog.mjs'
+import { GroupDialog } from '../classes/GroupDialog.mjs'
 
 class LinkCounter {
   static counter=0
@@ -127,6 +128,29 @@ class LinkCounter {
   }
 
   //----------------------------------------------------------------------------------
+  function buildGroupLink(groupId, groupName) {
+    const href = document.createElement("a")
+    //LinkCounter.counter++
+    //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
+    href.setAttribute("href", "javascript:void(0)")
+    href.innerHTML = `${groupName}`
+    //let myProject = this.project
+    let gId=groupId
+    let editGroupFn = function (ev) {
+      console.log("editGroupHref event Listener fired ")
+      ev.stopPropagation();
+      const group = new GroupDialog()
+      group.modify({groupId:gId});
+    }
+    href.addEventListener('click', editGroupFn, { once: true });
+    console.log(href)
+    return(href)
+  }
+
+  //----------------------------------------------------------------------------------
+  function buildGroupUsersLink(groupId, groupName) {}
+
+  //----------------------------------------------------------------------------------
   function buildUserRightsLink(userId, userName) {
     const href = document.createElement("a")
     //LinkCounter.counter++
@@ -170,6 +194,8 @@ class LinkCounter {
   export { buildAssigneeLink, 
     buildUserLink,
     buildUserRightsLink,
+    buildGroupLink,
+    buildGroupRightsLink,
     buildWorkspaceLink,
     buildProjectLink,
     buildSwimlaneLink,

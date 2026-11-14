@@ -16,7 +16,8 @@ import bcrypt from 'bcrypt'
     CREATE TABLE IF NOT EXISTS groups (
       id INTEGER PRIMARY KEY,
       name TEXT NOCASE NOT NULL,
-      description TEXT
+      description TEXT,
+      UNIQUE (name)
     )
   `);
 
