@@ -1,0 +1,84 @@
+:root {
+            --primary: #4a90e2;
+            --bg: #f5f7fa;
+            --border: #ccc;
+        }
+
+        Xbody {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: var(--bg);
+            margin: 0;
+        }
+
+        .n2n-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .n2n-box {
+            width: 200px;
+            height: 250px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            overflow-y: auto;
+            background: #fff;
+        }
+
+        .n2n-box-title {
+            text-align: center;
+            background: #f0f0f0;
+            margin: 0;
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .n2n-item {
+            padding: 10px;
+            padding-left: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+
+        .n2n-item:hover {
+            background-color: #eef5fc;
+        }
+
+        .n2n-item.selected {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .n2n-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        n2n-button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 1px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 4px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        n2n-button:hover {
+            background: var(--primary);
+            color: white;
+        }
