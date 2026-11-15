@@ -9,6 +9,7 @@ import { Swimlane } from './Swimlane.mjs'
 import { Rights } from './Rights.mjs'
 import { Task } from './Task.mjs'
 import { TasksComments } from './TasksComments.mjs'
+import { UsersGroups } from './UsersGroups.mjs'
 import { User } from './User.mjs'
 import { Workspace } from './Workspace.mjs'
 
@@ -36,6 +37,9 @@ class KanbearEntityFactory {
                 break
             case 'tasksComments':
                 return new TasksComments(parms)
+                break
+            case 'usersGroups':
+                return new UsersGroups(parms)
                 break
             case 'user':
                 return new User(parms)

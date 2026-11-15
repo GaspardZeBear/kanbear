@@ -8,6 +8,7 @@ import { TasksCommentsModal } from '../classes/TasksCommentsModal.mjs'
 import { RightsModal } from '../classes/RightsModal.mjs'
 import { UserDialog } from '../classes/UserDialog.mjs'
 import { GroupDialog } from '../classes/GroupDialog.mjs'
+import { N2nModal } from '../classes/N2nModal.mjs'
 
 class LinkCounter {
   static counter=0
@@ -148,7 +149,34 @@ class LinkCounter {
   }
 
   //----------------------------------------------------------------------------------
-  function buildGroupUsersLink(groupId, groupName) {}
+  function buildUsersGroupsLink(params) {
+      const href = document.createElement("a")
+    //LinkCounter.counter++
+    //href.setAttribute("id", `columnHref_${columnId}_${LinkCounter.counter}`)
+    href.setAttribute("href", "javascript:void(0)")
+    href.innerHTML = `Users`
+    //let myProject = this.project
+    //let uId=userId
+    let editUsersGroupsFn = function async (ev) {
+      console.log("editGroupUsersHref event Listener fired ")
+      ev.stopPropagation();
+      //const userRights = new UserDialog()
+      let modal=new N2nModal({
+        type: 'group',
+        id : params.id,
+        name : params.name,
+        leftCallback  : params.leftCallback,
+        rightKey : params.rightKey,
+        rightCallback : params.rightCallback, 
+        onSave : params.onSave
+      })
+      modal.render()
+    }
+    href.addEventListener('click', editUsersGroupsFn, { once: false });
+    console.log(href)
+    return(href)
+  }
+  
 
   //----------------------------------------------------------------------------------
   function buildUserRightsLink(userId, userName) {
@@ -195,7 +223,7 @@ class LinkCounter {
     buildUserLink,
     buildUserRightsLink,
     buildGroupLink,
-    buildGroupRightsLink,
+    buildUsersGroupsLink,
     buildWorkspaceLink,
     buildProjectLink,
     buildSwimlaneLink,

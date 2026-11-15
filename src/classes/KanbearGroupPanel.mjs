@@ -2,11 +2,13 @@ import { KanboardFilter } from "./KanboardFilter.mjs"
 import { formatDuration, dateToString, getDurationFromNow } from "../utils/dateAndTime.mjs";
 import { Kontext } from "./Kontext.mjs";
 import { Group } from "./Group.mjs"
+import { User } from "./User.mjs"
 import { GroupDialog } from "./GroupDialog.mjs"
-import { buildGroupLink, buildGroupRightsLink } from "../utils/linkBuilder.mjs";
+import { buildGroupLink, buildUsersGroupsLink } from "../utils/linkBuilder.mjs";
 import { sendEvent } from "../utils/sendEvent.mjs";
 import { getFiltersMap } from "../utils/filters.mjs";
 import { SmartTable } from "./SmartTable.mjs";
+import { UsersGroups } from "./UsersGroups.mjs";
 
 
 class KanbearGroupPanel {
@@ -20,7 +22,7 @@ class KanbearGroupPanel {
 
   //-----------------------------------------------------------------
   async render() {
-    if ( !await Kontext.isUserAdmin()) {
+    if (!await Kontext.isUserAdmin()) {
       alert("You must be admin to see groups")
       return
     }
@@ -49,7 +51,7 @@ class KanbearGroupPanel {
     await this.createTable()
     //console.log(this.table)
     result.appendChild(this.table)
-    let table=new SmartTable(this.table)
+    let table = new SmartTable(this.table)
   }
 
 
@@ -73,77 +75,109 @@ class KanbearGroupPanel {
         group.setId(toDel.getAttribute("groupid"))
         await group.delete()
       }
-      sendEvent('groupDeleted', { "ids" : [] })
-      console.log("KanbearGroupPanel <groupDeletedEvent>",toDelete)
+      sendEvent('groupDeleted', { "ids": [] })
+      console.log("KanbearGroupPanel <groupDeletedEvent>", toDelete)
     }
-      delGroupButton.addEventListener('click', delGroupFn, { once: true });
-      return (delGroupButton)
-    }
+    delGroupButton.addEventListener('click', delGroupFn, { once: true });
+    return (delGroupButton)
+  }
 
-    //------------------------------------------------------------------------
-    buildAddGroupButton() {
-      //let projectId = this.project.id
-      const addGroupButton = document.createElement('button')
-      addGroupButton.classList.add("add-item-btn")
-      addGroupButton.setAttribute("id", "addGroupButton")
-      addGroupButton.innerHTML = "+A"
-      let addGroupFn = function (ev) {
-        console.log("addGroupButton event Listener fired")
-        ev.stopPropagation();
-        const group = new GroupDialog('group')
-        group.create({});
-      }
-      //removeEventListener("click", addSwimlaneFn)
-      addGroupButton.addEventListener('click', addGroupFn, { once: true });
-      return (addGroupButton)
+  //------------------------------------------------------------------------
+  buildAddGroupButton() {
+    //let projectId = this.project.id
+    const addGroupButton = document.createElement('button')
+    addGroupButton.classList.add("add-item-btn")
+    addGroupButton.setAttribute("id", "addGroupButton")
+    addGroupButton.innerHTML = "+A"
+    let addGroupFn = function (ev) {
+      console.log("addGroupButton event Listener fired")
+      ev.stopPropagation();
+      const group = new GroupDialog('group')
+      group.create({});
     }
+    //removeEventListener("click", addSwimlaneFn)
+    addGroupButton.addEventListener('click', addGroupFn, { once: true });
+    return (addGroupButton)
+  }
 
   //-----------------------------------------------------------------
   async createTable() {
-      const groups = await Group.getAll('groups')
-      console.log("KanbearGroupPanel.createTable()","<groups>",groups)
-      this.table = document.createElement('table')
-      this.table.id="GroupsTable"
-      const thead = document.createElement('thead')
-      const hrow = document.createElement('tr')
-      hrow.innerHTML = `
+    const groups = await Group.getAll('groups')
+    //const users = await User.getAll('users')
+    console.log("KanbearGroupPanel.createTable()", "<groups>", groups)
+    this.table = document.createElement('table')
+    this.table.id = "GroupsTable"
+    const thead = document.createElement('thead')
+    const hrow = document.createElement('tr')
+    hrow.innerHTML = `
         <th>Sel</th>
         <th>Id</th>
         <th>Name</th>
         <th>Description</th>
+        <th>Users</th>
         `
-      thead.appendChild(hrow)
-      this.table.appendChild(thead)
-      const tbody = document.createElement('tbody')
+    thead.appendChild(hrow)
+    this.table.appendChild(thead)
+    const tbody = document.createElement('tbody')
 
-      Object.entries(groups).forEach((groupEntity) => {
-        const group = groupEntity[1]
-        //console.log("KanbearGroupPanel.createTable() <group>", group)
-        const row = document.createElement('tr');
+    Object.entries(groups).forEach((groupEntity) => {
+      const group = groupEntity[1]
+      //console.log("KanbearGroupPanel.createTable() <group>", group)
+      const row = document.createElement('tr');
 
-        const td = (p) => {
-          const td = document.createElement('td')
-          td.innerHTML = p
-          return (td)
-        }
-        const tdHref = (href) => {
-          const td = document.createElement('td')
-          td.appendChild(href)
-          return (td)
-        }
-        const id = "groupSel"
-        row.appendChild(td('<input class="groupCheckbox" groupId=' + group.id + ' type="checkbox"/>'))
-        row.appendChild(td(group.id))
-        row.appendChild(tdHref(buildGroupLink(group.id, group.name)))
-        //row.appendChild(td(group.name))
-        row.appendChild(td(group.description))
-        tbody.appendChild(row);
+      const td = (p) => {
+        const td = document.createElement('td')
+        td.innerHTML = p
+        return (td)
       }
-      );
-      this.table.appendChild(tbody)
-      //this.table=new SmartTable(this.table)
-      
+      const tdHref = (href) => {
+        const td = document.createElement('td')
+        td.appendChild(href)
+        return (td)
+      }
+      const id = "groupSel"
+      row.appendChild(td('<input class="groupCheckbox" groupId=' + group.id + ' type="checkbox"/>'))
+      row.appendChild(td(group.id))
+      row.appendChild(tdHref(buildGroupLink(group.id, group.name)))
+      //row.appendChild(td(group.name))
+      row.appendChild(td(group.description))
+      row.appendChild(tdHref(buildUsersGroupsLink({
+        id: group.id,
+        name: group.name,
+        leftCallback : () => {
+          console.log("Users callback fired")
+          return (User.getAll('users'))
+        },
+        rightKey : 'user_id',
+        rightCallback: () => {
+          console.log("KanbearGroupPanel rightCallback fired")
+          return (UsersGroups.getUsersByGroupId({ groupId: group.id }))
+        },
+        onSave: async (ids) => { 
+          console.log("KanbearGroupPanel onSave fired",ids)
+          alert("saving from KabearGroupPanel")
+          for ( let id of ids['mustDelete']) {
+            let gu=new UsersGroups('usersGroups')
+            gu.setId(id)
+            await gu.delete()
+          }
+          for ( let id of ids['mustAdd']) {
+            let gu=new UsersGroups('usersGroups')
+            gu.setData("group_id",group.id)
+            gu.setData("user_id",id)
+            await gu.create()
+          }
+        }
+      }))
+
+      )
+      tbody.appendChild(row);
     }
+    );
+    this.table.appendChild(tbody)
+    //this.table=new SmartTable(this.table)
 
   }
+
+}
 export { KanbearGroupPanel }

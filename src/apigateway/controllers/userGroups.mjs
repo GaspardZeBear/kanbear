@@ -3,7 +3,7 @@ import { UserGroup } from '../models/userGroup.mjs';
 export const   createUserGroup = (req, res) => {
   UserGroup.create(req.body, (err, userGroupId) => {
     if (err) return res.status(500).json({ error: err.message });
-    res.status(201).json({ id: groupUserId });
+    res.status(201).json({ id: userGroupId });
   });
 };
 
@@ -29,7 +29,7 @@ export const   getUserGroupsByUserId = (req, res) => {
 };
 
 export const   deleteUserGroup = (req, res) => {
-  UserGroup.delete(req.params.groupId, req.params.userId, (err) => {
+  UserGroup.delete(req.params.id, (err) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: 'Group user deleted successfully' });
   });

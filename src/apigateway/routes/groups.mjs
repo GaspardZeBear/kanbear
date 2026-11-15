@@ -13,7 +13,7 @@ router.get('/:id', UnifiedController.getFunction('groups','getById'))
 
 // To be seen !!!!!!!!!!!!!!!!!!!!!
 //router.get('/project/:projectId', swimlaneController.getgroupsByProjectId);
-//router.get('/user/:userId', UnifiedController.getFunction('groups','getByForeignKey',{foreignKey:'user_id'}))
+router.get('/users/:group_id', UnifiedController.getFunction('users_groups','getByForeignKey',{foreignKey:'group_id'}))
 
 //router.put('/:id', swimlaneController.updateSwimlane);
 router.put('/:id', UnifiedController.getFunction('groups','update'));

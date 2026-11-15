@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="src/assets/kanban.css">
     <link rel="stylesheet" href="src/assets/menu.css">
     <link rel="stylesheet" href="src/assets/modal.css">
+    <link rel="stylesheet" href="src/assets/rights.css">
+    <link rel="stylesheet" href="src/assets/n2n.css">
     <script type="module" src="src/index.mjs"></script>
     <!-- <script type="module" src="src/report.mjs"></script> -->
 </head>
@@ -33,8 +35,10 @@
                     </li>
                     <li class="dropdown" id="Actors"><a href="#">Actors</a>
                         <ul class="under">
-                            <li><a href="#" id="userPanel">Users</a></li>
                             <li><a href="#" id="assigneePanel">Assignees</a></li>
+                            <li><a href="#" id="groupPanel">Groups</a></li>
+                            <li><a href="#" id="userPanel">Users</a></li>
+                            <li><a href="#" id="rightPanel">Rights</a></li>
                         </ul>
                     </li>
                     <li class="dropdown" id="Tags"><a href="#">Tags</a>
@@ -292,6 +296,24 @@
         </form>
     </dialog>
 
+    <dialog id="groupDialog">
+        <h2 id="groupDialogTitle"></h2>
+        <div id="groupDialogMessage"></div>
+        <form id="groupForm" method="dialog">
+            <div id="groupNameDiv">
+                <label for="name">Group Name: </label>
+                <input type="text" id="groupName" name="groupName" />
+            </div>
+            <div id="groupDescriptionDiv">
+                <label for="group">Description: </label>
+                <input type="text" id="groupDescription" name="groupDescription" />
+            </div>
+            <button type="button" value="save" name="saveGroupBtn" id="saveGroupBtn">Save</button>
+            <button type="button" value="cancel" name="cancelGrouprBtn" id="cancelGroupBtn">Cancel</button>
+        </form>
+    </dialog>
+
+
     <dialog id="workspaceDialog" closedby="any">
         <h2 id="workspaceDialogTitle"></h2>
         <div id="workspaceDialogMessage"></div>
@@ -385,6 +407,33 @@
         </div>
     </dialog>
 
+
+    <dialog id="n2nModal" closedby="any">
+        <h2 id="n2nModalTitle"></h2>
+        <div id="n2nModalHeader">
+        </div>
+        <div id="N2n-buttons"></div>
+        <div class="n2n-container scroller" id="n2nModalResults">
+            <div>
+                <h4 class="n2n-box-title">Available</h4>
+                <div id="n2nLeftBox" class="n2n-box"></div>
+            </div>
+
+            <!-- Boutons de Contrôle -->
+            <div class="n2nControls">
+                <button id="n2nToRight">=&gt;</button>
+                <button id="n2nToLeft">&lt;=</button> 
+            </div>
+
+            <!-- Boîte de Droite -->
+            <div>
+                <h4 class="n2n-box-title">Engaged</h4>
+                <div id="n2nRightBox" class="n2n-box"></div>
+            </div>
+        </div>
+    </dialog>
+
+
     <dialog id="tasksCommentsDialog" closedby="any">
         <h2 id="tasksCommentsDialogTitle"></h2>
         <div id="tasksCommentsDialogMessage"></div>
@@ -416,8 +465,7 @@
                 <input type="text" id="rightsComment" name="rightsComment" />
             </div>
             <button type="button" value="save" name="saveRightsBtn" id="saveRightsBtn">Save</button>
-            <button type="button" value="cancel" name="cancelRightsBtn"
-                id="cancelRightsBtn">Cancel</button>
+            <button type="button" value="cancel" name="cancelRightsBtn" id="cancelRightsBtn">Cancel</button>
         </form>
     </dialog>
 
