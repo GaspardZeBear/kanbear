@@ -4,12 +4,19 @@ import { userGroupsController } from '../controllers/userGroups.mjs';
 import { UnifiedController } from '../controllers/UnifiedController.mjs';
 
 // Not a single id, ! Unified.model cannot apply at this time
-router.post('/', userGroupsController.createUserGroup);
-router.get('/', userGroupsController.getAllUserGroups);
+// old --router.post('/', userGroupsController.createUserGroup);
+router.post('/', UnifiedController.getFunction('users_groups','create'));
+
+
+
+// --old router.get('/', userGroupsController.getAllUserGroups)
+router.get('/', UnifiedController.getFunction('users_groups','getAll'));
 //router.get('/group/:groupId', userGroupsController.getUserGroupsByGroupId);
-router.get('/user/:userId', userGroupsController.getUserGroupsByUserId);
+//router.get('/user/:userId', userGroupsController.getUserGroupsByUserId);
 //router.put('/:userId/:groupId', userGroupsController.updateUserGroups);
-router.delete('/:id', userGroupsController.deleteUserGroup);
+
+// -old router.delete('/:id', userGroupsController.deleteUserGroup);
+router.delete('/:id', UnifiedController.getFunction('users_groups','delete'));
 
 export default router
 

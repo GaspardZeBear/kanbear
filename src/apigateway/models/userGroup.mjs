@@ -2,11 +2,12 @@ import { db } from '../config/database.mjs'
 
 class UserGroup {
   static create(userGroup, callback) {
-    const { group_id, user_id, right } = userGroup;
+    const { group_id, user_id } = userGroup;
     const sql = 'INSERT INTO users_groups (group_id, user_id) VALUES (?, ?)';
-    db.run(sql, [group_id, user_id], function(err) {
-      callback(err, this.lastID);
-    });
+    //db.run(sql, [group_id, user_id], function(err) {
+    //  callback(err, this.lastID);
+    //});
+    db.run(sql, [group_id, user_id],callback)
   }
 
   static getAll(callback) {

@@ -4,7 +4,7 @@ const auditMiddleware = (req, res, next) => {
   // L'événement 'finish' garantit que la réponse a été envoyée au client
   res.on('finish', () => {
     // Filtre pour ne garder que les actions de modification (Audit)
-    const methodsToLog = ['GET','POST', 'PUT', 'DELETE', 'PATCH'];
+    const methodsToLog = ['xGET','xPOST', 'xPUT', 'xDELETE', 'xPATCH'];
 
     if (methodsToLog.includes(req.method)) {
       const statusCode = res.statusCode;
