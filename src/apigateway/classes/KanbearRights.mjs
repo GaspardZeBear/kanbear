@@ -13,19 +13,20 @@ class KanbearRights {
     //Konsol.log("KanbearRights.constructor()", "userId", userId)
     //this.db = new DatabaseSync('db.sqlite', { readonly: true });
     //this.db = db
-    Konsol.log("KanbearRights.constructor()", ownerType, ownerId)
+    console.log("KanbearRights.constructor()", ownerType, ownerId)
     this.ownerId = ownerId
     this.ownerType = ownerType
-    Konsol.log("KanbearRights.constructor()", this.ownerType, this.ownerId)
+    //onsol.log("KanbearRights.constructor()", this.ownerType, this.ownerId)
     if (this.ownerType === 'user') {
       this.isAdmin = this.isAdminSql()
     }
-    this.rights = null
+    this.userRights = null
+    this.groupsRights = null
   }
 
   //-----------------------------------------------------
   isAdminSql() {
-    Konsol.log("KanbearRights.isAdmin()", this.ownerType, this.ownerId)
+    console.log("KanbearRights.isAdmin()", this.ownerType, this.ownerId)
     let req = `
       select
         id id,  
@@ -53,8 +54,8 @@ class KanbearRights {
   }
 
   //-----------------------------------------------------
-  loadRights() {
-    Konsol.log("KanbearRights.loadRights()")
+  loadUserRights() {
+    console.log("KanbearRights.loadUserRights() begin")
     let req = `
       select
         id id,
@@ -67,7 +68,7 @@ class KanbearRights {
         rights
       where
        owner_id='${this.ownerId}'
-       and owner_type='${this.ownerType}'
+       and owner_type='user'
     `
     let resp
     db.all(req, [], (err, httpCode, sqlResp) => {
@@ -76,26 +77,91 @@ class KanbearRights {
       resp = sqlResp
       //return (params)
     });
-
+    console.log("KanbearRights.loadUserRights() resp", "<rights>", resp)
     let rights = { data: { workspaces: {}, projects: {} } }
     resp.forEach(element => {
-      rights.data[element.target_kind][element.target_id] = element.rights
+      rights.data[`${element.target_kind}s`][element.target_id] = element.rights
     });
 
-    Konsol.log("KanbearRights.loadRights() over", "<rights>", rights)
-    this.resp = rights["data"] ?? null
-    return (this.resp)
+    console.log("KanbearRights.loadUserRights() over", "<rights>", rights)
+    this.userRights = rights["data"] ?? null
+    //return (this.resp)
   }
 
   //-----------------------------------------------------
+  loadGroupsRights() {
+    Konsol.log("KanbearRights.loadGroupsRights()")
+    let req = `
+      select
+        id id,
+        owner_id as owner_id,
+        owner_type as owner_type,
+        target_kind as target_kind,
+        target_id as target_id,
+        rights rights
+      from 
+        rights
+      where
+        owner_type='group'
+        and
+        owner_id in (
+          select
+           group_id
+          from 
+            users_groups
+          where 
+            user_id='${this.ownerId}'
+  )
+    `
+    let resp
+    db.all(req, [], (err, httpCode, sqlResp) => {
+      //Konsol.log("KanbearRights loadRights() callback()", "wreq", wreq)
+      //Konsol.log("KanbearRights loadRights() callback()", "sqlResp", sqlResp)
+      resp = sqlResp
+      //return (params)
+    });
+    console.log("KanbearRights.loadGroupRights() resp", resp)
+
+    let rights = { data: { workspaces: {}, projects: {} } }
+    
+    resp.forEach(element => {
+      let targetKind = `${element.target_kind}s`
+      let targetId = element.target_kind
+      let eRights=element.rights
+      if (!this.userRights[targetKind][targetId]) {
+        // remove all that is in userRights ( user is more important than groups)
+        // if not exists in groupRights, create
+        // if  exists in groupRights, bitwise or (take the most permissive value)
+        if (!rights.data[targetKind][targetId]) {
+          console.log("KanbearRights.loadGroupRights() creating  ", eRights )
+          rights.data[targetKind][targetId] = eRights
+        } else {
+          console.log("KanbearRights.loadGroupRights() merging  ", rights.data[targetKind][targetId] , eRights )
+          rights.data[targetKind][element.target_id] = rights.data[targetKind][targetId] | eRights
+        }
+      } else {
+        console.log("KanbearRights.loadGroupRights() discarding ", this.userRights[targetKind][targetId])
+      }
+    });
+    Konsol.log("KanbearRights.loadRights() over", "<rights>", rights)
+    this.groupsRights = rights["data"] ?? null
+    //return (this.resp)
+  }
+
+
+  //-----------------------------------------------------
   load() {
-    if ( this.isAdmin ) {
-      return({})
+    if (this.isAdmin) {
+      return ({})
     }
-    if (!this.resp) {
-      this.loadRights()
+    if (!this.userRights) {
+      this.loadUserRights()
+      console.log("KanbearRights.loadUserRights() over", "<rights>", this.userRights)
+      this.loadGroupsRights()
+      console.log("KanbearRights.loadGroupsRights() over", "<rights>", this.groupsRights)
     }
-    return (this.resp)
+    //Konsol.log("KanbearRights.load() over", "<rights>", this.userRights)
+    return (this.userRights)
   }
 
   //-----------------------------------------------------

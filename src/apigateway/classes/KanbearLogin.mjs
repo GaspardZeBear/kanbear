@@ -23,11 +23,12 @@ class KanbearLogin {
       throw Error("Login check failed", { cause: "no user" })
     }
     const valid = bcrypt.compareSync(this.userPassword, user.password);
-    Konsol.log("KanbearLogin.check() ", "user/password valid", valid)
+    
     if (valid) {
-      Konsol.log("KanbearLogin.check() kanbearRights")
+      console.log("KanbearLogin.check() ", "user/password valid", valid)
+      console.log("KanbearLogin.check() kanbearRights")
       let kanbearRights = new KanbearRights('user',user.userId).load()
-      Konsol.log("KanbearLogin.check() ok", kanbearRights)
+      console.log("KanbearLogin.check() kanbearRights created", kanbearRights)
       return ({
         isAdmin: user.isAdmin,
         userName: user.userName,
@@ -35,6 +36,7 @@ class KanbearLogin {
         rights: kanbearRights
       })
     } else {
+      Konsol.log("KanbearLogin.check() ", "user/password not valid", valid)
       throw Error("Login check failed", { cause: "user or password wrong" })
     }
   }
