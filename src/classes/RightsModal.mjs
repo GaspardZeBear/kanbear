@@ -28,7 +28,10 @@ class RightsModal {
     //document.getElementById(`taskCommentsDialogTitle`).innerHTML="www"
     this.dialog.showModal();
     this.htmlElement = `rightsModalResults`
-    this.createListeners(this)
+    
+    this.hasResetListener = false
+    this.createResetListener()
+    this.createListeners()
     //this.render()
   }
 
@@ -574,24 +577,6 @@ class RightsModal {
     //table.appendChild(this.buidRightsTableHead())
     const tbody = document.createElement('tbody')
 
-    const td = (p) => {
-      const td = document.createElement('td')
-      td.innerHTML = p
-      return (td)
-    }
-    const tdElement = (p) => {
-      const td = createElement('td', {
-        children: [p]
-      })
-      return (td)
-    }
-
-    const tdHref = (href) => {
-      const td = document.createElement('td')
-      td.appendChild(href)
-      return (td)
-    }
-
     groups.forEach((group) => {
       tbody.appendChild(this.getRow('group', group));
     })
@@ -599,61 +584,6 @@ class RightsModal {
     users.forEach((user) => {
       tbody.appendChild(this.getRow('user', user));
     })
-    //Object.entries(projectsRightsList).forEach((projectsRightsEntity) => {
-    /*
-    users.forEach((user) => {
-    users.forEach((user) => {
-      //console.log("UserRightsModal.buildRightsTable() tr ", "user", user)
-      const row = document.createElement('tr');
-      let rightsId = `${user.rightsId}`
-      let radix = `rights:${rightsId}`
-      let rights = this.rightsHash[rightsId]
-      let delRightButton = this.buildDelRightButton(rightsId, false)
-      row.appendChild(tdElement(delRightButton))
-      let hiddenRights = `<input type="hidden" class="hiddenRights" id="${radix}" value="${rights.rights}">`
-      row.appendChild(td(`${rightsId} ${hiddenRights}`))
-      row.appendChild(td(`user ${user.name}#${user.id}`))
-      row.appendChild(td(`${rights.target_kind}#${rights.target_id} : ${rights.rights}`))
-      let isadminChecked = ((rights.rights & ISADMINFLAG) > 0) ? "checked" : ""
-      let deleteChecked = ((rights.rights & DELETEFLAG) > 0) ? "checked" : ""
-      let referenceChecked = ((rights.rights & REFERENCEFLAG) > 0) ? "checked" : ""
-      let readChecked = ((rights.rights & READFLAG) > 0) ? "checked" : ""
-      let writeChecked = ((rights.rights & WRITEFLAG) > 0) ? "checked" : ""
-      //let readId = `projectsRights_read_${rightId}`
-      let isadminId = this.getItemId(radix, 'isadmin', rightsId)
-      row.appendChild(td(`isAdmin <input class="userRightsCheckbox"
-         type="checkbox"
-         name="${rights.rights}"
-         id="${isadminId}"
-         ${isadminChecked}/>`))
-      let deleteId = this.getItemId(radix, 'delete', rightsId)
-      row.appendChild(td(`delete <input class="userRightsCheckbox"
-         type="checkbox"
-         name="${rights.rights}"
-         id="${deleteId}"
-         ${deleteChecked}/>`))
-      let referenceId = this.getItemId(radix, 'reference', rightsId)
-      row.appendChild(td(`reference <input class="userRightsCheckbox"
-         type="checkbox"
-         name="${rights.rights}"
-         id="${referenceId}"
-         ${referenceChecked}/>`))
-      let readId = this.getItemId(radix, 'read', rightsId)
-      row.appendChild(td(`read <input class="userRightsCheckbox"
-         type="checkbox"
-         name="${rights.rights}"
-         id="${readId}"
-         ${readChecked}/>`))
-      //let writeId = `projectsRights_write_${rightId}`
-      let writeId = this.getItemId(radix, 'write', rightsId)
-      row.appendChild(td(`write <input class="userRightsCheckbox" 
-         type="checkbox"
-         id="${writeId}"
-         ${writeChecked}/>`))
-
-      tbody.appendChild(row);
-    }
-      */
 
     table.appendChild(tbody)
     divs.push(createElement('div', {
@@ -664,11 +594,6 @@ class RightsModal {
 
   //-------------------------------------------------------------------------
   async buildWorkspaceSelectBox() {
-    //wss.unshift({ id: -1, name: '* Create new workspace' })
-    let addWorkspaceButton = createElement("Button", {
-      textContent: "W",
-      onclick: [() => { alert("click") }]
-    })
     let workspaceBoxName = "rightsWorkspaceSelectBox"
     let workspaceBoxParams = {
       domId: workspaceBoxName,
@@ -677,8 +602,6 @@ class RightsModal {
       items: this.workspaces,
       labelText: "Workspace",
       klass: "filter-group",
-      //selectedOption: Kontext.getWorkspaceId()
-      //headItems:[['* Create new workspace',-1]]
     }
     console.log("RightsModal buildWorkspaceSelectBox() workspaces ", this.workspaces)
     let workspaceSelectBox = await selectBoxBuilder(workspaceBoxParams)
@@ -693,11 +616,8 @@ class RightsModal {
 
   //-------------------------------------------------------------------------
   async buildUserSelectBox() {
-    let userBoxName = "rightsUserSelectBox"
     let userBoxParams = {
-      //domId: userBoxName,
       boxLabel: "user",
-      //buttons: [addUserButton],
       items: this.users,
       labelText: "User",
       klass: "filter-group rightsUserSelectBox",
@@ -717,7 +637,6 @@ class RightsModal {
   async buildGroupSelectBox() {
     let groupBoxParams = {
       boxLabel: "group",
-      //buttons: [addUserButton],
       items: this.groups,
       labelText: "group",
       klass: "filter-group rightsGroupSelectBox",
@@ -742,20 +661,38 @@ class RightsModal {
       .filter((right) => right.target_kind === kind && right.owner_type === this.ownerType))
   }
 
+
   //---------------------------------------------------------------------
-  async createListeners(thisClass) {
+  createResetListener() {
+    let myThis = this
+    if (!this.hasResetListener) {
+      document.addEventListener('resetListeners', function (e) {
+        console.log("N2nModal resetListeners fired ", e)
+        e.detail.controller.abort()
+        myThis.createListeners()
+      })
+      this.hasResetListener = true
+    }
+  }
+
+
+  //---------------------------------------------------------------------
+  async createListeners() {
+    let myThis=this
+    const controller = new AbortController();
+    const { signal } = controller;
     document.addEventListener("projectsRightsCreated", async (ev) => {
       console.log("RightsModal() projectsRightsCreated listener fired <ev>", ev)
-      thisClass.render()
-    })
+      myThis.render()
+    }, { signal })
     document.addEventListener("workspacesRightsCreated", async (ev) => {
       console.log("RightsModal() workspacesRightsCreated listener fired <ev>", ev)
-      thisClass.render()
-    })
+      myThis.render()
+    }, { signal })
     document.addEventListener("rightDeleted", async (ev) => {
       console.log("RightsModal() rightDeleted listener fired <ev>", ev)
-      thisClass.render()
-    })
+      myThis.render()
+    }, { signal })
   }
 
   //------------------------------------------------------------------------

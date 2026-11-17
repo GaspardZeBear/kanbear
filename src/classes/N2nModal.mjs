@@ -109,7 +109,7 @@ class N2nModal {
         e.detail.controller.abort()
         myThis.createListeners()
       })
-      this.hasResetListener=true
+      this.hasResetListener = true
     }
   }
 
@@ -128,8 +128,7 @@ class N2nModal {
         e.target.classList.toggle('selected');
       }
       sendEvent("resetListeners", { controller: controller })
-    },
-      { signal }
+    },{ signal }
     );
 
     // Déplacer de gauche à droite
@@ -143,8 +142,7 @@ class N2nModal {
         rightBox.appendChild(item);
         console.log("N2nModal rightBox", rightBox)
       })
-    },
-      { signal });
+    },{ signal });
 
     // Déplacer de droite à gauche
     toLeftBtn.addEventListener('click', () => {
@@ -155,8 +153,7 @@ class N2nModal {
         item.classList.add('inLeftBox')
         leftBox.appendChild(item)
       })
-    },
-      { signal });
+    },{ signal });
 
   }
 
