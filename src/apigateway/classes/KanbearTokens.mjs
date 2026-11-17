@@ -17,7 +17,7 @@ class KanbearTokens {
         const token = jwt.sign(
             userInfos,
             'kanbear',
-            { expiresIn: '5m' }
+            { expiresIn: '20m' }
         );
         Konsol.log("KanbearTokens generateToken() access", token)
         return (token)

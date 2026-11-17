@@ -38,14 +38,15 @@ class RightsModal {
     await this.loadWorkspaces()
     await this.loadProjects()
     await this.loadUsers()
+    await this.loadGroups()
     await this.buildHavingRightsThings()
     console.log("render() workspaces", this.workspaces, "righted workspaces", this.havingRightsWorkspaces)
     let workspaceDiv = await this.buildWorkspaceSelectBox()
     let addRightsButton = buildAddRightsButton(
       `addWorkspacesRights`,
       this.getAddRightsFn({
-          action: "addWorkspace"
-        }
+        action: "addWorkspace"
+      }
       ),
       false)
 
@@ -56,12 +57,12 @@ class RightsModal {
     let saveRightsButton = this.buildSaveRightsButton()
     let exitRightsButton = this.buildExitRightsButton()
     let rightsTree = this.buildRightsTree(this.rights,
-      this.users, [],
+      this.users, this.groups,
       this.havingRightsWorkspaces,
       this.havingRightsProjects
     )
     console.log("render() rightsTree", rightsTree)
-        let treeAsTable = await this.renderTree(rightsTree)
+    let treeAsTable = await this.renderTree(rightsTree)
     //console.log("tree", tree)
 
     document.getElementById(this.htmlElement).replaceChildren(createElement("div", {
@@ -106,6 +107,15 @@ class RightsModal {
     this.usersHash = {}
     this.users.forEach((u) => {
       this.usersHash[u.id] = u
+    })
+  }
+
+  //-------------------------------------------------------------------------
+  async loadGroups() {
+    this.groups = await Project.getAll('groups')
+    this.groupsHash = {}
+    this.groups.forEach((g) => {
+      this.groupsHash[g.id] = g
     })
   }
 
@@ -172,6 +182,7 @@ class RightsModal {
         .filter(r => !r.owner_type && r.target_id > 0 && r.target_kind === kind)
         .map(r => [r.target_id, r])
     );
+    console.log("buildRightsTree() rights", rights)
     const workspacesRightIdsMap = createKindMap(rights, 'workspace');
     const projectsRightIdsMap = createKindMap(rights, 'project');
 
@@ -182,19 +193,21 @@ class RightsModal {
     const workspaceNodes = new Map();
     for (const w of workspaces) {
       console.log("buildRightsTree() w", w, "w.id", w.id, workspacesRightIdsMap.get(w.id) ?? "not found")
-      workspaceNodes.set(w.id, {
-        id: w.id,
-        name: w.name,
-        rightsId: workspacesRightIdsMap.get(w.id).id,
-        users: [],
-        groups: [],
-        projects: new Map(projects
-          .filter(p => p.workspace_id === w.id)
-          .map(p => [p.id, { id: p.id, name: p.name, rightsId: projectsRightIdsMap.get(p.id).id, users: [], groups: [] }])
-        ),
-      });
+      if (workspacesRightIdsMap.get(w.id)) {
+        workspaceNodes.set(w.id, {
+          id: w.id,
+          name: w.name,
+          rightsId: workspacesRightIdsMap.get(w.id).id,
+          users: [],
+          groups: [],
+          projects: new Map(projects
+            .filter(p => p.workspace_id === w.id)
+            .map(p => [p.id, { id: p.id, name: p.name, rightsId: projectsRightIdsMap.get(p.id).id, users: [], groups: [] }])
+          ),
+        });
+      }
     }
-        // 2. index target_id → node pour ranger les droits en O(1)
+    // 2. index target_id → node pour ranger les droits en O(1)
     const targetIndex = new Map(); // "kind:id" → node
     for (const w of workspaceNodes.values()) {
       targetIndex.set(`workspace:${w.id}`, w);
@@ -202,13 +215,24 @@ class RightsModal {
         targetIndex.set(`project:${p.id}`, p);
       }
     }
-    
+
     for (const r of rights) {
       const key = `${r.target_kind}:${r.target_id}`
       const node = targetIndex.get(key);
       if (!node) continue; // cible inconnue/supprimée → ligne ignorée (ou logger)
       const list = r.owner_type === 'user' ? node.users : node.groups;
-      list.push({ ...ownerRef(r.owner_type, r.owner_id), rightsId: r.id });
+      switch (r.owner_type) {
+        case 'user':
+          node.users.push({ ...ownerRef(r.owner_type, r.owner_id), rightsId: r.id });
+          break
+        case 'group':
+          node.groups.push({ ...ownerRef(r.owner_type, r.owner_id), rightsId: r.id });
+          break
+        default:
+          console.log("buildRightsTree() Not usable right r", r)
+          break
+      }
+      //list.push({ ...ownerRef(r.owner_type, r.owner_id), rightsId: r.id });
     }
 
     // 4. Map → Array
@@ -299,6 +323,24 @@ class RightsModal {
           rights.setData("target_id", params.projectId)
           rights.setData("target_kind", kind)
           break
+        case "addGroupToWorkspace":
+          kind = 'workspace'
+          if (getThis().ownerId < 1 || params.workspaceId < 1) { doIt = false }
+          rights.setData("owner_id", getThis().ownerId)
+          getThis().ownerId = -99
+          rights.setData("owner_type", 'group')
+          rights.setData("target_id", params.workspaceId)
+          rights.setData("target_kind", kind)
+          break
+        case "addGroupToProject":
+          kind = 'project'
+          if (getThis().ownerId < 1 || params.workspaceId < 1) { doIt = false }
+          rights.setData("owner_id", getThis().ownerId)
+          getThis().ownerId = -99
+          rights.setData("owner_type", 'group')
+          rights.setData("target_id", params.projectId)
+          rights.setData("target_kind", kind)
+          break
         default:
           doIt = false
           console.log("addRightsButton event Listener unknown action", params.action)
@@ -332,9 +374,17 @@ class RightsModal {
           projectId: p.id
         }),
         false)
+      let groupSelectBox = await this.buildGroupSelectBox()
+      let addGroupRightsButton = buildAddRightsButton(
+        `addGroupRightsToProject-${p.id}`,
+        this.getAddRightsFn({
+          action: "addGroupToProject",
+          projectId: p.id
+        }),
+        false)
       let delRightButton = this.buildDelRightButton(p.rightsId,
-        (!(p.users.length === 0 ) )
-        )
+        (!(p.users.length === 0))
+      )
       divs.push(createElement('div', {
         //style: "display:flex;",
         class: "rights-item right-level-1 right-project",
@@ -344,7 +394,9 @@ class RightsModal {
             textContent: `${p.rightsId} Project ${p.name}#${p.id}`,
           }),
           userSelectBox,
-          addUserRightsButton
+          addUserRightsButton,
+          groupSelectBox,
+          addGroupRightsButton
         ]
       }))
       this.buidRightsTable(divs, "rights-base right-level-2 right-actor", p.groups, p.users)
@@ -366,6 +418,7 @@ class RightsModal {
 
       false)
     let userSelectBox = await this.buildUserSelectBox()
+    let groupSelectBox = await this.buildGroupSelectBox()
     let addUserRightsButton = buildAddRightsButton(
       `addUserRightsToWorkspace-${w.id}`,
       this.getAddRightsFn({
@@ -373,9 +426,16 @@ class RightsModal {
         workspaceId: w.id
       }),
       false)
+    let addGroupRightsButton = buildAddRightsButton(
+      `addGroupRightsToWorkspace-${w.id}`,
+      this.getAddRightsFn({
+        action: "addGroupToWorkspace",
+        workspaceId: w.id
+      }),
+      false)
     let delRightButton = this.buildDelRightButton(w.rightsId,
       //( ! (w.users.length === 0 && w.groups.length === 0 && w.projects.length === 0) )
-      (!(w.users.length === 0 && w.projects.length === 0))
+      (!(w.groups.length === 0 && w.users.length === 0 && w.projects.length === 0))
       //false
     )
     let wDiv = createElement('div', {
@@ -389,7 +449,9 @@ class RightsModal {
         projectsSelectBox,
         addProjectRightsButton,
         userSelectBox,
-        addUserRightsButton]
+        addUserRightsButton,
+        groupSelectBox,
+        addGroupRightsButton]
     })
     divs.push(wDiv)
     console.log("renderWorkspaceHeader(w)", w, "wDiv", wDiv)
@@ -432,6 +494,77 @@ class RightsModal {
     return (thead)
   }
 
+  //----------------------------------------------------------------------------------------------------
+  getRow(type, elt) {
+    //console.log("UserRightsModal.buildRightsTable() tr ", "user", user)
+    const td = (p) => {
+      const td = document.createElement('td')
+      td.innerHTML = p
+      return (td)
+    }
+    const tdElement = (p) => {
+      const td = createElement('td', {
+        children: [p]
+      })
+      return (td)
+    }
+
+    const tdHref = (href) => {
+      const td = document.createElement('td')
+      td.appendChild(href)
+      return (td)
+    }
+
+    const row = document.createElement('tr');
+    let rightsId = `${elt.rightsId}`
+    let radix = `rights:${rightsId}`
+    let rights = this.rightsHash[rightsId]
+    let delRightButton = this.buildDelRightButton(rightsId, false)
+    row.appendChild(tdElement(delRightButton))
+    let hiddenRights = `<input type="hidden" class="hiddenRights" id="${radix}" value="${rights.rights}">`
+    row.appendChild(td(`${rightsId} ${hiddenRights}`))
+    row.appendChild(td(`${type} ${elt.name}#${elt.id}`))
+    row.appendChild(td(`${rights.target_kind}#${rights.target_id} : ${rights.rights}`))
+    let isadminChecked = ((rights.rights & ISADMINFLAG) > 0) ? "checked" : ""
+    let deleteChecked = ((rights.rights & DELETEFLAG) > 0) ? "checked" : ""
+    let referenceChecked = ((rights.rights & REFERENCEFLAG) > 0) ? "checked" : ""
+    let readChecked = ((rights.rights & READFLAG) > 0) ? "checked" : ""
+    let writeChecked = ((rights.rights & WRITEFLAG) > 0) ? "checked" : ""
+    //let readId = `projectsRights_read_${rightId}`
+    let isadminId = this.getItemId(radix, 'isadmin', rightsId)
+    row.appendChild(td(`isAdmin <input class="userRightsCheckbox"
+         type="checkbox"
+         name="${rights.rights}"
+         id="${isadminId}"
+         ${isadminChecked}/>`))
+    let deleteId = this.getItemId(radix, 'delete', rightsId)
+    row.appendChild(td(`delete <input class="userRightsCheckbox"
+         type="checkbox"
+         name="${rights.rights}"
+         id="${deleteId}"
+         ${deleteChecked}/>`))
+    let referenceId = this.getItemId(radix, 'reference', rightsId)
+    row.appendChild(td(`reference <input class="userRightsCheckbox"
+         type="checkbox"
+         name="${rights.rights}"
+         id="${referenceId}"
+         ${referenceChecked}/>`))
+    let readId = this.getItemId(radix, 'read', rightsId)
+    row.appendChild(td(`read <input class="userRightsCheckbox"
+         type="checkbox"
+         name="${rights.rights}"
+         id="${readId}"
+         ${readChecked}/>`))
+    //let writeId = `projectsRights_write_${rightId}`
+    let writeId = this.getItemId(radix, 'write', rightsId)
+    row.appendChild(td(`write <input class="userRightsCheckbox" 
+         type="checkbox"
+         id="${writeId}"
+         ${writeChecked}/>`))
+
+    return (row)
+  }
+
   //------------------------------------------------------------------------
   //users:  [ { id: 1, name: "Gaspard", rightsId: 1 } ],
   //  groups: [ { id: 10, name: "Équipe Design", rightsId: 2 } ],
@@ -447,7 +580,7 @@ class RightsModal {
       return (td)
     }
     const tdElement = (p) => {
-      const td = createElement('td',{
+      const td = createElement('td', {
         children: [p]
       })
       return (td)
@@ -459,14 +592,23 @@ class RightsModal {
       return (td)
     }
 
+    groups.forEach((group) => {
+      tbody.appendChild(this.getRow('group', group));
+    })
+
+    users.forEach((user) => {
+      tbody.appendChild(this.getRow('user', user));
+    })
     //Object.entries(projectsRightsList).forEach((projectsRightsEntity) => {
+    /*
+    users.forEach((user) => {
     users.forEach((user) => {
       //console.log("UserRightsModal.buildRightsTable() tr ", "user", user)
       const row = document.createElement('tr');
       let rightsId = `${user.rightsId}`
       let radix = `rights:${rightsId}`
       let rights = this.rightsHash[rightsId]
-      let delRightButton = this.buildDelRightButton(rightsId,false)
+      let delRightButton = this.buildDelRightButton(rightsId, false)
       row.appendChild(tdElement(delRightButton))
       let hiddenRights = `<input type="hidden" class="hiddenRights" id="${radix}" value="${rights.rights}">`
       row.appendChild(td(`${rightsId} ${hiddenRights}`))
@@ -511,7 +653,8 @@ class RightsModal {
 
       tbody.appendChild(row);
     }
-    );
+      */
+
     table.appendChild(tbody)
     divs.push(createElement('div', {
       class: cssClass,
@@ -550,13 +693,6 @@ class RightsModal {
 
   //-------------------------------------------------------------------------
   async buildUserSelectBox() {
-    //this.users = await User.getAll('users')
-    let addUserButton = createElement("Button", {
-      textContent: "U",
-      onclick: [() => {
-        alert("click")
-      }]
-    })
     let userBoxName = "rightsUserSelectBox"
     let userBoxParams = {
       //domId: userBoxName,
@@ -565,8 +701,6 @@ class RightsModal {
       items: this.users,
       labelText: "User",
       klass: "filter-group rightsUserSelectBox",
-      //selectedOption: Kontext.getWorkspaceId()
-      //headItems:[['* Create new workspace',-1]]
     }
     let userSelectBox = await selectBoxBuilder(userBoxParams)
 
@@ -577,6 +711,26 @@ class RightsModal {
       myThis.ownerType = 'user'
     });
     return (userSelectBox)
+  }
+
+  //-------------------------------------------------------------------------
+  async buildGroupSelectBox() {
+    let groupBoxParams = {
+      boxLabel: "group",
+      //buttons: [addUserButton],
+      items: this.groups,
+      labelText: "group",
+      klass: "filter-group rightsGroupSelectBox",
+    }
+    let groupSelectBox = await selectBoxBuilder(groupBoxParams)
+
+    let myThis = this
+    groupSelectBox.addEventListener('change', async (e) => {
+      console.log("RightsModal render() group ", e.target.value)
+      myThis.ownerId = e.target.value
+      myThis.ownerType = 'group'
+    });
+    return (groupSelectBox)
   }
 
   //-----------------------------------------------------------------------------
@@ -627,7 +781,7 @@ class RightsModal {
     let delRightFn = async function (ev) {
       console.log("delRightButton event Listener fired")
       ev.stopPropagation();
-      if ( confirm(`delRightButton_${rightId}`)) {
+      if (confirm(`delRightButton_${rightId}`)) {
         let rightsEntity
         rightsEntity = new Rights({})
         rightsEntity.setId(rightId)
@@ -635,7 +789,7 @@ class RightsModal {
         //rightsEntity.setData("target_type", kind)
         await rightsEntity.delete()
       }
-      sendEvent("rightDeleted",{})
+      sendEvent("rightDeleted", {})
     }
     //let dialog = document.getElementById(`projectsRightsModal`)
     const delRightButton = createElement('button', {
