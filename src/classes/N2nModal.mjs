@@ -104,7 +104,7 @@ class N2nModal {
   createResetListener() {
     let myThis = this
     if (!this.hasResetListener) {
-      document.addEventListener('resetListeners', function (e) {
+      document.addEventListener('resetN2nListeners', function (e) {
         console.log("N2nModal resetListeners fired ", e)
         e.detail.controller.abort()
         myThis.createListeners()
@@ -127,7 +127,7 @@ class N2nModal {
       if (e.target.classList.contains('n2n-item')) {
         e.target.classList.toggle('selected');
       }
-      sendEvent("resetListeners", { controller: controller })
+      sendEvent("resetN2nListeners", { controller: controller })
     },{ signal }
     );
 

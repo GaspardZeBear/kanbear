@@ -666,8 +666,8 @@ class RightsModal {
   createResetListener() {
     let myThis = this
     if (!this.hasResetListener) {
-      document.addEventListener('resetListeners', function (e) {
-        console.log("N2nModal resetListeners fired ", e)
+      document.addEventListener('resetRightsModalListeners', function (e) {
+        console.log("RightModal resetListeners fired ", e)
         e.detail.controller.abort()
         myThis.createListeners()
       })
