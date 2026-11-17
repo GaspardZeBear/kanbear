@@ -123,24 +123,27 @@ class KanbearRights {
     console.log("KanbearRights.loadGroupRights() resp", resp)
 
     let rights = { data: { workspaces: {}, projects: {} } }
-    
+
     resp.forEach(element => {
+      console.log("KanbearRights.loadGroupRights() element", element)
       let targetKind = `${element.target_kind}s`
-      let targetId = element.target_kind
-      let eRights=element.rights
-      if (!this.userRights[targetKind][targetId]) {
+      let targetId = element.target_id.toString()
+      let eRights = element.rights
+      console.log("KanbearRights.loadGroupRights() go  ", this.userRights, targetKind, targetId, "xxx", this.userRights?.[targetKind]?.[targetId])
+      if (!this.userRights?.[targetKind]?.[targetId]) {
+        console.log("KanbearRights.loadGroupRights() keeping  ", targetKind, targetId, "rights", rights)
         // remove all that is in userRights ( user is more important than groups)
         // if not exists in groupRights, create
         // if  exists in groupRights, bitwise or (take the most permissive value)
-        if (!rights.data[targetKind][targetId]) {
-          console.log("KanbearRights.loadGroupRights() creating  ", eRights )
+        if (!rights.data?.[targetKind]?.[targetId]) {
+          console.log("KanbearRights.loadGroupRights() creating  ", eRights)
           rights.data[targetKind][targetId] = eRights
         } else {
-          console.log("KanbearRights.loadGroupRights() merging  ", rights.data[targetKind][targetId] , eRights )
+          console.log("KanbearRights.loadGroupRights() merging  ", rights.data[targetKind][targetId], eRights)
           rights.data[targetKind][element.target_id] = rights.data[targetKind][targetId] | eRights
         }
       } else {
-        console.log("KanbearRights.loadGroupRights() discarding ", this.userRights[targetKind][targetId])
+        console.log("KanbearRights.loadGroupRights() discarding ", rights?.[targetKind]?.[targetId])
       }
     });
     Konsol.log("KanbearRights.loadRights() over", "<rights>", rights)
@@ -159,9 +162,14 @@ class KanbearRights {
       console.log("KanbearRights.loadUserRights() over", "<rights>", this.userRights)
       this.loadGroupsRights()
       console.log("KanbearRights.loadGroupsRights() over", "<rights>", this.groupsRights)
+      
     }
     //Konsol.log("KanbearRights.load() over", "<rights>", this.userRights)
-    return (this.userRights)
+    const resultat = {
+        workspaces: { ...this.userRights.workspaces, ...this.groupsRights.workspaces },
+        projects: { ...this.userRights.projects, ...this.groupsRights.projects }
+      };
+    return (resultat)
   }
 
   //-----------------------------------------------------

@@ -10,8 +10,8 @@ router.get('/', UnifiedController.getFunction('rights','getAll'))
 router.get('/:id', UnifiedController.getFunction('rights','getById'))
 router.get('/user/:owner_id', UnifiedController.getFunction('rights','getRightsByUserid'))
 router.get('/group/:owner_id', UnifiedController.getFunction('rights','getRightsByGroupid'))
-router.patch('/:id', UnifiedController.getFunction('rights','patch'))
-router.delete('/:id', UnifiedController.getFunction('rights','delete'))
+router.patch('/:id', UnifiedController.getFunction('rights','patchRights'))
+router.delete('/:id', UnifiedController.getFunction('rights','deleteRights'))
 
 
 export default router

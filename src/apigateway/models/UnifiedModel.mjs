@@ -4,7 +4,9 @@ import { SqlBuilder } from './SqlBuilder.mjs'
 import { Konsol } from 'konsol'
 import bcrypt from 'bcrypt'
 import { KanbearRights } from '../classes/KanbearRights.mjs'
+import { KanbearTokens } from '../classes/KanbearTokens.mjs'
 import { REFERENCE, READ, WRITE, ISADMIN, DELETE } from '../classes/KanbearRightsCheckerFactory.mjs'
+
 
 class UnifiedModel {
 
@@ -38,6 +40,8 @@ class UnifiedModel {
         UnifiedModel.UnifiedModelOp['update'] = UnifiedModel.update
         UnifiedModel.UnifiedModelOp['patch'] = UnifiedModel.patch
         UnifiedModel.UnifiedModelOp['delete'] = UnifiedModel.delete
+        UnifiedModel.UnifiedModelOp['patchRights'] = UnifiedModel.patchRights
+        UnifiedModel.UnifiedModelOp['deleteRights'] = UnifiedModel.deleteRights
         UnifiedModel.UnifiedModelOp['deleteProjectsRightsAndProject'] = UnifiedModel.deleteProjectsRightsAndProject
     }
 
@@ -65,7 +69,7 @@ class UnifiedModel {
                 const giveRightsSql = `INSERT INTO projects_rights (user_id, project_id, rights) values (${userId},${res.lastInsertRowid},${rights})`
                 Konsol.log("UnifiedModel.createProjectsAndSetRights(), project right", "<giveRights>", giveRightsSql)
                 db.run(giveRightsSql, [], (res1, code) => {
-                    Konsol.log("UnifiedModel.createProjectsAndSetRights(), project rights created", "<res>", res1, "code",code)
+                    Konsol.log("UnifiedModel.createProjectsAndSetRights(), project rights created", "<res>", res1, "code", code)
                     res.lastInsertRowid ? callback(null, 201, res) : callback(res, 500, null)
                 })
             } else {
@@ -104,7 +108,7 @@ class UnifiedModel {
         });
     }
 
-        //------------------------------------------------------------------
+    //------------------------------------------------------------------
     static getProjectsRightsByGroupid(table, req, opParms, callback) {
         Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<params>", req.params)
         Konsol.log("UnifiedModel.getProjectsRightsByUserid()", "<body>", req.body)
@@ -147,7 +151,7 @@ class UnifiedModel {
                         WHERE r.owner_id = ${req.params["owner_id"]}
                         AND r.owner_type = 'user'
         `
-       const sql = ` SELECT r.*, p.name AS target_name
+        const sql = ` SELECT r.*, p.name AS target_name
              FROM rights r JOIN projects   p ON p.id = r.target_id
              WHERE r.target_kind = 'project'
            UNION ALL
@@ -192,7 +196,7 @@ class UnifiedModel {
         //db.run(sql, [], callback)
     }
 
-       //------------------------------------------------------------------
+    //------------------------------------------------------------------
     static getWorkspacesRightsByGroupid(table, req, opParms, callback) {
         Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()", "<params>", req.params)
         Konsol.log("UnifiedModel.getWorkspacesRightsByUserid()", "<body>", req.body)
@@ -236,7 +240,7 @@ class UnifiedModel {
     //------------------------------------------------------------------
     static getRightsForUser(table, req, opParms, callback) {
         Konsol.log("UnifiedModel.getRightsForUser()", "<id>", req.params["id"])
-        let rights = new KanbearRights('user',req.params["id"]).load()
+        let rights = new KanbearRights('user', req.params["id"]).load()
         callback(null, 200, rights)
     }
 
@@ -298,7 +302,23 @@ class UnifiedModel {
         });
     }
 
-   //------------------------------------------------------------------
+    //------------------------------------------------------------------
+    static patchRights(table, req, opParms, callback) {
+        // const { name, is_open } = workspace;
+        UnifiedModel.patch(table, req, opParms, callback)
+        Konsol.log("UnifiedModel.patchRights(), <params>", req.params, "<body>", req.body)
+        KanbearTokens.rightsModified()
+    }
+    //------------------------------------------------------------------
+    static deleteRights(table, req, opParms, callback) {
+        Konsol.log("UnifiedModel.delete(), <params>", req.params, "<body>", req.body)
+        //const sql = `DELETE FROM ${table} WHERE id = ${req.params["id"]}`;
+        UnifiedModel.delete(table, req, opParms, callback)
+        KanbearTokens.rightsModified()
+    }
+
+
+    //------------------------------------------------------------------
     static deleteProjectsRightsAndProject(table, req, opParms, callback) {
         Konsol.log("UnifiedModel.deleteProjectsRightsAndProject(), <params>", req.params, "<body>", req.body)
         const sql = `DELETE FROM projects_rights WHERE project_id = ${req.params["id"]}`;
@@ -309,7 +329,7 @@ class UnifiedModel {
             //res.lastInsertRowid != null ? callback(null, 204, res) : callback(res, 500, null)
             UnifiedModel.delete(table, req, opParms, callback);
         })
-        
+
     }
 
     //------------------------------------------------------------------

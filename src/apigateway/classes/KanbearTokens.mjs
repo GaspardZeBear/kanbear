@@ -5,8 +5,13 @@ import jwt from 'jsonwebtoken'
 
 class KanbearTokens {
 
+    static deadToken
     constructor(params) {
         Konsol.log("KanbearTokens.constructor()", "params", params)
+    }
+
+    static rightsModified() {
+        KanbearTokens.deadToken=new Date()
     }
 
     //--------------------------------------------------------------------------------------
@@ -47,6 +52,11 @@ class KanbearTokens {
             let decodedToken = jwt.verify(token, 'kanbear')
             const iat = decodedToken.iat;
             const dateCreation = new Date(iat * 1000);
+            console.log("KanbearToken checkToken dateCreation",dateCreation,"deadToken",KanbearTokens.deadToken)
+            if ( kind === "access" && KanbearTokens.deadToken && dateCreation < KanbearTokens.deadToken) {
+                throw Error("deadTimeReset")
+                //console.log("KanbearToken checkToken dateCreation",dateCreation,"deadToken",KanbearTokens.deadToken)
+            }
             const exp = decodedToken.exp;
             const dateExp = new Date(exp * 1000);
 
