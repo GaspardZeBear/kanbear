@@ -54,7 +54,7 @@ class KanbearTokens {
             const dateCreation = new Date(iat * 1000);
             console.log("KanbearToken checkToken dateCreation",dateCreation,"deadToken",KanbearTokens.deadToken)
             if ( kind === "access" && KanbearTokens.deadToken && dateCreation < KanbearTokens.deadToken) {
-                throw Error("deadTimeReset")
+                //throw Error("deadTimeReset")
                 //console.log("KanbearToken checkToken dateCreation",dateCreation,"deadToken",KanbearTokens.deadToken)
             }
             const exp = decodedToken.exp;

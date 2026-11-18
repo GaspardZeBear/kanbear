@@ -22,6 +22,7 @@ class KanbearRights {
     }
     this.userRights = null
     this.groupsRights = null
+    this.analysis=[]
   }
 
   //-----------------------------------------------------
@@ -83,8 +84,9 @@ class KanbearRights {
       rights.data[`${element.target_kind}s`][element.target_id] = element.rights
     });
 
-    console.log("KanbearRights.loadUserRights() over", "<rights>", rights)
+    
     this.userRights = rights["data"] ?? null
+    this.analysis.push(" userRights ", this.userRights)
     //return (this.resp)
   }
 

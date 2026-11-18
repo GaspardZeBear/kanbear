@@ -42,6 +42,9 @@ class N2nModal {
       children: [this.buildExitN2nButton(), this.buildSaveN2nButton()]
     }
     )
+    document.getElementById("n2nModalTitle").replaceChildren(createElement('span',{
+      textContent : `Manage users in group ${this.name}`
+    }))
     document.getElementById("N2n-buttons").replaceChildren(buttons)
     const leftBox = document.getElementById('n2nLeftBox');
     const rightBox = document.getElementById('n2nRightBox');

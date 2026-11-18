@@ -155,7 +155,7 @@ class KanbearGroupPanel {
         },
         onSave: async (ids) => { 
           console.log("KanbearGroupPanel onSave fired",ids)
-          alert("saving from KabearGroupPanel")
+          
           for ( let id of ids['mustDelete']) {
             let gu=new UsersGroups('usersGroups')
             gu.setId(id)
@@ -167,6 +167,7 @@ class KanbearGroupPanel {
             gu.setData("user_id",id)
             await gu.create()
           }
+          alert("Group saved")
         }
       }))
 

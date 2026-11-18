@@ -4,21 +4,16 @@ import { Project } from './Project.mjs'
 import { Rights } from './Rights.mjs'
 import { Workspace } from './Workspace.mjs'
 import { User } from './User.mjs'
+import { Group } from './Group.mjs'
 //import { UserRightsDialog } from './UserRightsDialog.mjs'
 import { sendEvent } from '../utils/sendEvent.mjs'
 import { formatDuration, dateToString, getDurationFromNow } from "../utils/dateAndTime.mjs";
 import { selectBoxBuilder } from '../utils/selectBoxBuilder.mjs';
 //import { buildAddProjectsRightsButton, buildAddWorkspacesRightsButton } from '../utils/buttonBuilder.mjs'
 import { buildAddRightsButton } from '../utils/buttonBuilder.mjs'
+import { REFERENCE, READ, WRITE, DELETE, ADMIN, RIGHT_DEFS, hasBits } from './RightsDefs.mjs'
 import { createElement, buildKanbearProjectsSelectBox, buildWorkspacesSelectBox } from '../utils/createHtml.mjs';
-
-
-// Rights flags
-const REFERENCEFLAG = 4
-const READFLAG = 2
-const WRITEFLAG = 1
-const DELETEFLAG = 8
-const ISADMINFLAG = 16
+import { buildRightsTree } from './RightsTree.mjs'
 
 class RightsModal {
 
@@ -28,7 +23,7 @@ class RightsModal {
     //document.getElementById(`taskCommentsDialogTitle`).innerHTML="www"
     this.dialog.showModal();
     this.htmlElement = `rightsModalResults`
-    
+
     this.hasResetListener = false
     this.createResetListener()
     this.createListeners()
@@ -59,7 +54,7 @@ class RightsModal {
     })
     let saveRightsButton = this.buildSaveRightsButton()
     let exitRightsButton = this.buildExitRightsButton()
-    let rightsTree = this.buildRightsTree(this.rights,
+    let rightsTree = buildRightsTree(this.rights,
       this.users, this.groups,
       this.havingRightsWorkspaces,
       this.havingRightsProjects
@@ -106,7 +101,7 @@ class RightsModal {
 
   //-------------------------------------------------------------------------
   async loadUsers() {
-    this.users = await Project.getAll('users')
+    this.users = await User.getAll('users')
     this.usersHash = {}
     this.users.forEach((u) => {
       this.usersHash[u.id] = u
@@ -115,7 +110,7 @@ class RightsModal {
 
   //-------------------------------------------------------------------------
   async loadGroups() {
-    this.groups = await Project.getAll('groups')
+    this.groups = await Group.getAll('groups')
     this.groupsHash = {}
     this.groups.forEach((g) => {
       this.groupsHash[g.id] = g
@@ -167,85 +162,6 @@ class RightsModal {
     this.havingRightsProjects.sort((a, b) => a.name.localeCompare(b.name))
   }
 
-
-  //-------------------------------------------------------------------------
-  buildRightsTree(rights, users, groups, workspaces, projects) {
-    console.log("buildRightsTree() workspaces", workspaces)
-    console.log("buildRightsTree() projects", projects)
-    const usersById = new Map(users.map(u => [u.id, u]));
-    const groupsById = new Map(groups.map(g => [g.id, g]));
-
-    const ownerRef = (type, id) => {
-      const row = (type === 'user' ? usersById : groupsById).get(id);
-      return { id, name: row ? row.name : `#${type}:${id}` };
-    };
-
-    const createKindMap = (rights, kind) => new Map(
-      rights
-        .filter(r => !r.owner_type && r.target_id > 0 && r.target_kind === kind)
-        .map(r => [r.target_id, r])
-    );
-    console.log("buildRightsTree() rights", rights)
-    const workspacesRightIdsMap = createKindMap(rights, 'workspace');
-    const projectsRightIdsMap = createKindMap(rights, 'project');
-
-    console.log("buildRightsTree() workspacesRightIdsMap", workspacesRightIdsMap)
-    console.log("buildRightsTree() projectsRightIdsMap", projectsRightIdsMap)
-
-    // 1. Noeuds workspaces, chacun avec ses projets
-    const workspaceNodes = new Map();
-    for (const w of workspaces) {
-      console.log("buildRightsTree() w", w, "w.id", w.id, workspacesRightIdsMap.get(w.id) ?? "not found")
-      if (workspacesRightIdsMap.get(w.id)) {
-        workspaceNodes.set(w.id, {
-          id: w.id,
-          name: w.name,
-          rightsId: workspacesRightIdsMap.get(w.id).id,
-          users: [],
-          groups: [],
-          projects: new Map(projects
-            .filter(p => p.workspace_id === w.id)
-            .map(p => [p.id, { id: p.id, name: p.name, rightsId: projectsRightIdsMap.get(p.id).id, users: [], groups: [] }])
-          ),
-        });
-      }
-    }
-    // 2. index target_id → node pour ranger les droits en O(1)
-    const targetIndex = new Map(); // "kind:id" → node
-    for (const w of workspaceNodes.values()) {
-      targetIndex.set(`workspace:${w.id}`, w);
-      for (const p of w.projects.values()) {
-        targetIndex.set(`project:${p.id}`, p);
-      }
-    }
-
-    for (const r of rights) {
-      const key = `${r.target_kind}:${r.target_id}`
-      const node = targetIndex.get(key);
-      if (!node) continue; // cible inconnue/supprimée → ligne ignorée (ou logger)
-      const list = r.owner_type === 'user' ? node.users : node.groups;
-      switch (r.owner_type) {
-        case 'user':
-          node.users.push({ ...ownerRef(r.owner_type, r.owner_id), rightsId: r.id });
-          break
-        case 'group':
-          node.groups.push({ ...ownerRef(r.owner_type, r.owner_id), rightsId: r.id });
-          break
-        default:
-          console.log("buildRightsTree() Not usable right r", r)
-          break
-      }
-      //list.push({ ...ownerRef(r.owner_type, r.owner_id), rightsId: r.id });
-    }
-
-    // 4. Map → Array
-    let tree = [...workspaceNodes.values()].map(w => ({
-      ...w,
-      projects: [...w.projects.values()],
-    }));
-    return (tree)
-  }
-
   //---------------------------------------------------------------------------------
   /*
   [
@@ -271,97 +187,49 @@ class RightsModal {
     return (this.targetId)
   }
 
-  //-----------------------------------------------------------------------------------------------
-  getAddRightsFn(params) {
-    let myThis = this
-    let addRightsFn = function (ev) {
 
-      // trick to get values at time of firing the function, not creating it
-      let getThis = () => { console.log("getThis fired", myThis); return (myThis) }
-      /*console.log("addRightsButton event Listener fired",
-        "params", params,
-        "target_id", getThis().targetId,
-        "target_id() ", getThis().targetId,
-        "target_kind", getThis().targetKind,
-        "owner_id", getThis().ownerId,
-        "owner_type", getThis().ownerType)
-        */
-      //let el = document.getElementById(`kanbear${params.targetKind}RightsSelectBox`)
-      //console.log("addRightsButton event Listener fired, selected", el.value)
+  //-----------------------------------------------------------------------------------------
+  getAddRightsFn({ action, ...params }) {
+    console.log("getAddRightsFn ", action, params)
+    const ADD_ACTIONS = {
+      addWorkspace: (m) => ({ target_kind: 'workspace', target_id: m.targetId }),
+      addProjectToWorkspace: (m) => ({ target_kind: 'project', target_id: m.targetId }),
+      addUserToWorkspace: (m, p) => ({
+        owner_type: 'user', owner_id: m.ownerId,
+        target_kind: 'workspace', target_id: p.workspaceId
+      }),
+      addUserToProject: (m, p) => ({
+        owner_type: 'user', owner_id: m.ownerId,
+        target_kind: 'project', target_id: p.projectId
+      }),
+      addGroupToWorkspace: (m, p) => ({
+        owner_type: 'group', owner_id: m.ownerId,
+        target_kind: 'workspace', target_id: p.workspaceId
+      }),
+      addGroupToProject: (m, p) => ({
+        owner_type: 'group', owner_id: m.ownerId,
+        target_kind: 'project', target_id: p.projectId
+      }),
+    };
+    return (ev) => {
       ev.stopPropagation();
-      //let targetId = parseInt(document.getElementById(boxId).value)
-      //if (rightsModal.targetId && rightsModal.targetId > 0) {
-      const rights = new Rights({})
-      console.log("addRightsButton event Listener fired", "params", params)
-      let doIt = true
-      let kind
-      switch (params.action) {
-        case "addWorkspace":
-          kind = 'workspace'
-          if (getThis().targetId < 1) { doIt = false }
-          rights.setData("target_id", getThis().targetId)
-          rights.setData("target_kind", kind)
-          break
-        case "addProjectToWorkspace":
-          kind = 'project'
-          if (getThis().targetId < 1) { doIt = false }
-          rights.setData("target_id", getThis().targetId)
-          rights.setData("target_kind", kind)
-          break
-        case "addUserToWorkspace":
-          kind = 'workspace'
-          if (getThis().ownerId < 1 || params.workspaceId < 1) { doIt = false }
-          rights.setData("owner_id", getThis().ownerId)
-          getThis().ownerId = -99
-          rights.setData("owner_type", 'user')
-          rights.setData("target_id", params.workspaceId)
-          rights.setData("target_kind", kind)
-          break
-        case "addUserToProject":
-          kind = 'project'
-          if (getThis().ownerId < 1 || params.workspaceId < 1) { doIt = false }
-          rights.setData("owner_id", getThis().ownerId)
-          getThis().ownerId = -99
-          rights.setData("owner_type", 'user')
-          rights.setData("target_id", params.projectId)
-          rights.setData("target_kind", kind)
-          break
-        case "addGroupToWorkspace":
-          kind = 'workspace'
-          if (getThis().ownerId < 1 || params.workspaceId < 1) { doIt = false }
-          rights.setData("owner_id", getThis().ownerId)
-          getThis().ownerId = -99
-          rights.setData("owner_type", 'group')
-          rights.setData("target_id", params.workspaceId)
-          rights.setData("target_kind", kind)
-          break
-        case "addGroupToProject":
-          kind = 'project'
-          if (getThis().ownerId < 1 || params.workspaceId < 1) { doIt = false }
-          rights.setData("owner_id", getThis().ownerId)
-          getThis().ownerId = -99
-          rights.setData("owner_type", 'group')
-          rights.setData("target_id", params.projectId)
-          rights.setData("target_kind", kind)
-          break
-        default:
-          doIt = false
-          console.log("addRightsButton event Listener unknown action", params.action)
-          break
-      }
-      if (doIt) {
-        rights.create()
-          .finally(() => {
-            console.log("rightsUserSelectBox", document.getElementsByClassName("rightsUserSelectBox"))
-            for (let s of document.getElementsByClassName("rightsUserSelectBox")) {
-              s.selectedIndex = -1
-            }
-            sendEvent(`${kind}sRightsCreated`, {})
-          })
 
-      }
-    }
-    return (addRightsFn)
+      const data = ADD_ACTIONS[action]?.(this, params);
+      console.log("getAddRightsFn fired", action, params, data)
+      if (!data) return console.warn('action inconnue', action);
+      let rights = new Rights({})
+      rights.setData("owner_type", data.owner_type);
+      rights.setData("owner_id", parseInt(data.owner_id));
+      rights.setData("target_kind", data.target_kind);
+      rights.setData("target_id", parseInt(data.target_id));
+      rights.setData("rights", 0);
+      rights.create().finally(() => {
+        sendEvent(`${data.target_kind}sRightsCreated`, {})
+        for (let s of document.getElementsByClassName("rightsUserSelectBox")) {
+          s.selectedIndex = -1
+        }
+      })
+    };
   }
 
   //--------------------------------------------------------------------------------------------------------------
@@ -476,96 +344,40 @@ class RightsModal {
     }))
   }
 
-  //----------------------------------------------------------------------------------------------------------
-  buidRightsTableHead() {
-    const thead = createElement('thead', {
-      children: [
-        createElement('tr', {
-          children: [
-            createElement('th', {}),
-            createElement('th', {}),
-            createElement('th', { innerHTML: 'RightsId' }),
-            createElement('th', { innerHTML: 'isAdmin' }),
-            createElement('th', { innerHTML: 'Delete' }),
-            createElement('th', { innerHTML: 'Reference' }),
-            createElement('th', { innerHTML: 'Read' }),
-            createElement('th', { innerHTML: 'Write' }),
-          ]
-        })
-      ]
-    })
-    return (thead)
+  //------------------------------------------------------------------------------------
+  td(p) {
+    return (createElement('td', {
+      innerHTML: p
+    }))
   }
 
-  //----------------------------------------------------------------------------------------------------
+  //------------------------------------------------------------------------------------
+  tdElement(p, label) {
+    return (createElement('td', {
+      children: [label, p]
+    }))
+  }
+
+  //----------------------------------------------------------------------------------------
   getRow(type, elt) {
-    //console.log("UserRightsModal.buildRightsTable() tr ", "user", user)
-    const td = (p) => {
-      const td = document.createElement('td')
-      td.innerHTML = p
-      return (td)
-    }
-    const tdElement = (p) => {
-      const td = createElement('td', {
-        children: [p]
-      })
-      return (td)
-    }
-
-    const tdHref = (href) => {
-      const td = document.createElement('td')
-      td.appendChild(href)
-      return (td)
-    }
-
+    const rights = this.rightsHash[elt.rightsId];
     const row = document.createElement('tr');
-    let rightsId = `${elt.rightsId}`
-    let radix = `rights:${rightsId}`
-    let rights = this.rightsHash[rightsId]
-    let delRightButton = this.buildDelRightButton(rightsId, false)
-    row.appendChild(tdElement(delRightButton))
-    let hiddenRights = `<input type="hidden" class="hiddenRights" id="${radix}" value="${rights.rights}">`
-    row.appendChild(td(`${rightsId} ${hiddenRights}`))
-    row.appendChild(td(`${type} ${elt.name}#${elt.id}`))
-    row.appendChild(td(`${rights.target_kind}#${rights.target_id} : ${rights.rights}`))
-    let isadminChecked = ((rights.rights & ISADMINFLAG) > 0) ? "checked" : ""
-    let deleteChecked = ((rights.rights & DELETEFLAG) > 0) ? "checked" : ""
-    let referenceChecked = ((rights.rights & REFERENCEFLAG) > 0) ? "checked" : ""
-    let readChecked = ((rights.rights & READFLAG) > 0) ? "checked" : ""
-    let writeChecked = ((rights.rights & WRITEFLAG) > 0) ? "checked" : ""
-    //let readId = `projectsRights_read_${rightId}`
-    let isadminId = this.getItemId(radix, 'isadmin', rightsId)
-    row.appendChild(td(`isAdmin <input class="userRightsCheckbox"
-         type="checkbox"
-         name="${rights.rights}"
-         id="${isadminId}"
-         ${isadminChecked}/>`))
-    let deleteId = this.getItemId(radix, 'delete', rightsId)
-    row.appendChild(td(`delete <input class="userRightsCheckbox"
-         type="checkbox"
-         name="${rights.rights}"
-         id="${deleteId}"
-         ${deleteChecked}/>`))
-    let referenceId = this.getItemId(radix, 'reference', rightsId)
-    row.appendChild(td(`reference <input class="userRightsCheckbox"
-         type="checkbox"
-         name="${rights.rights}"
-         id="${referenceId}"
-         ${referenceChecked}/>`))
-    let readId = this.getItemId(radix, 'read', rightsId)
-    row.appendChild(td(`read <input class="userRightsCheckbox"
-         type="checkbox"
-         name="${rights.rights}"
-         id="${readId}"
-         ${readChecked}/>`))
-    //let writeId = `projectsRights_write_${rightId}`
-    let writeId = this.getItemId(radix, 'write', rightsId)
-    row.appendChild(td(`write <input class="userRightsCheckbox" 
-         type="checkbox"
-         id="${writeId}"
-         ${writeChecked}/>`))
 
-    return (row)
+    row.appendChild(this.tdElement(this.buildDelRightButton(elt.rightsId, false)));
+    row.appendChild(this.td(`${type} ${elt.name}#${elt.id}`));
+
+    for (const def of RIGHT_DEFS) {
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.dataset.rightsId = elt.rightsId;   // ← plus de parsing d'ID
+      cb.dataset.flag = def.bit;             // ← la valeur porte le bit
+      cb.checked = hasBits(rights.rights, def.bit);
+      const label = createElement('label', {
+        textContent: def.label
+      })
+      row.appendChild(this.tdElement(cb, label));
+    }
+    return row;
   }
 
   //------------------------------------------------------------------------
@@ -675,10 +487,9 @@ class RightsModal {
     }
   }
 
-
   //---------------------------------------------------------------------
   async createListeners() {
-    let myThis=this
+    let myThis = this
     const controller = new AbortController();
     const { signal } = controller;
     document.addEventListener("projectsRightsCreated", async (ev) => {
@@ -741,41 +552,28 @@ class RightsModal {
     return (delRightButton)
   }
 
-  //------------------------------------------------------------------------
+  //-----------------------------------------------------------------------
   saveRights() {
-    let hiddenRights = document.querySelectorAll(".hiddenRights")
-    for (let r of hiddenRights) {
-      //hiddenRights.forEach((r) => {
-      console.log("UserRightsModal saveRights", r.id, r.value)
-      let cRights = 0
-      if (document.getElementById(`${r.id}:reference`).checked) {
-        cRights += REFERENCEFLAG
-      }
-      if (document.getElementById(`${r.id}:read`).checked) {
-        cRights += READFLAG
-      }
-      if (document.getElementById(`${r.id}:write`).checked) {
-        cRights += WRITEFLAG
-      }
-      if (document.getElementById(`${r.id}:delete`).checked) {
-        cRights += DELETEFLAG
-      }
-      if (document.getElementById(`${r.id}:isadmin`).checked) {
-        cRights += ISADMINFLAG
-      }
-      console.log("UserRightsModal saveRights", r.id, r.value, "cRights", cRights)
-      if (cRights != r.value) {
-        console.log("UserRightsModal saveRights", r.id, " update")
-        let [kind, rightsId, kindId, userId, dum0, dum1] = r.id.split(":")
-        let rightsEntity
-        rightsEntity = new Rights({})
-        rightsEntity.setId(rightsId)
-        rightsEntity.setData("rights", cRights)
-        //rightsEntity.setData("target_type", kind)
-        rightsEntity.patch()
+    const updated = new Map();   // éviter plusieurs patch sur la même ligne
+    document.querySelectorAll('input[type=checkbox][data-rights-id]').forEach(cb => {
+      const id = cb.dataset.rightsId;
+      updated.set(id, (updated.get(id) ?? 0) | (cb.checked ? +cb.dataset.flag : 0));
+    });
+    console.log("RightsModal saveRights updated", updated)
+
+    let patched = 0
+    for (const [rightsId, newBits] of updated) {
+      if (this.rightsHash[rightsId].rights !== newBits) {
+        const entity = new Rights({});
+        entity.setId(rightsId);
+        entity.setData('rights', newBits);
+        entity.patch();
+        patched++
       }
     }
+    patched === 0 ? alert("Nothing to change") : alert(`${patched} Rights updated`)
   }
+
 
   //------------------------------------------------------------------------
   buildSaveRightsButton() {
