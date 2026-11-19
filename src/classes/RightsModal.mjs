@@ -14,6 +14,7 @@ import { buildAddRightsButton } from '../utils/buttonBuilder.mjs'
 import { REFERENCE, READ, WRITE, DELETE, ADMIN, RIGHT_DEFS, hasBits } from './RightsDefs.mjs'
 import { createElement, buildKanbearProjectsSelectBox, buildWorkspacesSelectBox } from '../utils/createHtml.mjs';
 import { buildRightsTree } from './RightsTree.mjs'
+import { RightsLoader } from './RightsLoader.mjs';
 
 class RightsModal {
 
@@ -32,12 +33,28 @@ class RightsModal {
 
   //-------------------------------------------------------------------------
   async render() {
+    /*
     await this.loadRights()
     await this.loadWorkspaces()
     await this.loadProjects()
     await this.loadUsers()
     await this.loadGroups()
     await this.buildHavingRightsThings()
+    */
+    const loader = new RightsLoader();
+    await loader.loadAll();
+
+    // On copie les références (une seule source de vérité : l'instance loader)
+    Object.assign(this, {
+      rights: loader.rights, workspaces: loader.workspaces,
+      projects: loader.projects, users: loader.users, groups: loader.groups,
+      rightsHash: loader.rightsHash, workspacesHash: loader.workspacesHash,
+      projectsHash: loader.projectsHash, usersHash: loader.usersHash,
+      groupsHash: loader.groupsHash,
+      havingRightsWorkspaces: loader.havingRightsWorkspaces,
+      havingRightsProjects: loader.havingRightsProjects,
+    });
+
     console.log("render() workspaces", this.workspaces, "righted workspaces", this.havingRightsWorkspaces)
     let workspaceDiv = await this.buildWorkspaceSelectBox()
     let addRightsButton = buildAddRightsButton(
@@ -76,117 +93,6 @@ class RightsModal {
     }))
     document.getElementById(this.htmlElement).appendChild(treeAsTable)
   }
-
-  //-------------------------------------------------------------------------
-  async loadWorkspaces() {
-    this.workspaces = await Workspace.getAll('workspaces')
-    console.log("RightsModal loadWorkspaces", this.workspaces)
-    this.workspaces.sort((a, b) => a.name.localeCompare(b.name))
-    console.log("RightsModal loadWorkspaces sorted", this.workspaces)
-    this.workspacesHash = {}
-    this.workspaces.forEach((w) => {
-      this.workspacesHash[w.id] = w
-    })
-  }
-
-  //-------------------------------------------------------------------------
-  async loadProjects() {
-    this.projects = await Project.getAll('projects')
-    this.projects.sort()
-    this.projectsHash = {}
-    this.projects.forEach((w) => {
-      this.projectsHash[w.id] = w
-    })
-  }
-
-  //-------------------------------------------------------------------------
-  async loadUsers() {
-    this.users = await User.getAll('users')
-    this.usersHash = {}
-    this.users.forEach((u) => {
-      this.usersHash[u.id] = u
-    })
-  }
-
-  //-------------------------------------------------------------------------
-  async loadGroups() {
-    this.groups = await Group.getAll('groups')
-    this.groupsHash = {}
-    this.groups.forEach((g) => {
-      this.groupsHash[g.id] = g
-    })
-  }
-
-  //-------------------------------------------------------------------------
-  async loadRights() {
-    this.rights = await Rights.getAll('rights')
-    this.rightsHash = {}
-    this.rights.forEach((r) => {
-      this.rightsHash[r.id] = r
-    })
-  }
-
-  //-------------------------------------------------------------------------
-  async buildHavingRightsThings() {
-    let havingRightsWorkspaces = new Set()
-    let havingRightsProjects = new Set()
-    //console.log("RightsModal buildHavingRightsThings r")
-    this.rights.forEach((r) => {
-      //console.log("RightsModal buildHavingRightsThings r", r)
-      switch (r.target_kind) {
-        case 'workspace':
-          //console.log("RightsModal buildHavingRightsThings workspace r", r)
-          if (this.workspacesHash[r.target_id]) {
-            havingRightsWorkspaces.add(this.workspacesHash[r.target_id].id)
-          }
-          break
-        case 'project':
-          //console.log("RightsModal buildHavingRightsThings project r", r)
-          if (this.projectsHash[r.target_id]) {
-            havingRightsProjects.add(this.projectsHash[r.target_id].id)
-          }
-          break
-      }
-    })
-    //console.log("RightsModal buildHavingRightsThings havingRightsWorkspaces", havingRightsWorkspaces)
-    //console.log("RightsModal buildHavingRightsThings havingRightsProjects", havingRightsProjects)
-    this.havingRightsWorkspaces = []
-    for (let wId of havingRightsWorkspaces) {
-      this.havingRightsWorkspaces.push(this.workspacesHash[wId])
-    }
-    this.havingRightsProjects = []
-    for (let pId of havingRightsProjects) {
-      this.havingRightsProjects.push(this.projectsHash[pId])
-    }
-    this.havingRightsWorkspaces.sort((a, b) => a.name.localeCompare(b.name))
-    this.havingRightsProjects.sort((a, b) => a.name.localeCompare(b.name))
-  }
-
-  //---------------------------------------------------------------------------------
-  /*
-  [
-  {
-    id: 101, name: "Workspace Kanbear", rightsId: 13,
-    users:  [ { id: 1, name: "Gaspard", rightsId: 1 } ],
-    groups: [ { id: 10, name: "Équipe Design", rightsId: 2 } ],
-    projects: [
-      {
-        id: 201, name: "Site vitrine", rightsId: 45
-        users:  [ { id: 1, name: "Gaspard", rightsId: 3 } ],
-        groups: [ { id: 11, name: "Dev Backend", rightsId: 4 } ],
-      },
-      // ... autres projets sans droits : présents, listes vides
-    ],
-  },
-  // ...
-]
-  */
-
-  //-----------------------------------------------------------------------------------------
-  getTargetId() {
-    return (this.targetId)
-  }
-
 
   //-----------------------------------------------------------------------------------------
   getAddRightsFn({ action, ...params }) {
@@ -559,7 +465,6 @@ class RightsModal {
       const id = cb.dataset.rightsId;
       updated.set(id, (updated.get(id) ?? 0) | (cb.checked ? +cb.dataset.flag : 0));
     });
-    console.log("RightsModal saveRights updated", updated)
 
     let patched = 0
     for (const [rightsId, newBits] of updated) {
@@ -599,12 +504,7 @@ class RightsModal {
     //let projects = await Project.getAll('projects', {})
     let boxName = "kanbearProjectsRightsSelectBox"
     let checkboxes = []
-    //let projects = []
-    //console.log("RightsModal buildProjectsSelectBox()", this.projects)
-    //this.projects.forEach((p) => {
-    //  p.name = `${this.workspacesHash[p.workspace_id].name}/${p.name}/#${p.id}`
-    //  projects.push(p)
-    //})
+
     let boxParams = {
       domId: boxName,
       boxLabel: "Projects",
@@ -625,21 +525,6 @@ class RightsModal {
     return (projectsSelectBox)
   }
 
-  //------------------------------------------------------------------------
-  getItemId(radix, action) {
-    return (`${radix}:${action}`)
-  }
-
-  //--------------------------------------------------------------------------------
-  getFullProjectName(projectId) {
-    let wsName
-    try {
-      wsName = this.workspacesHash[this.projectsHash[projectId].workspace_id].name ?? "unknown wsName"
-    } catch (error) {
-      console.log("RightsModal hash ", this.workspacesHash, " target ", rights.target_id)
-    }
-    return (`${wsName}/${this.projectsHash[projectId].name}/${this.projectsHash[projectId].workspace_id}`)
-  }
 }
 
 export { RightsModal }

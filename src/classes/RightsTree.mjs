@@ -1,4 +1,23 @@
 //-------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------
+  /*
+  [
+  {
+    id: 101, name: "Workspace Kanbear", rightsId: 13,
+    users:  [ { id: 1, name: "Gaspard", rightsId: 1 } ],
+    groups: [ { id: 10, name: "Équipe Design", rightsId: 2 } ],
+    projects: [
+      {
+        id: 201, name: "Site vitrine", rightsId: 45
+        users:  [ { id: 1, name: "Gaspard", rightsId: 3 } ],
+        groups: [ { id: 11, name: "Dev Backend", rightsId: 4 } ],
+      },
+      // ... autres projets sans droits : présents, listes vides
+    ],
+  },
+  // ...
+]
+  */
 function buildRightsTree(rights, users, groups, workspaces, projects) {
     console.log("buildRightsTree() workspaces", workspaces)
     console.log("buildRightsTree() projects", projects)
