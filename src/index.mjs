@@ -57,23 +57,23 @@ document.addEventListener("loginOk", async (ev) => {
     document.getElementById("results").innerHTML = ""
     document.getElementById('Tags').style.visibility = "hidden"
     if (!Kontext.isAdmin) {
-        //document.getElementById('Actors').style.visibility = "hidden"
-        document.getElementById('Actors').setAttribute("aria-disabled", true)
-        document.getElementById('Actors').setAttribute("tabindex", -1)
-        //document.getElementById('Kanboard').style.visibility = "hidden"
-        //document.getElementById('showEvents').style.visibility = "hidden"
-        //document.getElementById('clearProject').style.visibility = "hidden"
+        document.getElementById('Actors').style.visibility = "hidden"
+        //document.getElementById('Actors').setAttribute("aria-disabled", true)
+        //document.getElementById('Actors').setAttribute("tabindex", -1)
+        document.getElementById('Kanboard').style.visibility = "hidden"
+        document.getElementById('showEvents').style.visibility = "hidden"
+        document.getElementById('clearProject').style.visibility = "hidden"
         document.getElementById('Kanboard').disabled = true
         document.getElementById('showEvents').disabled = true
         document.getElementById('clearProject').disabled = true
         document.getElementById('isAdmin').innerHTML = `N`;
     } else {
-        //document.getElementById('Actors').style.visibility = "visible"
-        document.getElementById('Actors').setAttribute("aria-disabled", false)
-        document.getElementById('Actors').setAttribute("tabindex", 0)
-        //document.getElementById('Kanboard').style.visibility = "visible"
-        //document.getElementById('showEvents').style.visibility = "visible"
-        //document.getElementById('clearProject').style.visibility = "visible"
+        document.getElementById('Actors').style.visibility = "visible"
+        //document.getElementById('Actors').setAttribute("aria-disabled", false)
+        //document.getElementById('Actors').setAttribute("tabindex", 0)
+        document.getElementById('Kanboard').style.visibility = "visible"
+        document.getElementById('showEvents').style.visibility = "visible"
+        document.getElementById('clearProject').style.visibility = "visible"
         document.getElementById('Kanboard').disabled = false
         document.getElementById('showEvents').disabled = false
         document.getElementById('clearProject').disabled = false
@@ -385,6 +385,11 @@ document.getElementById('loginPanel').addEventListener('click', () => {
     login.create({})
 });
 
+
+//------------------- Login --------------------------------------
+document.getElementById('refreshRightsPanel').addEventListener('click', () => {
+    Kontext.getUserRights()
+});
 
 //------------------- list --------------------------------------
 document.getElementById('listWorkspace').addEventListener('click', async () => {

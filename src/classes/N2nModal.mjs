@@ -26,7 +26,7 @@ class N2nModal {
     this.dialog.showModal();
     this.htmlElement = `n2nModalResults`
     this.hasResetListener = false
-    this.createResetListener()
+    //this.createResetListener()
     this.createListeners()
     //this.render()
   }
@@ -42,8 +42,8 @@ class N2nModal {
       children: [this.buildExitN2nButton(), this.buildSaveN2nButton()]
     }
     )
-    document.getElementById("n2nModalTitle").replaceChildren(createElement('span',{
-      textContent : `Manage users in group ${this.name}`
+    document.getElementById("n2nModalTitle").replaceChildren(createElement('span', {
+      textContent: `Manage users in group ${this.name}`
     }))
     document.getElementById("N2n-buttons").replaceChildren(buttons)
     const leftBox = document.getElementById('n2nLeftBox');
@@ -59,7 +59,7 @@ class N2nModal {
       rightElements.push(createElement("div", {
         classes: ["n2n-item", "inRightBox", "rightBoxInitial"],
         id: fullRef,
-        textContent: this.fullMap.get(l[this.rightKey]).name
+        textContent: this.fullMap.get(l[this.rightKey])?.name
       }))
     }
     rightBox.replaceChildren(createElement('div', {
@@ -104,24 +104,74 @@ class N2nModal {
   }
 
   //---------------------------------------------------------------------
-  createResetListener() {
+  XcreateResetListener() {
     let myThis = this
     if (!this.hasResetListener) {
+      console.log("N2nModal does no have ResetListener")
       document.addEventListener('resetN2nListeners', function (e) {
         console.log("N2nModal resetListeners fired ", e)
         e.detail.controller.abort()
         myThis.createListeners()
       })
       this.hasResetListener = true
+    } else {
+      console.log("N2nModal has ResetListener")
     }
   }
 
-  //---------------------------------------------------------------------
+  //------------------------------------------------------------------------------------------
   createListeners() {
+    // Annule l'éventuel ancien écouteur si createListeners() est rappelé plus tard
+    this.controller?.abort();
+    this.controller = new AbortController();
+
+    // Écoute le clic uniquement dans la modale (ou sur document) SANS renvoyer d'événement reset
+    document.addEventListener('click', (e) => {
+      if (e.target.classList.contains('n2n-item')) {
+        console.log("N2nModal item clicked");
+        e.target.classList.toggle('selected');
+      }
+    }, { signal: this.controller.signal });
+
     const leftBox = document.getElementById('n2nLeftBox');
     const rightBox = document.getElementById('n2nRightBox');
     const toRightBtn = document.getElementById('n2nToRight');
     const toLeftBtn = document.getElementById('n2nToLeft');
+    // Déplacer de gauche à droite
+    toRightBtn.addEventListener('click', () => {
+      const selectedItems = leftBox.querySelectorAll('.n2n-item.selected');
+      console.log("N2nModal toRight clicked", selectedItems)
+      selectedItems.forEach(item => {
+        item.classList.remove('selected');
+        item.classList.remove('inLeftBox')
+        item.classList.add('inRightBox')
+        rightBox.appendChild(item);
+        console.log("N2nModal rightBox", rightBox)
+      })
+    }, { signal : this.controller.signal });
+
+    // Déplacer de droite à gauche
+    toLeftBtn.addEventListener('click', () => {
+      const selectedItems = rightBox.querySelectorAll('.n2n-item.selected');
+      selectedItems.forEach(item => {
+        item.classList.remove('selected');
+        item.classList.remove('inRightBox')
+        item.classList.add('inLeftBox')
+        leftBox.appendChild(item)
+      })
+    }, { signal: this.controller.signal });
+
+  }
+
+  // ---------------------------------------------------------------------
+  destroyListeners() {
+    // Supprime d'un seul coup les 3 écouteurs liés à { signal }
+    this.controller?.abort();
+  }
+
+  //---------------------------------------------------------------------
+  XcreateListeners() {
+
     const controller = new AbortController();
     const { signal } = controller;
     // Gestion de la sélection au clic
@@ -131,7 +181,7 @@ class N2nModal {
         e.target.classList.toggle('selected');
       }
       sendEvent("resetN2nListeners", { controller: controller })
-    },{ signal }
+    }, { signal }
     );
 
     // Déplacer de gauche à droite
@@ -145,7 +195,7 @@ class N2nModal {
         rightBox.appendChild(item);
         console.log("N2nModal rightBox", rightBox)
       })
-    },{ signal });
+    }, { signal });
 
     // Déplacer de droite à gauche
     toLeftBtn.addEventListener('click', () => {
@@ -156,7 +206,7 @@ class N2nModal {
         item.classList.add('inLeftBox')
         leftBox.appendChild(item)
       })
-    },{ signal });
+    }, { signal });
 
   }
 
@@ -171,6 +221,7 @@ class N2nModal {
     let exitN2nFn = async function (ev) {
       console.log("exitN2nButton event Listener fired")
       ev.stopPropagation();
+      myThis.destroyListeners()
       document.getElementById(`n2nModal`).close()
     }
     //let dialog = document.getElementById(`tasksCommentsModal`)

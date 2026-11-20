@@ -4,7 +4,7 @@ import { Kontext } from "./Kontext.mjs";
 import { Group } from "./Group.mjs"
 import { User } from "./User.mjs"
 import { GroupDialog } from "./GroupDialog.mjs"
-import { buildGroupLink, buildUsersGroupsLink } from "../utils/linkBuilder.mjs";
+import { buildGroupLink, buildUsersGroupsLinkWrapper } from "../utils/linkBuilder.mjs";
 import { sendEvent } from "../utils/sendEvent.mjs";
 import { getFiltersMap } from "../utils/filters.mjs";
 import { SmartTable } from "./SmartTable.mjs";
@@ -141,6 +141,8 @@ class KanbearGroupPanel {
       row.appendChild(tdHref(buildGroupLink(group.id, group.name)))
       //row.appendChild(td(group.name))
       row.appendChild(td(group.description))
+      row.appendChild(tdHref(buildUsersGroupsLinkWrapper({id:group.id,name:group.name})))
+      /*
       row.appendChild(tdHref(buildUsersGroupsLink({
         id: group.id,
         name: group.name,
@@ -170,8 +172,7 @@ class KanbearGroupPanel {
           alert("Group saved")
         }
       }))
-
-      )
+              )*/
       tbody.appendChild(row);
     }
     );
