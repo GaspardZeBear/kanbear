@@ -23,8 +23,10 @@ import { getOpenCloseParmBoolean } from './utils/openClose.mjs'
 import { UserDialog } from './classes/UserDialog.mjs';
 import { LoginDialog } from './classes/LoginDialog.mjs'
 import { RightsModal } from './classes/RightsModal.mjs';
+import { SelectBox } from './classes/components/SelectBox.mjs'
 import { createElement, buildKanbearProjectsSelectBox, buildWorkspacesSelectBox } from './utils/createHtml.mjs';
 import { sendMessage, sendErrorMessage } from './utils/sendMessage.mjs';
+import { EventsHub } from './classes/EventsHub.mjs';
 
 await Kontext.loadConfig()
 await Kontext.init()
@@ -81,6 +83,7 @@ document.addEventListener("loginOk", async (ev) => {
     }
     document.getElementById('user').innerHTML = `${Kontext.getUserName()}`;
     await buildWorkspacesSelectBox()
+    // for test !! buildWorkspacesSelectBoxComponent()
     await buildKanbearProjectsSelectBox()
     for (let item of ['project', 'swimlane', 'task']) {
         for (let status of ['Open', 'Closed']) {
@@ -94,7 +97,6 @@ document.addEventListener("loginOk", async (ev) => {
         }
     }
 
-    
     document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
             stopRightsTimer()
@@ -105,8 +107,6 @@ document.addEventListener("loginOk", async (ev) => {
     });
     Kontext.getUserRights()
     startRightsTimer();
-    
-
 })
 
 function startRightsTimer() {
@@ -116,10 +116,97 @@ function stopRightsTimer() {
     clearInterval(rightsTimer)
     rightsTimer = null;
 }
-//function refreshUserRights() {
-//    console.log("refreshUserRights()")
-//}
 
+Kontext.eventsHub.on('index.mjs', ['workspaceCreated', 'rightsModified', 'rightsDeleted'],
+    async (e) => { buildWorkspacesSelectBox() })
+Kontext.eventsHub.on("index.mjs", ["assigneeCreated", "assigneeModified", "assigneeDeleted"],
+    async (e) => { new KanbearAssigneePanel().render() })
+Kontext.eventsHub.on("index.mjs", ["userCreated", "userDeleted", "userModified"],
+    async (e) => { new KanbearUserPanel().render() })
+Kontext.eventsHub.on("index.mjs", ["groupCreated", "groupModified", "groupDeleted"],
+    async (e) => { new KanbearGroupPanel().render() })
+Kontext.eventsHub.on("index.mjs", [
+    "taskCreated", "taskModified", "taskDeleted",
+    "dialogCanceled",
+    "swimlaneCreated", "swimlaneModified", "swimlaneDeleted", "swimlaneDragged",
+    "columnCreated", "columnModified", "columnDeleted", "columnDragged",
+],
+    async (e) => {
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
+Kontext.eventsHub.on('index.mjs', ['workspaceModified'],
+    async (ev) => {
+        const wsEntity = await KanbearEntityFactory.generate('workspace')
+        wsEntity.setId(ev.workspaceId)
+        let ws = await wsEntity.get()
+        wsEntity.setName(ws.name)
+        let workspaceLink = buildWorkspaceLink(ws.id, ws.name)
+        document.getElementById("workspace").replaceChildren(workspaceLink)
+        buildWorkspacesSelectBox()
+    })
+Kontext.eventsHub.on('index.mjs', ['workspaceSelected'],
+    async (ev) => {
+        Kontext.setWorkspaceId(ev.workspaceId)
+        buildKanbearProjectsSelectBox()
+    })
+Kontext.eventsHub.on('index.mjs', ['projectCreated'],
+    async (ev) => {
+        // project was created and given rights
+        await Kontext.getTokensManager().handleRefreshToken();
+        await buildKanbearProjectsSelectBox()
+        await Kontext.setProject(ev.projectId);
+        sendEvent("_projectReloaded", { projectId: ev.projectId })
+        new KanbanPanel().render()
+    })
+Kontext.eventsHub.on('index.mjs', ['cancelProjectBtn'],
+    async (ev) => { document.getElementById('addProjectButton').replaceWith(buildAddProjectButton(Kontext.getWorkspaceId())) })
+Kontext.eventsHub.on('index.mjs', ['cancelWorkspaceBtn'],
+    async (ev) => { document.getElementById('addWorkspaceButton').replaceWith(buildAddWorkspaceButton()) })
+Kontext.eventsHub.on('index.mjs', ['projectSelected'],
+    async (ev) => {
+
+        await Kontext.setProject(ev.projectId);
+        sendEvent("_projectReloaded", { projectId: ev.projectId })
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
+Kontext.eventsHub.on('index.mjs', ['projectModified'],
+    async (ev) => {
+        console.log("Hub ", ev)
+        await Kontext.setProject(ev.projectId);
+        sendEvent("_projectReloaded", { projectId: ev.projectId })
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
+// Event _projectReloaded : "subevent" to update various things
+Kontext.eventsHub.on('index.mjs', ['_projectReloaded'],
+    async (ev) => {
+        console.log("index.mjs() _projectReloaded listener fired <ev>", ev)
+        buildKanbearProjectsSelectBox()
+        let projectLink = buildProjectLink(Kontext.getCurrentProjectId(), Kontext.getCurrentProjectName())
+        document.getElementById("project").replaceChildren(projectLink)
+        const kb = await KanbanPanel.builder()
+        kb.render()
+    })
+Kontext.eventsHub.on('index.mjs', ['projectDeleted'],
+    async (ev) => {
+        if (ev.detail.deleted) {
+            document.getElementById("project").replaceChildren(createElement('span', {
+                textContent: ""
+            }))
+            buildKanbearProjectsSelectBox()
+            sendMessage("Project deleted")
+        } else {
+            const kb = await KanbanPanel.builder()
+            kb.render()
+        }
+    })
+
+Kontext.eventsHub.on('index.mjs', ['error'],
+    async (ev) => { sendErrorMessage(ev.errors)})
+
+document.getElementById('kanboard').href = Kontext.getKanboardUrl()
 
 document.getElementById("projectOpen").addEventListener("change", async (ev) => {
     console.log(`index.mjs() projectOpen2 listener fired <ev>`, ev)
@@ -130,215 +217,6 @@ document.getElementById("projectClosed").addEventListener("change", async (ev) =
     console.log(`index.mjs() projectClosed listener fired <ev>`, ev)
     buildKanbearProjectsSelectBox()
 })
-
-document.addEventListener("workspaceCreated", (ev) => {
-    console.log("workspaceCreated listener fired <ev>", ev)
-    buildWorkspacesSelectBox()
-})
-
-document.addEventListener("workspaceModified", async (ev) => {
-    console.log("workspaceModified listener fired <ev>", ev)
-    const wsEntity = await KanbearEntityFactory.generate('workspace')
-    wsEntity.setId(ev.detail.workspaceId)
-    let ws = await wsEntity.get()
-    console.log("workspaceModified ws", ws)
-    //document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
-    wsEntity.setName(ws.name)
-    let workspaceLink = buildWorkspaceLink(ws.id, ws.name)
-    document.getElementById("workspace").replaceChildren(workspaceLink)
-    buildWorkspacesSelectBox()
-})
-
-document.addEventListener("workspaceSelected", async (ev) => {
-    console.log("workspaceSelected listener fired", "<ev>", ev)
-    Kontext.setWorkspaceId(ev.detail.workspaceId)
-    buildKanbearProjectsSelectBox()
-})
-
-//document.querySelectorAll("projectCreated").addEventListener("projectCreated", (ev) => {
-document.addEventListener("projectCreated", async (ev) => {
-    console.log("projectCreated listener fired <ev>", ev)
-    // project was created and given rights
-    await Kontext.getTokensManager().handleRefreshToken();
-    await buildKanbearProjectsSelectBox()
-    await Kontext.setProject(ev.detail.projectId);
-    sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
-    new KanbanPanel().render()
-})
-
-document.addEventListener("cancelProjectBtn", async (ev) => {
-    console.log("projectCreationCancelled listener fired <ev>", ev)
-    document.getElementById('addProjectButton').replaceWith(buildAddProjectButton(Kontext.getWorkspaceId()))
-})
-
-document.addEventListener("cancelWorkspaceBtn", async (ev) => {
-    console.log("workspaceCreationCancelled listener fired <ev>", ev)
-    document.getElementById('addWorkspaceButton').replaceWith(buildAddWorkspaceButton())
-})
-
-document.addEventListener("projectSelected", async (ev) => {
-    console.log("projectSelected listener fired <ev>", ev)
-    //buildKanbearProjectsSelectBox()
-    await Kontext.setProject(ev.detail.projectId);
-    sendEvent("_projectReloaded", { projectId: ev.detail.projectId })
-    //let projectLink=buildProjectLink(Kontext.getCurrentProjectId(),Kontext.getCurrentProjectName())
-    //document.getElementById("project").replaceChildren(projectLink)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-document.addEventListener("projectModified", async (ev) => {
-    console.log("index.mjs() project modified listener fired <ev>", ev)
-    //buildKanbearProjectsSelectBox()
-    await Kontext.setProject(ev.detail.id);
-    sendEvent("_projectReloaded", { projectId: ev.detail.id })
-    //let projectLink=buildProjectLink(Kontext.getCurrentProjectId(),Kontext.getCurrentProjectName())
-    //document.getElementById("project").replaceChildren(projectLink)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-// Event _projectReloaded : "subevent" to update various things
-document.addEventListener("_projectReloaded", async (ev) => {
-    console.log("index.mjs() _projectReloaded listener fired <ev>", ev)
-    buildKanbearProjectsSelectBox()
-    let projectLink = buildProjectLink(Kontext.getCurrentProjectId(), Kontext.getCurrentProjectName())
-    document.getElementById("project").replaceChildren(projectLink)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-document.addEventListener("projectDeleted", async (ev) => {
-    console.log("projectDeleted listener fired <ev>", ev)
-    if (ev.detail.deleted) {
-        document.getElementById("project").replaceChildren(createElement('span', {
-            textContent: ""
-        }))
-        buildKanbearProjectsSelectBox()
-        sendMessage("Project deleted")
-    } else {
-        const kb = await KanbanPanel.builder()
-        kb.render()
-    }
-})
-
-document.addEventListener("swimlaneCreated", async (ev) => {
-    console.log("index.mjs() swimlane listener Created fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-document.addEventListener("swimlaneModified", async (ev) => {
-    console.log("index.mjs() swimlane Modified listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-document.addEventListener("swimlaneDeleted", async (ev) => {
-    console.log("index.mjs() swimlane deleted listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-document.addEventListener("assigneeCreated", async (ev) => {
-    console.log("index.mjs() assigneeCreated listener fired <ev>", ev)
-    new KanbearAssigneePanel().render()
-})
-
-document.addEventListener("assigneeDeleted", async (ev) => {
-    console.log("index.mjs() assigneeDeleted listener fired <ev>", ev)
-    new KanbearAssigneePanel().render()
-})
-
-document.addEventListener("userCreated", async (ev) => {
-    console.log("index.mjs() userCreated listener fired <ev>", ev)
-    new KanbearUserPanel().render()
-})
-
-document.addEventListener("groupCreated", async (ev) => {
-    console.log("index.mjs() groupCreated listener fired <ev>", ev)
-    new KanbearGroupPanel().render()
-})
-
-
-document.addEventListener("groupDeleted", async (ev) => {
-    console.log("index.mjs() groupDeleted listener fired <ev>", ev)
-    new KanbearGroupPanel().render()
-})
-
-
-document.addEventListener("groupModified", async (ev) => {
-    console.log("index.mjs() groupModified listener fired <ev>", ev)
-    new KanbearGroupPanel().render()
-})
-
-document.addEventListener("userDeleted", async (ev) => {
-    console.log("index.mjs() userDeleted listener fired <ev>", ev)
-    new KanbearUserPanel().render()
-})
-
-document.addEventListener("userModified", async (ev) => {
-    new KanbearUserPanel().render()
-})
-
-
-document.addEventListener("assigneeModified", async (ev) => {
-    new KanbearAssigneePanel().render()
-})
-
-document.addEventListener("columnCreated", async (ev) => {
-    console.log("index.mjs() column created listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-document.addEventListener("columnModified", async (ev) => {
-    console.log("index.mjs() column  modified listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-document.addEventListener("columnDeleted", async (ev) => {
-    console.log("index.mjs() column deleted listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-document.addEventListener("columnDragged", async (ev) => {
-    console.log("index.mjs() columnDragged listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-
-
-document.addEventListener("taskCreated", async (ev) => {
-    console.log("index.mjs() task listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-document.addEventListener("taskModified", async (ev) => {
-    console.log("index.mjs() task modified listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-document.addEventListener("taskDeleted", async (ev) => {
-    console.log("index.mjs() task deleted listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-document.addEventListener("dialogCanceled", async (ev) => {
-    console.log("index.mjs() dialogCanceled listener fired <ev>", ev)
-    const kb = await KanbanPanel.builder()
-    kb.render()
-})
-document.addEventListener("error", async (ev) => {
-    console.log("index.mjs() error listener fired <ev>", ev)
-    //document.getElementById("message").innerHTML = "Error : " + ev.detail.error
-    sendErrorMessage(ev.detail.errors)
-})
-
-document.getElementById('kanboard').href = Kontext.getKanboardUrl()
-
 document.getElementById('loadProject').addEventListener('click', async () => {
     try {
         const response = await Kontext.loadKanbearJsonBulkData()
@@ -354,44 +232,35 @@ function migrateFromKanboard() {
     new KanbearMigrator().migrate()
 }
 
-//------------------- migrate from kanboard to kanbear --------------------------------------
 document.getElementById('migrateFromKanboard').addEventListener('click', () => {
     new KanbearMigrator().migrate()
 });
 
-//------------------- Assignee --------------------------------------
 document.getElementById('assigneePanel').addEventListener('click', () => {
     new KanbearAssigneePanel().render()
 });
 
-//------------------- User --------------------------------------
 document.getElementById('userPanel').addEventListener('click', () => {
     new KanbearUserPanel().render()
 });
 
-//------------------- User --------------------------------------
 document.getElementById('groupPanel').addEventListener('click', () => {
     new KanbearGroupPanel().render()
 });
 
-//------------------- User --------------------------------------
 document.getElementById('rightPanel').addEventListener('click', () => {
     new RightsModal().render()
 });
 
-//------------------- Login --------------------------------------
 document.getElementById('loginPanel').addEventListener('click', () => {
     let login = new LoginDialog('login')
     login.create({})
 });
 
-
-//------------------- Login --------------------------------------
 document.getElementById('refreshRightsPanel').addEventListener('click', () => {
     Kontext.getUserRights()
 });
 
-//------------------- list --------------------------------------
 document.getElementById('listWorkspace').addEventListener('click', async () => {
     try {
         let kl = await KanbearListPanel.builder()
@@ -401,7 +270,6 @@ document.getElementById('listWorkspace').addEventListener('click', async () => {
     }
 });
 
-//------------------- kanban --------------------------------------
 document.getElementById('kanban').addEventListener('click', () => {
     new KanbanPanel().render()
 });
@@ -412,5 +280,31 @@ document.getElementById('clearProject').addEventListener('click', () => {
     new KanbearProjectCleanor().cleanup()
 });
 
+// for test with Web component !
+function buildWorkspacesSelectBoxComponent() {
+    const box = document.createElement('select-box');
+    box.className = 'filter-group';
+    box.setAttribute('label', 'Mon filtre');
+    box.setAttribute('name', 'mon-filtre');
+    box.setAttribute('select-id', 'dom-id-1');
+    box.setAttribute('selected', 'Livres');
+
+    // Ajout d'un bouton enfant si nécessaire
+    const btn = document.createElement('button');
+    btn.textContent = 'Reset';
+    box.appendChild(btn);
+
+    // Injection des données
+    /*box.items = [
+        { id: 1, name: 'Électronique' },
+        { id: 2, name: 'Livres' }
+    ];
+    */
+    Workspace.getAll('workspaces')
+        .then((ws) => box.items = ws)
+        .finally(() => console.log('workspaces loaded'))
+
+    document.body.appendChild(box);
+}
 
 

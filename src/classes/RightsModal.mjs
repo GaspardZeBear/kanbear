@@ -13,6 +13,7 @@ import { selectBoxBuilder } from '../utils/selectBoxBuilder.mjs';
 import { buildAddRightsButton } from '../utils/buttonBuilder.mjs'
 import { REFERENCE, READ, WRITE, DELETE, ADMIN, RIGHT_DEFS, hasBits } from './RightsDefs.mjs'
 import { createElement, buildKanbearProjectsSelectBox, buildWorkspacesSelectBox } from '../utils/createHtml.mjs';
+import { buildUsersGroupsLinkWrapper } from '../utils/linkBuilder.mjs'
 import { buildRightsTree } from './RightsTree.mjs'
 import { RightsLoader } from './RightsLoader.mjs';
 
@@ -26,21 +27,14 @@ class RightsModal {
     this.htmlElement = `rightsModalResults`
 
     this.hasResetListener = false
-    this.createResetListener()
+    //this.createResetListener()
     this.createListeners()
     //this.render()
   }
 
   //-------------------------------------------------------------------------
   async render() {
-    /*
-    await this.loadRights()
-    await this.loadWorkspaces()
-    await this.loadProjects()
-    await this.loadUsers()
-    await this.loadGroups()
-    await this.buildHavingRightsThings()
-    */
+
     const loader = new RightsLoader();
     await loader.loadAll();
 
@@ -270,7 +264,12 @@ class RightsModal {
     const row = document.createElement('tr');
 
     row.appendChild(this.tdElement(this.buildDelRightButton(elt.rightsId, false)));
-    row.appendChild(this.td(`${type} ${elt.name}#${elt.id}`));
+    if (type == 'group') {
+      const groupLink = buildUsersGroupsLinkWrapper({ id: elt.id, name: elt.name, text: `Group ${elt.name}#${elt.id}` })
+      row.appendChild(this.tdElement(groupLink, `${elt.name}#${elt.id}`));
+    } else {
+      row.appendChild(this.td(`${type} ${elt.name}#${elt.id}`));
+    }
 
     for (const def of RIGHT_DEFS) {
       const cb = document.createElement('input');
@@ -381,7 +380,7 @@ class RightsModal {
 
 
   //---------------------------------------------------------------------
-  createResetListener() {
+  XcreateResetListener() {
     let myThis = this
     if (!this.hasResetListener) {
       document.addEventListener('resetRightsModalListeners', function (e) {
@@ -394,7 +393,7 @@ class RightsModal {
   }
 
   //---------------------------------------------------------------------
-  async createListeners() {
+  XcreateListeners() {
     let myThis = this
     const controller = new AbortController();
     const { signal } = controller;
@@ -412,6 +411,44 @@ class RightsModal {
     }, { signal })
   }
 
+  //---------------------------------------------------------------------
+  createListeners() {
+    // 1. Annule les anciens écouteurs s'ils existent déjà (évite les doublons)
+    this.controller?.abort();
+
+    // 2. Stocke le nouveau contrôleur sur l'instance
+    this.controller = new AbortController();
+    const { signal } = this.controller;
+    const dialog = document.getElementById('rightsModal');
+
+    // Nettoyage automatique dès que le <dialog> se ferme
+    dialog.addEventListener('close', () => {
+      this.destroyListeners();
+    }, { signal });
+
+    // Pour fermer le <dialog> au clic sur l'arrière-plan (backdrop)
+    dialog.addEventListener('click', (ev) => {
+      if (ev.target === dialog) {
+        dialog.close(); // Déclenchera l'événement 'close' ci-dessus
+      }
+    }, { signal });
+
+    const events = ["projectsRightsCreated", "workspacesRightsCreated", "rightDeleted"];
+
+    events.forEach((eventName) => {
+      document.addEventListener(eventName, async (ev) => {
+        console.log(`RightsModal() ${eventName} listener fired <ev>`, ev);
+        await this.render();
+      }, { signal: this.controller.signal });
+    });
+  }
+
+  //---------------------------------------------------------------------
+  destroyListeners() {
+    // Supprime d'un seul coup les 3 écouteurs quand vous fermez la modale
+    this.controller?.abort();
+  }
+
   //------------------------------------------------------------------------
   buildExitRightsButton() {
     const exitRightsButton = document.createElement('button')
@@ -422,6 +459,7 @@ class RightsModal {
     let exitRightsFn = async function (ev) {
       console.log("exitRightsButton event Listener fired")
       ev.stopPropagation();
+      myThis.destroyListeners()
       document.getElementById(`rightsModal`).close()
     }
     //let dialog = document.getElementById(`projectsRightsModal`)
@@ -477,6 +515,7 @@ class RightsModal {
       }
     }
     patched === 0 ? alert("Nothing to change") : alert(`${patched} Rights updated`)
+    sendEvent("rightsModified",{})
   }
 
 

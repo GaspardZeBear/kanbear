@@ -8,9 +8,11 @@ import { Columns } from './Columns.mjs'
 import { ApiCaller } from './ApiCaller.mjs'
 import { TokensManager } from './TokensManager.mjs'
 import axios from 'axios';
+import { sendEvent } from '../utils/sendEvent.mjs'
+import { EventsHub } from './EventsHub.mjs'
 
 class Kontext {
-
+    static eventsHub
     static jsonBulkData
     static kanboardJsonBulkData
     static kanbearConfig
@@ -51,6 +53,7 @@ class Kontext {
         Kontext.projectsRights = null
         Kontext.workspacesRights = null
         Kontext.tokensManager=new TokensManager(`${Kontext.getKanbearUrl()}/api/auth/refresh`,null,null,Kontext.processAccessToken)
+        Kontext.eventsHub = new EventsHub()
         Kontext.isAdmin = null
         Kontext.currentUserId = null
         Kontext.currentUserName = null
@@ -139,18 +142,20 @@ class Kontext {
     }
 
     //--------------------------------------------------------------
-    static async setUserRights(rights) {
+    static setUserRights(rights) {
         console.log("Kontext setUserRights()",rights)
         Kontext.projectsRights=rights["projects"]
         Kontext.workspacesRights=rights["workspaces"]
+        sendEvent("rightsModified",{})
     }
 
     //--------------------------------------------------------------
     static async getUserRights() {
         let rights = await new ApiCaller().get(`/api/users/rights/${Kontext.currentUserId}`, {})
         console.log("Kontext getUserRights()",rights.data)
-        Kontext.projectsRights=rights.data["projects"]
-        Kontext.workspacesRights=rights.data["workspaces"]
+        Kontext.setUserRights(rights.data)
+        //Kontext.projectsRights=rights.data["projects"]
+        //Kontext.workspacesRights=rights.data["workspaces"]
     }
 
  //--------------------------------------------------------------

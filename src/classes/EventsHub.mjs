@@ -88,7 +88,7 @@ class EventsHub {
       for (const [listenerId, callback] of callbacksMap.entries()) {
         try {
           // Utilisez console.debug plutôt que console.error pour le suivi normal
-          console.debug(`[EventsHub:${this.hubId}] listener "${listenerId}" | ev.type "${ev.type}" :`, enrichedDetail);
+          console.log(`[EventsHub:${this.hubId}] listener "${listenerId}" | ev.type "${ev.type}" :`, enrichedDetail);
           callback(enrichedDetail, ev, { listenerId, trace: currentTrace });
         } catch (err) {
           console.error(`[EventsHub:${this.hubId}] Erreur dans le listener "${listenerId}" sur "${ev.type}" :`, err);
