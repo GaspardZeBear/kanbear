@@ -36,6 +36,9 @@ class TaskDialog extends Dialog {
         console.log("TaskDialog() fillFormIsOpen ", task.is_open)
         if (task.is_open > 0) {
             document.getElementById("taskIsOpen").setAttribute("checked", "")
+        } else {
+            document.getElementById("taskIsOpen").checked = false;
+            document.getElementById("taskIsOpen").removeAttribute("checked");
         }
 
         //let taskCommentsLink = this.buildTaskCommentsLink(task.id)

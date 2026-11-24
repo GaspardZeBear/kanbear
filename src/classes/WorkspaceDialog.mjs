@@ -17,6 +17,9 @@ class WorkspaceDialog extends Dialog {
         workspaceForm.workspaceDescription.value = workspace.description
         if (workspace.is_open > 0) {
             document.getElementById("workspaceIsOpen").setAttribute("checked", "")
+        } else {
+            document.getElementById("workspaceIsOpen").checked = false;
+            document.getElementById("workspaceIsOpen").removeAttribute("checked");
         }
     }
 

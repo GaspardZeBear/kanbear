@@ -86,12 +86,20 @@ document.addEventListener("loginOk", async (ev) => {
     // try for test with webComponent !! buildWorkspacesSelectBoxComponent()
     
     Kontext.eventsHub.on('index.mjs', [
+        'workspaceOpen', 'worskpaceClosed',
         'projectOpen', 'projectClosed',
         'swimlaneOpen', 'swimlaneClosed',
         'taskOpen', 'taskClosed'],
         async (e) => {
             await Kontext.loadKanbearJsonBulkData()
             await Kontext.renderPanel()
+        })
+
+        Kontext.eventsHub.on('index.mjs', [
+        'workspaceOpen', 'worskpaceClosed',
+        ],
+        async (e) => {
+            console.log("workspace opened/closed")
         })
 
     document.addEventListener('visibilitychange', () => {

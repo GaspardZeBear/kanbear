@@ -22,6 +22,9 @@ class SwimlaneDialog extends Dialog {
         console.log("SwimlaneDialog() fillFormIsOpen ", swimlane.is_open)
         if (swimlane.is_open > 0) {
             document.getElementById("swimlaneIsOpen").setAttribute("checked", "")
+        } else {
+            document.getElementById("swimlaneIsOpen").checked = false;
+            document.getElementById("swimlaneIsOpen").removeAttribute("checked");
         }
     }
 

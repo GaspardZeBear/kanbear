@@ -131,6 +131,10 @@ async function buildKanbearProjectsSelectBox() {
     button.setAttribute("disabled", "")
   }
   let checkboxes = []
+  for (let p of projects){
+    p.name=getPastille(p.is_open)+p.name
+  }
+
   let boxParams = {
     domId: boxName,
     boxLabel: "Project",
@@ -154,20 +158,14 @@ async function buildKanbearProjectsSelectBox() {
   });
 }
 
+//---------------------------------------------------------------------------------
+function getPastille(is_open) {
+ return(is_open ? "O\u{1F7E2}" : "C\u{1F7E0}")
+}
 
 //---------------------------------------------------------------------------------
 async function buildWorkspacesSelectBox() {
 
-  /*
-  let wss0 = []
-  try {
-    wss0 = await Workspace.getAll('workspaces')
-  } catch (err) {
-
-  }
-  let wss = wss0
-  */
-  //document.getElementById("message").innerHTML = "Ready"
   let wss = await Workspace.getAll('workspaces')
   if (wss.length == 0) {
     document.getElementById("message").innerHTML = "No workspace found"
@@ -177,8 +175,13 @@ async function buildWorkspacesSelectBox() {
   }
   // as wss will be modified, let's keep a copy
   let wssOrigin = []
+
   for (let i = 0; i < wss.length; i++) {
     wssOrigin[i] = wss[i]
+    //wss[i].name=ocSymbols[wss[i].is_opened]+wss[i].name
+    
+    //console.log("xxx",wss[i].name,wss[i].is_open,pastille)
+    wss[i].name=getPastille(wss[i].is_open)+wss[i].name
   }
 
   //wss.unshift({ id: -1, name: '* Create new workspace' })
