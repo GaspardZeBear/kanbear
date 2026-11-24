@@ -8,21 +8,23 @@ class EventsHub {
     // Verrou synchrone pour les ré-entrées immédiates
     this.processingEvents = new Set();
   }
-
-  on(listenerId, eventTypes, callback) {
+  //--------------------------------------------------------------------
+  on(listenerId, eventTypes, callback, options={}) {
+    console.log(`EventsHub:${this.hubId} on() listener ${listenerId} `, eventTypes);
     const types = Array.isArray(eventTypes) ? eventTypes : [eventTypes];
-
+    const { elementId = null } = options;
     for (const type of types) {
+      console.log(`EventsHub:${this.hubId} on() loop  listener ${listenerId} type ${type}`);
       if (!this.listeners.has(type)) {
         this.listeners.set(type, new Map());
-        this.target.addEventListener(type, this); 
+        this.target.addEventListener(type, this, true); 
       }
-      
-      this.listeners.get(type).set(listenerId, callback);
+      this.listeners.get(type).set(listenerId, { callback, elementId} );
     }
-
     return () => this.off(listenerId, types);
   }
+
+   //--------------------------------------------------------------------
 
   off(listenerId, eventTypes = null) {
     const types = eventTypes
@@ -85,13 +87,16 @@ class EventsHub {
     // 4. EXÉCUTION DES CALLBACKS
     this.processingEvents.add(ev.type);
     try {
-      for (const [listenerId, callback] of callbacksMap.entries()) {
+      for (const [listenerId, entry] of callbacksMap.entries()) {
+        if ( entry.elementId && ev.target?.id !== entry.elementId ) {
+          continue
+        }
         try {
           // Utilisez console.debug plutôt que console.error pour le suivi normal
-          console.log(`[EventsHub:${this.hubId}] listener "${listenerId}" | ev.type "${ev.type}" :`, enrichedDetail);
-          callback(enrichedDetail, ev, { listenerId, trace: currentTrace });
+          console.log(`EventsHub:${this.hubId} listener ${listenerId} | ev.type "${ev.type}" :`, enrichedDetail);
+          entry.callback(enrichedDetail, ev, { listenerId, trace: currentTrace });
         } catch (err) {
-          console.error(`[EventsHub:${this.hubId}] Erreur dans le listener "${listenerId}" sur "${ev.type}" :`, err);
+          console.error(`EventsHub:${this.hubId} Erreur dans le listener "${listenerId}" sur "${ev.type}" :`, err);
         }
       }
     } finally {

@@ -150,9 +150,9 @@ class Kontext {
     }
 
     //--------------------------------------------------------------
-    static async getUserRights() {
+    static async fetchUserRights() {
         let rights = await new ApiCaller().get(`/api/users/rights/${Kontext.currentUserId}`, {})
-        console.log("Kontext getUserRights()",rights.data)
+        console.log("Kontext fetchUserRights()",rights.data)
         Kontext.setUserRights(rights.data)
         //Kontext.projectsRights=rights.data["projects"]
         //Kontext.workspacesRights=rights.data["workspaces"]

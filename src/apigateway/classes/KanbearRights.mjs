@@ -88,11 +88,12 @@ class KanbearRights {
     this.userRights = rights["data"] ?? null
     this.analysis.push(" userRights ", this.userRights)
     //return (this.resp)
+    console.log("KanbearRights.loadUserRights() end")
   }
 
   //-----------------------------------------------------
   loadGroupsRights() {
-    Konsol.log("KanbearRights.loadGroupsRights()")
+    console.log("KanbearRights.loadGroupsRights() begin")
     let req = `
       select
         id id,
@@ -148,7 +149,7 @@ class KanbearRights {
         console.log("KanbearRights.loadGroupRights() discarding ", rights?.[targetKind]?.[targetId])
       }
     });
-    Konsol.log("KanbearRights.loadRights() over", "<rights>", rights)
+    console.log("KanbearRights.loadRights() over", "<rights>", rights)
     this.groupsRights = rights["data"] ?? null
     //return (this.resp)
   }
@@ -171,6 +172,7 @@ class KanbearRights {
         workspaces: { ...this.userRights.workspaces, ...this.groupsRights.workspaces },
         projects: { ...this.userRights.projects, ...this.groupsRights.projects }
       };
+    console.log("KanbearRights.load() over", "<resultat>", resultat)
     return (resultat)
   }
 

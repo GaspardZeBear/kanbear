@@ -8,6 +8,7 @@ import { Workspace } from "../classes/Workspace.mjs";
 import { selectBoxBuilder } from "./selectBoxBuilder.mjs";
 import { getOpenCloseParmBoolean } from "./openClose.mjs";
 import { buildWorkspaceLink, buildProjectLink } from './linkBuilder.mjs';
+import { sendMessage } from "./sendMessage.mjs";
 
 
 //-----------------------------------------------------------------------------------------------
@@ -84,11 +85,12 @@ function getIdentityDiv(entity, dialog) {
           entity.patch({ is_open: entity.getOpen() })
             .then(() => { })
             .catch(() => { })
-            .finally(() => sendEvent(`${entity.getKind()}Modified`, entity))
-        }
-        // Event will be sent twice, to be fixed  !!!!
-        // Must be sent even if cancel to reset once on the listener
-        sendEvent(`${entity.getKind()}Modified`, entity)
+            .finally(() => { sendMessage(`${entity.getKind()} ${entity.name} Modified`)})
+        } //else {
+          // Event will be sent twice, to be fixed  !!!!
+          // Must be sent even if cancel to reset once on the listener
+        sendEvent(`${entity.getKind()}Modified`, { entity: entity })
+        //}
       }),
       createElement('br'),
       createElement('b', {
@@ -110,7 +112,7 @@ function getDeleteEntityDiv(entity, buttonDiv) {
 async function buildKanbearProjectsSelectBox() {
   let workspaceId = Kontext.getWorkspaceId()
   let projects = []
-  console.log("buildKanbearProjectsSelectBox() <workspaceId>", workspaceId)
+  //console.log("buildKanbearProjectsSelectBox() <workspaceId>", workspaceId)
   if (workspaceId) {
     const isOpen = document.getElementById("projectOpen").checked;
     const isClosed = document.getElementById("projectClosed").checked;
@@ -120,23 +122,19 @@ async function buildKanbearProjectsSelectBox() {
       parms["is_open"] = openClosed
     }
     projects = await Project.getAll('projects', parms)
-    //projects.unshift({ id: -1, name: '* Create new project' })
   }
-  console.log("buildKanbearProjectsSelectBox <Kontext.getCurrentProjectId>", Kontext.getCurrentProjectId())
+  //console.log("buildKanbearProjectsSelectBox <Kontext.getCurrentProjectId>", Kontext.getCurrentProjectId())
   let boxName = "kanbearProjectSelectBox"
-  let buttons = []
-
-  if (workspaceId > 0) {
-    buttons.push(buildAddProjectButton(workspaceId))
-  } else {
-    buttons.push(buildAddDummyButton())
+  //let buttons = []
+  let button = buildAddProjectButton(workspaceId)
+  if (workspaceId < 1) {
+    button.setAttribute("disabled", "")
   }
   let checkboxes = []
-
   let boxParams = {
     domId: boxName,
     boxLabel: "Project",
-    buttons: buttons,
+    buttons: [button],
     checkboxes: checkboxes,
     items: projects,
     labelText: "Project",
@@ -160,6 +158,7 @@ async function buildKanbearProjectsSelectBox() {
 //---------------------------------------------------------------------------------
 async function buildWorkspacesSelectBox() {
 
+  /*
   let wss0 = []
   try {
     wss0 = await Workspace.getAll('workspaces')
@@ -167,9 +166,9 @@ async function buildWorkspacesSelectBox() {
 
   }
   let wss = wss0
-
+  */
   //document.getElementById("message").innerHTML = "Ready"
-
+  let wss = await Workspace.getAll('workspaces')
   if (wss.length == 0) {
     document.getElementById("message").innerHTML = "No workspace found"
     alert("Could not initialize workspaces, are you logged in with a right user  ?")
@@ -181,7 +180,6 @@ async function buildWorkspacesSelectBox() {
   for (let i = 0; i < wss.length; i++) {
     wssOrigin[i] = wss[i]
   }
-  console.log("wssOrigin init", wssOrigin)
 
   //wss.unshift({ id: -1, name: '* Create new workspace' })
   let addWorkspaceButton = buildAddWorkspaceButton()
@@ -199,6 +197,7 @@ async function buildWorkspacesSelectBox() {
   let wsDiv = await selectBoxBuilder(boxParams)
   document.getElementById("kanbearWorkspacesDiv").replaceChildren(wsDiv)
   document.getElementById(boxName).addEventListener('change', async (e) => {
+    console.log("buildWorkspacesSelectBiox() change fired , elt ", e.target.value)
     let workspaceId = parseInt(e.target.value)
     if (workspaceId < 0) {
       sendEvent("workspaceSelected", workspaceId)
@@ -216,9 +215,10 @@ async function buildWorkspacesSelectBox() {
     document.getElementById("workspace").innerHTML = `${ws.id} ${ws.name}`
     let workspaceLink = buildWorkspaceLink(ws.id, ws.name)
     document.getElementById("workspace").replaceChildren(workspaceLink)
-    buildKanbearProjectsSelectBox()
+    await buildKanbearProjectsSelectBox()
     console.log({ boxName }, e.target.value)
   });
+  await buildKanbearProjectsSelectBox()
 }
 
 export { createElement, getIdentityDiv, getDeleteEntityDiv, buildKanbearProjectsSelectBox, buildWorkspacesSelectBox }
