@@ -6,7 +6,7 @@ import { Kontext } from "../classes/Kontext.mjs";
 import { Project } from "../classes/Project.mjs";
 import { Workspace } from "../classes/Workspace.mjs";
 import { selectBoxBuilder } from "./selectBoxBuilder.mjs";
-import { getOpenCloseParmBoolean } from "./openClose.mjs";
+import { getOpenCloseParmBoolean, getPastille } from "./openClose.mjs";
 import { buildWorkspaceLink, buildProjectLink } from './linkBuilder.mjs';
 import { sendMessage } from "./sendMessage.mjs";
 
@@ -159,11 +159,6 @@ async function buildKanbearProjectsSelectBox() {
 }
 
 //---------------------------------------------------------------------------------
-function getPastille(is_open) {
-  return (is_open ? "\u{1F7E2}" : "\u{274C}")
-}
-
-//---------------------------------------------------------------------------------
 async function buildWorkspacesSelectBox() {
   const isOpen = document.getElementById("workspacesOpenedCheckbox").checked;
   const isClosed = document.getElementById("workspacesClosedCheckbox").checked;
@@ -205,6 +200,9 @@ async function buildWorkspacesSelectBox() {
     let workspaceId = parseInt(e.target.value)
     if (workspaceId < 0) {
       sendEvent("workspaceSelected", workspaceId)
+      Kontext.setWorkspaceId(e.target.value);
+      Kontext.setProject(-1)
+      await buildKanbearProjectsSelectBox()
       return
     }
     Kontext.setWorkspaceId(e.target.value);

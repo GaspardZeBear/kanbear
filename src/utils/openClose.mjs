@@ -10,6 +10,13 @@ function getOpenCloseClass(val) {
     //return(val ? '<i class="material-icons">lock</i>':'<i class="material-icons">lock</i>')
 }
 
+
+//---------------------------------------------------------------------------------
+function getPastille(is_open) {
+  return (is_open ? "\u{1F7E2}" : "\u{274C}")
+}
+
+
 //--------------------------------------------------------------------------------------------
 function getOpenCloseParmBoolean(kind, openSelected, closeSelected) {
     //console.log("getOpenCloseParmBoolean() <kind>", kind, openSelected, closeSelected)
@@ -62,4 +69,4 @@ function getOpenCloseQueryParms(kinds=['project', 'swimlane', 'task']) {
 //--------------------------------------------------------------------------------------------
 
 
-export { getOpenCloseSymbol, getOpenCloseClass, getOpenCloseQueryParms, getOpenCloseParmBoolean }
+export { getOpenCloseSymbol, getOpenCloseClass, getOpenCloseQueryParms, getOpenCloseParmBoolean, getPastille }

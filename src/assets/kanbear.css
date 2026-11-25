@@ -252,3 +252,24 @@ th {
     overflow : hidden;
     xtransition: background-color 0.3s;
 }
+.select-wrapper {
+    position: relative;
+    width: 250px;
+    Xheight: 65px; /* Hauteur fixe pour l'input + le select fermé */
+  }
+
+  .select-wrapper input,
+  .select-wrapper select {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* 2. Quand le select s'ouvre, il flotte par-dessus le reste */
+  .select-wrapper select.ouvert {
+    position: absolute;
+    top: 26px; /* À ajuster selon la hauteur de votre input */
+    left: 0;
+    z-index: 1000;
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }

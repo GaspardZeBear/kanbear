@@ -58,6 +58,7 @@ class KanbearSqlReporter {
       select 
         w.id wId,
         w.name wName,
+        w.is_open wIsOpen,
         p.id pId,
 	      p.name pName,
         p.description pDescription,
@@ -187,7 +188,7 @@ class KanbearSqlReporter {
       //console.log(row)
       if (!projectsMap[row.pId]) {
         projectsMap[row.pId] = {}
-        projectsMap[row.pId].workspace = { name: row.wName, id: row.wId }
+        projectsMap[row.pId].workspace = { name: row.wName, id: row.wId, is_open:row.wIsOpen }
         projectsMap[row.pId].name = row.pName
         projectsMap[row.pId].id = row.pId
         projectsMap[row.pId].is_open = row.pIsOpen

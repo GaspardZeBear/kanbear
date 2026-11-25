@@ -5,8 +5,11 @@ import { Ref } from "./Ref.mjs"
 import { getFiltersMap } from "../utils/filters.mjs";
 import { Task } from "./Task.mjs"
 import { Project } from "./Project.mjs"
-import { getOpenCloseSymbol, getOpenCloseParmBoolean } from "../utils/openClose.mjs";
+import { getPastille, getOpenCloseSymbol, getOpenCloseParmBoolean } from "../utils/openClose.mjs";
 import { SmartTable } from "./SmartTable.mjs";
+import { createElement } from "../utils/createHtml.mjs";
+import { KanbanPanel } from "./KanbanPanel.mjs";
+
 //import { buildWorkspaceLink } from "../utils/linkBuilder.mjs";
 
 class KanbearListPanel {
@@ -27,10 +30,13 @@ class KanbearListPanel {
     //if ( !Kontext.getWorkspaceId()) {
     //  throw new Error("No workspace selected")
     //}
-    const isOpen = document.getElementById("projectOpen").checked;
-    const isClosed = document.getElementById("projectClosed").checked;
+    const isOpen = document.getElementById("projectsOpenedCheckbox").checked;
+    const isClosed = document.getElementById("projectsClosedCheckbox").checked;
     const openClosed = getOpenCloseParmBoolean('project', isOpen, isClosed)
-    const parms = { workspace_id: Kontext.getWorkspaceId() }
+    let parms = {}
+    if (Kontext.getWorkspaceId() > 0) {
+      parms = { workspace_id: Kontext.getWorkspaceId() }
+    }
     if (!(openClosed === undefined)) {
       parms["is_open"] = openClosed
     }
@@ -99,7 +105,7 @@ class KanbearListPanel {
     this.createButtons()
     await this.createTable()
     //console.log(this.table)
-    let t=new SmartTable(this.table)
+    let t = new SmartTable(this.table)
     const result = document.getElementById(this.htmlElement);
     //document.getElementById(this.htmlElement).innerHTML = `<h2>${this.project.name} filtered by ...</h2>`
     let resultTitle = document.createElement('h2')
@@ -114,7 +120,7 @@ class KanbearListPanel {
     result.appendChild(this.buttons['move'])
     result.appendChild(this.buttons['close'])
     result.appendChild(this.table)
-    
+
     //this.setPopup()
   }
 
@@ -131,6 +137,25 @@ class KanbearListPanel {
     return (jsonBulkData)
   }
 
+  //------------------------------------------------------------------------------------
+  td(p) {
+    return (createElement('td', {
+      innerHTML: p
+    }))
+  }
+
+  //------------------------------------------------------------------------------------
+  tdElement(self = {}) {
+    return (createElement('td', {
+      children: [children]
+    }))
+  }
+
+  //------------------------------------------------------------------------------------
+  tdElement(self = {}) {
+    return (createElement('td', self))
+  }
+
   //-----------------------------------------------------------------
   async createTable() {
     this.table = document.createElement('table')
@@ -141,12 +166,9 @@ class KanbearListPanel {
         <th>Action</th>
         <th>Workspace</th>
         <th>Project</th>
-        <th></th>
         <th>Swimlane</th>
-        <th></th>
         <th>Column</th>
         <th>Task</th>
-        <th></th>
         <th>Since</th>
         <th>Duration</th>
         <th>Due</th>
@@ -173,7 +195,7 @@ class KanbearListPanel {
         Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
           if (!this.kanboardFilter.keepTask(task.name)) { return }
           console.log("KanbearListPanel.createTable() <task>", task)
-          if ( task.assignee_id ) {
+          if (task.assignee_id) {
             if (!this.kanboardFilter.keepAssignee(project.assignees[task.assignee_id].name)) { return }
           } else {
             if (!this.kanboardFilter.keepAssignee("")) { return }
@@ -189,28 +211,70 @@ class KanbearListPanel {
           const checkBoxId = Ref.getRef('checkbox', project.id, swimlane.id, task.id)
           const commentLinkId = Ref.getRef('commentLink', project.id, swimlane.id, task.id)
 
-          const projectKanban=document.createElement('span')
-          
+          const projectKanban = document.createElement('span')
 
-          //<td style="background-color:${taskEntity.getTaskDisplayColor()}">${task.name} ${getOpenCloseSymbol(task.is_open)}</td>
-          //<td style="background-color:${task.color}">${task.name} ${getOpenCloseSymbol(task.is_open)}</td>
+          const kanban = createElement('a', {
+            href: "#",
+            textContent: "kanban",
+            'onclick': async () => {
+              Kontext.setProject(project.id)
+              const k = await KanbanPanel.builder()
+              k.render()
+            }
+          });
+
+          row.appendChild(this.tdElement({
+            children: [createElement("input", {
+              type: "checkbox",
+              id: checkBoxId,
+              classes: ['taskCheckbox']
+            })]
+          }))
+          row.appendChild(this.tdElement({
+            children: [createElement("a", {
+              href: "#",
+              id: commentLinkId,
+              innerHTML: "Comments",
+              classes: ["taskCommentLink"]
+            })]
+          }))
+          console.log("xxx",project)
+          row.appendChild(this.td(`${getPastille(project.workspace.is_open)} ${project.workspace.name}`))
+          row.appendChild(this.td(`${getPastille(project.is_open)} ${project.name}`))
+          row.appendChild(this.tdElement({ children: [kanban] }))
+          row.appendChild(this.tdElement({
+            style: `background-color:${project.columns[task.column_id].color}`,
+            textContent: `${project.columns[task.column_id].name}`
+          }))
+          row.appendChild(this.tdElement({
+            style: `background-color:${taskEntity.getTaskDisplayColor(project.columns[task.column_id])}`,
+            children: [
+              createElement('span', {
+                textContent: `${getPastille(task.is_open)} ${task.name}`
+              })]
+          }))
+          row.appendChild(this.td(`${dateToString(task.date_moved)}`))
+          row.appendChild(this.td(`${getDurationFromNow(task.date_moved, true)}`))
+          row.appendChild(this.td(`${dateToString(task.date_due)}`))
+          row.appendChild(this.td(`${getDurationFromNow(task.date_due, true) ?? ''}`))
+          row.appendChild(this.td(`${project.assignees[task.assignee_id]?.name || ""}`))
+          //`style="background-color:${project.columns[task.column_id].color}">${project.columns[task.column_id].name}`))
+          /*
           row.innerHTML = `
               <td><input type="checkbox" name="tasks" id="${checkBoxId}" class="taskCheckbox"/></td>
               <td><a href="#" class="taskCommentLink" id="${commentLinkId}">c</a></td>
               <td>${project.workspace.name}</td>
-              <td>${project.name}</td>
-              <td>${getOpenCloseSymbol(project.is_open)}</td>
-              <td>${swimlane.name}</td>
-              <td>${getOpenCloseSymbol(swimlane.is_open)}</td>
+              <td>${getPastille(project.is_open)} ${project.name} </td>
+              <td>${getPastille(swimlane.is_open)} ${swimlane.name}</td>
               <td style="background-color:${project.columns[task.column_id].color}">${project.columns[task.column_id].name}</td>
-              <td style="background-color:${taskEntity.getTaskDisplayColor(project.columns[task.column_id])}">${task.name}</td>
-              <td>${getOpenCloseSymbol(task.is_open)}</td>
+              <td style="background-color:${taskEntity.getTaskDisplayColor(project.columns[task.column_id])}">${getPastille(task.is_open)} ${task.name}</td>
               <td>${dateToString(task.date_moved)}</td>
               <td>${getDurationFromNow(task.date_moved, true)}</td>
               <td>${dateToString(task.date_due)}</td>
               <td>${getDurationFromNow(task.date_due, true) ?? ''}</td>
               <td>${project.assignees[task.assignee_id]?.name || ""}</td>
             `;
+            */
           tbody.appendChild(row);
         })
       });
