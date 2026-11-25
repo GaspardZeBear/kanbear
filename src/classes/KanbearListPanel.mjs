@@ -169,6 +169,7 @@ class KanbearListPanel {
         <th>Swimlane</th>
         <th>Column</th>
         <th>Task</th>
+        <th>Note</th>
         <th>Since</th>
         <th>Duration</th>
         <th>Due</th>
@@ -215,7 +216,7 @@ class KanbearListPanel {
 
           const kanban = createElement('a', {
             href: "#",
-            textContent: "kanban",
+            textContent: project.name,
             'onclick': async () => {
               Kontext.setProject(project.id)
               const k = await KanbanPanel.builder()
@@ -240,19 +241,26 @@ class KanbearListPanel {
           }))
           console.log("xxx",project)
           row.appendChild(this.td(`${getPastille(project.workspace.is_open)} ${project.workspace.name}`))
-          row.appendChild(this.td(`${getPastille(project.is_open)} ${project.name}`))
-          row.appendChild(this.tdElement({ children: [kanban] }))
-          row.appendChild(this.tdElement({
+          //row.appendChild(this.td(`${getPastille(project.is_open)} ${project.name}`))
+          row.appendChild(this.tdElement({ children: [
+            createElement('span',{
+              textContent : `${getPastille(project.is_open)}`
+            }),
+              kanban] }))
+              row.appendChild(this.td(`${getPastille(swimlane.is_open)} SWIM ${swimlane.name}`))
+           row.appendChild(this.tdElement({
             style: `background-color:${project.columns[task.column_id].color}`,
-            textContent: `${project.columns[task.column_id].name}`
+            textContent: `COL ${project.columns[task.column_id].name}`
           }))
+          
           row.appendChild(this.tdElement({
             style: `background-color:${taskEntity.getTaskDisplayColor(project.columns[task.column_id])}`,
             children: [
               createElement('span', {
-                textContent: `${getPastille(task.is_open)} ${task.name}`
+                textContent: `${getPastille(task.is_open)} TASK ${task.name}`
               })]
           }))
+          row.appendChild(this.td(`${task.note}`))
           row.appendChild(this.td(`${dateToString(task.date_moved)}`))
           row.appendChild(this.td(`${getDurationFromNow(task.date_moved, true)}`))
           row.appendChild(this.td(`${dateToString(task.date_due)}`))
