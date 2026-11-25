@@ -84,7 +84,7 @@ document.addEventListener("loginOk", async (ev) => {
     document.getElementById('user').innerHTML = `${Kontext.getUserName()}`;
     await buildWorkspacesSelectBox()
     // try for test with webComponent !! buildWorkspacesSelectBoxComponent()
-    
+
     Kontext.eventsHub.on('index.mjs', [
         'workspaceOpen', 'worskpaceClosed',
         'projectOpen', 'projectClosed',
@@ -95,9 +95,9 @@ document.addEventListener("loginOk", async (ev) => {
             await Kontext.renderPanel()
         })
 
-        Kontext.eventsHub.on('index.mjs', [
+    Kontext.eventsHub.on('index.mjs', [
         'workspaceOpen', 'worskpaceClosed',
-        ],
+    ],
         async (e) => {
             console.log("workspace opened/closed")
         })
@@ -229,10 +229,29 @@ Kontext.eventsHub.on('index.mjs.loadProject', ['change'],
 
 document.getElementById('kanboard').href = Kontext.getKanboardUrl()
 
-document.getElementById("projectOpen").addEventListener("change", async (ev) => {
-    console.log(`index.mjs() projectOpen2 listener fired <ev>`, ev)
-    buildKanbearProjectsSelectBox()
-})
+Kontext.eventsHub.on('index.mjs projectsOpenedCheckbox', ['change'],
+    async (detail, ev) => {
+        await buildKanbearProjectsSelectBox()
+    },
+    { elementId: 'projectsOpenedCheckbox' });
+
+Kontext.eventsHub.on('index.mjs projectsClosedCheckbox', ['change'],
+    async (detail, ev) => {
+        await buildKanbearProjectsSelectBox()
+    },
+    { elementId: 'projectsClosedCheckbox' });
+Kontext.eventsHub.on('index.mjs workspaceOpenedCheckbox', ['change'],
+    async (detail, ev) => {
+        await buildWorkspacesSelectBox()
+    },
+    { elementId: 'workspacesOpenedCheckbox' });
+
+Kontext.eventsHub.on('index.mjs workspacesClosedCheckbox', ['change'],
+    async (detail, ev) => {
+        await buildWorkspacesSelectBox()
+    },
+    { elementId: 'workspacesClosedCheckbox' });
+
 
 //------------------- migrate from kanboard to kanbear --------------------------------------
 function migrateFromKanboard() {

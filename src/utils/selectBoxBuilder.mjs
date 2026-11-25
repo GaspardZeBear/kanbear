@@ -1,4 +1,4 @@
-//---------------------------------------------------------------------------------
+import { createElement } from '../utils/createHtml.mjs'
 async function selectBoxBuilder(params) {
 
   //console.log("selectBoxBuilder() <params>", params)
@@ -13,7 +13,9 @@ async function selectBoxBuilder(params) {
   ////"filter-group") {
 
   //console.log("selectBoxBuilder", items)
-  const itemDiv = document.createElement("div")
+  const itemDiv = document.createElement("div",{
+    
+  })
   const classes = klass.split(" ")
   for (let c of classes) {
     itemDiv.classList.add(c)
@@ -31,7 +33,10 @@ async function selectBoxBuilder(params) {
   // label.innerHTML = labelText
 
 
-  const select = document.createElement("select")
+  const select = createElement("select",{
+    classes:["select-wrapper"]
+  })
+
   select.setAttribute("name", boxLabel)
   if (domId && domId.length > 0) {
     select.setAttribute("id", domId)
@@ -61,8 +66,43 @@ async function selectBoxBuilder(params) {
     }
     select.appendChild(option)
   })
+  
+  const filterId = `${domId}Filter`
+  const filter = createElement("input", {
+    id: filterId,
+    type: 'text',
+    placeholder: 'Search ...'
+  })
+  //const select = document.getElementById('mon-select');
+  // Ouvre sur 5 lignes quand on interagit avec le champ ou le select
+
+  
+  const ouvrirListe = () => select.size = 5;
+  const fermerListe = () => select.size = 1;
+
+  filter.addEventListener('focus', ouvrirListe);
+  select.addEventListener('focus', ouvrirListe);
+
+  // Referme quand on quitte les deux éléments ou après un choix
+  select.addEventListener('change', fermerListe);
+  select.addEventListener('blur', fermerListe);
+  filter.addEventListener('blur', (e) => {
+    if (e.relatedTarget !== select) fermerListe();
+  });
+  
+
+
+  const options = Array.from(select.options); 
+  filter.addEventListener('input', () => {
+    const search = filter.value.toLowerCase();
+    options.forEach(opt => {
+      opt.hidden = !opt.text.toLowerCase().includes(search);
+    });
+  });
   itemDiv.appendChild(label)
+  itemDiv.appendChild(filter)
   itemDiv.appendChild(select)
+
   //console.log("selectBoxBuilder() <itemDiv>",itemDiv)
   return (itemDiv)
 }

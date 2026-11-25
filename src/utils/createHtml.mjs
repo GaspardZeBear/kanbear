@@ -85,10 +85,10 @@ function getIdentityDiv(entity, dialog) {
           entity.patch({ is_open: entity.getOpen() })
             .then(() => { })
             .catch(() => { })
-            .finally(() => { sendMessage(`${entity.getKind()} ${entity.name} Modified`)})
+            .finally(() => { sendMessage(`${entity.getKind()} ${entity.name} Modified`) })
         } //else {
-          // Event will be sent twice, to be fixed  !!!!
-          // Must be sent even if cancel to reset once on the listener
+        // Event will be sent twice, to be fixed  !!!!
+        // Must be sent even if cancel to reset once on the listener
         sendEvent(`${entity.getKind()}Modified`, { entity: entity })
         //}
       }),
@@ -114,8 +114,8 @@ async function buildKanbearProjectsSelectBox() {
   let projects = []
   //console.log("buildKanbearProjectsSelectBox() <workspaceId>", workspaceId)
   if (workspaceId) {
-    const isOpen = document.getElementById("projectOpen").checked;
-    const isClosed = document.getElementById("projectClosed").checked;
+    const isOpen = document.getElementById("projectsOpenedCheckbox").checked;
+    const isClosed = document.getElementById("projectsClosedCheckbox").checked;
     const openClosed = getOpenCloseParmBoolean('project', isOpen, isClosed)
     const parms = { workspace_id: workspaceId }
     if (!(openClosed === undefined)) {
@@ -131,8 +131,8 @@ async function buildKanbearProjectsSelectBox() {
     button.setAttribute("disabled", "")
   }
   let checkboxes = []
-  for (let p of projects){
-    p.name=getPastille(p.is_open)+p.name
+  for (let p of projects) {
+    p.name = getPastille(p.is_open) + p.name
   }
 
   let boxParams = {
@@ -160,31 +160,33 @@ async function buildKanbearProjectsSelectBox() {
 
 //---------------------------------------------------------------------------------
 function getPastille(is_open) {
- return(is_open ? "O\u{1F7E2}" : "C\u{1F7E0}")
+  return (is_open ? "\u{1F7E2}" : "\u{274C}")
 }
 
 //---------------------------------------------------------------------------------
 async function buildWorkspacesSelectBox() {
-
-  let wss = await Workspace.getAll('workspaces')
+  const isOpen = document.getElementById("workspacesOpenedCheckbox").checked;
+  const isClosed = document.getElementById("workspacesClosedCheckbox").checked;
+  const openClosed = getOpenCloseParmBoolean('workspace', isOpen, isClosed)
+  const parms = {}
+  if (!(openClosed === undefined)) {
+    parms["is_open"] = openClosed
+  }
+  let wss = await Workspace.getAll('workspaces', parms)
   if (wss.length == 0) {
     document.getElementById("message").innerHTML = "No workspace found"
     alert("Could not initialize workspaces, are you logged in with a right user  ?")
   } else {
-    document.getElementById("message").innerHTML = "Ready"
+    document.getElementById("message").innerHTML = "Workspaces loadedy"
   }
   // as wss will be modified, let's keep a copy
   let wssOrigin = []
 
   for (let i = 0; i < wss.length; i++) {
     wssOrigin[i] = wss[i]
-    //wss[i].name=ocSymbols[wss[i].is_opened]+wss[i].name
-    
-    //console.log("xxx",wss[i].name,wss[i].is_open,pastille)
-    wss[i].name=getPastille(wss[i].is_open)+wss[i].name
+    wss[i].name = getPastille(wss[i].is_open) + wss[i].name
   }
 
-  //wss.unshift({ id: -1, name: '* Create new workspace' })
   let addWorkspaceButton = buildAddWorkspaceButton()
   let boxName = "kanbearWorkspaceSelectBox"
   let boxParams = {
@@ -195,7 +197,6 @@ async function buildWorkspacesSelectBox() {
     labelText: "Workspace",
     klass: "filter-group",
     selectedOption: Kontext.getWorkspaceId()
-    //headItems:[['* Create new workspace',-1]]
   }
   let wsDiv = await selectBoxBuilder(boxParams)
   document.getElementById("kanbearWorkspacesDiv").replaceChildren(wsDiv)
