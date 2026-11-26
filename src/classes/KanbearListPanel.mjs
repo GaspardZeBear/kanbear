@@ -182,6 +182,10 @@ class KanbearListPanel {
 
     console.log("KanbearListPanel.createTable() <projects>", this.projects)
     //Object.entries(this.projects).forEach(([projectId, project]) => {
+    const isOpen = document.getElementById("workspacesOpenedCheckbox").checked;
+    const isClosed = document.getElementById("workspacesClosedCheckbox").checked
+    const openClosed = getOpenCloseParmBoolean('workspace', isOpen, isClosed)
+    
 
     for (let p of this.projects) {
       const projectM = await this.getJsonBulkData(p.id)
@@ -191,6 +195,16 @@ class KanbearListPanel {
       console.log("KanbearListPanel.createTable() <project>", project)
       if (!this.kanboardFilter.keepProject(project.name)) { continue }
       if (!this.kanboardFilter.keepWorkspace(project.workspace.name)) { continue }
+ 
+      if ( ! (openClosed === undefined) ) {
+        //console.log("openClosed",openClosed,project.workspace.is_open)
+        if ( ! ((project.workspace.is_open===1) === openClosed) ) {
+          continue
+        }
+      }
+      
+
+
       Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
         if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
         Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
