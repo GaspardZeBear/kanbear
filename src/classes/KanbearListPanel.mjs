@@ -30,16 +30,22 @@ class KanbearListPanel {
     //if ( !Kontext.getWorkspaceId()) {
     //  throw new Error("No workspace selected")
     //}
-    const isOpen = document.getElementById("projectsOpenedCheckbox").checked;
-    const isClosed = document.getElementById("projectsClosedCheckbox").checked;
-    const openClosed = getOpenCloseParmBoolean('project', isOpen, isClosed)
     let parms = {}
-    if (Kontext.getWorkspaceId() > 0) {
-      parms = { workspace_id: Kontext.getWorkspaceId() }
-    }
+    //const isOpen = document.getElementById("projectsOpenedCheckbox").checked;
+    //const isClosed = document.getElementById("projectsClosedCheckbox").checked;
+    //const openClosed = getOpenCloseParmBoolean('project', isOpen, isClosed)
+
+    //if (!(openClosed === undefined)) {
+    const filter=new KanboardFilter(getFiltersMap())
+    const openClosed=filter.openCloseFilter('project')
+    console.log("KanbearListPanel.builder() openClosed project",openClosed)
     if (!(openClosed === undefined)) {
       parms["is_open"] = openClosed
     }
+    if (Kontext.getWorkspaceId() > 0) {
+      parms = { workspace_id: Kontext.getWorkspaceId() }
+    }
+
     console.log("KanbearListPanel.builder() <parms>", parms)
     const projects = await Project.getAll('projects', parms)
     Kontext.setPanelClass(KanbearListPanel)
@@ -145,15 +151,8 @@ class KanbearListPanel {
   }
 
   //------------------------------------------------------------------------------------
-  tdElement(self = {}) {
-    return (createElement('td', {
-      children: [children]
-    }))
-  }
-
-  //------------------------------------------------------------------------------------
-  tdElement(self = {}) {
-    return (createElement('td', self))
+  tdElement(element = {}) {
+    return (createElement('td', element))
   }
 
   //-----------------------------------------------------------------------------------
@@ -181,14 +180,7 @@ class KanbearListPanel {
         classes: ['taskCheckbox']
       })]
     }))
-    row.appendChild(this.tdElement({
-      children: [createElement("a", {
-        href: "#",
-        id: commentLinkId,
-        innerHTML: "Comments",
-        classes: ["taskCommentLink"]
-      })]
-    }))
+
     console.log("xxx", project)
     row.appendChild(this.td(`${getPastille(project.workspace.is_open)} ${project.workspace.name}`))
     //row.appendChild(this.td(`${getPastille(project.is_open)} ${project.name}`))
@@ -213,6 +205,14 @@ class KanbearListPanel {
         })]
     }))
     row.appendChild(this.td(`${task.note}`))
+    row.appendChild(this.tdElement({
+      children: [createElement("a", {
+        href: "#",
+        id: commentLinkId,
+        innerHTML: "Comments",
+        classes: ["taskCommentLink"]
+      })]
+    }))
     row.appendChild(this.td(`${dateToString(task.date_moved)}`))
     row.appendChild(this.td(`${getDurationFromNow(task.date_moved, true)}`))
     row.appendChild(this.td(`${dateToString(task.date_due)}`))
@@ -227,14 +227,14 @@ class KanbearListPanel {
     const thead = document.createElement('thead')
     const hrow = document.createElement('tr')
     hrow.innerHTML = `
-        <th>Sel</th>
-        <th>Action</th>
+        <th>SelTask</th>
         <th>Workspace</th>
         <th>Project</th>
         <th>Swimlane</th>
         <th>Column</th>
         <th>Task</th>
         <th>Note</th>
+        <th>Comments</th>
         <th>Since</th>
         <th>Duration</th>
         <th>Due</th>
@@ -255,9 +255,9 @@ class KanbearListPanel {
       let projectM
       // maybe an existing project does not meet criterias (ex : open swimlane)
       try {
-        projectM=await this.getJsonBulkData(p.id)
-      } catch(error) {
-        alert(error)
+        projectM = await this.getJsonBulkData(p.id)
+      } catch (error) {
+        //alert(error)
         continue
       }
       console.log("KanbearListPanel.createTable() <projectM>", projectM)

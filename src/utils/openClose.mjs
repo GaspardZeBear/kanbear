@@ -19,7 +19,7 @@ function getPastille(is_open) {
 
 //--------------------------------------------------------------------------------------------
 function getOpenCloseParmBoolean(kind, openSelected, closeSelected) {
-    //console.log("getOpenCloseParmBoolean() <kind>", kind, openSelected, closeSelected)
+    console.log("getOpenCloseParmBoolean() <kind>", kind, openSelected, closeSelected)
     if (openSelected && closeSelected) {
         //console.log("getOpenCloseParmBoolean() openSelected && closeSelected")
         return(undefined)
@@ -51,8 +51,8 @@ function getOpenCloseQueryParms(kinds=['project', 'swimlane', 'task']) {
 
     let queries = []
     for (let kind of kinds) {
-        const openChecked = document.getElementById(`${kind}Open`).checked
-        const closeChecked = document.getElementById(`${kind}Closed`).checked
+        const openChecked = document.getElementById(`${kind}sOpenedCheckbox`).checked
+        const closeChecked = document.getElementById(`${kind}sClosedCheckbox`).checked
         const parm = getOpenCloseParm(kind, openChecked, closeChecked)
         if (parm.length > 0) queries.push(parm)
     }

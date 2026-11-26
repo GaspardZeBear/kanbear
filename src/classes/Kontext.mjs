@@ -322,7 +322,7 @@ class Kontext {
             sendMessage("Project loaded")
             return (resp)
         } catch (error) {
-            sendErrorMessage(`Could not  load project ${error}`)
+            sendErrorMessage(`${error}`)
             console.log(`Kontext.loadKanbearJsonBulkData() error ${error}`)
             throw new Error(`Kontext.loadKanbearJsonBulkData() error ${error.message}`)
         }

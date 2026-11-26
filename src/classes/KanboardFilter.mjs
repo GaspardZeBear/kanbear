@@ -7,8 +7,16 @@ class KanboardFilter {
     this.tRx = new RegExp(filtersMap.taskFilter)
     this.cRx = new RegExp(filtersMap.columnFilter)
     this.aRx = new RegExp(filtersMap.assigneeFilter)
+    this.OCFilter = filtersMap.OCFilter
     // WIP for assignee !!
     //this.aRx = new RegExp('.*')
+  }
+  
+    
+  //-------------------------------------------------------------------
+  openCloseFilter(kind) {
+    console.log("kanboardFilter() this.OCFilter", kind, this.OCFilter)
+    return(this.OCFilter[kind])
   }
 
   //-------------------------------------------------------------------
@@ -28,8 +36,8 @@ class KanboardFilter {
   }
 
   //-------------------------------------------------------------------
-  keepTask(tTitle) {
-    return ((tTitle ? this.tRx.test(tTitle) : true))
+  keepTask(tName) {
+    return ((tName ? this.tRx.test(tName) : true))
   }
 
   //-------------------------------------------------------------------
