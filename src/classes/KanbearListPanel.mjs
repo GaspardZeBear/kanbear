@@ -156,6 +156,71 @@ class KanbearListPanel {
     return (createElement('td', self))
   }
 
+  //-----------------------------------------------------------------------------------
+  getRow(project, swimlane, task) {
+    let taskEntity = new Task(task)
+    const row = document.createElement('tr');
+    const duration = formatDuration((Date.now() / 1000 - task.date_moved))
+    const checkBoxId = Ref.getRef('checkbox', project.id, swimlane.id, task.id)
+    const commentLinkId = Ref.getRef('commentLink', project.id, swimlane.id, task.id)
+
+    const kanban = createElement('a', {
+      href: "#",
+      textContent: project.name,
+      'onclick': async () => {
+        Kontext.setProject(project.id)
+        const k = await KanbanPanel.builder()
+        k.render()
+      }
+    });
+
+    row.appendChild(this.tdElement({
+      children: [createElement("input", {
+        type: "checkbox",
+        id: checkBoxId,
+        classes: ['taskCheckbox']
+      })]
+    }))
+    row.appendChild(this.tdElement({
+      children: [createElement("a", {
+        href: "#",
+        id: commentLinkId,
+        innerHTML: "Comments",
+        classes: ["taskCommentLink"]
+      })]
+    }))
+    console.log("xxx", project)
+    row.appendChild(this.td(`${getPastille(project.workspace.is_open)} ${project.workspace.name}`))
+    //row.appendChild(this.td(`${getPastille(project.is_open)} ${project.name}`))
+    row.appendChild(this.tdElement({
+      children: [
+        createElement('span', {
+          textContent: `${getPastille(project.is_open)}`
+        }),
+        kanban]
+    }))
+    row.appendChild(this.td(`${getPastille(swimlane.is_open)} SWIM ${swimlane.name}`))
+    row.appendChild(this.tdElement({
+      style: `background-color:${project.columns[task.column_id].color}`,
+      textContent: `COL ${project.columns[task.column_id].name}`
+    }))
+
+    row.appendChild(this.tdElement({
+      style: `background-color:${taskEntity.getTaskDisplayColor(project.columns[task.column_id])}`,
+      children: [
+        createElement('span', {
+          textContent: `${getPastille(task.is_open)} TASK ${task.name}`
+        })]
+    }))
+    row.appendChild(this.td(`${task.note}`))
+    row.appendChild(this.td(`${dateToString(task.date_moved)}`))
+    row.appendChild(this.td(`${getDurationFromNow(task.date_moved, true)}`))
+    row.appendChild(this.td(`${dateToString(task.date_due)}`))
+    row.appendChild(this.td(`${getDurationFromNow(task.date_due, true) ?? ''}`))
+    row.appendChild(this.td(`${project.assignees[task.assignee_id]?.name || ""}`))
+    return (row)
+  }
+
   //-----------------------------------------------------------------
   async createTable() {
     this.table = document.createElement('table')
@@ -182,126 +247,48 @@ class KanbearListPanel {
 
     console.log("KanbearListPanel.createTable() <projects>", this.projects)
     //Object.entries(this.projects).forEach(([projectId, project]) => {
-    const isOpen = document.getElementById("workspacesOpenedCheckbox").checked;
-    const isClosed = document.getElementById("workspacesClosedCheckbox").checked
-    const openClosed = getOpenCloseParmBoolean('workspace', isOpen, isClosed)
-    
+    const isOpenWorkspace = document.getElementById("workspacesOpenedCheckbox").checked;
+    const isClosedWorkspace = document.getElementById("workspacesClosedCheckbox").checked
+    const openClosedWorkspace = getOpenCloseParmBoolean('workspace', isOpenWorkspace, isClosedWorkspace)
 
     for (let p of this.projects) {
-      const projectM = await this.getJsonBulkData(p.id)
+      let projectM
+      // maybe an existing project does not meet criterias (ex : open swimlane)
+      try {
+        projectM=await this.getJsonBulkData(p.id)
+      } catch(error) {
+        alert(error)
+        continue
+      }
       console.log("KanbearListPanel.createTable() <projectM>", projectM)
       if (!projectM[p.id]) { continue }
       const project = projectM[p.id]
       console.log("KanbearListPanel.createTable() <project>", project)
       if (!this.kanboardFilter.keepProject(project.name)) { continue }
       if (!this.kanboardFilter.keepWorkspace(project.workspace.name)) { continue }
- 
-      if ( ! (openClosed === undefined) ) {
+      if (!(openClosedWorkspace === undefined)) {
         //console.log("openClosed",openClosed,project.workspace.is_open)
-        if ( ! ((project.workspace.is_open===1) === openClosed) ) {
+        if (!((project.workspace.is_open === 1) === openClosedWorkspace)) {
           continue
         }
       }
-      
-
 
       Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
         if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
         Object.entries(swimlane.tasks).forEach(([tKey, task]) => {
           if (!this.kanboardFilter.keepTask(task.name)) { return }
-          console.log("KanbearListPanel.createTable() <task>", task)
           if (task.assignee_id) {
             if (!this.kanboardFilter.keepAssignee(project.assignees[task.assignee_id].name)) { return }
           } else {
             if (!this.kanboardFilter.keepAssignee("")) { return }
           }
           if (!this.kanboardFilter.keepColumn(project.columns[task.column_id].name)) { return }
-          let userName = ""
-          if (project.users[task.owner_id] && project.users[task.owner_id].name) {
-            userName = project.users[task.owner_id].name
-          }
-          let taskEntity = new Task(task)
-          const row = document.createElement('tr');
-          const duration = formatDuration((Date.now() / 1000 - task.date_moved))
-          const checkBoxId = Ref.getRef('checkbox', project.id, swimlane.id, task.id)
-          const commentLinkId = Ref.getRef('commentLink', project.id, swimlane.id, task.id)
-
-          const projectKanban = document.createElement('span')
-
-          const kanban = createElement('a', {
-            href: "#",
-            textContent: project.name,
-            'onclick': async () => {
-              Kontext.setProject(project.id)
-              const k = await KanbanPanel.builder()
-              k.render()
-            }
-          });
-
-          row.appendChild(this.tdElement({
-            children: [createElement("input", {
-              type: "checkbox",
-              id: checkBoxId,
-              classes: ['taskCheckbox']
-            })]
-          }))
-          row.appendChild(this.tdElement({
-            children: [createElement("a", {
-              href: "#",
-              id: commentLinkId,
-              innerHTML: "Comments",
-              classes: ["taskCommentLink"]
-            })]
-          }))
-          console.log("xxx",project)
-          row.appendChild(this.td(`${getPastille(project.workspace.is_open)} ${project.workspace.name}`))
-          //row.appendChild(this.td(`${getPastille(project.is_open)} ${project.name}`))
-          row.appendChild(this.tdElement({ children: [
-            createElement('span',{
-              textContent : `${getPastille(project.is_open)}`
-            }),
-              kanban] }))
-              row.appendChild(this.td(`${getPastille(swimlane.is_open)} SWIM ${swimlane.name}`))
-           row.appendChild(this.tdElement({
-            style: `background-color:${project.columns[task.column_id].color}`,
-            textContent: `COL ${project.columns[task.column_id].name}`
-          }))
-          
-          row.appendChild(this.tdElement({
-            style: `background-color:${taskEntity.getTaskDisplayColor(project.columns[task.column_id])}`,
-            children: [
-              createElement('span', {
-                textContent: `${getPastille(task.is_open)} TASK ${task.name}`
-              })]
-          }))
-          row.appendChild(this.td(`${task.note}`))
-          row.appendChild(this.td(`${dateToString(task.date_moved)}`))
-          row.appendChild(this.td(`${getDurationFromNow(task.date_moved, true)}`))
-          row.appendChild(this.td(`${dateToString(task.date_due)}`))
-          row.appendChild(this.td(`${getDurationFromNow(task.date_due, true) ?? ''}`))
-          row.appendChild(this.td(`${project.assignees[task.assignee_id]?.name || ""}`))
-          //`style="background-color:${project.columns[task.column_id].color}">${project.columns[task.column_id].name}`))
-          /*
-          row.innerHTML = `
-              <td><input type="checkbox" name="tasks" id="${checkBoxId}" class="taskCheckbox"/></td>
-              <td><a href="#" class="taskCommentLink" id="${commentLinkId}">c</a></td>
-              <td>${project.workspace.name}</td>
-              <td>${getPastille(project.is_open)} ${project.name} </td>
-              <td>${getPastille(swimlane.is_open)} ${swimlane.name}</td>
-              <td style="background-color:${project.columns[task.column_id].color}">${project.columns[task.column_id].name}</td>
-              <td style="background-color:${taskEntity.getTaskDisplayColor(project.columns[task.column_id])}">${getPastille(task.is_open)} ${task.name}</td>
-              <td>${dateToString(task.date_moved)}</td>
-              <td>${getDurationFromNow(task.date_moved, true)}</td>
-              <td>${dateToString(task.date_due)}</td>
-              <td>${getDurationFromNow(task.date_due, true) ?? ''}</td>
-              <td>${project.assignees[task.assignee_id]?.name || ""}</td>
-            `;
-            */
-          tbody.appendChild(row);
+          tbody.appendChild(this.getRow(project, swimlane, task));
         })
       });
-      this.table.appendChild(tbody)
+      //this.table.appendChild(tbody)
     };
+    this.table.appendChild(tbody)
   }
 
 }

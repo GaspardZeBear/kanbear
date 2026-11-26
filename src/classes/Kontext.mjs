@@ -306,7 +306,12 @@ class Kontext {
             }
             //const resp = await response.json();
             const resp = await response.data;
-            console.log("Kontext.loadKanbearJsonBulkData() from updated loaded", "resp.keys()", Object.keys(resp))
+            //console.log("Kontext.loadKanbearJsonBulkData() from updated loaded", "resp.keys()", Object.keys(resp))
+            console.log("Kontext.loadKanbearJsonBulkData() from updated loaded", "resp", resp)
+            if ( Object.keys(resp).length === 0 ) {
+                //sendMessage("No Project loaded")
+                throw new Error(`No project loaded ${url}`)
+            }
             const key = Object.keys(resp)[0]
             const bulk = resp[key]
             console.log("Kontext.loadKanbearJsonBulkData() from updated loaded", "", bulk)
@@ -314,12 +319,11 @@ class Kontext {
             if (parms.useKontext) {
                 Kontext.jsonBulkData = resp
             }
-
             sendMessage("Project loaded")
             return (resp)
         } catch (error) {
-            sendErrorMessage(`Could not  load project ${Kontext.currentProjectId}`)
-            console.log(`Kontext.loadKanbearJsonBulkData() error ",error`)
+            sendErrorMessage(`Could not  load project ${error}`)
+            console.log(`Kontext.loadKanbearJsonBulkData() error ${error}`)
             throw new Error(`Kontext.loadKanbearJsonBulkData() error ${error.message}`)
         }
     }
