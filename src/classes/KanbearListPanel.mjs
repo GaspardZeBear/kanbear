@@ -9,6 +9,8 @@ import { getPastille, getOpenCloseSymbol, getOpenCloseParmBoolean } from "../uti
 import { SmartTable } from "./SmartTable.mjs";
 import { createElement } from "../utils/createHtml.mjs";
 import { KanbanPanel } from "./KanbanPanel.mjs";
+import { TasksCommentsModal } from "./TasksCommentsModal.mjs";
+import { buildTasksCommentsLink } from "../utils/linkBuilder.mjs";
 
 //import { buildWorkspaceLink } from "../utils/linkBuilder.mjs";
 
@@ -205,6 +207,7 @@ class KanbearListPanel {
         })]
     }))
     row.appendChild(this.td(`${task.note}`))
+    /*
     row.appendChild(this.tdElement({
       children: [createElement("a", {
         href: "#",
@@ -213,8 +216,30 @@ class KanbearListPanel {
         classes: ["taskCommentLink"]
       })]
     }))
+      */
+     /*
+     row.appendChild(this.tdElement({
+      classes : ["add-item-btn"],
+      children: [buildTasksCommentsLink(task.id,"\u{1F4DD}")]
+    }))
+      */
+     row.appendChild(this.tdElement({
+      children: [createElement("button", {
+        id: commentLinkId,
+        classes : ["add-item-btn"],
+        innerHTML: "Comments",
+        onclick : () => {
+          new TasksCommentsModal(task.id)
+        }
+      })]
+    }))
     row.appendChild(this.td(`${dateToString(task.date_moved)}`))
-    row.appendChild(this.td(`${getDurationFromNow(task.date_moved, true)}`))
+    row.appendChild(this.tdElement(createElement('span',{
+      innerHTML : `${getDurationFromNow(task.date_moved, true)}`
+      })
+    ))
+    
+    //row.appendChild(this.td(`${getDurationFromNow(task.date_moved, true)}`))
     row.appendChild(this.td(`${dateToString(task.date_due)}`))
     row.appendChild(this.td(`${getDurationFromNow(task.date_due, true) ?? ''}`))
     row.appendChild(this.td(`${project.assignees[task.assignee_id]?.name || ""}`))
@@ -247,9 +272,12 @@ class KanbearListPanel {
 
     console.log("KanbearListPanel.createTable() <projects>", this.projects)
     //Object.entries(this.projects).forEach(([projectId, project]) => {
-    const isOpenWorkspace = document.getElementById("workspacesOpenedCheckbox").checked;
-    const isClosedWorkspace = document.getElementById("workspacesClosedCheckbox").checked
-    const openClosedWorkspace = getOpenCloseParmBoolean('workspace', isOpenWorkspace, isClosedWorkspace)
+    
+    //  const isOpenWorkspace = document.getElementById("workspacesOpenedCheckbox").checked;
+    // const isClosedWorkspace = document.getElementById("workspacesClosedCheckbox").checked
+    // const openClosedWorkspace = getOpenCloseParmBoolean('workspace', isOpenWorkspace, isClosedWorkspace)
+    const openClosedWorkspace=this.kanboardFilter.openCloseFilter('workspace')
+    
 
     for (let p of this.projects) {
       let projectM

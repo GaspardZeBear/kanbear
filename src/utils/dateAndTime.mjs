@@ -13,7 +13,7 @@ function getDurationFromNow(date, string) {
 
 //-----------------------------------------------------------------------
 
-function formatDuration(seconds) {
+function XformatDuration(seconds) {
   // Vérifier que l'entrée est un nombre valide
   if (typeof seconds !== 'number' || isNaN(seconds) || seconds < 0) {
     return "00:00:00";
@@ -32,8 +32,42 @@ function formatDuration(seconds) {
 
   // Retourner la chaîne formatée
   //return `${formattedHours}<b>h</b>${formattedMinutes}m${formattedSeconds}s`;
-  return `${formattedHours}<b>h</b>${formattedMinutes}`;
+  return `${formattedHours} ${formattedMinutes}`;
 }
+
+function formatDuration(seconds) {
+  const SECONDS_IN_YEAR = 31536000;  // 365 jours
+  const SECONDS_IN_MONTH = 2592000;  // 30 jours
+  const SECONDS_IN_DAY = 86400;
+  const SECONDS_IN_HOUR = 3600;
+  const SECONDS_IN_MINUTE = 60;
+
+  const padZero = (num) => String(num).padStart(2, '0');
+
+  if (seconds > SECONDS_IN_YEAR) {
+    const years = Math.floor(seconds / SECONDS_IN_YEAR);
+    const months = Math.floor((seconds % SECONDS_IN_YEAR) / SECONDS_IN_MONTH);
+    const days = Math.floor((seconds % SECONDS_IN_MONTH) / SECONDS_IN_DAY);
+
+    return `${padZero(years)}Y ${padZero(months)}M ${padZero(days)}d`;
+  }
+
+  if (seconds > SECONDS_IN_DAY) {
+    const days = Math.floor(seconds / SECONDS_IN_DAY);
+    const hours = Math.floor((seconds % SECONDS_IN_DAY) / SECONDS_IN_HOUR);
+    const minutes = Math.floor((seconds % SECONDS_IN_HOUR) / SECONDS_IN_MINUTE);
+
+    return `${padZero(days)}d ${padZero(hours)}h ${padZero(minutes)}m`;
+  }
+
+  const hours = Math.floor(seconds / SECONDS_IN_HOUR);
+  const minutes = Math.floor((seconds % SECONDS_IN_HOUR) / SECONDS_IN_MINUTE);
+  const remainingSeconds = Math.floor(seconds % SECONDS_IN_MINUTE);
+
+  return `${padZero(hours)}h {padZero(minutes)}m ${padZero(remainingSeconds)}`;
+}
+
+
 
 //----------------------------------------------------------------------------
 function dateToString(sinceEpochMs) {

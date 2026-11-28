@@ -138,6 +138,7 @@ Kontext.eventsHub.on("index.mjs", [
     "dialogCanceled",
     "swimlaneCreated", "swimlaneModified", "swimlaneDeleted", "swimlaneDragged",
     "columnCreated", "columnModified", "columnDeleted", "columnDragged",
+    "collapseSwimlanes"
 ],
     async (e) => {
         const kb = await KanbanPanel.builder()

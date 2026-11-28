@@ -33,6 +33,7 @@ class Kontext {
     //static jwtRefreshToken
     static currentUserId
     static currentUserName
+    static collapseSwimlanes
 
     //--------------------------------------------------------------
     static async init() {
@@ -57,6 +58,7 @@ class Kontext {
         Kontext.isAdmin = null
         Kontext.currentUserId = null
         Kontext.currentUserName = null
+        Kontext.collapseSwimlanes = false
         console.log("Kontext init() ends")
     }
 
@@ -99,6 +101,16 @@ class Kontext {
     //--------------------------------------------------------------
     static setPanelClass(panelClass) {
         Kontext.panelClass = panelClass
+    }
+
+    //--------------------------------------------------------------
+    static setCollapseSwimlanes(val) {
+        Kontext.collapseSwimlanes=val
+    }
+
+    //--------------------------------------------------------------
+    static getCollapseSwimlanes() {
+        return(Kontext.collapseSwimlanes)
     }
 
     //--------------------------------------------------------------
@@ -316,6 +328,7 @@ class Kontext {
             const bulk = resp[key]
             console.log("Kontext.loadKanbearJsonBulkData() from updated loaded", "", bulk)
             bulk.jsonColumnsOrder = JSON.parse(bulk.columnsOrder)
+            bulk.jsonSwimlanesOrder = JSON.parse(bulk.swimlanesOrder)
             if (parms.useKontext) {
                 Kontext.jsonBulkData = resp
             }

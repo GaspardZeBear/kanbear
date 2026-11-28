@@ -49,6 +49,12 @@ class Ref {
     }
 
     //-----------------------------------------------------------------------------------------
+    static getSwimlaneIdFromRef(ref) {
+        let [name, projectId, swimlaneId, taskId, columnId] = ref.split(':')
+        return (swimlaneId)
+    }
+
+    //-----------------------------------------------------------------------------------------
     static getIdsFromRef(ref) {
         let [name, projectId, swimlaneId, taskId, columnId] = ref.split(':')
         //console.log("Ref.getIdsFromRef()","ref",ref)

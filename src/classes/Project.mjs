@@ -54,6 +54,46 @@ class Project extends KanbearEntity {
         await this.patch("project", {})
     }
 
+//-------------------------------------------------------------------------
+    async resetSwimlanesOrder(jsonSwimlanesOrder) {
+        console.log("Project$ resetSwimlanesOrder", jsonSwimlanesOrder)
+        //this.data.jsonColumnsOrder=JSON.stringify(jsonColumnsOrder)
+        this.setData("swimlanes_order", JSON.stringify(jsonSwimlanesOrder))
+        this.patch()
+    } 
+    
+    //-------------------------------------------------------------------------
+    async insertSwimlaneAtPos(swimlanesOrder, swimlaneId, pos) {
+        console.log("Project$ insertSwimlaneAtPos()", swimlanesOrder, swimlaneId, pos)
+        let newSwimlanesOrder = JSON.parse(swimlanesOrder)
+        newSwimlanesOrder.splice(pos, 0, swimlaneId)
+        console.log("Project$ insertSwimlaneAtPos() newSwimlanesOrder", newSwimlanesOrder)
+        this.setData("swimlanes_order", JSON.stringify(newSwimlanesOrder))
+        await this.patch("project", {})
+    }
+
+
+    //-------------------------------------------------------------------------
+    async dragSwimlane(swimlanesOrder, swimlaneId, dropSwId) {
+
+        //let newColumnsOrder = JSON.parse(columnsOrder, (value) => parseInt(value))
+        let newSwimlanesOrder = JSON.parse(swimlanesOrder)
+        console.log("Project$ dragSwimlane()", swimlanesOrder, swimlaneId, typeof(swimlaneId), dropSwId, typeof(dropSwId))
+        console.log("Project$ dragSwimlane()", newSwimlanesOrder, swimlaneId, dropSwId)
+        for (let i=0;i<newSwimlanesOrder.length;i++) {
+            console.log("Project dragSwimlane()",newSwimlanesOrder[i],typeof(newSwimlanesOrder[i]))
+        }
+        let swIdx = newSwimlanesOrder.indexOf(swimlaneId)
+        let insertIdx = newSwimlanesOrder.indexOf(dropSwId)
+        console.log("Project$ dragSwimlane()", "swIdx", swIdx, "insertIdx", insertIdx)
+        let newSwIdx=newSwimlanesOrder[swIdx]
+        newSwimlanesOrder.splice(swIdx, 1)
+        newSwimlanesOrder.splice(insertIdx, 0, newSwIdx)
+        console.log("Project$ dragSwimlane() JSON",JSON.stringify(newSwimlanesOrder))
+        this.setData("swimlanes_order", JSON.stringify(newSwimlanesOrder))
+        await this.patch("project", {})
+    }
+
 
 }
 

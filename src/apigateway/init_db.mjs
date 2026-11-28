@@ -41,6 +41,7 @@ import bcrypt from 'bcrypt'
       description TEXT,
       workspace_id INTEGER NOT NULL DEFAULT 0,
       columns_order TEXT DEFAULT '[]',
+      swimlanes_order TEXT DEFAULT '[]',
       is_open INTEGER DEFAULT 1,
       FOREIGN KEY(workspace_id) REFERENCES workspaces(id) ON DELETE SET DEFAULT,
       UNIQUE (name, workspace_id)

@@ -16,6 +16,29 @@ import { createElement } from "./createHtml.mjs"
 import { getOpenCloseClass, getOpenCloseSymbol } from "./openClose.mjs"
 
 //------------------------------------------------------------------------
+function buildCollapseSwimlanesButton(projectId) {
+  //let projectId = this.project.id
+  const action=Kontext.getCollapseSwimlanes() ? 'collapseSwimlanes':'expandSwimlanes'
+  let collapseButton = createElement('button', {
+    id: "collapseSwimlanesButton",
+    innerHTML: action,
+  })
+  //collapseButton.setAttribute("id", "collapseSwimlanesButton")
+  //collapseButton.setAttribute("title", "Collapse swimlanes")
+  //collapseButton.setAttribute("data-project-id", projectId)
+  //collapseButton.innerHTML = "Collapse"
+  let collapseFn = function (ev) {
+    console.log("collapseButton event Listener fired collapse",Kontext.getCollapseSwimlanes())
+    ev.stopPropagation();
+    Kontext.setCollapseSwimlanes( !Kontext.getCollapseSwimlanes())
+    sendEvent("collapseSwimlanes", { detail: Kontext.getCollapseSwimlanes() })
+  }
+  //removeEventListener("click", addSwimlaneFn)
+  collapseButton.addEventListener('click', collapseFn, { once: true });
+  return (collapseButton)
+}
+
+//------------------------------------------------------------------------
 function buildAddSwimlaneButton(projectId) {
   //let projectId = this.project.id
   const addSwimlaneButton = document.createElement('button')
@@ -283,6 +306,7 @@ function buildAddOpenCloseButton(id, value, callback) {
 export {
   buildAddColumnButton,
   buildAddSwimlaneButton,
+  buildCollapseSwimlanesButton,
   buildAddTaskButton,
   buildDeleteEntityButton,
   buildAddProjectButton,

@@ -39,7 +39,7 @@ class Columns {
     }
 
     //------------------------------------------------------------------------
-    buildOrderedList() {
+    XbuildOrderedList() {
         try {
             const firstColumn = this.columns.find(col => col.prevColumnId === 0);
             if (!firstColumn) {
@@ -74,7 +74,7 @@ class Columns {
     }
 
     //------------------------------------------------------------------------
-    chainFromScratch(index) {
+    XchainFromScratch(index) {
         let columns = Kontext.getJsonBulkData()[projectId].columns
         console.log("Columns.chainFromScratch()", "ordered", columns)
         let prevIndex = 0
@@ -120,7 +120,7 @@ class Columns {
 
     //------------------------------------------------------------------------
     // insert column columnId after column dropColumId
-    async drag(columnId, dropColumnId) {
+    async Xdrag(columnId, dropColumnId) {
         if (columnId == dropColumnId) {
             console.log("Drop", "col and dropCol identical")
             return

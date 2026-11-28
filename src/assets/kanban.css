@@ -25,13 +25,8 @@ h1 {
 }
 
 .kanban-swimlane-header {
-    xpadding: 5px 5px;
-    xmargin: 10px;
     width:200px;
-    xmargin : 10px;
-    xpadding: 10px;
     vertical-align:middle; 
-    xflex-direction: column;
     border-style: solid;
     border-color: rgb(217, 21, 194);
     border-width: 3px;
@@ -87,7 +82,7 @@ h1 {
 .kanban-items {
     background-color: lightgray;
     flex-grow: 1;
-    min-height: 150px;
+    xmin-height: 150px;
     padding: 5px;
     overflow-y: auto;
 }

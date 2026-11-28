@@ -12,7 +12,7 @@ import { TaskDialog } from "./TaskDialog.mjs"
 import { buildProjectLink, buildSwimlaneLink, buildColumnLink } from "../utils/linkBuilder.mjs"
 import { getFiltersMap } from "../utils/filters.mjs"
 import { Ref } from "./Ref.mjs"
-import { buildAddColumnButton, buildAddTaskButton, buildAddSwimlaneButton, buildDeleteEntityButton } from "../utils/buttonBuilder.mjs"
+import { buildAddColumnButton, buildCollapseSwimlanesButton,buildAddTaskButton, buildAddSwimlaneButton, buildDeleteEntityButton } from "../utils/buttonBuilder.mjs"
 import { getOpenCloseSymbol } from "../utils/openClose.mjs"
 import { KanbearEntityFactory } from "./KanbearEntityFactory.mjs"
 import { sendEvent } from "../utils/sendEvent.mjs"
@@ -35,9 +35,11 @@ class KanbanPanel {
       this.projectEntity = new Project(this.project)
     }
     this.orderedColumnsList = []
+    this.orderedSwimlanesList = []
 
-    console.log("KanbanPanel.constructor", "columnsOrder", this.project.jsonColumnsOrder)
+    console.log("KanbanPanel.constructor", "project", this.project)
     let columnAlready = new Set()
+    let swimlaneAlready = new Set()
 
     for (let colId of this.project.jsonColumnsOrder) {
       // maybe column was deleted
@@ -45,6 +47,14 @@ class KanbanPanel {
       if (this.project.columns[colId] && !columnAlready.has(colId)) {
         this.orderedColumnsList.push(this.project.columns[colId])
         columnAlready.add(colId)
+      }
+    }
+    for (let swId of this.project.jsonSwimlanesOrder) {
+      // maybe column was deleted
+      // or col twice 
+      if (this.project.swimlanes[swId] && !swimlaneAlready.has(swId)) {
+        this.orderedSwimlanesList.push(this.project.swimlanes[swId])
+        swimlaneAlready.add(swId)
       }
     }
 
@@ -55,6 +65,11 @@ class KanbanPanel {
       // It's a promise, but don't worry about it
       new Project(this.project).resetColumnsOrder(Array.from(columnAlready))
     }
+    if (this.project.jsonSwimlanesOrder.length !== swimlaneAlready.size) {
+      console.log("KanbanPanel unconsistent swimlane Order", this.project.jsonSwimlanesOrder, " should be ", Array.from(swimlaneAlready))
+      // It's a promise, but don't worry about it
+      new Project(this.project).resetSwimlanesOrder(Array.from(swimlaneAlready))
+    }
 
     //--------------------------------------------------------------
     //console.log("KanbanPanel.constructor() orderedColumnsList", this.orderedColumnsList)
@@ -63,6 +78,7 @@ class KanbanPanel {
     this.buttons = {}
     this.table = undefined
     this.kColumns = {}
+    this.kSwimlanes = {}
   }
 
   //------------------------------------------------------------------------
@@ -91,13 +107,14 @@ class KanbanPanel {
         getIdentityDiv(this.projectEntity, new ProjectDialog()),
         buildAddSwimlaneButton(this.project.id),
         buildAddColumnButton(this.project.id),
+        buildCollapseSwimlanesButton(this.project.id),
         createElement("span", {
           innerHTML: " filtered by..."
         }),
         buildDeleteEntityButton(this.projectEntity, mustDisable(DELETE), async () => {
-          let cleanor=new KanbearProjectCleanor()
-          let deleted=await cleanor.cleanup()
-          return(deleted)
+          let cleanor = new KanbearProjectCleanor()
+          let deleted = await cleanor.cleanup()
+          return (deleted)
         })
       ]
     })
@@ -111,13 +128,27 @@ class KanbanPanel {
     //this.buildkColumnsQuerySelectors(this.projects[0])
     this.setDropZonesForTasks(this.project.id)
     this.setDropZonesForColumnsHeaders(this.project.id)
+    this.setDropZonesForSwimlanesHeaders(this.project.id)
+    
     this.loadTasksForProject(this.project)
   }
 
   //-----------------------------------------------------------------------------
   getSwimlaneHeaderDiv(swimlaneEntity) {
+    const dragId = Ref.getRef('drag', project.id, swimlaneEntity.getId(), "_", "_")
+
     return (createElement('div', {
-      classes: ["kanban-item-topline","kanban-swimlane-header"],
+      classes: ["kanban-item-topline", "kanban-swimlane-header"],
+      "data-swimlane-id": swimlaneEntity.getId(),
+      "draggable": true,
+      "ondragstart": (ev) => {
+        ev.dataTransfer.setData('dragId', dragId);
+        ev.target.classList.add("dragging")
+        ev.dataTransfer.effectAllowed = 'move';
+      },
+      "ondragend": (ev) => {
+        ev.target.classList.remove("dragging")
+      },
       children: [
         getIdentityDiv(swimlaneEntity, new SwimlaneDialog()),
         buildDeleteEntityButton(swimlaneEntity, mustDisable(DELETE), null)]
@@ -143,8 +174,10 @@ class KanbanPanel {
       "data-projectid": project.id
     })
 
-    //console.log("KanbanPanel.buildKanbanDivsForProject() ", orderedColumnsList)
-    Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
+    console.log("KanbanPanel.buildKanbanDivsForProject() this.orderedSwimlanesList ", this.orderedSwimlanesList)
+    console.log("KanbanPanel.buildKanbanDivsForProject() project.swimlanes ", project.swimlanes)
+    //Object.entries(project.swimlanes).forEach(([sKey, swimlane]) => {
+    this.orderedSwimlanesList.forEach((swimlane) => {
       let swimlaneEntity = new Swimlane(swimlane)
       if (!this.kanboardFilter.keepSwimlane(swimlane.name)) { return }
       const kSwimlaneDiv = createElement('div', {
@@ -175,7 +208,7 @@ class KanbanPanel {
 
         console.log("KanbanPanel buildKanbanDivsForProject() columnEntity", columnEntity)
         const kColumnHeaderDiv = createElement('div', {
-          classes: ["kanban-column-header","kanban-item-topline"],
+          classes: ["kanban-column-header", "kanban-item-topline"],
           "data-swimlane-id": swimlane.id,
           "draggable": true,
           "data-column-id": col.id,
@@ -346,6 +379,52 @@ class KanbanPanel {
 
   };
 
+  //----------------------------------------------------------------------------------------
+  setDropZonesForSwimlanesHeaders(project) {
+    //console.log("setDropZones")
+    this.kSwimlanes[project.id] = {}
+    const ch = `.kanban-swimlane-header`
+    //console.log("ch", ch)
+    const zones = document.querySelectorAll(ch)
+    //console.log(zones)
+    zones.forEach((zone) => {
+      //console.log("listener", zone)
+      project = this.project
+      zone.addEventListener('dragover', (ev) => {
+        //console.log("dragover starting for column ", zone)
+        //console.log("dragover", zone)
+        ev.preventDefault()
+        zone.classList.add("drag-over")
+      })
+      zone.addEventListener('dragleave', (ev) => {
+        zone.classList.remove("drag-over")
+      })
+      zone.addEventListener('drop', async (ev) => {
+        console.log("Drop starting for column ", zone)
+        ev.preventDefault()
+        zone.classList.remove("drag-over")
+        const data = ev.dataTransfer.getData("dragId");
+        const target = ev.target
+        console.log("Drop data", data)
+        let swimlaneId = Ref.getSwimlaneIdFromRef(data)
+
+        //let columnId = target.getAttribute("data-column-id")
+        let dropSwimlaneDiv = ev.target.closest(".kanban-swimlane")
+        let dropSwimlaneId = dropSwimlaneDiv.getAttribute("data-swimlane-id")
+
+        let projectEntity = await KanbearEntityFactory.generate('project')
+        projectEntity.setId(project.id)
+        const project0 = await projectEntity.get('project', {})
+        console.log("KanbanPanel.drag", project0, projectEntity)
+        await projectEntity.dragSwimlane(project0.swimlanes_order, parseInt(swimlaneId), parseInt(dropSwimlaneId))
+        sendEvent(`swimlaneDragged`, { swimlaneId: swimlaneId })
+        //await new Columns({columnsList:this.orderedColumnsList}).drag(columnId,dropColumnId)
+      })
+    })
+
+  };
+
+
   //------------------------------------------------------------------------
   // Searh if task in swimlane/column
   // status is column 
@@ -367,11 +446,16 @@ class KanbanPanel {
             if (task.column_id == columnId) {
               if (!this.kanboardFilter.keepTask(task.name)) { return }
               const newTask = new Task(task)
-              container.appendChild(newTask.createKanbanTaskElement());
-              //document.getElementById(project.id).addEventListener("taskModified", (ev) => {
-              document.addEventListener("taskModified", (ev) => {
-                console.log("taskModified listener <ev>", ev)
-              })
+              const taskDiv = newTask.createKanbanTaskElement()
+              console.log("loadTasksForProject Kontext.getCollapseSwimlanes()",Kontext.getCollapseSwimlanes())
+              if (Kontext.getCollapseSwimlanes()) {
+                container.appendChild(taskDiv);
+                //document.getElementById(project.id).addEventListener("taskModified", (ev) => {
+                document.addEventListener("taskModified", (ev) => {
+                  console.log("taskModified listener <ev>", ev)
+                })
+              }
+
               //Mettre à jour le compteur
               this.updateCounter(columnId, kSwimlaneId);
             }
